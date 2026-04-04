@@ -53,7 +53,7 @@ class AuthController extends Controller
             return redirect()->route('school.dashboard', ['tenant' => $tenant]);
         }
 
-        return redirect()->route('auth.login', ['tenant' => $request->route('tenant')])
+        return redirect()->route('school.login', ['tenant' => $request->route('tenant')])
             ->withErrors(['email' => 'Invalid credentials']);
     }
 
