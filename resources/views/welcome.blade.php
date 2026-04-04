@@ -1,0 +1,1 @@
+<h1>Hello, this is school erp software</h1>

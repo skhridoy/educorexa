@@ -1,0 +1,21 @@
+name: Deploy EduCorexa
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }} # আপনার ডোমেইন educorexa.com
+          username: ${{ secrets.USERNAME }} # আপনার সিপ্যানেল ইউজার educorex
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd public_html
+            git pull origin main
+            sh deploy.sh
