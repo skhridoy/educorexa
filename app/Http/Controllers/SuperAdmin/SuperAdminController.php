@@ -174,7 +174,7 @@ class SuperAdminController extends Controller
                 }
 
                 // ৫. গুরুত্বপূর্ণ: রোলে পারমিশন সিঙ্ক করা
-                $role->syncPermissions($permissions);
+                $role->givePermissionTo($permissions);
 
                 // ৬. ইউজারকে রোল দেওয়া (যদি ইতিমধ্যে না থাকে)
                 if (!$adminUser->hasRole('school_admin')) {
@@ -186,8 +186,7 @@ class SuperAdminController extends Controller
             }
 
         });
-        return view('super.schools.create', compact('mainDomain'))
-            ->with('success', 'School registered successfully! This school is approved automatically.');
+        return redirect()->route('super.schools.all')->with('success', 'School registered successfully!');
     }
     public function Profile() {
         $id = Auth::user()->id;
@@ -196,39 +195,62 @@ class SuperAdminController extends Controller
         return view('super.profile.profile', compact('profileData'));
     }
 
-    public function ProfileStore(Request $request) {
+    public function ProfileStore(Request $request)
+    {
         $id = Auth::user()->id;
         $data = User::find($id);
+        
+        // টেক্সট ফিল্ড আপডেট
         $data->name = $request->name;
         $data->email = $request->email;
         $data->phone = $request->phone;
 
-        if ($request->file('photo')) {
-            $file = $request->file('photo');
-            
-            // ১. আগের ফটো ডিলিট করার আগে চেক করা যে সেটি ডাটাবেসে আছে কি না
-            if ($data->photo && file_exists(public_path('upload/super_images/' . $data->photo))) {
-                @unlink(public_path('upload/super_images/' . $data->photo));
+        // যদি ক্রপ করা ইমেজ ডাটা থাকে (Base64)
+        if ($request->cropped_image) {
+            $image_data = $request->cropped_image;
+
+            // Base64 স্ট্র্রিং থেকে ডাটা আলাদা করা
+            // ডাটা ফরম্যাট থাকে: data:image/webp;base64,UklGRmY...
+            list($type, $image_data) = explode(';', $image_data);
+            list(, $image_data)      = explode(',', $image_data);
+            $image_data = base64_decode($image_data);
+
+            // ইউনিক ফাইলের নাম তৈরি (WebP ফরম্যাটে)
+            $imageName = 'super_admin_' . time() . '.webp';
+            $directory = public_path('uploads/super_admin/');
+
+            // ডিরেক্টরি না থাকলে তৈরি করুন
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
             }
 
-            // ২. ফাইলের নামে স্পেস থাকলে সেটি রিমুভ করা (এরর এড়াতে)
-            $filename = date('YmdHi') . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-
-            // ৩. ফোল্ডারটি না থাকলে অটোমেটিক তৈরি করার লজিক
-            $destPath = public_path('upload/super_images');
-            if (!file_exists($destPath)) {
-                mkdir($destPath, 0777, true);
+            // পুরনো ছবি ডিলিট করা (যদি থাকে এবং ডিফল্ট ইমেজ না হয়)
+            if (!empty($data->photo) && file_exists($directory . $data->photo)) {
+                @unlink($directory . $data->photo);
             }
 
-            // ৪. ফাইল মুভ করা
-            $file->move($destPath, $filename);
-            
-            // ৫. ডাটাবেস অবজেক্টে সেভ করা
-            $data->photo = $filename; 
+            // ফাইলটি সার্ভারে সেভ করা
+            file_put_contents($directory . $imageName, $image_data);
+
+            // ডাটাবেসে সেভ করার জন্য নাম সেট করা
+            $data->photo = $imageName;
         }
 
         $data->save();
+
+        // সাকসেস মেসেজসহ ব্যাক করা
+        $notification = array(
+            'message' => 'Profile Updated Successfully',
+            'alert-type' => 'success'
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function markNotificationsRead() 
+    {
+        auth()->user()->unreadNotifications->markAsRead();
         
-        return redirect()->back()->with('success', 'Profile Updated Successfully');
+        return response()->json(['status' => 'success']);
     }
 }

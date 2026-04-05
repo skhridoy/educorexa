@@ -41,16 +41,6 @@ use App\Http\Controllers\SuperAdmin\{
     SettingController
 };
 
-Route::get('/setup-link', function () {
-    $targetFolder = base_path().'/storage/app/public';
-    $linkFolder = $_SERVER['DOCUMENT_ROOT'].'/storage';
-    if (!file_exists($linkFolder)) {
-        symlink($targetFolder, $linkFolder);
-        return "Symlink Created!";
-    }
-    return "Symlink already exists.";
-});
-
 Route::domain(config('app.main_domain'))->group(function () {
 
     /*
@@ -92,16 +82,16 @@ Route::domain(config('app.main_domain'))->group(function () {
 
                     Route::prefix('schools')->name('schools.')->group(function () {
 
-                        Route::get('/create', [SuperAdminController::class, 'createSchool'])->name('create');
-                        Route::post('/create', [SuperAdminController::class, 'schoolStore'])->name('store');
+                        Route::get('/create', 'createSchool')->name('create');
+                        Route::post('/create', 'schoolStore')->name('store');
                         Route::get('/pending', 'pending')->name('pending');
-                        Route::put('/{school}/approve', [SuperAdminController::class, 'approve'])->name('approve');
-                        Route::get('/rejected', [SuperAdminController::class, 'rejected'])->name('rejected');
-                        Route::post('/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('reject');
-                        Route::delete('/{school}', [SuperAdminController::class, 'destroy'])->name('destroy');
+                        Route::put('/{school}/approve', 'approve')->name('approve');
+                        Route::get('/rejected', 'rejected')->name('rejected');
+                        Route::delete('/{school}/reject', 'rejectSchool')->name('reject');
+                        Route::delete('/{school}', 'destroy')->name('destroy');
                         Route::get('/all-school', 'allSchools')->name('all');
                     });
-
+                    Route::get('/notifications/read-all', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.readAll');
                     Route::resource('roles', RoleController::class);
                     Route::resource('permissions', PermissionController::class);
                 });

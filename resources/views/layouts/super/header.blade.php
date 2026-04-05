@@ -24,28 +24,38 @@
                 <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i data-feather="bell"></i>
-                    <div class="indicator">
-                        <div class="circle"></div>
-                    </div>
+                    {{-- যদি কোনো আন-রিড নোটিফিকেশন থাকে তবেই সংখ্যা দেখাবে --}}
+                    @if(Auth::user()->unreadNotifications->count() > 0)
+                        <div class="indicator">
+                            <span class="badge bg-danger rounded-circle" style="font-size: 10px; position: absolute; top: 10px; right: 5px;">
+                                {{ Auth::user()->unreadNotifications->count() }}
+                            </span>
+                        </div>
+                    @endif
                 </a>
+                
                 <div class="dropdown-menu p-0" aria-labelledby="notificationDropdown">
-                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
-                        <p>New Notifications</p>
-                        <a href="javascript:;" class="text-muted">Clear all</a>
+                    <div class="px-1 py-2 d-flex align-items-center justify-content-between border-bottom">
+                        <p class="px-2">{{ Auth::user()->unreadNotifications->count() }} Notifications</p>
+                        <a href="{{ route('super.notifications.readAll') }}" class="text-muted mx-2">Read All</a>
                     </div>
-                    <div class="p-1">
-                        <a href="javascript:;" class="dropdown-item d-flex align-items-center py-2">
-                            <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                <i class="icon-sm text-white" data-feather="home"></i>
+                    
+                    <div class="p-1" style="max-height: 300px; overflow-y: auto;">
+                        @forelse(Auth::user()->unreadNotifications as $notification)
+                            <a href="{{ $notification->data['link'] }}" class="dropdown-item d-flex align-items-center py-2">
+                                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
+                                    <i class="icon-sm text-white" data-feather="{{ $notification->data['icon'] }}"></i>
+                                </div>
+                                <div class="flex-grow-1 me-2">
+                                    <p class="text-dark">{{ $notification->data['message'] }}</p>
+                                    <p class="tx-12 text-muted">{{ $notification->created_at->diffForHumans() }}</p>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="dropdown-item d-flex align-items-center py-2">
+                                <p class="text-muted text-center w-100">No new notifications</p>
                             </div>
-                            <div class="flex-grow-1 me-2">
-                                <p>New School Registered</p>
-                                <p class="tx-12 text-muted">Just now</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
-                        <a href="javascript:;">View all</a>
+                        @endforelse
                     </div>
                 </div>
             </li>
@@ -54,14 +64,14 @@
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img class="wd-30 ht-30 rounded-circle" 
-                         src="{{ Auth::user()->photo ? asset('upload/super_images/'.Auth::user()->photo) : asset('assets/images/profile.webp') }}"
+                         src="{{ Auth::user()->photo ? asset('uploads/super_admin/'.Auth::user()->photo) : asset('assets/images/profile.webp') }}"
                          alt="profile">
                 </a>
                 <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
                     <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
                         <div class="mb-3">
                             <img class="wd-80 ht-80 rounded-circle" 
-                                 src="{{ Auth::user()->photo ? asset('upload/super_images/'.Auth::user()->photo) : asset('assets/images/profile.webp') }}" 
+                                 src="{{ Auth::user()->photo ? asset('uploads/super_admin/'.Auth::user()->photo) : asset('assets/images/profile.webp') }}" 
                                  alt="">
                         </div>
                         <div class="text-center">

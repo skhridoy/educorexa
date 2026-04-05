@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Notifications\SuperAdminNotification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\School;
-use App\Models\User;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,10 +25,13 @@ class SchoolRegisterController extends Controller
             'admin_password'  => 'required|min:8',
         ]);
 
-        DB::transaction(function () use ($request) {
+        // আমরা ডাটাগুলো ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবলে রাখছি
+        $newSchool = null;
+
+        DB::transaction(function () use ($request, &$newSchool) {
 
             // 1️⃣ Create School
-            $school = School::create([
+            $newSchool = School::create([
                 'name'   => $request->school_name,
                 'slug'   => strtolower($request->slug),
                 'email'  => $request->admin_email,
@@ -40,16 +44,37 @@ class SchoolRegisterController extends Controller
                 'email'     => $request->admin_email,
                 'password'  => Hash::make($request->admin_password),
                 'role'      => 'school_admin',
-                'school_id' => $school->id, // relation correct
+                'school_id' => $newSchool->id,
             ]);
+
             if (method_exists($user, 'assignRole')) {
                 $user->assignRole('school_admin');
             }
         });
 
+        $superAdmin = User::where('role', 'super_admin')->first();
+
+        if (!$superAdmin) {
+            
+            // যদি এটি দেখায়, তবে বুঝবেন আপনার ডাটাবেসে 'super_admin' রোলে কেউ নেই।
+            dd("Error: সুপার এডমিন ইউজার পাওয়া যায় নাই! আপনার ডাটাবেসের role কলাম চেক করুন।"); 
+        }
+
+        try {
+            $details = [
+                'message' => "নতুন স্কুল রেজিস্ট্রেশন: {$newSchool->name} (ইমেইল: {$newSchool->email}) - কিন্তু সুপার এডমিন ইউজার পাওয়া যায় নাই!",
+                'icon'    => 'alert-triangle',
+                'link'    => route('super.schools.pending'),
+            ];
+            $superAdmin->notify(new SuperAdminNotification($details));
+            dd("সফল! এবার আপনার notifications টেবিল চেক করুন।");
+        } catch (\Exception $e) {
+            dd("এরর হয়েছে: " . $e->getMessage());
+        }
+
         return redirect()
             ->back()
-            ->with('success', 'School registered successfull! Waiting for approval. You will receive an email once your school is approved.');
+            ->with('success', 'School registered successful! Waiting for approval. You will receive an email once your school is approved.');
     }
 
     // ১. এডিট পেজ দেখানোর জন্য (GET Method)

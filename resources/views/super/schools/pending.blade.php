@@ -64,10 +64,9 @@
                                                 </form>
 
                                                 {{-- Reject Button --}}
-                                                <form action="{{ route('super.schools.reject', $school->id) }}" method="POST" 
-                                                      onsubmit="return confirm('আপনি কি নিশ্চিত যে এই রিকোয়েস্টটি ডিলিট করতে চান?')">
+                                                <form action="{{ route('super.schools.reject', $school->id) }}" method="POST" >
                                                     @csrf
-                                                    @method('DELETE') <button class="btn btn-inverse-danger btn-icon btn-sm" title="Reject">
+                                                    @method('DELETE') <button class="btn btn-inverse-danger btn-icon btn-sm" type="button" onclick="confirmDelete(this)">
                                                         <i data-feather="x"></i>
                                                     </button>
                                                 </form>
@@ -91,4 +90,45 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('customJs')
+<script>
+    function confirmDelete(button) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to reject this school?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, reject it!',
+            cancelButtonText: 'Cancel',
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                button.closest('form').submit();
+
+            }
+        })
+    }
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ $errors->first() }}', // প্রথম এরর মেসেজটি দেখাবে
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+    @if(session('success'))
+    Swal.fire({
+        icon: '{{ session('type', 'success') }}',
+        title: 'Success!',
+        text: '{{ session('success') }}',
+        timer: 1500,
+        showConfirmButton: false
+    });
+    @endif
+</script>
 @endsection

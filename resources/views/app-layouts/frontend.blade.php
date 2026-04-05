@@ -13,7 +13,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link href="{{ asset('frontend/lib/animate/animate.min.css') }}" rel="stylesheet">
     <link href="{{ asset('frontend/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
     <link href="{{ asset('frontend/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -39,6 +39,7 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="{{ asset('frontend/lib/wow/wow.min.js') }}"></script>
     <script src="{{ asset('frontend/lib/easing/easing.min.js') }}"></script>
     <script src="{{ asset('frontend/lib/waypoints/waypoints.min.js') }}"></script>

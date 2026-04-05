@@ -31,7 +31,12 @@
                                         <td>{{ $school->id }}</td>
                                         <td>{{ $school->name }}</td>
                                         <td>{{ $school->email ?? 'No Admin Email' }}</td>
-                                        <td>{{ $school->slug }}.{{ $mainDomain }}</td>
+                                        <td>
+                                            <a href="http://{{ $school->slug }}.schoolerp.test" target="_blank" class="text-primary text-decoration-none">
+                                                <i data-feather="external-link" class="icon-sm me-1"></i>
+                                                {{ $school->slug }}.{{ $mainDomain }}
+                                            </a>
+                                        </td>
                                         <td>
                                             @if($school->is_active)
                                                 <span class="badge bg-success">Active</span>
@@ -78,4 +83,45 @@
         </div>
     </div>
 
+@endsection
+
+@section('customJs')
+<script>
+    function confirmDelete(button) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete this school?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                button.closest('form').submit();
+
+            }
+        })
+    }
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ $errors->first() }}', // প্রথম এরর মেসেজটি দেখাবে
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+    @if(session('success'))
+    Swal.fire({
+        icon: '{{ session('type', 'success') }}',
+        title: 'Success!',
+        text: '{{ session('success') }}',
+        timer: 1500,
+        showConfirmButton: false
+    });
+    @endif
+</script>
 @endsection

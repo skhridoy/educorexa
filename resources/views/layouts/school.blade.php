@@ -153,6 +153,8 @@
 	<script src="{{ asset('../assets/js/template.js') }}"></script>
 	<!-- endinject -->
 
+    <!-- Cropper Js  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 	<!-- Custom js for this page -->
 	<script src="{{ asset('../assets/js/dashboard-dark.js') }}"></script>
 	<script src="https://unpkg.com/feather-icons"></script>

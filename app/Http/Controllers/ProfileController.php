@@ -19,6 +19,7 @@ public function updateProfile(Request $request, $tenant)
     $user = auth()->user();
     $tenantSlug = $tenant;
 
+    // রোল অনুযায়ী ফোল্ডার পাথ নির্ধারণ
     $roleFolder = 'students'; 
     if($user->role == 'school_admin') {
         $roleFolder = 'admins';
@@ -28,10 +29,7 @@ public function updateProfile(Request $request, $tenant)
 
     $request->validate([
         'name' => 'required|string|max:255',
-        
         'phone' => 'nullable|string|max:15',
-        'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:512',
-        // নতুন ভ্যালিডেশন
         'facebook' => 'nullable|url',
         'twitter' => 'nullable|url',
         'linkedin' => 'nullable|url',
@@ -41,7 +39,7 @@ public function updateProfile(Request $request, $tenant)
     $user->name = $request->name;
     $user->phone = $request->phone;
 
-    // যদি অ্যাডমিন হয়, তবে সরাসরি ইউজার টেবিলে সোশ্যাল লিঙ্ক সেভ হবে
+    // স্কুল অ্যাডমিন হলে সরাসরি ইউজার টেবিলে সেভ
     if ($user->role == 'school_admin') {
         $user->facebook = $request->facebook;
         $user->twitter = $request->twitter;
@@ -49,7 +47,7 @@ public function updateProfile(Request $request, $tenant)
         $user->insta = $request->instagram;
     }
 
-    // যদি টিচার হয়, তবে টিচার টেবিলে সোশ্যাল লিঙ্ক এবং পদবী সেভ হবে
+    // টিচার হলে টিচার টেবিলে আপডেট
     if ($user->role == 'teacher' && $user->teacher) {
         $user->teacher->update([
             'designation' => $request->designation,
@@ -60,32 +58,45 @@ public function updateProfile(Request $request, $tenant)
         ]);
     }
 
-    if ($request->hasFile('photo')) {
-        $folder = public_path("uploads/schools/{$tenantSlug}/{$roleFolder}");
+    // ইমেজ প্রসেসিং (Cropped WebP Base64)
+    if ($request->cropped_image) {
+        $folderPath = public_path("uploads/schools/{$tenantSlug}/{$roleFolder}/");
         
-        if (!file_exists($folder)) {
-            mkdir($folder, 0755, true);
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0755, true);
         }
 
-        $oldPhoto = $user->photo; 
+        // পুরনো ফটো ডিলিট করার লজিক
+        $oldPhoto = null;
         if($user->role == 'teacher' && $user->teacher) {
-            $oldPhoto = $user->teacher->photo; // আপনার টিচার টেবিলে কলাম নাম 'image' হলে
+            $oldPhoto = $user->teacher->photo;
         } elseif($user->role == 'student' && $user->student) {
             $oldPhoto = $user->student->photo;
+        } else {
+            $oldPhoto = $user->photo;
         }
 
         if ($oldPhoto && file_exists(public_path($oldPhoto))) {
-            unlink(public_path($oldPhoto));
+            @unlink(public_path($oldPhoto));
         }
 
-        $file = $request->file('photo');
-        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $file->move($folder, $filename);
+        // Base64 ডাটা ডিকোড করা
+        $image_parts = explode(";base64,", $request->cropped_image);
+        $image_base64 = base64_decode($image_parts[1]);
         
+        // ফাইল নেম তৈরি
+        $filename = time() . '_' . uniqid() . '.webp';
+        $fullPath = $folderPath . $filename;
+        
+        // ফাইল সেভ করা
+        file_put_contents($fullPath, $image_base64);
+        
+        // ডাটাবেস পাথ (রিলেটিভ পাথ)
         $photoPath = "uploads/schools/{$tenantSlug}/{$roleFolder}/" . $filename;
 
+        // রোল অনুযায়ী সঠিক টেবিলে পাথ আপডেট করা
         if ($user->role == 'teacher' && $user->teacher) {
-            $user->teacher->update(['photo' => $photoPath]); // টিচার টেবিলের ইমেজ কলাম আপডেট
+            $user->teacher->update(['photo' => $photoPath]);
         } elseif ($user->role == 'student' && $user->student) {
             $user->student->update(['photo' => $photoPath]);
         } else {
