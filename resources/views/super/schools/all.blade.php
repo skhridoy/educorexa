@@ -32,7 +32,7 @@
                                         <td>{{ $school->name }}</td>
                                         <td>{{ $school->email ?? 'No Admin Email' }}</td>
                                         <td>
-                                            <a href="http://{{ $school->slug }}.schoolerp.test" target="_blank" class="text-primary text-decoration-none">
+                                            <a href="http://{{ $school->slug }}.{{ $mainDomain }}" target="_blank" class="text-primary text-decoration-none">
                                                 <i data-feather="external-link" class="icon-sm me-1"></i>
                                                 {{ $school->slug }}.{{ $mainDomain }}
                                             </a>
