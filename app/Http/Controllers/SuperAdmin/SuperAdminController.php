@@ -1,13 +1,13 @@
 <?php 
 
-namespace App\Http\Controllers\superadmin;
+namespace App\Http\Controllers\SuperAdmin;
+use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use App\Models\School;
 use Illuminate\Http\Request;
