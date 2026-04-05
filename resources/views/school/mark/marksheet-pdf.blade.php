@@ -2,13 +2,6 @@
     try {
 @endphp
 
-{{-- আপনার পুরো ব্লেড কোড এখানে থাকবে --}}
-
-@php
-    } catch (\Exception $e) {
-        dd($e->getMessage(), $e->getLine());
-    }
-@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,7 +196,7 @@
     <table class="footer-sig">
         <tr>
             <td>
-                <span style="font-style: italic;">Kajol Ray</span><br>
+                <span style="font-style: italic;"></span><br>
                 <span class="sig-line">Class Teacher's Signature</span>
             </td>
             <td>
@@ -220,3 +213,9 @@
 
 </body>
 </html>
+
+@php
+    } catch (\Exception $e) {
+        dd($e->getMessage(), $e->getLine());
+    }
+@endphp

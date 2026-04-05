@@ -192,20 +192,38 @@
             let input = $(this);
             let marks = input.val();
             let studentId = input.data('student');
-            let fullMarks = input.data('fullmarks');
+            
+            // parseFloat ব্যবহার করা ভালো যাতে দশমিক মার্কস হ্যান্ডেল করা যায়
+            let fullMarks = parseFloat(input.data('fullmarks')); 
 
-            // ড্রপডাউন থেকে না নিয়ে হিডেন ইনপুট থেকে নিন যা পেজ লোড হওয়ার সময় সেট হয়েছে
+            // ১. ফুল মার্কস লিমিট চেক
+            if (marks > fullMarks) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Limit Exceeded',
+                    text: `Marks cannot be more than ${fullMarks}`,
+                    confirmButtonColor: '#3085d6',
+                });
+                marks = fullMarks;    
+            }
+
             let classId = $('#hidden_class_id').val();
             let examId = $('#hidden_exam_id').val();
             let subjectId = $('#hidden_subject_id').val();
-
             let status = input.closest('tr').find('.status-input').val();
 
-            // গ্রেড ক্যালকুলেশন
+            // ২. রিয়েল-টাইম গ্রেড আপডেট
             let grade = calculateGrade(marks, fullMarks);
-            input.closest('tr').find('.grade-box').text(grade);
+            
+            // আপনার নতুন কার্ড ডিজাইনে আইডি হলো #grade-ID
+            // যদি আইডি কাজ না করে তবে .grade-box ক্লাসটি ব্যবহার করবে (নিরাপত্তার জন্য দুইটাই রাখা হলো)
+            if($(`#grade-${studentId}`).length) {
+                $(`#grade-${studentId}`).text(grade);
+            } else {
+                input.closest('tr').find('.grade-box').text(grade);
+            }
 
-            // AJAX কল
+            // ৩. AJAX অটো-সেভ
             $.ajax({
                 url: "{{ route('marks.autosave', auth()->user()->school->slug) }}",
                 type: "POST",
@@ -219,15 +237,29 @@
                     _token: "{{ csrf_token() }}"
                 },
                 success: function (response) {
-                    console.log("Saved successfully");
-                    // আপনি চাইলে এখানে ছোট একটা টিক চিহ্ন দেখাতে পারেন
+                    // ইনপুট বক্সের বর্ডার গ্রিন করা
+                    input.addClass('is-valid').removeClass('is-invalid');
+                    
+                    // ছোট টোস্ট সাকসেস মেসেজ
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true,
+                    });
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Mark saved'
+                    });
                 },
                 error: function (err) {
+                    input.addClass('is-invalid').removeClass('is-valid');
                     console.error("Error saving mark");
                 }
             });
         });
-
         // STATUS CHANGE (ABSENT SYSTEM)
 
         $('.status-input').change(function () {

@@ -24,6 +24,9 @@ class SubjectController extends Controller
             'code' => 'required|string|max:50|unique:subjects,code,NULL,id,school_id,' . auth()->user()->school_id,
             'type' => 'required|in:theory,practical',
             'description' => 'nullable|string',
+            [
+                'code.unique' => 'এই কোডটি আপনার বিষয়ে ইতিমধ্যে তৈরি করা আছে!',
+            ]
         ]);
 
         Subject::create([
