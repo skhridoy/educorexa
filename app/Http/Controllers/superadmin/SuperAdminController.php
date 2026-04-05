@@ -17,7 +17,7 @@ class SuperAdminController extends Controller
 {
     public function dashboard()
     {
-        $mainDomain = config('app.main_domain', 'schoolerp.test');
+        $mainDomain = parse_url(config('app.url'), PHP_URL_HOST) ?? 'educorexa.com';
         $pendingSchools = School::where('status', 'pending')->count();
         $totalSchools = School::count();
         $recentSchools = School::latest()->take(5)->get();
