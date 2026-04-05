@@ -134,10 +134,15 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
-       $validated = $request->validate([
+        // ১. আলাদা আসা দিন, মাস, বছরকে এক করে 'date_of_birth' তৈরি করা
+        if ($request->filled(['dob_year', 'dob_month', 'dob_day'])) {
+            $dob = $request->dob_year . '-' . $request->dob_month . '-' . $request->dob_day;
+            $request->merge(['date_of_birth' => $dob]);
+        }
+        $validated = $request->validate([
             'name'         => 'required|string|max:255',
             'subject_id'   => 'required|exists:subjects,id',
-            'date_of_birth' => 'nullable|date',
+            'date_of_birth' => 'nullable|date|before:today',
             'gender'        => 'nullable|in:male,female,other',
             'email'         => 'nullable|email|max:255|unique:teachers,email',
             'phone'         => 'nullable|string|max:20',

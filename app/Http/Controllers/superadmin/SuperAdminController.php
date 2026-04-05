@@ -17,10 +17,11 @@ class SuperAdminController extends Controller
 {
     public function dashboard()
     {
+        $mainDomain = config('app.main_domain', 'schoolerp.test');
         $pendingSchools = School::where('status', 'pending')->count();
         $totalSchools = School::count();
         $recentSchools = School::latest()->take(5)->get();
-        return view('super.dashboard', compact('pendingSchools', 'totalSchools', 'recentSchools'));
+        return view('super.dashboard', compact('pendingSchools', 'totalSchools', 'recentSchools', 'mainDomain'));
     }
 
     // ২. পেন্ডিং স্কুল লিস্ট
@@ -51,7 +52,7 @@ class SuperAdminController extends Controller
 
             // ৪. কনফিগ থেকে পারমিশন ডাটাবেজে নেওয়া
             $permissions = array_keys(config('permissions.permissions'));
-            
+
             foreach ($permissions as $permissionName) {
                 Permission::firstOrCreate([
                     'name' => $permissionName, 
@@ -59,10 +60,11 @@ class SuperAdminController extends Controller
                 ]);
             }
 
-            // ৫. গুরুত্বপূর্ণ: রোলে পারমিশন সিঙ্ক করা
-            $role->syncPermissions($permissions);
+            // ৫. সংশোধন: syncPermissions এর বদলে missing permissions গুলো যোগ করা
+            // এতে আগের পারমিশন রিসেট হবে না
+            $role->givePermissionTo($permissions); 
 
-            // ৬. ইউজারকে রোল দেওয়া (যদি ইতিমধ্যে না থাকে)
+            // ৬. ইউজারকে রোল দেওয়া
             if (!$adminUser->hasRole('school_admin')) {
                 $adminUser->assignRole($role);
             }

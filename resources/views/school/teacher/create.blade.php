@@ -102,11 +102,36 @@
                                 </div>
                           
                                 <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="date_of_birth" class="form-label">Date of Birth <span class="text-warning mx-1">*</span></label>
-                                        <input type="date" name="date_of_birth" class="form-control"
-                                            id="date_of_birth" placeholder="Enter teacher's date of birth">
+                                    <label class="form-label">Date of Birth <span class="text-warning mx-1">*</span></label>
+                                    <div class="input-group">
+                                        <select name="dob_day" class="form-select" required>
+                                            <option value="">Day</option>
+                                            @for ($i = 1; $i <= 31; $i++)
+                                                <option value="{{ sprintf('%02d', $i) }}">{{ $i }}</option>
+                                            @endfor
+                                        </select>
+
+                                        <select name="dob_month" class="form-select" required>
+                                            <option value="">Month</option>
+                                            @foreach(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $index => $month)
+                                                <option value="{{ sprintf('%02d', $index + 1) }}">{{ $month }}</option>
+                                            @endforeach
+                                        </select>
+
+                                        <select name="dob_year" class="form-select" required>
+                                            <option value="">Year</option>
+                                            @php
+                                                $currentYear = date('Y');
+                                                $startYear = $currentYear - 80; // ৮০ বছর আগের পর্যন্ত
+                                            @endphp
+                                            @for ($i = $currentYear; $i >= $startYear; $i--)
+                                                <option value="{{ $i }}">{{ $i }}</option>
+                                            @endfor
+                                        </select>
                                     </div>
+                                    @error('date_of_birth')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 <div class="col-lg-3 my-2">
                                     <div class="form-group">

@@ -38,7 +38,7 @@
                                         @if($teacher->photo)
                                             <img style="border: 2px solid gold" src="{{ asset($teacher->photo) }}" alt="image" >
                                         @else
-                                            <img style="border: 2px solid gold" src="{{ asset('admin/dist/img/avatar3.png') }}" alt="image" >
+                                            <img style="border: 2px solid gold" src="{{ asset('assets/images/profile.webp') }}" alt="image" >
                                         @endif 
                                     </td>
                                     <td>{{ $teacher->teacher_id }}</td>

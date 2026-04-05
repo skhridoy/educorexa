@@ -17,10 +17,13 @@ class ClassesController extends Controller
     {
         $schoolId = auth()->user()->school_id;
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:classes,name,NULL,id,school_id,' . $schoolId,
             'code' => 'required|string|max:50|unique:classes,code,NULL,id,school_id,' . $schoolId,
             'description' => 'nullable|string',
-        ]);
+            [
+                'name.unique' => 'এই ক্লাস এবং কোডটি আপনার স্কুলে ইতিমধ্যে তৈরি করা আছে!',
+            ]
+        ]); 
 
         Classes::create([
             'school_id' => auth()->user()->school_id,
@@ -68,6 +71,10 @@ class ClassesController extends Controller
             'name' => $request->name,
             'code' => $request->code,
             'description' => $request->description,
+            
+            [
+                'name.unique' => 'এই ক্লাসটি আপনার স্কুলে ইতিমধ্যে তৈরি করা আছে!',
+            ]
         ]);
 
         return redirect()->back()->with(['success' => 'Class updated successfully', 'type' => 'success']);

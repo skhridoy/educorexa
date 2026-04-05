@@ -65,33 +65,41 @@
 
 @section('customJs')
 <script>
-function confirmDelete(button) {
+    function confirmDelete(button) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete this section?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                button.closest('form').submit();
+
+            }
+        })
+    }
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ $errors->first() }}', // প্রথম এরর মেসেজটি দেখাবে
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+    @if(session('success'))
     Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to delete this section?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel',
-
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Submit the form
-            button.closest('form').submit();
-
-        }
-    })
-}
-@if(session('success'))
-Swal.fire({
-    icon: '{{ session('type', 'success') }}',
-    title: 'Success!',
-    text: '{{ session('success') }}',
-    timer: 1500,
-    showConfirmButton: false
-});
-@endif
+        icon: '{{ session('type', 'success') }}',
+        title: 'Success!',
+        text: '{{ session('success') }}',
+        timer: 1500,
+        showConfirmButton: false
+    });
+    @endif
 </script>
 @endsection

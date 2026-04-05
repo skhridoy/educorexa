@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Validation\Rule;
 use App\Models\Section;
 use Illuminate\Http\Request;
 
@@ -21,14 +21,26 @@ class SectionController extends Controller
      */
     public function store(Request $request)
     {
+        $schoolId = auth()->user()->school_id;
         $request->validate([
-            'name' => 'required|string|max:255',
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+                
+                Rule::unique('sections')->where(function ($query) use ($schoolId) {
+                    return $query->where('school_id', $schoolId);
+                }),
+            ],
             'description' => 'nullable|string',
+        ],[
+            
+            'name.unique' => 'এই সেকশনটি আপনার স্কুলে ইতিমধ্যে তৈরি করা আছে!',
         ]);
 
         Section::create([
-            'school_id' => auth()->user()->school_id,
-            'name' => $request->name,
+            'school_id'   => $schoolId,
+            'name'        => $request->name,
             'description' => $request->description,
         ]);
 
@@ -70,6 +82,10 @@ class SectionController extends Controller
         $section->update([
             'name' => $request->name,
             'description' => $request->description,
+
+            [
+                'name.unique' => 'এই সেকশনটি আপনার স্কুলে ইতিমধ্যে তৈরি করা আছে!',
+            ]
         ]);
 
         return redirect()->back()->with(['success' => 'Section updated successfully', 'type' => 'success']);

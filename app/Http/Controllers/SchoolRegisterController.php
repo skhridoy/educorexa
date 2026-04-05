@@ -42,7 +42,9 @@ class SchoolRegisterController extends Controller
                 'role'      => 'school_admin',
                 'school_id' => $school->id, // relation correct
             ]);
-            $user->assignRole('school_admin');
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('school_admin');
+            }
         });
 
         return redirect()

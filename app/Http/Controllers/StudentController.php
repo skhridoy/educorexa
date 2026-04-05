@@ -115,6 +115,11 @@ class StudentController extends Controller
 
     public function store($tenant, Request $request)
     {
+        // ১. আলাদা আসা দিন, মাস, বছরকে এক করে 'date_of_birth' তৈরি করা
+        if ($request->filled(['dob_year', 'dob_month', 'dob_day'])) {
+            $dob = $request->dob_year . '-' . $request->dob_month . '-' . $request->dob_day;
+            $request->merge(['date_of_birth' => $dob]);
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -123,7 +128,7 @@ class StudentController extends Controller
             'section_id' => 'required|exists:sections,id',
             'father_nid' => 'nullable|string|max:255',
             'student_birth_nid' => 'nullable|string|max:255',
-            'date_of_birth' => 'nullable|date',
+            'date_of_birth' => 'nullable|date|before:today',
             'gender' => 'nullable|in:male,female,other',
             'phone' => 'nullable|string|max:11',
             'admission_date' => 'required|date',

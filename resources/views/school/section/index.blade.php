@@ -44,12 +44,14 @@
                                         <td>{{ $section->name }}</td>
                                         <td>{{ $section->description }}</td>
                                         <td>
-                                            <a href="{{ route('sections.edit', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" class="btn btn-sm btn-warning badge">Edit</a>
+                                            <a href="{{ route('sections.edit', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" class="btn btn-sm btn-warning badge"><i
+                                                        class="fa-regular fa-pen-to-square"></i></a>
 
                                             <form action="{{ route('sections.destroy', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger badge">Delete</button>
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger badge"><i
+                                                        class="fa-regular fa-trash-can"></i></button>
                                             </form>
                                         </td>
                                     </tr>
@@ -66,33 +68,41 @@
 
 @section('customJs')
 <script>
-function confirmDelete(button) {
+    function confirmDelete(button) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete this section?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit the form
+                button.closest('form').submit();
+
+            }
+        })
+    }
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ $errors->first() }}', // প্রথম এরর মেসেজটি দেখাবে
+            confirmButtonColor: '#3085d6',
+        });
+    @endif
+    @if(session('success'))
     Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to delete this section?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel',
-
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Submit the form
-            button.closest('form').submit();
-
-        }
-    })
-}
-@if(session('success'))
-Swal.fire({
-    icon: '{{ session('type', 'success') }}',
-    title: 'Success!',
-    text: '{{ session('success') }}',
-    timer: 1500,
-    showConfirmButton: false
-});
-@endif
+        icon: '{{ session('type', 'success') }}',
+        title: 'Success!',
+        text: '{{ session('success') }}',
+        timer: 1500,
+        showConfirmButton: false
+    });
+    @endif
 </script>
 @endsection

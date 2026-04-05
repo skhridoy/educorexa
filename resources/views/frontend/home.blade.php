@@ -62,12 +62,14 @@
                 <img class="img-fluid rounded shadow" src="{{ asset('frontend/img/about.jpg') }}" alt="About EduOrbit">
             </div>
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
-                <h1 class="mb-4">কেন EduOrbit ব্যবহার করবেন?</h1>
-                <p class="mb-4">EduOrbit শুধুমাত্র একটি সফটওয়্যার নয়, এটি আপনার শিক্ষা প্রতিষ্ঠানের জন্য একটি পূর্ণাঙ্গ সমাধান। আমরা ফোকাস করি আপনার প্রতিষ্ঠানের সহজ অপারেশন এবং স্বচ্ছতার ওপর।</p>
+                <h1 class="mb-4">কেন {{ config('app.name') }} ব্যবহার করবেন?</h1>
+                <p class="mb-4">{{ config('app.name') }} শুধুমাত্র একটি সফটওয়্যার নয়, এটি আপনার শিক্ষা প্রতিষ্ঠানের জন্য একটি পূর্ণাঙ্গ সমাধান। আমরা ফোকাস করি আপনার প্রতিষ্ঠানের সহজ অপারেশন এবং স্বচ্ছতার ওপর।</p>
                 <ul class="list-unstyled mb-4">
                     <li><i class="fa fa-check text-primary me-3"></i>User Friendly Dashboard</li>
                     <li><i class="fa fa-check text-primary me-3"></i>Real-time Data Sync</li>
                     <li><i class="fa fa-check text-primary me-3"></i>Secure Multi-school SaaS Architecture</li>
+                    <li><i class="fa fa-check text-primary me-3"></i>Automatic Id Generation</li>
+                    <li><i class="fa fa-check text-primary me-3"></i>24/7 Customer Support</li>
                 </ul>
                 <a class="btn btn-primary rounded-pill py-3 px-5" href="{{ route('school.register.form') }}">Get Started</a>
             </div>

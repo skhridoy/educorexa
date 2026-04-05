@@ -126,6 +126,7 @@
             document.documentElement.classList.add("dark-mode");
         }
     </script>
+    @yield('customCSS')
 </head>
 <body class="{{ (isset($_COOKIE['theme']) && $_COOKIE['theme'] == 'dark') ? 'dark-mode' : '' }}">
     

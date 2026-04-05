@@ -128,7 +128,7 @@
                                             <td>{{ $school->name }}</td>
                                             <td>
                                                 <span class="badge bg-light-primary text-primary">
-                                                    {{ $school->slug }}.{{ $mainDomain ?? config('app.url') }}
+                                                    {{ $school->slug }}.{{ $mainDomain }}
                                                 </span>
                                             </td>
                                             <td>{{ $school->email ?? 'No Admin Email' }}</td>
