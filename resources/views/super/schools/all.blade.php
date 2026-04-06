@@ -67,7 +67,7 @@
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm badge">
+                                                    <button type="button" class="btn btn-danger btn-sm badge" onclick="confirmDelete(this)">
                                                         Delete
                                                     </button>
                                                 </form>
