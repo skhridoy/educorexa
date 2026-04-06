@@ -67,7 +67,6 @@ class SchoolRegisterController extends Controller
                 'link'    => route('super.schools.pending'),
             ];
             $superAdmin->notify(new SuperAdminNotification($details));
-            dd("সফল! এবার আপনার notifications টেবিল চেক করুন।");
         } catch (\Exception $e) {
             dd("এরর হয়েছে: " . $e->getMessage());
         }

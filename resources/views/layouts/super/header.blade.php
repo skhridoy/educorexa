@@ -1,3 +1,6 @@
+@php
+    $unreadNotifications = auth()->user()->unreadNotifications;
+@endphp
 <nav class="navbar">
     <a href="#" class="sidebar-toggler">
         <i data-feather="menu"></i>
@@ -34,29 +37,36 @@
                     @endif
                 </a>
                 
-                <div class="dropdown-menu p-0" aria-labelledby="notificationDropdown">
-                    <div class="px-1 py-2 d-flex align-items-center justify-content-between border-bottom">
-                        <p class="px-2">{{ Auth::user()->unreadNotifications->count() }} Notifications</p>
-                        <a href="{{ route('super.notifications.readAll') }}" class="text-muted mx-2">Read All</a>
-                    </div>
+                <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in notification-dropdown" 
+                    aria-labelledby="notificationDropdown" 
+                    style="width: 350px; max-width: 90vw; padding: 0; border: none;">
                     
-                    <div class="p-1" style="max-height: 300px; overflow-y: auto;">
-                        @forelse(Auth::user()->unreadNotifications as $notification)
-                            <a href="{{ $notification->data['link'] }}" class="dropdown-item d-flex align-items-center py-2">
-                                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
-                                    <i class="icon-sm text-white" data-feather="{{ $notification->data['icon'] }}"></i>
+                    <div class="dropdown-header bg-primary text-white d-flex justify-content-between align-items-center p-3">
+                        <h6 class="m-0 font-weight-bold">Notifications</h6>
+                        <a href="#" class="text-white-50 small" id="mark-all-read">Read All</a>
+                    </div>
+
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        @forelse($unreadNotifications as $notification)
+                            <a class="dropdown-item d-flex align-items-start p-3 border-bottom" href="{{ $notification->data['link'] ?? '#' }}">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-primary text-white p-2 rounded-circle">
+                                        <i class="fas fa-{{ $notification->data['icon'] ?? 'bell' }}"></i>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 me-2">
-                                    <p class="text-dark">{{ $notification->data['message'] }}</p>
-                                    <p class="tx-12 text-muted">{{ $notification->created_at->diffForHumans() }}</p>
+                                <div class="notification-content">
+                                    <div class="small text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
+                                    <span class="font-weight-bold text-dark d-block text-truncate-2">
+                                        {{ $notification->data['message'] }}
+                                    </span>
                                 </div>
                             </a>
                         @empty
-                            <div class="dropdown-item d-flex align-items-center py-2">
-                                <p class="text-muted text-center w-100">No new notifications</p>
-                            </div>
+                            <div class="p-4 text-center text-gray-500">No new notifications</div>
                         @endforelse
                     </div>
+
+                    <a class="dropdown-item text-center small text-gray-500 p-2" href="#">Show All Alerts</a>
                 </div>
             </li>
 
