@@ -1,6 +1,4 @@
-@php
-    $unreadNotifications = auth()->user()->unreadNotifications;
-@endphp
+
 <nav class="navbar">
     <a href="#" class="sidebar-toggler">
         <i data-feather="menu"></i>
@@ -23,15 +21,21 @@
                 </a>
             </li>
 
+            @php
+                // ইউজার লগইন থাকলে নোটিফিকেশন আনবে, নাহলে খালি কালেকশন দেবে যেন এরর না আসে
+                $unreadNotifications = auth()->check() ? auth()->user()->unreadNotifications : collect();
+            @endphp
+
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="position: relative;">
                     <i data-feather="bell"></i>
+                    
                     {{-- যদি কোনো আন-রিড নোটিফিকেশন থাকে তবেই সংখ্যা দেখাবে --}}
-                    @if(Auth::user()->unreadNotifications->count() > 0)
+                    @if($unreadNotifications->count() > 0)
                         <div class="indicator">
-                            <span class="badge bg-danger rounded-circle" style="font-size: 10px; position: absolute; top: 10px; right: 5px;">
-                                {{ Auth::user()->unreadNotifications->count() }}
+                            <span class="badge bg-danger rounded-circle" style="font-size: 10px; position: absolute; top: 0px; right: -5px;">
+                                {{ $unreadNotifications->count() }}
                             </span>
                         </div>
                     @endif
@@ -43,26 +47,26 @@
                     
                     <div class="dropdown-header bg-primary text-white d-flex justify-content-between align-items-center p-3">
                         <h6 class="m-0 font-weight-bold">Notifications</h6>
-                        <a href="#" class="text-white-50 small" id="mark-all-read">Read All</a>
+                        <a href="javascript:void(0)" class="text-white-50 small" id="mark-all-read">Read All</a>
                     </div>
 
                     <div style="max-height: 400px; overflow-y: auto;">
                         @forelse($unreadNotifications as $notification)
                             <a class="dropdown-item d-flex align-items-start p-3 border-bottom" href="{{ $notification->data['link'] ?? '#' }}">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-primary text-white p-2 rounded-circle">
+                                <div class="me-3"> {{-- Bootstrap 5 এ mr-3 এর বদলে me-3 ব্যবহার হয় --}}
+                                    <div class="icon-circle bg-primary text-white p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                                         <i class="fas fa-{{ $notification->data['icon'] ?? 'bell' }}"></i>
                                     </div>
                                 </div>
-                                <div class="notification-content">
-                                    <div class="small text-gray-500">{{ $notification->created_at->diffForHumans() }}</div>
-                                    <span class="font-weight-bold text-dark d-block text-truncate-2">
+                                <div class="notification-content w-100">
+                                    <span class="font-weight-bold text-dark d-block" style="font-size: 14px; line-height: 1.4; white-space: normal;">
                                         {{ $notification->data['message'] }}
                                     </span>
+                                    <div class="small text-muted mt-1">{{ $notification->created_at->diffForHumans() }}</div>
                                 </div>
                             </a>
                         @empty
-                            <div class="p-4 text-center text-gray-500">No new notifications</div>
+                            <div class="p-4 text-center text-muted">No new notifications</div>
                         @endforelse
                     </div>
 

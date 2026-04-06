@@ -62,13 +62,13 @@ class SchoolRegisterController extends Controller
 
         try {
             $details = [
-                'message' => "নতুন স্কুল রেজিস্ট্রেশন: {$newSchool->name} (ইমেইল: {$newSchool->email}) - কিন্তু সুপার এডমিন ইউজার পাওয়া যায় নাই!",
-                'icon'    => 'alert-triangle',
+                'message' => "New School Registered: {$newSchool->name}",
+                'icon'    => 'home',
                 'link'    => route('super.schools.pending'),
             ];
             $superAdmin->notify(new SuperAdminNotification($details));
         } catch (\Exception $e) {
-            dd("এরর হয়েছে: " . $e->getMessage());
+            dd("Error: " . $e->getMessage());
         }
 
         return redirect()

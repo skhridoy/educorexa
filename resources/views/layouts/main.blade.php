@@ -59,7 +59,77 @@
 				right: 10px !important;
 			}
 		}
+		@media (max-width: 767.98px) {
+    /* মেইন কন্টেইনার অ্যাডজাস্টমেন্ট: হালকা ধূসর ব্যাকগ্রাউন্ড */
+    .table-responsive-custom {
+        padding: 15px !important;
+        background-color: #f6f8fb;
+        border: none !important;
+    }
 
+    /* ডিফল্ট টেবিল ব্যাকগ্রাউন্ড রিমুভ */
+    .custom-mobile-table {
+        background-color: transparent !important;
+    }
+
+    /* কার্ড ডিজাইন: আরও ছোট উইডথ এবং মাঝখানে এলাইনমেন্ট */
+    .custom-mobile-table tbody tr {
+        display: block;
+        width: 100%; /* কার্ড স্ক্রিনের ৯০% জায়গা নিবে */
+        margin: 0 auto 15px auto; /* কার্ড মাঝখানে থাকবে এবং নিচে গ্যাপ থাকবে */
+        background: #ffffff;
+        border: none !important;
+        border-radius: 5px; /* হালকা রাউন্ডেড কর্নার */
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04); /* একদম হালকা প্রিমিয়াম শ্যাডো */
+        overflow: hidden;
+    }
+
+    /* প্রতিটি সেলের ডিজাইন */
+    .custom-mobile-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px !important; /* আরও কম এবং ক্লিন প্যাডিং */
+        border-bottom: 1px solid #f1f4f8 !important;
+    }
+
+    /* লেবেল ডিজাইন: আরও ছোট ও হালকা */
+    .custom-mobile-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 10px; /* ফন্ট ছোট করা হয়েছে */
+        letter-spacing: 0.5px;
+        color: #adb5bd; /* হালকা কালার যেন লেবেল কম গুরুত্ব পায় */
+        flex: 0 0 35%; /* লেবেল এরিয়া ফিক্সড */
+        text-align: left;
+    }
+
+    /* ডেটা ডিজাইন: ফন্ট অ্যাডজাস্টমেন্ট */
+    .school-name-text {
+        font-size: 12px; /* ফন্ট কিছুটা ছোট */
+        font-weight: 700;
+        color: #6b6868;
+        word-break: break-word; /* নাম বড় হলে নিচে নামবে */
+        text-align: right;
+        width: 100%;
+    }
+
+    /* ইমেইল ও ডোমেইন ছোট ফন্টে */
+    .custom-mobile-table tbody td:nth-child(2),
+    .custom-mobile-table tbody td:nth-child(3),
+    .custom-mobile-table tbody td:nth-child(4) {
+        font-size: 13px;
+        color: #666;
+    }
+
+    /* অ্যাকশন বাটন এরিয়া */
+    .custom-mobile-table tbody td:last-child {
+        background: #fdfdfd;
+        padding: 10px 15px !important;
+        border-bottom: none !important;
+    }
+}
 	</style>
 	@yield('customCSS')
 </head>

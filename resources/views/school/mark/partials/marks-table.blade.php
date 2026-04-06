@@ -11,21 +11,21 @@
                 <table class="table table-hover align-middle">
                     <thead class="bg-light">
                         <tr>
-                            <th class="fw-bold border-0" style="width: 15%;">Student ID</th>
-                            <th>Roll</th>
-                            <th class="fw-bold border-0">Student Name</th>
+                            <th class="fw-bold border-0 d-none d-sm-table-cell" style="width: 15%;">Student ID</th>
+                            <th style="width: 10%;">Roll</th>
+                            <th class="fw-bold border-0 d-none d-sm-table-cell">Student Name</th>
                             <th class="fw-bold border-0" style="width: 20%;">Obtained Marks</th>
-                            <th class="fw-bold border-0 text-center" style="width: 10%;">Grade</th>
-                            <th class="fw-bold border-0 text-center" style="width: 15%;">Attendance</th>
+                            <th class="fw-bold border-0 text-center d-none d-sm-table-cell" style="width: 10%;">Grade</th>
+                            <th class="fw-bold border-0 text-center" style="width: 15%;">Atten</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         @foreach($students as $student)
                             <tr>
-                                <td class="text-muted fw-medium">{{ $student->student_id }}</td>
+                                <td class="text-muted fw-medium  d-none d-sm-table-cell">{{ $student->student_id }}</td>
                                 <td>{{ $student->roll }}</td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     <div class="d-flex align-items-center">
                                         <div class="fw-bold text-dark">{{ $student->name }}</div>
                                     </div>
@@ -46,7 +46,7 @@
                                     </div>
                                 </td>
 
-                                <td class="text-center">
+                                <td class="text-center  d-none d-sm-table-cell">
                                     <span class="badge bg-soft-info p-2 grade-box fs-6 fw-bolder text-primary shadow-sm border border-info" 
                                           id="grade-{{ $student->id }}" 
                                           style="min-width: 45px; display: inline-block;">
@@ -57,8 +57,8 @@
                                 <td>
                                     <select class="form-select form-select-sm status-input border-{{ ($marksWithGrade[$student->id]['status'] ?? 'present') == 'absent' ? 'danger' : 'success' }}" 
                                             data-student="{{ $student->id }}">
-                                        <option value="present" {{ ($marksWithGrade[$student->id]['status'] ?? '') == 'present' ? 'selected' : '' }}>Present</option>
-                                        <option value="absent" {{ ($marksWithGrade[$student->id]['status'] ?? '') == 'absent' ? 'selected' : '' }}>Absent</option>
+                                        <option value="present" {{ ($marksWithGrade[$student->id]['status'] ?? '') == 'present' ? 'selected' : '' }}>Pre</option>
+                                        <option value="absent" {{ ($marksWithGrade[$student->id]['status'] ?? '') == 'absent' ? 'selected' : '' }}>Abs</option>
                                     </select>
                                 </td>
                             </tr>
