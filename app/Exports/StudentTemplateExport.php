@@ -13,8 +13,10 @@ class StudentTemplateExport implements WithHeadings, ShouldAutoSize
     public function headings(): array
     {
         return [
-            'name', 
-            'class', 
+            'class_code', 
+            'sub_category_id',
+            'name',
+            'roll',
             'section', 
             'fathers_name', 
             'mothers_name', 
@@ -23,10 +25,7 @@ class StudentTemplateExport implements WithHeadings, ShouldAutoSize
             'gender', 
             'religion', 
             'blood_group', 
-            'address', 
-            'admission_date', 
-            'previous_school', 
-            'password'
+            'address',
         ];
     }
 }
