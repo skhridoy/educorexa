@@ -113,8 +113,9 @@
 <script>
     // এডিট মোড চালু করার ফাংশন
     function editClass(id, name, code, categoryId, description) {
-        let tenantSlug = "{{ auth()->user()->school->slug }}";
-        let updateUrl = `/${tenantSlug}/classes/${id}`;
+        // শুরুতে স্ল্যাশ এবং টেন্যান্ট স্লাগ দেওয়ার দরকার নেই যদি আপনি সাবডোমেইনে থাকেন
+        // শুধু 'classes/id' দিলেই হবে
+        let updateUrl = "classes/" + id; 
 
         // ফর্মের টেক্সট এবং টাইটেল পরিবর্তন
         $('#form-title').text('Update Class: ' + name);
@@ -131,14 +132,13 @@
         $('#school_category_id').val(categoryId);
         $('#description').val(description);
 
-        // স্ক্রল করে ফর্মে নিয়ে যাওয়া (অপশনাল)
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ফর্ম রিসেট বা ক্যানসেল করার ফাংশন
     function resetForm() {
-        let tenantSlug = "{{ auth()->user()->school->slug }}";
-        let storeUrl = `/${tenantSlug}/classes`;
+        // স্টোর করার জন্য শুধু 'classes' দিলেই হবে
+        let storeUrl = "classes";
 
         $('#form-title').text('Create Class');
         $('#submit-btn').text('Create Class');

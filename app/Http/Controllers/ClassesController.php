@@ -42,14 +42,6 @@ class ClassesController extends Controller
         return redirect()->back()->with(['success' => 'Class created successfully', 'type' => 'success']);
     }
 
-    /**
-     * যেহেতু আপনি একই পেজে এডিট করছেন, এই মেথডটি এখন আর প্রয়োজন নেই। 
-     * তবে আপনি চাইলে এটাকে API হিসেবে রাখতে পারেন যদি ভবিষ্যতে JSON ডাটা লাগে।
-     */
-    public function edit($tenant, $classId)
-    {
-        // এটি এখন বাদ দিতে পারেন কারণ ব্লেডে আপনি সরাসরি JS দিয়ে ডাটা পাস করছেন।
-    }
 
     public function update(Request $request, $tenant, $classId)
     {
