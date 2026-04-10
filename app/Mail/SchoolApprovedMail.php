@@ -4,6 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class SchoolApprovedMail extends Mailable
@@ -16,13 +18,30 @@ class SchoolApprovedMail extends Mailable
     public function __construct($school)
     {
         $this->school = $school;
-        // সাব-ডোমেইন বা স্ল্যাগ অনুযায়ী ইউআরএল
+        // আপনার কনফিগারেশন অনুযায়ী URL তৈরি
         $this->loginUrl = "http://" . $school->slug . ".educorexa.com/login";
     }
 
-    public function build()
+    public function envelope(): Envelope
     {
-        return $this->subject('অভিনন্দন! আপনার স্কুল অ্যাকাউন্টটি এখন সক্রিয় - EduCorexa')
-                    ->view('super.emails.school_approved');
+        return new Envelope(
+            subject: 'অভিনন্দন! আপনার স্কুল অ্যাকাউন্টটি এখন সক্রিয় - EduCorexa',
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'super.emails.school_approve',
+            with: [
+                'school' => $this->school,
+                'loginUrl' => $this->loginUrl,
+            ],
+        );
+    }
+
+    public function attachments(): array
+    {
+        return [];
     }
 }

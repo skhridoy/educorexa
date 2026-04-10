@@ -89,7 +89,7 @@ Route::domain(config('app.main_domain'))->group(function () {
                         Route::get('/pending', 'pending')->name('pending');
                         Route::put('/{school}/approve', 'approve')->name('approve');
                         Route::get('/rejected', 'rejected')->name('rejected');
-                        Route::delete('/{school}/reject', 'rejectSchool')->name('reject');
+                        Route::post('/{school}/reject', 'rejectSchool')->name('reject');
                         Route::delete('/{school}', 'destroy')->name('destroy');
                         Route::get('/all-school', 'allSchools')->name('all');
                     });

@@ -76,7 +76,7 @@ class SchoolRegisterController extends Controller
             // স্কুলকে পেন্ডিং ধন্যবাদ মেইল পাঠানো
             Mail::to($newSchool->email)->send(new SchoolPendingMail($newSchool));
         } catch (\Exception $e) {
-            // মেইল না গেলে লগ করে রাখবে কিন্তু রেজিস্ট্রেশন থামাবে না
+            dd("মেইল এরর মেসেজ: " . $e->getMessage());
             \Log::error("Registration Mail Error: " . $e->getMessage());
         }
 

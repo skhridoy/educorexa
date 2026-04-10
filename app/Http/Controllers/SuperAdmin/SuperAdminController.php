@@ -75,11 +75,19 @@ class SuperAdminController extends Controller
                 app()[PermissionRegistrar::class]->forgetCachedPermissions();
             }
         });
-        try {
-        Mail::to($school->email)->send(new SchoolApprovedMail($school));
+       try {
+            // ডাটাবেস থেকে লেটেস্ট ডাটা নিশ্চিত করতে রিফ্রেশ করুন
+            $school->refresh(); 
+            
+            Mail::to($school->email)->send(new SchoolApprovedMail($school));
+            
+            // মেইল সেন্ড হয়েছে কি না তা লগে চেক করার জন্য
+            \Log::info("Approval Mail sent to: " . $school->email); 
+
         } catch (\Exception $e) {
-            // মেইল না গেলেও সিস্টেম যেন ক্রাশ না করে সেজন্য লগ করা
-            \Log::error("Approval Email failed for {$school->name}: " . $e->getMessage());
+            // যদি মেইল না যায়, তবে এই dd() আপনাকে কারণটি বলে দেবে
+            dd("মেইল এরর: " . $e->getMessage()); 
+            \Log::error("Approval Email failed: " . $e->getMessage());
         }
 
         return redirect()->route('super.schools.all')->with('success', 'School Approved & Welcome Email Sent!');
@@ -113,8 +121,8 @@ class SuperAdminController extends Controller
     public function destroy(School $school)
     {
 
-        $school->delete();
         $school->users()->delete(); // Delete associated users
+        $school->delete();
 
         return redirect()
             ->route('super.schools.all')
@@ -129,49 +137,44 @@ class SuperAdminController extends Controller
 
     public function schoolStore(Request $request)
     {
-        $mainDomain = config('app.main_domain', 'schoolerp.test');
         $request->validate([
-            'school_name'     => 'required|string|max:255',
-            'slug'            => 'required|alpha_num|unique:schools,slug',
-            'admin_name'      => 'required|string|max:255',
-            'admin_email'     => 'required|email|unique:users,email',
-            'admin_mobile'    => [
-                'required',
-                'regex:/^01[0-9]{9}$/'
-            ],
-            'admin_password'  => 'required|min:8',
+            'school_name'    => 'required|string|max:255',
+            'slug'           => 'required|alpha_num|unique:schools,slug',
+            'admin_name'     => 'required|string|max:255',
+            'admin_email'    => 'required|email|unique:users,email',
+            'admin_mobile'   => ['required', 'regex:/^01[0-9]{9}$/'],
+            'admin_password' => 'required|min:8',
         ]);
 
-        DB::transaction(function () use ($request) {
+        // ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবল
+        $newSchool = null;
 
-            // 1️⃣ Create School
-            $school = School::create([
-                'name'   => $request->school_name,
-                'slug'   => strtolower($request->slug),
-                'email'  => $request->admin_email,
-                'phone' => $request->admin_mobile,
-                'status' => 'approved',
+        DB::transaction(function () use ($request, &$newSchool) {
+
+            // 1️⃣ Create School (সরাসরি approved স্ট্যাটাসে)
+            $newSchool = School::create([
+                'name'      => $request->school_name,
+                'slug'      => strtolower($request->slug),
+                'email'     => $request->admin_email,
+                'phone'     => $request->admin_mobile,
+                'status'    => 'approved',
                 'is_active' => true,
             ]);
 
             // 2️⃣ Create School Admin User
-            User::create([
+            $adminUser = User::create([
                 'name'      => $request->admin_name,
                 'email'     => $request->admin_email,
                 'password'  => Hash::make($request->admin_password),
                 'role'      => 'school_admin',
-                'school_id' => $school->id, // relation correct
+                'school_id' => $newSchool->id,
             ]);
-
-            $adminUser = User::where('email', $school->email)
-                         ->where('school_id', $school->id)
-                         ->first();
 
             if ($adminUser) {
                 // ৩. 'School Admin' রোল নিশ্চিত করা
                 $role = Role::firstOrCreate(['name' => 'school_admin', 'guard_name' => 'web']);
 
-                // ৪. কনফিগ থেকে পারমিশন ডাটাবেজে নেওয়া
+                // ৪. কনফিগ থেকে পারমিশন নেওয়া
                 $permissions = array_keys(config('permissions.permissions'));
                 
                 foreach ($permissions as $permissionName) {
@@ -181,20 +184,27 @@ class SuperAdminController extends Controller
                     ]);
                 }
 
-                // ৫. গুরুত্বপূর্ণ: রোলে পারমিশন সিঙ্ক করা
+                // ৫. পারমিশন দেওয়া
                 $role->givePermissionTo($permissions);
 
-                // ৬. ইউজারকে রোল দেওয়া (যদি ইতিমধ্যে না থাকে)
-                if (!$adminUser->hasRole('school_admin')) {
-                    $adminUser->assignRole($role);
-                }
+                // ৬. ইউজারকে রোল দেওয়া
+                $adminUser->assignRole($role);
 
-                // ৭. সবচেয়ে গুরুত্বপূর্ণ: Spatie এর ইন্টারনাল ক্যাশ ক্লিয়ার করা
+                // ৭. ক্যাশ ক্লিয়ার
                 app()[PermissionRegistrar::class]->forgetCachedPermissions();
             }
-
         });
-        return redirect()->route('super.schools.all')->with('success', 'School registered successfully!');
+
+        // মেইল পাঠানো (সরাসরি Approved Mail পাঠাচ্ছি কারণ এটি সরাসরি এক্টিভ হয়েছে)
+        try {
+            if ($newSchool) {
+                Mail::to($newSchool->email)->send(new SchoolApprovedMail($newSchool));
+            }
+        } catch (\Exception $e) {
+            \Log::error("Direct Registration Mail Error: " . $e->getMessage());
+        }
+
+        return redirect()->route('super.schools.all')->with('success', 'School created and activation email sent!');
     }
     public function Profile() {
         $id = Auth::user()->id;
