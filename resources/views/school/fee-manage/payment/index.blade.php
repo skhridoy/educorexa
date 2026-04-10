@@ -30,7 +30,7 @@
                     @if($student->photo)
                         <img style="border: 2px solid gold" src="{{ asset($student->photo) }}" alt="image" class="wd-100 ht-100 rounded-circle mb-3">
                     @else
-                        <img style="border: 2px solid gold" src="{{ asset('main/img/default-photo.png') }}" alt="image" class="wd-100 ht-100 rounded-circle mb-3">
+                        <img style="border: 2px solid gold" src="{{ asset('assets/images/profile.webp') }}" alt="image" class="wd-100 ht-100 rounded-circle mb-3">
                     @endif
                     <h5 class="mb-1">{{ $student->name }}</h5>
                     <p class="text-muted mb-3">{{ $student->student_id }}</p>
