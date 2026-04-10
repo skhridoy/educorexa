@@ -104,6 +104,9 @@
                                 <a href="{{ route('students.export', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-success btn-sm">
                                     Export
                                 </a>
+                                <a href="{{ route('students.importForm', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-success btn-sm">
+                                    import
+                                </a>
                             </div>
                         </div>
                         <div id="loadingSpinner" class="text-center my-3" style="display:none;">
