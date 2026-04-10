@@ -132,51 +132,83 @@
         // ক্যাটেগরি চেঞ্জ লজিক
         $('#setup_category_id').on('change', function() {
             let categoryId = $(this).val();
+            let subCategorySelect = $('#setup_sub_category_id');
+            
             if (categoryId) {
                 // সাব-ক্যাটেগরি লোড
                 $.ajax({
                     url: "{{ route('get-sub-categories', ['tenant' => auth()->user()->school->slug, 'categoryId' => ':id']) }}".replace(':id', categoryId),
                     method: 'GET',
                     success: function(data) {
-                        let subCategorySelect = $('#setup_sub_category_id');
                         subCategorySelect.html('<option value="">None/All</option>');
                         $.each(data, function(key, value) {
                             subCategorySelect.append('<option value="'+ value.id +'">'+ value.name +'</option>');
                         });
+                        
+                        // সাব-ক্যাটেগরি ড্রপডাউন আপডেট হওয়ার পর টেবিল লোড করুন
+                        loadClassesForSetup(categoryId);
                     }
                 });
-                loadClassesForSetup(categoryId);
             } else {
-                $('#setup_sub_category_id').html('<option value="">None/All</option>');
+                subCategorySelect.html('<option value="">None/All</option>');
                 $('#class_amount_body').html('<tr><td colspan="2" class="text-center text-muted">প্রথমে ক্যাটেগরি সিলেক্ট করুন</td></tr>');
             }
         });
 
-        function loadClassesForSetup(categoryId) {
-            $('#class_amount_body').html('<tr><td colspan="2" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div> লোড হচ্ছে...</td></tr>');
-            $.ajax({
-                url: "{{ route('get-classes-by-category', ['tenant' => auth()->user()->school->slug]) }}",
-                method: 'GET',
-                data: { category_id: categoryId },
-                success: function(classes) {
-                    let html = '';
-                    if(classes.length > 0) {
-                        $.each(classes, function(key, item) {
-                            html += `<tr>
-                                <td>${item.name}</td>
-                                <td>
-                                    <input type="number" name="amounts[${item.id}]" class="form-control form-control-sm border-primary" placeholder="0.00" step="0.01">
-                                </td>
-                            </tr>`;
-                        });
-                    } else {
-                        html = '<tr><td colspan="2" class="text-center text-danger">কোনো ক্লাস পাওয়া যায়নি।</td></tr>';
-                    }
-                    $('#class_amount_body').html(html);
-                }
-            });
-        }
+        // সাব-ক্যাটেগরি বা ফি হেড ম্যানুয়ালি চেঞ্জ করলে টেবিল আপডেট হবে
+        $(document).on('change', '#setup_sub_category_id, select[name="fee_head_id"]', function() {
+            let categoryId = $('#setup_category_id').val();
+            if (categoryId) {
+                loadClassesForSetup(categoryId);
+            }
+        });
     });
+
+    function loadClassesForSetup(categoryId) {
+        let feeHeadId = $('select[name="fee_head_id"]').val();
+        let subCategoryId = $('#setup_sub_category_id').val(); // এখন সঠিক ভ্যালু পাবে
+
+        if (!feeHeadId) {
+            $('#class_amount_body').html('<tr><td colspan="2" class="text-center text-warning">প্রথমে Fee Head সিলেক্ট করুন</td></tr>');
+            return;
+        }
+
+        $('#class_amount_body').html('<tr><td colspan="2" class="text-center"><div class="spinner-border spinner-border-sm text-primary"></div> লোড হচ্ছে...</td></tr>');
+        
+        $.ajax({
+            url: "{{ route('get-classes-by-category', ['tenant' => auth()->user()->school->slug]) }}",
+            method: 'GET',
+            data: { 
+                category_id: categoryId,
+                fee_head_id: feeHeadId,
+                sub_category_id: subCategoryId
+            },
+            success: function(response) {
+                let html = '';
+                let classes = response.classes;
+                let existingAmounts = response.existingAmounts; 
+
+                if(classes.length > 0) {
+                    $.each(classes, function(key, item) {
+                        let amount = (existingAmounts && existingAmounts[item.id] !== undefined) ? existingAmounts[item.id] : '';
+                        
+                        html += `<tr>
+                            <td>${item.name}</td>
+                            <td>
+                                <input type="number" name="amounts[${item.id}]" 
+                                    value="${amount}" 
+                                    class="form-control form-control-sm border-primary" 
+                                    placeholder="0.00" step="0.01">
+                            </td>
+                        </tr>`;
+                    });
+                } else {
+                    html = '<tr><td colspan="2" class="text-center text-danger">কোনো ক্লাস পাওয়া যায়নি।</td></tr>';
+                }
+                $('#class_amount_body').html(html);
+            }
+        });
+    }
 
     // Delete Confirmation
     function confirmDelete(button) {

@@ -30,7 +30,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
         $yearPart = substr($academicYear->name, -2);
         $prefix = 'STD-' . $yearPart;
 
-        // ১. ডাটাবেজ থেকে বর্তমান সর্বোচ্চ সিরিয়াল নম্বরটি একবারই নিয়ে আসা
+        // বর্তমান সর্বোচ্চ সিরিয়াল নম্বর বের করা
         $lastSerial = Student::where('school_id', $schoolId)
             ->where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
@@ -38,27 +38,37 @@ class StudentsImport implements ToCollection, WithHeadingRow
 
         $currentNextNumber = $lastSerial ? $lastSerial + 1 : 1001;
 
-        // ২. সব ক্লাসের ব্যবহৃত রোলগুলো লোড করা
+        // রোল ট্র্যাকিংয়ের জন্য খালি অ্যারে
         $usedRolls = [];
-        $classIds = $rows->pluck('class')->unique();
-        
-        foreach($classIds as $id) {
-            $usedRolls[$id] = Student::where('school_id', $schoolId)
-                ->where('class_id', $id)
-                ->where('academic_year_id', $academicYear->id)
-                ->pluck('roll')
-                ->toArray();
-
-            // এক্সেলের ম্যানুয়াল রোলগুলোকেও ব্যবহৃত তালিকায় রাখা
-            $excelManualRolls = $rows->where('class', $id)->pluck('roll')->filter()->toArray();
-            $usedRolls[$id] = array_unique(array_merge($usedRolls[$id], $excelManualRolls));
-        }
 
         foreach ($rows as $row) {
-            $class = Classes::where('id', $row['class'])->where('school_id', $schoolId)->first();
-            if (!$class) continue;
+            // ১. Class Code দিয়ে ক্লাস খুঁজে বের করা (আপনার ইমেজে দেখা যাচ্ছে 01, 09 ইত্যাদি কোড আছে)
+            // এক্সেলে কলামের নাম দিবেন 'class_code'
+            $excelCode = str_pad(trim($row['class_code']), 2, '0', STR_PAD_LEFT);
+            
+            $class = Classes::where('school_id', $schoolId)
+                            ->where('code', $excelCode)
+                            ->first();
+
+            if (!$class) continue; 
 
             $classId = $class->id;
+            $categoryId = $class->school_category_id; 
+            
+            
+            // এক্সেলে কলামের নাম 'sub_category_id' থাকতে হবে
+            $subCategoryId = isset($row['sub_category_id']) && !empty($row['sub_category_id']) 
+                            ? $row['sub_category_id'] 
+                            : null;
+
+            // ২. বিদ্যমান রোল নম্বরগুলো চেক করা (যদি আগে লোড করা না থাকে)
+            if (!isset($usedRolls[$classId])) {
+                $usedRolls[$classId] = Student::where('school_id', $schoolId)
+                    ->where('class_id', $classId)
+                    ->where('academic_year_id', $academicYear->id)
+                    ->pluck('roll')
+                    ->toArray();
+            }
 
             // ৩. রোল নির্ধারণ (গ্যাপ ফিলিং লজিক)
             $finalRoll = null;
@@ -70,26 +80,25 @@ class StudentsImport implements ToCollection, WithHeadingRow
                     $suggestedRoll++;
                 }
                 $finalRoll = $suggestedRoll;
-                $usedRolls[$classId][] = $finalRoll; // লুপের পরের জনের জন্য বুক করে রাখা
+                $usedRolls[$classId][] = $finalRoll; 
             }
 
-            // ৪. স্টুডেন্ট আইডি জেনারেশন (লুপের ভেতরে ডাইনামিকালি ইনক্রিমেন্ট)
+            // ৪. স্টুডেন্ট আইডি জেনারেশন
             $studentId = $prefix . str_pad($currentNextNumber, 4, '0', STR_PAD_LEFT);
-            $currentNextNumber++; // পরবর্তী স্টুডেন্টের জন্য ১ বাড়িয়ে রাখা
+            $currentNextNumber++;
 
-            // ৫. ডিফল্ট সেকশন হ্যান্ডেলিং (যদি এক্সেলে না থাকে)
+            // ৫. সেকশন নির্ধারণ (এক্সেলে থাকলে ভালো, নাহলে ডিফল্ট প্রথম সেকশন)
             $sectionId = $row['section'] ?? null;
             if (!$sectionId) {
                 $defaultSection = Section::where('school_id', $schoolId)->where('class_id', $classId)->first();
                 $sectionId = $defaultSection ? $defaultSection->id : null;
             }
 
-            // ৬. ট্রানজ্যাকশন ব্যবহার করা ভালো যাতে এরর হলে ডাটা অসম্পূর্ণ না থাকে
-            DB::transaction(function () use ($row, $schoolId, $academicYear, $classId, $sectionId, $studentId, $finalRoll) {
+            // ৬. ট্রানজ্যাকশন ব্যবহার করে ডাটা সেভ
+            DB::transaction(function () use ($row, $schoolId, $academicYear, $class, $categoryId, $subCategoryId, $sectionId, $studentId, $finalRoll) {
                 
-                // ইউজার অ্যাকাউন্ট
                 $user = User::updateOrCreate(
-                    ['email' => $studentId . '@gmail.com'], // ডোমেইন পরিবর্তন করতে পারেন
+                    ['email' => $studentId . '@gmail.com'], 
                     [
                         'school_id' => $schoolId,
                         'name'      => $row['name'],
@@ -102,27 +111,28 @@ class StudentsImport implements ToCollection, WithHeadingRow
                     $user->assignRole('student');
                 }
 
-                // স্টুডেন্ট তৈরি
                 Student::create([
-                    'user_id'           => $user->id,
-                    'school_id'         => $schoolId,
-                    'academic_year_id'  => $academicYear->id,
-                    'class_id'          => $classId,
-                    'section_id'        => $sectionId,
-                    'student_id'        => $studentId,
-                    'roll'              => $finalRoll,
-                    'name'              => $row['name'],
-                    'fathers_name'      => $row['fathers_name'] ?? null,
-                    'mothers_name'      => $row['mothers_name'] ?? null,
-                    'contact_number'    => $row['contact_number'] ?? null,
-                    'date_of_birth'     => isset($row['date_of_birth']) ? (is_numeric($row['date_of_birth']) ? Date::excelToDateTimeObject($row['date_of_birth'])->format('Y-m-d') : $row['date_of_birth']) : null,
-                    'gender'            => $row['gender'] ?? null,
-                    'blood_group'       => $row['blood_group'] ?? null,
-                    'religion'          => $row['religion'] ?? null,
-                    'address'           => $row['address'] ?? null,
-                    'password'          => Hash::make($row['password'] ?? '12345678'),
-                    'status'            => 'active',
-                    'created_by'        => Auth::id(),
+                    'user_id'                => $user->id,
+                    'school_id'              => $schoolId,
+                    'academic_year_id'       => $academicYear->id,
+                    'school_category_id'     => $categoryId,    // Classes টেবিল থেকে প্রাপ্ত
+                    'school_sub_category_id' => $subCategoryId,,
+                    'class_id'               => $class->id,
+                    'section_id'             => $sectionId,
+                    'student_id'             => $studentId,
+                    'roll'                   => $finalRoll,
+                    'name'                   => $row['name'],
+                    'fathers_name'           => $row['fathers_name'] ?? null,
+                    'mothers_name'           => $row['mothers_name'] ?? null,
+                    'contact_number'         => $row['contact_number'] ?? null,
+                    'date_of_birth'          => isset($row['date_of_birth']) ? (is_numeric($row['date_of_birth']) ? Date::excelToDateTimeObject($row['date_of_birth'])->format('Y-m-d') : $row['date_of_birth']) : null,
+                    'gender'                 => $row['gender'] ?? null,
+                    'blood_group'            => $row['blood_group'] ?? null,
+                    'religion'               => $row['religion'] ?? null,
+                    'address'                => $row['address'] ?? null,
+                    'password'               => Hash::make($row['password'] ?? '12345678'),
+                    'status'                 => 'active',
+                    'created_by'             => Auth::id(),
                 ]);
             });
         }

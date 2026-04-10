@@ -26,14 +26,38 @@ class FeeAmountController extends Controller
         return view('school.fee-manage.fee-amount.index', compact('feeHeads', 'categories', 'feeAmounts'));
     }
 
-    public function getClassesByCategory(Request $request) {
-        $schoolId = auth()->user()->school_id;
-        $classes = Classes::where('school_id', $schoolId)
-                        ->where('school_category_id', $request->category_id)
-                        ->get();
-                        
-        return response()->json($classes);
+public function getClassesByCategory(Request $request) {
+    $schoolId = auth()->user()->school_id;
+    $categoryId = $request->category_id;
+    $feeHeadId = $request->fee_head_id;
+    $subCategoryId = $request->sub_category_id;
+
+    // ১. ওই ক্যাটেগরির ক্লাসগুলো নিন
+    $classes = Classes::where('school_id', $schoolId)
+                    ->where('school_category_id', $categoryId)
+                    ->get();
+
+    $existingAmounts = [];
+    if ($feeHeadId) {
+        $query = FeeAmount::where('school_id', $schoolId)
+            ->where('fee_head_id', $feeHeadId)
+            ->where('school_category_id', $categoryId);
+
+        // ২. সাব-ক্যাটেগরি লজিক ফিক্স
+        if ($subCategoryId && $subCategoryId !== 'null' && $subCategoryId !== '') {
+            $query->where('school_sub_category_id', $subCategoryId);
+        } else {
+            $query->whereNull('school_sub_category_id');
+        }
+
+        $existingAmounts = $query->pluck('amount', 'class_id');
     }
+                    
+    return response()->json([
+        'classes' => $classes,
+        'existingAmounts' => $existingAmounts
+    ]);
+}
 
     public function getSubCategories($tenant, $categoryId)
     {

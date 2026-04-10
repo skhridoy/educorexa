@@ -66,6 +66,7 @@
                         <table class="table custom-mobile-table align-middle">
                             <thead class="d-none d-md-table-header-group bg-light">
                                 <tr>
+                                    <th>#Id</th>
                                     <th>Sub-Category</th>
                                     <th>Main Category</th>
                                     <th class="text-end">Action</th>
@@ -74,6 +75,7 @@
                             <tbody>
                                 @forelse($subCategories as $sub)
                                 <tr>
+                                    <td data-label="iSub-Category-id " class="fw-bold text-primary">{{ $sub->id }}</td>
                                     <td data-label="Sub-Category" class="fw-bold text-primary">{{ $sub->name }}</td>
                                     <td data-label="Main Category">
                                         <span class="badge bg-soft-info text-info">{{ $sub->mainCategory->name }}</span>
