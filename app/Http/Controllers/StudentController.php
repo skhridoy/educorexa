@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SchoolCategory;
+use App\Models\SchoolSubCategory;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
@@ -16,14 +18,13 @@ use App\Models\LessonPlan;
 use App\Models\FeeAmount;
 use Illuminate\Support\Facades\Hash;
 use App\Imports\StudentsImport;
-
 use App\Exports\StudentsExport;
 use App\Exports\StudentTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
-        public function studentDashboard($tenant)
+    public function studentDashboard($tenant)
     {
         $user = auth()->user();
         $student = $user->student;
@@ -96,7 +97,10 @@ class StudentController extends Controller
         }
 
 
-        $students = $students->orderBy('roll', 'desc')->paginate(6);
+        $students = Student::where('school_id', $schoolId)
+            ->with(['class', 'section', 'category', 'group']) // ক্যাটেগরি এবং গ্রুপ লোড হবে
+            ->orderBy('roll', 'asc')
+            ->paginate(10);
 
         if ($request->ajax()) {
             return view('school.student.partials.table', compact('students', 'activeStudents'))->render();
@@ -104,13 +108,21 @@ class StudentController extends Controller
 
         return view('school.student.index', compact('students', 'activeStudents'));
     }
-
+    public function getSubCategories($tenant, $categoryId)
+    {
+        $subCategories = SchoolSubCategory::where('school_category_id', $categoryId)
+                        ->where('school_id', auth()->user()->school_id)
+                        ->get(['id', 'name']);
+                        
+        return response()->json($subCategories);
+    }
     public function create()
     {
         $schoolId = auth()->user()->school_id;
         $classes = Classes::where('school_id', $schoolId)->get();
+        $categories = SchoolCategory::where('school_id', $schoolId)->get();
         $sections = Section::where('school_id', $schoolId)->get();
-        return view('school.student.create', compact('classes', 'sections'));
+        return view('school.student.create', compact('classes', 'sections', 'categories'));
     }
 
     public function store($tenant, Request $request)
@@ -125,6 +137,8 @@ class StudentController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'class_id' => 'required|exists:classes,id',
+            'school_category_id' => 'required',
+            'school_sub_category_id' => 'nullable',
             'section_id' => 'required|exists:sections,id',
             'father_nid' => 'nullable|string|max:255',
             'student_birth_nid' => 'nullable|string|max:255',
@@ -161,30 +175,7 @@ class StudentController extends Controller
         // ট্রানজ্যাকশন শুরু
         DB::transaction(function () use ($schoolId, $request, $validated, $academicYear, $photoPath, $tenantSlug) {
             
-            // ২. স্টুডেন্ট আইডি জেনারেশন (Unique Logic)
-            $yearPart = substr($academicYear->name, -2);
-            $prefix = 'STD-' . $yearPart;
-
-            // লক সহ সর্বোচ্চ সিরিয়াল খুঁজে বের করা
-            $lastSerial = Student::where('school_id', $schoolId)
-                ->where('student_id', 'like', $prefix . '%')
-                ->lockForUpdate()
-                ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
-                ->value('max_serial');
-
-            $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
-            $studentId = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-            // ৩. রোল নম্বর জেনারেশন (গ্যাপ ফিলিং বা ম্যাক্স লজিক)
-            $lastRoll = Student::where('school_id', $schoolId)
-                ->where('class_id', $validated['class_id'])
-                ->where('academic_year_id', $academicYear->id)
-                ->lockForUpdate()
-                ->max('roll');
-
-            $nextRoll = $lastRoll ? $lastRoll + 1 : 1;
-
-            // ৪. ইউজার তৈরি (ইমেইল ইউনিক হওয়া নিশ্চিত করা হয়েছে ভ্যালিডেশনে)
+            // ১. ইউজার তৈরি
             $user = User::create([
                 'school_id' => $schoolId,
                 'name'      => $validated['name'],
@@ -192,39 +183,31 @@ class StudentController extends Controller
                 'password'  => Hash::make($request->password),
                 'role'      => 'student',
             ]);
-            
-            if (method_exists($user, 'assignRole')) {
-                $user->assignRole('student');
-            }
 
-            // ৫. স্টুডেন্ট তৈরি
+            // ২. স্টুডেন্ট তৈরি (school_category_id সহ)
             $student = Student::create([
-                'user_id'           => $user->id,
-                'school_id'         => $schoolId,
-                'academic_year_id'  => $academicYear->id,
-                'class_id'          => $validated['class_id'],
-                'section_id'        => $validated['section_id'],
-                'student_id'        => $studentId,
-                'roll'              => $nextRoll,
-                'name'              => $validated['name'],
-                'fathers_name'      => $request->father_name,
-                'mothers_name'      => $request->mother_name,
-                'mother_nid'        => $request->mother_nid,
-                'father_nid'        => $request->father_nid,
-                'student_birth_nid' => $request->student_birth_nid,
-                'date_of_birth'     => $request->date_of_birth,
-                'gender'            => $request->gender,
-                'contact_number'    => $request->phone,
-                'previous_school'   => $request->previous_school,
-                'previous_class'    => $request->previous_class,
-                'admission_date'    => $request->admission_date,
-                'address'           => $request->address,
-                'religion'          => $request->religion,
-                'blood_group'       => $request->blood_group,
-                'password'          => Hash::make($request->password),
-                'photo'             => $photoPath,
-                'status'            => 'active',
-                'created_by'        => auth()->id(),
+                'user_id'                => $user->id,
+                'school_id'              => $schoolId,
+                'academic_year_id'       => $academicYear->id,
+                'class_id'               => $validated['class_id'],
+                'school_category_id'     => $validated['school_category_id'], // ইনসার্ট করা হচ্ছে
+                'school_sub_category_id' => $request->school_sub_category_id,
+                'section_id'             => $validated['section_id'],
+                'student_id'             => $this->generateUniqueStudentId($schoolId, $academicYear), // আলাদা মেথডে করা ভালো
+                'roll'                   => $this->getNextRoll($schoolId, $validated['class_id'], $academicYear->id),
+                'name'                   => $validated['name'],
+                'fathers_name'           => $request->father_name,
+                'mothers_name'           => $request->mother_name,
+                'date_of_birth'          => $request->date_of_birth,
+                'gender'                 => $request->gender,
+                'contact_number'         => $request->phone,
+                'admission_date'         => $request->admission_date,
+                'address'                => $request->address,
+                'religion'               => $request->religion,
+                'photo'                  => $photoPath,
+                'status'                 => 'active',
+                'password'               => Hash::make($request->password),
+                'created_by'             => auth()->id(),
             ]);
 
             // ৬. অ্যাডমিশন ফি জেনারেশন
@@ -259,12 +242,14 @@ class StudentController extends Controller
     {
         $schoolId = auth()->user()->school_id;
         $classes = Classes::where('school_id', $schoolId)->get();
+        $categories = SchoolCategory::where('school_id', $schoolId)->get();
+        $groups = SchoolSubCategory::where('school_id', $schoolId)->get();
         $sections = Section::where('school_id', $schoolId)->get();
        
         $student = Student::where('id', $student)
                             ->where('school_id', $schoolId)
                             ->firstOrFail();
-        return view('school.student.edit', compact('student', 'classes', 'sections'));
+        return view('school.student.edit', compact('student', 'classes', 'categories','groups', 'sections', 'tenant'));
     }
 
     public function update(Request $request, $tenant, $student)
@@ -281,6 +266,7 @@ class StudentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $student->user->id,
+            'school_category_id' => 'required',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'contact_number' => 'nullable|string|max:11',
@@ -328,6 +314,8 @@ class StudentController extends Controller
             $student->update([
                 'name' => $validated['name'],
                 'class_id' => $request->class_id,
+                'school_category_id'     => $request->school_category_id,
+                'school_sub_category_id' => $request->school_sub_category_id,
                 'section_id' => $request->section_id,
                 'fathers_name' => $request->father_name,
                 'mothers_name' => $request->mother_name,
@@ -353,6 +341,26 @@ class StudentController extends Controller
             'success' => 'Student updated successfully',
             'type' => 'success'
         ]);
+    }
+
+    // ইউনিক আইডি এবং রোল জেনারেশনের জন্য হেল্পার মেথড (কোড ক্লিন রাখার জন্য)
+    private function generateUniqueStudentId($schoolId, $academicYear) {
+        $yearPart = substr($academicYear->name, -2);
+        $prefix = 'STD-' . $yearPart;
+        $lastSerial = Student::where('school_id', $schoolId)
+            ->where('student_id', 'like', $prefix . '%')
+            ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
+            ->value('max_serial');
+        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    private function getNextRoll($schoolId, $classId, $academicYearId) {
+        $lastRoll = Student::where('school_id', $schoolId)
+            ->where('class_id', $classId)
+            ->where('academic_year_id', $academicYearId)
+            ->max('roll');
+        return $lastRoll ? $lastRoll + 1 : 1;
     }
 
     public function destroy($tenant, $student)

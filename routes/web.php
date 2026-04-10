@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SchoolSubCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Student;
 use App\Http\Controllers\{
@@ -9,6 +10,7 @@ use App\Http\Controllers\{
     AuthController,
     DashboardController,
     AcademicYearController,
+    SchoolCategoryController,
     StudentController,
     ClassesController,
     SectionController,
@@ -175,6 +177,16 @@ Route::domain(config('app.main_domain'))->group(function () {
                         ->name('academic-year.toggleInactive');
                 });
 
+                // Categories
+                Route::middleware(['permission:category.manage'])->group(function () {
+                    Route::get('/categories', [SchoolCategoryController::class, 'index'])->name('categories.index');
+                    Route::resource('categories', SchoolCategoryController::class);
+                });
+                // Sub Categories
+                Route::middleware(['permission:sub-category.manage'])->group(function () {
+                    
+                    Route::resource('sub-categories', SchoolSubCategoryController::class);
+                });
                 // Newsletter 
     
                 // Classes
@@ -207,6 +219,7 @@ Route::domain(config('app.main_domain'))->group(function () {
 
                 // Students
                 Route::middleware('permission:student.manage')->group(function () {
+                    Route::get('get-subcategories/{categoryId}', [StudentController::class, 'getSubCategories'])->name('get.subcategories');
                     Route::get('students/import', [StudentController::class, 'importForm'])->name('students.importForm');
                     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
                     Route::get('students/export', [StudentController::class, 'exportForm'])->name('students.exportForm');
@@ -308,9 +321,12 @@ Route::domain(config('app.main_domain'))->group(function () {
                 });
 
                 Route::middleware('permission:fee.manage')->group(function () {
+                    Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories'); 
+                    Route::get('/get-classes-by-category', [FeeAmountController::class, 'getClassesByCategory'])->name('get-classes-by-category');
                     Route::resource('fee-amounts', FeeAmountController::class);
                 });
                 Route::middleware('permission:fee.manage')->group(function () {
+                    Route::get('/get-sub-categories/{categoryId}', [StudentFeeController::class, 'getSubCategories'])->name('get-sub-categories');
                     Route::get('student-fees/get-list', [StudentFeeController::class, 'getStudentList'])->name('student-fees.get-list');
                     Route::resource('student-fees', StudentFeeController::class);
                 });

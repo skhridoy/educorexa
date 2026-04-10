@@ -10,31 +10,50 @@
                         <h6 class="card-title">Create Exam</h6>
                         <form action="{{ route('exams.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                             @csrf
+                            
                             <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="name" name="name"
-                                    placeholder="Enter Exam Name: " required>
+                                <label for="name" class="form-label">Exam Name</label>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                    id="name" name="name" placeholder="উদা: ১ম সাময়িক পরীক্ষা" value="{{ old('name') }}" required>
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
+
                             <div class="mb-3">
-                                <label for="year_id" class="form-label">Year</label>
-                                <select class="form-control" id="year_id" name="year_id">
-                                    <option value="" default selected>Select Year</option>
+                                <label for="year_id" class="form-label">Academic Year</label>
+                                <select class="form-select @error('year_id') is-invalid @enderror" id="year_id" name="year_id" required>
+                                    <option value="" selected disabled>Select Year</option>
                                     @foreach ($years as $year)
-
-                                        <option value="{{ $year->id }}">{{ $year->name }}</option>
-
+                                        <option value="{{ $year->id }}" {{ old('year_id') == $year->id ? 'selected' : '' }}>
+                                            {{ $year->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date">
+                                <label for="school_category_id" class="form-label">School Category</label>
+                                <select class="form-select @error('school_category_id') is-invalid @enderror" name="school_category_id" required>
+                                    <option value="" selected disabled>Select Category</option>
+                                    @foreach ($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ old('school_category_id') == $cat->id ? 'selected' : '' }}>
+                                            {{ $cat->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="start_date" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="end_date" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-end">Create</button>
+
+                            <button type="submit" class="btn btn-primary w-100">Create Exam</button>
                         </form>
                     </div>
                 </div>
@@ -254,16 +273,15 @@
                         }
 
                         if (response.success) {
-
-                            location.reload(); // 🔥 Recalculate smart status instantly
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Status Updated',
+                                timer: 1000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // Swal শেষ হওয়ার পর রিলোড হবে
+                            });
                         }
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Status Updated',
-                            timer: 1000,
-                            showConfirmButton: false
-                        });
 
                     }
                 }

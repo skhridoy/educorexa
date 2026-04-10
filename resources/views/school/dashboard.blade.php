@@ -86,6 +86,7 @@
                             <div class="text-center py-5">
                                 <div class="spinner-border text-primary" role="status"></div>
                                 <p class="mt-2">বকেয়া তালিকা লোড হচ্ছে...</p>
+                                
                             </div>
                         </div>
                     </div>
@@ -159,20 +160,62 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function() {
-    // ১. আনপেইড লিস্ট লোড করার ফাংশন
-    function loadUnpaidList(month) {
-        $('#unpaidListContainer').html('<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>');
+    /**
+     * ১. আনপেইড লিস্ট লোড করার ফাংশন (পেজ নম্বরসহ)
+     */
+    function loadUnpaidList(month, page = 1) {
+        // কন্টেইনারে লোডার দেখানো
+        $('#unpaidListContainer').html(`
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">বকেয়া তালিকা লোড হচ্ছে...</p>
+            </div>
+        `);
+
         $.ajax({
-            url: "{{ route('school.unpaid.ajax', ['tenant' => auth()->user()->school->slug]) }}",
+            // URL এ পেজ নম্বর পাস করা হচ্ছে
+            url: "{{ route('school.unpaid.ajax', ['tenant' => auth()->user()->school->slug]) }}?page=" + page,
             method: 'GET',
             data: { month: month },
             success: function(response) {
+                // কন্ট্রোলার থেকে পাঠানো HTML কন্টেইনারে বসানো
                 $('#unpaidListContainer').html(response.html);
+                
+                // পেজিনেশন লিঙ্কগুলোকে সুন্দর করতে (ঐচ্ছিক)
+                $('.unpaid-pagination-wrapper .pagination').addClass('pagination-sm');
+            },
+            error: function() {
+                $('#unpaidListContainer').html('<p class="text-danger text-center">ডাটা লোড করতে সমস্যা হয়েছে!</p>');
             }
         });
     }
 
-    // ২. অ্যাটেনডেন্স পাই চার্ট (ইনিশিয়াল)
+    /**
+     * ২. পেজিনেশন লিঙ্কে ক্লিকের ইভেন্ট (Event Delegation)
+     * এটি JSON ওপেন হওয়া রোধ করবে
+     */
+    $(document).on('click', '#unpaidPaginationLinks a, .pagination a', function(e) {
+        e.preventDefault(); // ডিফল্ট লিঙ্ক ক্লিক অ্যাকশন বন্ধ
+        
+        let url = $(this).attr('href');
+        if(url) {
+            let page = url.split('page=')[1]; // URL থেকে পেজ নম্বর নেওয়া
+            let month = $('#unpaidMonthFilter').val();
+            loadUnpaidList(month, page);
+        }
+    });
+
+    /**
+     * ৩. মাস ফিল্টার পরিবর্তন হলে
+     */
+    $('#unpaidMonthFilter').on('change', function() {
+        loadUnpaidList($(this).val(), 1); // মাস বদলালে সবসময় ১ নম্বর পেজ থেকে শুরু হবে
+    });
+
+    /**
+     * ৪. চার্টস (যথাযথ রাখা হয়েছে)
+     */
+    // অ্যাটেনডেন্স পাই চার্ট
     const ctxPie = document.getElementById('attendancePieChart').getContext('2d');
     new Chart(ctxPie, {
         type: 'doughnut',
@@ -187,7 +230,7 @@ $(document).ready(function() {
         options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // ৩. ক্লাস-ভিত্তিক ফি বার চার্ট (ইনিশিয়াল)
+    // ক্লাস-ভিত্তিক ফি বার চার্ট
     const ctxBar = document.getElementById('classFeeBarChart').getContext('2d');
     let classFeeBarChart = new Chart(ctxBar, {
         type: 'bar',
@@ -207,13 +250,7 @@ $(document).ready(function() {
         }
     });
 
-    
-    // আনপেইড লিস্ট ফিল্টার
-    $('#unpaidMonthFilter').on('change', function() {
-        loadUnpaidList($(this).val());
-    });
-
-  
+    // ফি ফিল্টার (বার চার্ট আপডেট)
     $('#feeMonthFilter').on('change', function() {
         const monthNum = $(this).val();
         $.ajax({
@@ -221,7 +258,6 @@ $(document).ready(function() {
             method: 'GET',
             data: { month: monthNum },
             success: function(response) {
-                // চার্টের ডাটা আপডেট
                 classFeeBarChart.data.labels = response.classNames;
                 classFeeBarChart.data.datasets[0].data = response.classFees;
                 classFeeBarChart.update();
@@ -229,6 +265,7 @@ $(document).ready(function() {
         });
     });
 
+    // শুরুতে আনপেইড লিস্ট কল করা
     loadUnpaidList($('#unpaidMonthFilter').val());
 });
 </script>

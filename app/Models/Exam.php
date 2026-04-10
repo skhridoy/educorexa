@@ -10,6 +10,7 @@ class Exam extends Model
         'school_id',
         'name',
         'year_id',
+        'school_category_id',
         'status',
         'start_date',
         'end_date',
@@ -45,5 +46,9 @@ class Exam extends Model
     public function marks()
     {
         return $this->hasMany(Mark::class);
+    }
+    public function categories()
+    {
+        return $this->hasMany(SchoolCategory::class, 'school_category_id');
     }
 }

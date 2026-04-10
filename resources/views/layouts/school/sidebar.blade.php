@@ -52,6 +52,18 @@
                             <a href="{{ route('academic-year.index', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">Academic Years</a>
                         </li>
                         @endif
+                        @if(in_array('category.manage', $permissions))
+                        <li class="nav-item">
+                            <a href="{{ route('categories.index', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">
+                                <span class="nav-link">Categories</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('sub-categories.index', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">
+                                <span class="nav-link">Sub Categories</span>
+                            </a>
+                        </li>
+                        @endif
                         @if(in_array('class.manage', $permissions))
                         <li class="nav-item">
                             <a href="{{ route('classes.index', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">Classes</a>
@@ -66,6 +78,7 @@
                 </div>
             </li>
             @endif
+
 
             @if(in_array('admission.manage', $permissions))
             <li class="nav-item">

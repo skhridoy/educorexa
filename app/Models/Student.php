@@ -11,6 +11,7 @@ class Student extends Model
         'school_id',
         'academic_year_id',
         'class_id',
+        'school_category_id', // যুক্ত করা হয়েছে
         'section_id',
         'student_id',
         'roll',
@@ -33,8 +34,21 @@ class Student extends Model
         'blood_group',
         'address',
         'admin_note',
-        'created_by'
+        'created_by',
+        'school_sub_category_id' // যুক্ত করা হয়েছে
     ];
+
+    // 🔹 স্টুডেন্ট কোন ক্যাটেগরির (Primary/High School) আন্ডারে
+    public function category()
+    {
+        return $this->belongsTo(SchoolCategory::class, 'school_category_id');
+    }
+
+    // 🔹 স্টুডেন্ট কোন গ্রুপের (Science/Arts) আন্ডারে - আপনি অলরেডি group() নামে দিয়েছেন
+    public function group()
+    {
+        return $this->belongsTo(SchoolSubCategory::class, 'school_sub_category_id');
+    }
 
     // 🔹 Admission belongs to School
     public function school()

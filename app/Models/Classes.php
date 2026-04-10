@@ -12,7 +12,8 @@ class Classes extends Model
         'school_id',
         'name',
         'code',
-        'description'
+        'description',
+        'school_category_id'
     ];
 
     // 🔹 Class belongs to School
@@ -57,5 +58,9 @@ class Classes extends Model
     public function teacherAssignments()
     {
         return $this->hasMany(TeacherAssignSubject::class, 'class_id');
+    }
+
+    public function category() {
+        return $this->belongsTo(SchoolCategory::class, 'school_category_id');
     }
 }

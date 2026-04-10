@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Exam;
 use App\Models\AcademicYear;
 use App\Models\Classes;
+use App\Models\SchoolCategory;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\School;
@@ -24,13 +25,14 @@ class ExamController extends Controller
         $schoolId = auth()->user()->school_id;
 
         $years = AcademicYear::where('school_id', $schoolId)->get();
+        $categories = SchoolCategory::where('school_id', $schoolId)->get();
 
         $exams = Exam::with('academicYear')
             ->where('school_id', $schoolId)
             ->orderBy('id', 'desc')
             ->paginate(5);
 
-        return view('school.exam.index', compact('exams', 'years'));
+        return view('school.exam.index', compact('exams', 'years', 'categories'));
     }
 
 
@@ -42,33 +44,46 @@ class ExamController extends Controller
         $schoolId = auth()->user()->school_id;
 
         $request->validate([
-            'year_id' => 'required',
-            'name' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'year_id'            => 'required|exists:academicyears,id',
+            'school_category_id' => 'required|exists:school_categories,id', 
+            'name'               => 'required|string|max:255',
+            'start_date'         => 'required|date',
+            'end_date'           => 'required|date|after_or_equal:start_date',
+        ], [
+            'academic_year_id.required' => 'শিক্ষাবর্ষ সিলেক্ট করা বাধ্যতামূলক।',
+            'school_category_id.required' => 'স্কুল ক্যাটেগরি সিলেক্ট করুন।',
+            'end_date.after_or_equal' => 'শেষ তারিখ অবশ্যই শুরু তারিখের সমান বা পরে হতে হবে।'
         ]);
 
-        Exam::create([
-            'school_id' => $schoolId,
-            'year_id' => $request->year_id,
-            'name' => $request->name,
-            'status' => 0,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-        ]);
+        try {
+            Exam::create([
+                'school_id'          => $schoolId,
+                'school_category_id' => $request->school_category_id, 
+                'year_id'            => $request->year_id,
+                'name'               => $request->name,
+                'status'             => 0, // ডিফল্ট ইন-অ্যাক্টিভ
+                'start_date'         => $request->start_date,
+                'end_date'           => $request->end_date,
+                'is_published'       => 0,
+            ]);
 
-        return back()->with([
-            'success' => 'Exam created successfully!',
-            'type' => 'success'
-        ]);
+            return back()->with([
+                'success' => 'নতুন পরীক্ষা সফলভাবে তৈরি করা হয়েছে!', 
+                'type'    => 'success'
+            ]);
+        } catch (\Exception $e) {
+            return back()->with([
+                'success' => 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।', 
+                'type'    => 'danger'
+            ]);
+        }
     }
-
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($tenant, $exam)
     {
-         $schoolId = auth()->user()->school_id;
+        $schoolId = auth()->user()->school_id;
 
         $exam = Exam::where('school_id', $schoolId)
             ->where('id', $exam)
@@ -214,23 +229,26 @@ class ExamController extends Controller
     public function publishResult(Request $request, $tenant, $id)
     {
         try {
-
             $exam = Exam::where('id', $id)
                         ->where('school_id', auth()->user()->school_id)
-                        ->where('status', 1) // শুধুমাত্র active exam এর জন্য
+                        // আপনি চাইলে status চেকটি সরিয়ে দিতে পারেন যদি ইন-অ্যাক্টিভ পরীক্ষারও রেজাল্ট পাবলিশ করার প্রয়োজন হয়
                         ->firstOrFail();
 
-            // স্ট্যাটাস টগল (০ থাকলে ১, ১ থাকলে ০)
-            $exam->is_published = !$exam->is_published;
+            // রেজাল্ট পাবলিশ স্ট্যাটাস টগল
+            $exam->is_published = $exam->is_published ? 0 : 1;
             $exam->save();
 
             return response()->json([
                 'success' => true,
-                'new_status' => $exam->is_published,
-                'message' => $exam->is_published ? 'Result Published Successfully' : 'Result Unpublished'
+                'is_published' => (bool)$exam->is_published, // নিশ্চিত করুন বুলিয়ান ভ্যালু যাচ্ছে
+                'message' => $exam->is_published ? 'Result Published Successfully' : 'Result Unpublished Successfully'
             ]);
+            
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Something went wrong. Please try again.'
+            ], 500);
         }
     }
 }

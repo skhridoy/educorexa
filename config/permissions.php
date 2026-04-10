@@ -23,7 +23,8 @@ return [
             'syllabus.manage'      => 'Manage Syllabus',
             'class.routine'       => 'Manage Class Routine',
             'class.routine.view'  => 'View Class Routine',
-            
+            'category.manage'       => 'Manage School Categories',
+            'sub-category.manage'   => 'Manage School Sub Categories',
         ],
 
         'Admissions' => [

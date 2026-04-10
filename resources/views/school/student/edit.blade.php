@@ -68,6 +68,34 @@
                                 </div>
                                 <div class="col-lg-3 my-2">
                                     <div class="form-group">
+                                        <label for="school_category_id" class="form-label">Category </label>
+                                        <select class="form-select" id="school_category_id" name="school_category_id">
+                                            <option value="">Select Category</option>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ old('school_category_id', $student->school_category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                            @endforeach
+                                           
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 my-2">
+                                    <div class="form-group">
+                                        <label for="school_sub_category_id" class="form-label">Group </label>
+                                        <select class="form-select" id="school_sub_category_id" name="school_sub_category_id">
+                                            <option value="">Select Group</option>
+                                            @foreach($groups as $group)
+                                                {{-- শুধুমাত্র বর্তমান ক্যাটাগরির গ্রুপগুলো দেখাবে --}}
+                                                @if($group->school_category_id == $student->school_category_id)
+                                                    <option value="{{ $group->id }}" {{ old('school_sub_category_id', $student->school_sub_category_id) == $group->id ? 'selected' : '' }}>
+                                                        {{ $group->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 my-2">
+                                    <div class="form-group">
                                         <label for="section_id" class="form-label">Section </label>
                                         <select class="form-select" id="section_id" name="section_id" required>
                                             @foreach($sections as $section)
@@ -210,9 +238,9 @@
                                     <div class="form-group">
                                         <label for="email" class="form-label">Email </label>
                                         <input type="email" 
-       name="email" 
-       class="form-control"
-       value="{{ $student->user->email ?? '' }}">
+                                            name="email" 
+                                            class="form-control"
+                                            value="{{ $student->user->email ?? '' }}">
                                         
                                     </div>
                                 </div>
@@ -235,6 +263,29 @@
 
 @section('customJs')
 <script>
+    $(document).ready(function() {
+        $('#school_category_id').on('change', function() {
+            var categoryId = $(this).val();
+            var subCatDropdown = $('#school_sub_category_id');
+            
+            // আগে সাব-ক্যাটাগরি ক্লিয়ার করুন
+            subCatDropdown.empty();
+            subCatDropdown.append('<option value="">সাব-ক্যাটাগরি সিলেক্ট করুন</option>');
+
+            if(categoryId) {
+                $.ajax({
+                    url: "{{ route('get.subcategories', ['tenant' => $tenant, 'categoryId' => ':id']) }}".replace(':id', categoryId),
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data, function(key, value) {
+                            subCatDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                        });
+                    }
+                });
+            }
+        });
+    });
     // Add any custom JavaScript for the teacher creation page here
     @if(session('success'))
     Swal.fire({

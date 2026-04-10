@@ -8,6 +8,7 @@
                 <th>Student Id</th>
                 <th>Name</th>
                 <th>Class</th>
+                <th>Group</th>
                 <th>Section</th>
                 <th>Year</th>
                 <th>Contact</th>
@@ -32,6 +33,7 @@
                     <td>{{ $student->student_id }}</td>
                     <td>{{ $student->name }}</td>
                     <td>{{ $student->class->name ?? 'N/A' }}</td>
+                    <td>{{ $student->group->name ?? 'N/A' }}</td>
                     <td>{{ $student->section->name ?? 'N/A' }}</td>
                     <td>{{ $student->academicYear->name ?? 'N/A' }}</td>
                     <td>{{ $student->contact_number }}</td>

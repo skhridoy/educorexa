@@ -7,6 +7,8 @@ use App\Models\StudentFee;
 use App\Models\FeeAmount;
 use App\Models\Student;
 use App\Models\Classes;
+use App\Models\SchoolCategory;
+use App\Models\SchoolSubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,8 +18,11 @@ class StudentFeeController extends Controller
     {
         $schoolId = auth()->user()->school_id;
         $feeHeads = FeeHead::where('school_id', $schoolId)->get();
-        
         $classes = Classes::where('school_id', $schoolId)->get();
+        
+        // ভিউতে ক্যাটেগরি পাঠানোর জন্য
+        $categories = SchoolCategory::where('school_id', $schoolId)->get();
+        
         $recentGenerations = StudentFee::with('feeHead')
             ->where('school_id', $schoolId)
             ->select(
@@ -32,20 +37,38 @@ class StudentFeeController extends Controller
             ->limit(10)
             ->get();
 
-        return view('school.fee-manage.student-fee.index', compact('feeHeads', 'recentGenerations', 'classes'));
+        return view('school.fee-manage.student-fee.index', compact('feeHeads', 'recentGenerations', 'classes', 'categories'));
     }
 
+    public function getSubCategories($tenant, $categoryId)
+    {
+        // স্কুল আইডি এবং ক্যাটেগরি আইডি অনুযায়ী সাব-ক্যাটেগরি ফিল্টার
+        $subCategories = SchoolSubCategory::where('school_id', auth()->user()->school_id)
+                            ->where('school_category_id', $categoryId)
+                            ->get(['id', 'name']);
+
+        return response()->json($subCategories);
+    }
     public function store(Request $request)
     {
         $request->validate([
             'fee_head_id' => 'required',
-            'month' => 'required',
+            'month'       => 'required',
+            // ক্যাটেগরি এবং ক্লাস এখন রিকোয়ার্ড করা যেতে পারে নির্দিষ্ট ফি-র জন্য
+            'school_category_id' => 'nullable', 
         ]);
 
         $schoolId = auth()->user()->school_id;
-        $feeSetups = FeeAmount::where('school_id', $schoolId)
-                        ->where('fee_head_id', $request->fee_head_id)
-                        ->get();
+
+        // ফি সেটআপ খোঁজা (ক্যাটেগরি বা ক্লাস ফিল্টার থাকলে সেটা ব্যবহার করা)
+        $feeQuery = FeeAmount::where('school_id', $schoolId)
+                             ->where('fee_head_id', $request->fee_head_id);
+
+        if ($request->filled('class_id')) {
+            $feeQuery->where('class_id', $request->class_id);
+        }
+
+        $feeSetups = $feeQuery->get();
 
         if ($feeSetups->isEmpty()) {
             return back()->with('error', 'এই ফি হেডের জন্য কোনো অ্যামাউন্ট সেট করা নেই!');
@@ -56,9 +79,21 @@ class StudentFeeController extends Controller
         DB::transaction(function () use ($feeSetups, $request, $schoolId, &$count) {
             foreach ($feeSetups as $setup) {
                 
-                $students = Student::where('school_id', $schoolId)
-                    ->where('class_id', $setup->class_id)
-                    ->whereNotExists(function ($query) use ($request) {
+                // স্টুডেন্ট কোয়েরিতে ক্যাটেগরি এবং সাব-ক্যাটেগরি লজিক যুক্ত করা
+                $studentQuery = Student::where('school_id', $schoolId)
+                    ->where('class_id', $setup->class_id);
+
+                // যদি ইউজার নির্দিষ্ট ক্যাটেগরি সিলেক্ট করে (যেমন শুধু প্রাইমারি স্টুডেন্টদের ফি হবে)
+                if ($request->filled('school_category_id')) {
+                    $studentQuery->where('school_category_id', $request->school_category_id);
+                }
+                
+                // যদি ইউজার নির্দিষ্ট সাব-ক্যাটেগরি সিলেক্ট করে (যেমন শুধু সায়েন্সের ফি হবে)
+                if ($request->filled('school_sub_category_id')) {
+                    $studentQuery->where('school_sub_category_id', $request->school_sub_category_id);
+                }
+
+                $students = $studentQuery->whereNotExists(function ($query) use ($request) {
                         $query->select(DB::raw(1))
                             ->from('student_fees')
                             ->whereColumn('student_fees.student_id', 'students.id')

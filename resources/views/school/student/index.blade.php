@@ -3,14 +3,15 @@
 <style>
     .pagination{
         justify-content: center;
+        
     }
 
     /* pagination item */
     .pagination .page-link{
-        border-radius: 50%!important;
+    border-radius: 50%!important;
         margin: 0 4px;
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 33px;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -28,7 +29,7 @@
     .pagination .page-item.active .page-link{
         background:#0d6efd;
         border-color:#0d6efd;
-        border-radius: 50% !important;
+
         color:#fff;
     }
 

@@ -87,6 +87,32 @@
                                 </div>
                                 <div class="col-lg-3 my-2">
                                     <div class="form-group">
+                                        <label for="school_category_id" class="form-label">Category <span class="text-warning mx-1">*</span></label>
+                                        <select class="form-select" id="school_category_id" name="school_category_id" required>
+                                            <option value="">Select Category</option>
+                                            
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" class="text-capitalize">{{ $category->name }}</option>
+                                            @endforeach
+                                            @error('school_category_id')
+                                            <p class="text-danger">{{ $message }}</p>
+                                            @enderror
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 my-2">
+                                    <div class="form-group">
+                                        <label for="school_sub_category_id" class="form-label">Group <span class="text-warning mx-1">*</span></label>
+                                        <select class="form-select" id="school_sub_category_id" name="school_sub_category_id" required>
+                                            <option value="">Select Group</option>
+                                            @error('school_sub_category_id')
+                                            <p class="text-danger">{{ $message }}</p>
+                                            @enderror
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 my-2">
+                                    <div class="form-group">
                                         <label for="section_id" class="form-label">Section <span class="text-warning mx-1">*</span></label>
                                         <select class="form-select" id="section_id" name="section_id" required>
                                             <option value="">Select Section</option>
@@ -316,6 +342,29 @@
 
 @section('customJs')
 <script>
+    $(document).ready(function() {
+        $('#school_category_id').on('change', function() {
+            var categoryId = $(this).val();
+            var subCatDropdown = $('#school_sub_category_id');
+            
+            // আগে সাব-ক্যাটাগরি ক্লিয়ার করুন
+            subCatDropdown.empty();
+            subCatDropdown.append('<option value="">গ্রুপ সিলেক্ট করুন</option>');
+
+            if(categoryId) {
+                $.ajax({
+                    url: "{{ route('get.subcategories', ['tenant' => auth()->user()->school->slug, 'categoryId' => ':id']) }}".replace(':id', categoryId),
+                    type: "GET",
+                    dataType: "json",
+                    success:function(data) {
+                        $.each(data, function(key, value) {
+                            subCatDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                        });
+                    }
+                });
+            }
+        });
+    });
     // Add any custom JavaScript for the teacher creation page here
     @if(session('success'))
     Swal.fire({

@@ -89,7 +89,7 @@ class DashboardController extends Controller
             ->where('status', 'unpaid')
             ->where('month', $month)
             ->whereHas('student')
-            ->get();
+            ->paginate(5);
 
         return response()->json([
             'html' => view('school.partials._unpaid_list', compact('unpaidList'))->render()
