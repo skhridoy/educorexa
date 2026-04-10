@@ -7,6 +7,7 @@ use App\Models\StudentFee;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -90,12 +91,14 @@ class PaymentController extends Controller
 
     public function downloadReceipt($tenant, $id)
     {
+        $schoolId = auth()->user()->school_id;
         $fee = StudentFee::with(['student.class', 'feeHead', 'school'])->findOrFail($id);
-
+        $school = DB::table('schools')->find($schoolId);
         $data = [
             'fee' => $fee,
             'school' => $fee->school,
             'student' => $fee->student,
+            'schoolLogo' => public_path($school->logo ?? 'no-logo.png'),
             'amountInWords' => $this->amountInWords($fee->amount), // এখানে কল করুন
         ];
 

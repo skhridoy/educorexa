@@ -9,5 +9,7 @@
     </div>
 
     <p style="margin-top: 20px;">কোনো সমস্যা হলে আমাদের সাপোর্ট টিমে যোগাযোগ করুন।</p>
-    <p>ধন্যবাদ,<br><strong>EduCorexa টিম</strong></p>
+    <p style="font-size:16px">ধন্যবাদ,<br><strong>EduCorexa টিম</strong></p>
+    <p style="font-size: 14px;">Kajol Ray</p>
+    <p style="font-size: 12px;">Founder, educorexa</p>
 </div>
