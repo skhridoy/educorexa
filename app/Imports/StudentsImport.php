@@ -116,7 +116,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
                     'school_id'              => $schoolId,
                     'academic_year_id'       => $academicYear->id,
                     'school_category_id'     => $categoryId,    // Classes টেবিল থেকে প্রাপ্ত
-                    'school_sub_category_id' => $subCategoryId,,
+                    'school_sub_category_id' => $subCategoryId,
                     'class_id'               => $class->id,
                     'section_id'             => $sectionId,
                     'student_id'             => $studentId,
