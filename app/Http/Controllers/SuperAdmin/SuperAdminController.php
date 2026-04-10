@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\SchoolApprovedMail;
+use Illuminate\Support\Facades\Mail;
 
 class SuperAdminController extends Controller
 {
@@ -32,51 +34,57 @@ class SuperAdminController extends Controller
         return view('super.schools.pending', compact('schools', 'mainDomain'));
     }
     public function approve(School $school)
-{
-    DB::transaction(function () use ($school) {
-        // ১. স্কুল স্ট্যাটাস আপডেট
-        $school->update([
-            'status' => 'approved',
-            'is_active' => true,
-            'slug' => $school->slug ?? Str::slug($school->name)
-        ]);
+    {
+        DB::transaction(function () use ($school) {
+            // ১. স্কুল স্ট্যাটাস আপডেট
+            $school->update([
+                'status' => 'approved',
+                'is_active' => true,
+                'slug' => $school->slug ?? Str::slug($school->name)
+            ]);
 
-        // ২. স্কুলের অ্যাডমিন ইউজারকে খুঁজে বের করা
-        $adminUser = User::where('email', $school->email)
-                         ->where('school_id', $school->id)
-                         ->first();
+            // ২. স্কুলের অ্যাডমিন ইউজারকে খুঁজে বের করা
+            $adminUser = User::where('email', $school->email)
+                            ->where('school_id', $school->id)
+                            ->first();
 
-        if ($adminUser) {
-            // ৩. 'School Admin' রোল নিশ্চিত করা
-            $role = Role::firstOrCreate(['name' => 'school_admin', 'guard_name' => 'web']);
+            if ($adminUser) {
+                // ৩. 'School Admin' রোল নিশ্চিত করা
+                $role = Role::firstOrCreate(['name' => 'school_admin', 'guard_name' => 'web']);
 
-            // ৪. কনফিগ থেকে পারমিশন ডাটাবেজে নেওয়া
-            $permissions = array_keys(config('permissions.permissions'));
+                // ৪. কনফিগ থেকে পারমিশন ডাটাবেজে নেওয়া
+                $permissions = array_keys(config('permissions.permissions'));
 
-            foreach ($permissions as $permissionName) {
-                Permission::firstOrCreate([
-                    'name' => $permissionName, 
-                    'guard_name' => 'web'
-                ]);
+                foreach ($permissions as $permissionName) {
+                    Permission::firstOrCreate([
+                        'name' => $permissionName, 
+                        'guard_name' => 'web'
+                    ]);
+                }
+
+                // ৫. সংশোধন: syncPermissions এর বদলে missing permissions গুলো যোগ করা
+                // এতে আগের পারমিশন রিসেট হবে না
+                $role->givePermissionTo($permissions); 
+
+                // ৬. ইউজারকে রোল দেওয়া
+                if (!$adminUser->hasRole('school_admin')) {
+                    $adminUser->assignRole($role);
+                }
+
+                // ৭. সবচেয়ে গুরুত্বপূর্ণ: Spatie এর ইন্টারনাল ক্যাশ ক্লিয়ার করা
+                app()[PermissionRegistrar::class]->forgetCachedPermissions();
             }
-
-            // ৫. সংশোধন: syncPermissions এর বদলে missing permissions গুলো যোগ করা
-            // এতে আগের পারমিশন রিসেট হবে না
-            $role->givePermissionTo($permissions); 
-
-            // ৬. ইউজারকে রোল দেওয়া
-            if (!$adminUser->hasRole('school_admin')) {
-                $adminUser->assignRole($role);
-            }
-
-            // ৭. সবচেয়ে গুরুত্বপূর্ণ: Spatie এর ইন্টারনাল ক্যাশ ক্লিয়ার করা
-            app()[PermissionRegistrar::class]->forgetCachedPermissions();
+        });
+        try {
+        Mail::to($school->email)->send(new SchoolApprovedMail($school));
+        } catch (\Exception $e) {
+            // মেইল না গেলেও সিস্টেম যেন ক্রাশ না করে সেজন্য লগ করা
+            \Log::error("Approval Email failed for {$school->name}: " . $e->getMessage());
         }
-    });
 
-    return redirect()->route('super.schools.all')->with('success', 'School Approved & Full Permissions Assigned!');
-}
-    
+        return redirect()->route('super.schools.all')->with('success', 'School Approved & Welcome Email Sent!');
+    }
+        
     public function allSchools()
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');

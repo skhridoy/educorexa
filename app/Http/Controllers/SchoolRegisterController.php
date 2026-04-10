@@ -5,7 +5,8 @@ use App\Notifications\SuperAdminNotification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\School;
-
+use App\Mail\SchoolPendingMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -69,6 +70,14 @@ class SchoolRegisterController extends Controller
             $superAdmin->notify(new SuperAdminNotification($details));
         } catch (\Exception $e) {
             dd("Error: " . $e->getMessage());
+        }
+
+        try {
+            // স্কুলকে পেন্ডিং ধন্যবাদ মেইল পাঠানো
+            Mail::to($newSchool->email)->send(new SchoolPendingMail($newSchool));
+        } catch (\Exception $e) {
+            // মেইল না গেলে লগ করে রাখবে কিন্তু রেজিস্ট্রেশন থামাবে না
+            \Log::error("Registration Mail Error: " . $e->getMessage());
         }
 
         return redirect()
