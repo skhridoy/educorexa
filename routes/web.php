@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\SchoolSubCategoryController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Student;
+
 use App\Http\Controllers\{
     HomeController,
     SchoolRegisterController,
@@ -33,8 +33,8 @@ use App\Http\Controllers\{
     AboutSectionController,
     FooterSettingController,
     SchoolOverviewController,
-    LessonPlanController
-
+    LessonPlanController,
+    HolidayController
 };
 use App\Http\Controllers\SuperAdmin\{
     SuperAdminController,
@@ -300,18 +300,14 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::middleware('permission:lesson.view')->group(function () {
                     Route::get('diary/view/student', [LessonPlanController::class, 'studentView'])->name('diary.student_view');
                 });
+                Route::middleware('permission:holiday.manage')->group(function(){
+                    Route::get('holidays', [HolidayController::class, 'index'])->name('holidays.index');
+                    Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
+                    Route::delete('holidays/{id}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
+                });
                 Route::middleware('permission:attendance.manage')->group(function () {
-                    Route::get('get-students-by-class/{class_id}', function($tenant, $class_id) {
-                        $schoolId = auth()->user()->school_id;
-
-                        $students = Student::where('class_id', $class_id)
-                            ->where('school_id', $schoolId)
-                            ->select('id', 'name', 'student_id')
-                            ->get();
-                            
-                        return response()->json($students);
-                    })->name('students.get_by_class');
-                    Route::get('/attendance/report', [AttendanceController::class, 'StudentAttendanceReport'])->name('student.attendance.report');
+                    Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
+                    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('student.attendance.report');
                     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendances.index');
                     Route::post('/attendance-save', [AttendanceController::class, 'store'])->name('attendances.store');
                 });

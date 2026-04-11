@@ -193,11 +193,19 @@
                             <a href="{{ route('student.attendance.report', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">Attendance Report</a>
                         </li>
                         @endif
+                        {{-- Holiday Setup লিঙ্ক --}}
+                        @if(in_array('holiday.manage', $permissions) || auth()->user()->hasRole('school_admin'))
+                        <li class="nav-item">
+                            <a href="{{ route('holidays.index', ['tenant' => auth()->user()->school->slug]) }}" 
+                            class="nav-link {{ Request::is('*/holidays*') ? 'active' : '' }}">Holiday Setup</a>
+                        </li>
+                        @endif
                     </ul>
                 </div>
             </li>
             @endif
-
+          
+          
             {{-- Digital Diary Management --}}
             @if(auth()->user()->can('lesson.view') || auth()->user()->hasRole('student'))
             <li class="nav-item">

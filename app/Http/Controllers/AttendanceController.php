@@ -7,7 +7,7 @@ use App\Models\TeacherAssignSubject;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Attendance;
-use App\Models\Classes;
+use App\Models\Holiday;
 use Illuminate\Support\Facades\DB;
 class AttendanceController extends Controller
 {
@@ -100,41 +100,75 @@ class AttendanceController extends Controller
         }
     }
 
-    public function StudentAttendanceReport($tenant, Request $request) 
+    public function searchAjax(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
-        $classId = $request->class_id;
-        $studentId = $request->student_id;
-        $year = $request->year ?? date('Y');
+        $query = $request->get('q');
+        $classId = $request->get('class_id');
+
+        $students = Student::where('school_id', auth()->user()->school_id)
+            ->when($query, function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                ->orWhere('student_id', 'LIKE', "%{$query}%"); // এখানে আইডি দিয়ে সার্চ হচ্ছে
+            })
+            ->when($classId, function($q) use ($classId) {
+                $q->where('class_id', $classId);
+            })
+            ->limit(10)
+            ->get(['id', 'name', 'student_id']);
+
+        return response()->json($students);
+    }
+    public function report(Request $request, $tenant)
+    {
+        $year = $request->get('year', date('Y'));
+        $studentIdInput = $request->get('student_id');
 
         $student = null;
-        $events = [];
+        $attendanceData = [];
+        
+        // স্কুলের সকল বিশেষ ছুটির তারিখগুলো অ্যারে হিসেবে আনা
+        $allHolidays = \App\Models\Holiday::where('school_id', auth()->user()->school_id)
+                        ->whereYear('date', $year)
+                        ->pluck('date')
+                        ->map(fn($date) => $date instanceof \Carbon\Carbon ? $date->toDateString() : date('Y-m-d', strtotime($date)))
+                        ->toArray();
 
-        // ১. সকল ক্লাস নিয়ে আসা
-        $classes = Classes::where('school_id', $schoolId)->get();
-
-        if ($studentId) {
-            $student = Student::where('id', $studentId)
-                            ->where('school_id', $schoolId)
+        if ($studentIdInput) {
+            $student = Student::with(['class', 'section'])
+                            ->where('school_id', auth()->user()->school_id)
+                            ->where('student_id', $studentIdInput) 
                             ->first();
 
             if ($student) {
                 $attendances = Attendance::where('student_id', $student->id)
                                         ->whereYear('date', $year)
-                                        ->where('school_id', $schoolId)
                                         ->get();
-                
-                foreach ($attendances as $attendance) {
-                    $events[] = [
-                        'title' => ucfirst($attendance->status),
-                        'start' => $attendance->date,
-                        'backgroundColor' => ($attendance->status == 'present') ? '#05a34a' : '#ff3366',
-                        'borderColor' => ($attendance->status == 'present') ? '#05a34a' : '#ff3366',
+
+                foreach ($attendances as $record) {
+                    $attendanceData[] = [
+                        'title' => $record->status == 'present' ? 'P' : 'A',
+                        'start' => date('Y-m-d', strtotime($record->date)), 
                     ];
                 }
             }
         }
 
-        return view('school.attendance.report', compact('events', 'student', 'year', 'classes', 'classId', 'tenant'));
+        return view('school.attendance.report', compact('student', 'year', 'attendanceData', 'tenant', 'allHolidays'));
+    }
+
+    private function isHoliday($date, $schoolId)
+    {
+        // ১. সাপ্তাহিক ছুটি (শুক্রবার) চেক করা
+        $dayName = date('l', strtotime($date));
+        if ($dayName == 'Friday') {
+            return true;
+        }
+
+        // ২. ডাটাবেজে ওই দিনের জন্য কোনো বিশেষ ছুটি সেট করা আছে কি না
+        $specialHoliday = Holiday::where('school_id', $schoolId)
+                            ->where('date', $date)
+                            ->exists();
+
+        return $specialHoliday;
     }
 }

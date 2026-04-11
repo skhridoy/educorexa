@@ -1,343 +1,274 @@
 @extends('layouts.school')
 
 @section('customCss')
-    <style>
-        input{
-            min-width: 50px;
-            }
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+<style>
+    .form-section-title {
+        position: relative;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #050c24;
+        border-bottom: 2px solid #e8ebf1;
+    }
+    .form-section-title::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 50px;
+        height: 2px;
+        background: #6571ff;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 12px;
+    }
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #444;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        border: 1px solid #dce1e7;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #6571ff;
+        box-shadow: 0 0 0 0.2rem rgba(101, 113, 255, 0.1);
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
 
-        /* Firefox */
-        input[type=number] {
-            -moz-appearance: textfield;
+    @media (max-width: 576px) {
+        
+        .btn-sm.px-3 {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
         }
-        .phone-icon{
-            position: absolute;
-            right: 12px;
-            top: 38px;
-            font-size: 18px;
-            display: none;
+        .link-icon {
+            margin-right: 0 !important;
         }
+        .btn-sm span {
+            display: none!important;
+        }
+    }
 
-        .phone-valid{
-            color: #28a745; /* green */
-        }
-
-        .phone-invalid{
-            color: #dc3545; /* red */
-        }
-    </style>
+    /* ফটো প্রিভিউ বক্সের স্টাইল */
+    #photo-preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px dashed #dce1e7;
+        display: none; /* শুরুতে হাইড থাকবে */
+    }
+</style>
 @endsection
+
 @section('content')
+<div class="page-content">
+    <nav class="page-breadcrumb d-flex justify-content-between align-items-center">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Student Admission</li>
+        </ol>
+        <div class="d-flex gap-2">
+            <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()->school->slug]) }}" class="custom-btn btn btn-outline-primary btn-sm px-3">
+                <i class="link-icon" data-feather="download"></i> <span>Download Template</span>
+            </a>
+            <a href="{{ route('students.importForm', ['tenant' => auth()->user()->school->slug]) }}" class="custom-btn btn btn-primary btn-sm px-3">
+                <i class="link-icon" data-feather="upload"></i> <span>Import Students</span>
+            </a>
+        </div>
+    </nav>
 
-    <div class="page-content">
-        <div class="row">
-            <nav class="col-md-6 page-breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Student Create</li>
-                </ol>
-            </nav>
-            
-            <div class="my-2 text-end">
-                
-                <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-outline-primary btn-sm">
-                    Download Excel
-                </a>
-                <a href="{{ route('students.importForm', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-primary btn-sm">Import Students</a>
-            </div>
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Add New Student</h6>
-                        <p class="card-description">Fill in the details below to add a new student to your school.</p>
-                        <form method="POST" action="{{ route('students.store', ['tenant' => auth()->user()->school->slug]) }}" enctype="multipart/form-data">
-                            @csrf
-
-                            <div class="row">
-                                <h4 class="form-title mt-2 text-12">Academic Information</h4>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label class="form-label" for="name">Name <span class="text-warning mx-1">*</span></label>
-                                        <input type="text" name="name" class="form-control"
-                                            id="name" placeholder="Enter student's name">
-                                        @error('name')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="class_id" class="form-label">Class <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="class_id" name="class_id" required>
-                                            <option value="">Select Class</option>
-                                            
-                                            @foreach($classes as $class)
-                                                <option value="{{ $class->id }}" class="text-capitalize">{{ $class->name }}</option>
-                                            @endforeach
-                                            @error('class_id')
-                                            <p class="text-danger">{{ $message }}</p>
-                                            @enderror
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="school_category_id" class="form-label">Category <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="school_category_id" name="school_category_id" required>
-                                            <option value="">Select Category</option>
-                                            
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->id }}" class="text-capitalize">{{ $category->name }}</option>
-                                            @endforeach
-                                            @error('school_category_id')
-                                            <p class="text-danger">{{ $message }}</p>
-                                            @enderror
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="school_sub_category_id" class="form-label">Group <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="school_sub_category_id" name="school_sub_category_id" required>
-                                            <option value="">Select Group</option>
-                                            @error('school_sub_category_id')
-                                            <p class="text-danger">{{ $message }}</p>
-                                            @enderror
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="section_id" class="form-label">Section <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="section_id" name="section_id" required>
-                                            <option value="">Select Section</option>
-                                            
-                                            @foreach($sections as $section)
-                                                <option value="{{ $section->id }}" class="text-capitalize">{{ $section->name }}</option>
-                                            @endforeach
-                                            @error('class_id')
-                                            <p class="text-danger">{{ $message }}</p>
-                                            @enderror
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="previous_school" class="form-label">Previous School </label>
-                                        <input type="text" class="form-control" id="previous_school" name="previous_school" placeholder="Enter previous school name">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="previous_class" class="form-label">Previous Class</label>
-                                        <input type="text" name="previous_class" class="form-control"
-                                            id="previous_class" placeholder="Enter student's previous class">
-                                        @error('previous_class')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="admission_date" class="form-label">Admission Date</label>
-                                        <input type="date" name="admission_date" class="form-control"
-                                            id="admission_date" placeholder="Enter student's admission date">
-                                        @error('admission_date')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <h4 class="form-title mt-2 text-12">Personal Information</h4>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="father_name" class="form-label">Father Name</label>
-                                        <input type="text" name="father_name" class="form-control"
-                                            id="father_name" placeholder="Enter teacher's father name">
-                                        @error('father_name')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="mother_name" class="form-label">Mother Name</label>
-                                        <input type="text" name="mother_name" class="form-control"
-                                            id="mother_name" placeholder="Enter teacher's mother name">
-                                        @error('mother_name')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="father_nid" class="form-label">Father's NID</label>
-                                        <input type="text" name="father_nid" class="form-control"
-                                            id="father_nid" placeholder="Enter father's Nid number">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="mother_nid" class="form-label">Mother's NID</label>
-                                        <input type="text" name="mother_nid" class="form-control"
-                                            id="mother_nid" placeholder="Enter mother's Nid number">
-                                    </div>
-                                </div>
-                            
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="student_nid" class="form-label">Student NID/Birth <span class="text-warning mx-1">*</span></label>
-                                        <input type="text" name="student_birth_nid" class="form-control"
-                                            id="student_birth_nid" placeholder="Enter student's Nid number">
-                                        @error('student_birth_nid')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <label class="form-label">Date of Birth <span class="text-warning mx-1">*</span></label>
-                                    <div class="input-group">
-                                        <select name="dob_day" class="form-select" required>
-                                            <option value="">Day</option>
-                                            @for ($i = 1; $i <= 31; $i++)
-                                                <option value="{{ sprintf('%02d', $i) }}">{{ $i }}</option>
-                                            @endfor
-                                        </select>
-
-                                        <select name="dob_month" class="form-select" required>
-                                            <option value="">Month</option>
-                                            @foreach(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $index => $month)
-                                                <option value="{{ sprintf('%02d', $index + 1) }}">{{ $month }}</option>
-                                            @endforeach
-                                        </select>
-
-                                        <select name="dob_year" class="form-select" required>
-                                            <option value="">Year</option>
-                                            @php
-                                                $currentYear = date('Y');
-                                                $startYear = $currentYear - 80; // ৮০ বছর আগের পর্যন্ত
-                                            @endphp
-                                            @for ($i = $currentYear; $i >= $startYear; $i--)
-                                                <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    @error('date_of_birth')
-                                        <small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="gender" class="form-label">Gender <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="gender" name="gender">
-                                            <option value="">Select Gender</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="religion" class="form-label">Religion <span class="text-warning mx-1">*</span></label>
-                                        <select class="form-select" id="religion" name="religion">
-                                            <option value="">Select Religion</option>
-                                            <option value="Islam">Islam</option>
-                                            <option value="Hinduism">Hinduism</option>
-                                            <option value="Christian">Christian</option>
-                                            <option value="Buddhist">Buddhist</option>
-                                        </select>
-                                        @error('religion')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="phone" class="form-label">Phone <span class="text-warning mx-1">*</span></label>
-                                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter 11 digit phone number">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="blood_group" class="form-label">Blood Group</label>
-                                        <select class="form-select" id="blood_group" name="blood_group">
-                                            <option value="">Select Blood Group</option>
-                                            <option value="A+">A+</option>
-                                            <option value="A-">A-</option>
-                                            <option value="B+">B+</option>
-                                            <option value="B-">B-</option>
-                                            <option value="AB+">AB+</option>
-                                            <option value="AB-">AB-</option>
-                                            <option value="O+">O+</option>
-                                            <option value="O-">O-</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="address" class="form-label">Address</label>
-                                        <input type="text" name="address" class="form-control"
-                                            id="address" placeholder="Enter student's address">
-                                        @error('address')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <h4 class="form-title mt-2 text-12">Account Information</h4>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="email" class="form-label">Email <span class="text-warning mx-1">*</span></label>
-                                        <input type="email" name="email" class="form-control"
-                                            id="email" placeholder="Enter teacher's email">
-                                        @error('email')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="password" class="form-label">Password <span class="text-warning mx-1">*</span></label>
-                                        <input type="password" name="password" class="form-control"
-                                            id="password" placeholder="Enter password">
-                                        @error('password')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="password_confirmation" class="form-label">Confirm Password <span class="text-warning mx-1">*</span></label>
-                                        <input type="password" name="password_confirmation" class="form-control"
-                                            id="password_confirmation" placeholder="Confirm password">
-                                        @error('password_confirmation')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 my-2">
-                                    <div class="form-group">
-                                        <label for="photo" class="form-label">Photo <span class="text-warning mx-1">*</span></label>
-                                        <input type="file" class="form-control" id="photo" name="photo">
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add Student</button>
-                        </form>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="card-title mb-1">New Student Registration</h4>
+                            <p class="text-muted">Fill out the form below to register a new student.</p>
+                        </div>
                     </div>
+
+                    <form method="POST" action="{{ route('students.store', ['tenant' => auth()->user()->school->slug]) }}" enctype="multipart/form-data">
+                        @csrf
+
+                        <h5 class="form-section-title">Academic Information</h5>
+                        <div class="row mb-4">
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter student's full name" value="{{ old('name') }}" required>
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Class <span class="text-danger">*</span></label>
+                                <select class="form-select @error('class_id') is-invalid @enderror" name="class_id" id="class_id" required>
+                                    <option value="">Choose Class</option>
+                                    @foreach($classes as $class)
+                                        <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('class_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Section <span class="text-danger">*</span></label>
+                                <select class="form-select" name="section_id" id="section_id" required>
+                                    <option value="">Choose Section</option>
+                                    @foreach($sections as $section)
+                                        <option value="{{ $section->id }}">{{ $section->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="school_category_id" name="school_category_id" required>
+                                    <option value="">Choose Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Group/Sub-Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="school_sub_category_id" name="school_sub_category_id" required>
+                                    <option value="">Select Group</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Admission Date</label>
+                                <input type="date" name="admission_date" class="form-control" value="{{ date('Y-m-d') }}">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Previous School Name</label>
+                                <input type="text" name="previous_school" class="form-control" placeholder="Optional">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Previous Class</label>
+                                <input type="text" name="previous_class" class="form-control" placeholder="Optional">
+                            </div>
+                        </div>
+
+                        <h5 class="form-section-title">Personal Information</h5>
+                        <div class="row mb-4">
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Father's Name</label>
+                                <input type="text" name="father_name" class="form-control" placeholder="Enter father's name">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Mother's Name</label>
+                                <input type="text" name="mother_name" class="form-control" placeholder="Enter mother's name">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Father's NID</label>
+                                <input type="text" name="father_nid" class="form-control" placeholder="NID Number">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Mother's NID</label>
+                                <input type="text" name="mother_nid" class="form-control" placeholder="NID Number">
+                            </div>
+                            <div class="col-lg-3 mb-3">
+                                <label class="form-label">Student NID/Birth Certificate <span class="text-danger">*</span></label>
+                                <input type="text" name="student_birth_nid" class="form-control" placeholder="Enter number" required>
+                            </div>
+                            <div class="col-lg-5 mb-3">
+                                <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <select name="dob_day" class="form-select" required>
+                                        <option value="">Day</option>
+                                        @for ($i = 1; $i <= 31; $i++) <option value="{{ sprintf('%02d', $i) }}">{{ $i }}</option> @endfor
+                                    </select>
+                                    <select name="dob_month" class="form-select" required>
+                                        <option value="">Month</option>
+                                        @foreach(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $idx => $m)
+                                            <option value="{{ sprintf('%02d', $idx + 1) }}">{{ $m }}</option>
+                                        @endforeach
+                                    </select>
+                                    <select name="dob_year" class="form-select" required>
+                                        <option value="">Year</option>
+                                        @for ($i = date('Y'); $i >= date('Y')-30; $i--) <option value="{{ $i }}">{{ $i }}</option> @endfor
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 mb-3">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 mb-3">
+                                <label class="form-label">Religion</label>
+                                <select class="form-select" name="religion">
+                                    <option value="Islam">Islam</option>
+                                    <option value="Hinduism">Hinduism</option>
+                                    <option value="Christian">Christian</option>
+                                    <option value="Buddhist">Buddhist</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="text" name="phone" id="phone" class="form-control" placeholder="01xxxxxxxxx" required maxlength="11">
+                                <div id="phone-error" class="text-danger small" style="display:none;">Invalid Bangladeshi phone number</div>
+                            </div>
+                            <div class="col-lg-2 mb-3">
+                                <label class="form-label">Blood Group</label>
+                                <select class="form-select" name="blood_group">
+                                    <option value="">Select</option>
+                                    @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
+                                        <option value="{{ $bg }}">{{ $bg }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Permanent Address</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter full address">
+                            </div>
+                        </div>
+
+                        <h5 class="form-section-title">Account Credentials</h5>
+                        <div class="row mb-4">
+                            <div class="col-lg-4 mb-3">
+                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="student@example.com" value="{{ old('email') }}" required>
+                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Minimum 8 characters" required>
+                                @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password_confirmation" class="form-control" placeholder="Repeat password" required>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <label class="form-label">Student Photo</label>
+                                <input type="file" name="photo" class="form-control @error('photo') is-invalid @enderror">
+                                <small class="text-muted">Max size: 2MB (JPG, PNG)</small>
+                                @error('photo') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="reset" class="btn btn-light me-2">Reset Form</button>
+                            <button type="submit" class="btn btn-primary px-5">Save Student Data</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('customJs')
@@ -347,9 +278,7 @@
             var categoryId = $(this).val();
             var subCatDropdown = $('#school_sub_category_id');
             
-            // আগে সাব-ক্যাটাগরি ক্লিয়ার করুন
-            subCatDropdown.empty();
-            subCatDropdown.append('<option value="">গ্রুপ সিলেক্ট করুন</option>');
+            subCatDropdown.empty().append('<option value="">Loading...</option>');
 
             if(categoryId) {
                 $.ajax({
@@ -357,21 +286,72 @@
                     type: "GET",
                     dataType: "json",
                     success:function(data) {
+                        subCatDropdown.empty().append('<option value="">Select Group</option>');
                         $.each(data, function(key, value) {
                             subCatDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
                         });
+                    },
+                    error: function() {
+                        subCatDropdown.empty().append('<option value="">No Group Found</option>');
                     }
                 });
             }
         });
     });
-    // Add any custom JavaScript for the teacher creation page here
+
+    $(document).ready(function() {
+    // ১. ফটো প্রিভিউ লজিক
+    $('#photo-input').change(function() {
+        const file = this.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                $('#photo-preview').attr('src', event.target.result).fadeIn();
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // ২. ফোন নাম্বার ভেলিডেশন (বাংলাদেশী ফরমেট)
+    $('#phone').on('input', function() {
+        var phone = $(this).val();
+        var regex = /^01[3-9]\d{8}$/; // বাংলাদেশী ১১ ডিজিট ভেলিডেশন
+        
+        // শুধু নাম্বার ইনপুট নিতে সাহায্য করবে
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        if (phone.length > 0) {
+            if (regex.test(phone)) {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+                $('#phone-error').hide();
+            } else {
+                $(this).removeClass('is-valid').addClass('is-invalid');
+                $('#phone-error').show();
+            }
+        } else {
+            $(this).removeClass('is-invalid is-valid');
+            $('#phone-error').hide();
+        }
+    });
+
+    // ফর্ম সাবমিট করার সময় ভুল ফোন নাম্বার থাকলে বাধা দিবে
+    $('form').on('submit', function(e) {
+        var phone = $('#phone').val();
+        var regex = /^01[3-9]\d{8}$/;
+        if (!regex.test(phone)) {
+            e.preventDefault();
+            $('#phone').addClass('is-invalid').focus();
+            $('#phone-error').show();
+            Swal.fire('Error', 'Please enter a valid 11-digit phone number', 'error');
+        }
+    });
+});
     @if(session('success'))
     Swal.fire({
-        icon: '{{ session('type', 'success') }}',
-        title: 'Success!',
+        icon: 'success',
+        title: 'Successful!',
         text: '{{ session('success') }}',
-        timer: 1500,
+        timer: 2000,
         showConfirmButton: false
     });
     @endif

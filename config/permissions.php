@@ -52,6 +52,7 @@ return [
             'attendance.manage'    => 'Manage Attendance',
             'attendance.report'    => 'View Attendance Report',
             'attendance.view'      => 'View Attendance',
+            'holiday.manage'       => 'Setup Holidays'
         ],
 
         'Exams' => [
