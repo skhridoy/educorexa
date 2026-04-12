@@ -213,8 +213,8 @@
         {{-- Action Button --}}
         <div class="p-4 pt-0">
             <a href="{{ route('frontend.generate_marksheet', ['tenant' => $tenant, 'studentId' => $student->id, 'classId' => $student->class_id, 'examId' => $exam->id]) }}" 
-               class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-sm transition">
-                <i class="fas fa-file-download me-2"></i> Download Marksheet (PDF)
+               class="btn btn-primary btn-sm w-100 rounded-pill fw-bold p-2 shadow-sm transition">
+                <i class="fas fa-file-download me-2"></i> Marksheet (PDF)
             </a>
         </div>
     </div>
