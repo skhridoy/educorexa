@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ResultController;
 use App\Http\Controllers\SchoolSubCategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -129,6 +130,9 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
+            // Result Route 
+            Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
+            Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
             // Protected Routes
             Route::middleware(['auth'])->group(function () {
                 // শিক্ষার্থীর জন্য নির্দিষ্ট রাউট
