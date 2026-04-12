@@ -164,7 +164,7 @@
         {{-- Top Card Header --}}
         <div class="result-header">
             <div class="profile-avatar">
-                <img src="{{ $student->photo ? asset('storage/' . $student->photo) : asset('assets/images/profile.webp') }}" 
+                <img src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}" 
                      alt="{{ $student->name }}"
                      onerror="this.src='{{ asset('assets/images/profile.webp') }}'">
             </div>
