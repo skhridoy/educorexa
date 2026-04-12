@@ -33,7 +33,7 @@
         .top-container { width: 100%; margin-bottom: 15px; }
         .top-container td { vertical-align: top; }
         
-        .photo-box { width: 100px; height: 110px; border: 1px solid #000; text-align: center; line-height: 110px; }
+        .photo-box { width: 100px; height: 100px; border: 1px solid #000; text-align: center; line-height: 110px; }
         .logo-box img { width: 90px; }
         
         .grade-table { width: 100%; border-collapse: collapse; font-size: 9px; margin-top: -10px;}

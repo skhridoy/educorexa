@@ -15,6 +15,7 @@
                 <div class="position-relative w-100 mt-3 animated fadeInUp">
                     <form id="resultSearchForm">
                         @csrf
+                        
                         <input name="student_id" id="student_id" class="form-control border-0 rounded-pill w-100 ps-4 pe-5" 
                             type="text" placeholder="Search Result by ID (e.g. STD-261001)..." 
                             style="height: 58px;" required>
