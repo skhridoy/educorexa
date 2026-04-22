@@ -112,6 +112,19 @@ return [
             'contact.manage'        => 'Manage Contact Messages',
             'social.manage'         => 'Manage Social Links',
         ],
+
+        'Staff & HR' => [
+            'employee.manage' => 'Manage Employees',
+            'employee.index'  => 'View Employees',
+            'employee.create' => 'Add Employee',
+            'employee.edit'   => 'Edit Employee',
+            'employee.delete' => 'Delete Employee',
+        ],
+        'Super Admin Access' => [
+            'school.manage' => 'Manage Schools',
+            'super.roles.manage' => 'Manage Roles',
+            'super.settings.manage' => 'Manage Settings',
+        ],
     ],
 
 ];

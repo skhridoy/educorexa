@@ -13,7 +13,10 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        // রোল টাইপ দেখার জন্য role_type কলামটিও লোড করা ভালো
+        $roles = Role::with('permissions')
+                 ->withCount('users')
+                 ->get();
         return view('super.roles.index', compact('roles'));
     }
 
@@ -27,20 +30,21 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'role_type' => 'required|in:school_admin,teacher,student,custom',
+            // এখানে 'employee' এবং 'school_admin' ভ্যালিডেশনে যোগ করা হয়েছে
+            'role_type' => 'required|in:school_admin,teacher,student,employee,custom',
             'permissions' => 'required|array'
         ]);
 
         DB::transaction(function () use ($request) {
-
+            // আপনার ডাটাবেজ টেবিলে যদি role_type কলাম থাকে তবে এটি সেভ হবে
             $role = Role::create([
                 'name' => $request->name,
+                'role_type' => $request->role_type, 
                 'guard_name' => 'web'
             ]);
 
             // Assign permissions
             $role->syncPermissions($request->permissions);
-           
         });
 
         return redirect()
@@ -58,21 +62,29 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
+            'role_type' => 'required|in:school_admin,teacher,student,employee,custom',
         ]);
 
-        $role->update(['name' => $request->name]);
-        $role->syncPermissions($request->permissions ?? []);
+        DB::transaction(function () use ($request, $role) {
+            $role->update([
+                'name' => $request->name,
+                'role_type' => $request->role_type
+            ]);
+            
+            $role->syncPermissions($request->permissions ?? []);
+        });
 
         return redirect()->route('super.roles.index')->with('success','Role Updated Successfully');
     }
+
     public function destroy(Role $role)
     {
-        if(in_array($role->name, ['school_admin','teacher','student'])) {
-            return back()->with('error','Default role cannot be deleted.');
+        // ডিফল্ট রোলগুলো প্রোটেক্ট করা
+        if(in_array($role->name, ['school_admin','teacher','student','super_admin'])) {
+            return back()->with('error','Default system role cannot be deleted.');
         }
+        
         $role->delete();
         return redirect()->route('super.roles.index')->with('success','Role Deleted Successfully');
     }
 }
-
-

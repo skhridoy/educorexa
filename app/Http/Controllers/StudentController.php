@@ -78,30 +78,31 @@ class StudentController extends Controller
     {
         $schoolId = auth()->user()->school_id;
 
-        $students = Student::where('school_id', $schoolId);
+        // ১. কোয়েরি বিল্ডার শুরু করা (এখনই গেট বা পেজিনেট করা যাবে না)
+        $query = Student::where('school_id', $schoolId)
+            ->with(['class', 'section', 'category', 'group']);
+
+        // ২. সার্চ ফিল্টারসমূহ যোগ করা
+        if ($request->filled('student_id')) {
+            $query->where('student_id', 'like', '%' . $request->student_id . '%');
+        }
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if ($request->filled('contact')) {
+            // ডাটাবেজ কলামের নাম contact_number কি না নিশ্চিত হয়ে নিন
+            $query->where('contact_number', 'like', '%' . $request->contact . '%');
+        }
+
+        // ৩. সর্টিং এবং পেজিনেশন (সবশেষে)
+        $students = $query->orderBy('roll', 'asc')->paginate(10);
+
+        // ৪. একটিভ স্টুডেন্ট কাউন্ট (এটি আগের মতোই থাকবে)
         $activeStudents = Student::where('school_id', $schoolId)->where('status', 'active')->count();
 
-        // 🔍 Student ID
-        if ($request->filled('student_id')) {
-            $students->where('student_id', 'like', '%' . $request->student_id . '%');
-        }
-
-        // 🔍 Name
-        if ($request->filled('name')) {
-            $students->where('name', 'like', '%' . $request->name . '%');
-        }
-
-        // 🔍 Contact
-        if ($request->filled('contact')) {
-            $students->where('contact_number', 'like', '%' . $request->contact . '%');
-        }
-
-
-        $students = Student::where('school_id', $schoolId)
-            ->with(['class', 'section', 'category', 'group']) // ক্যাটেগরি এবং গ্রুপ লোড হবে
-            ->orderBy('roll', 'asc')
-            ->paginate(10);
-
+        // ৫. AJAX রেসপন্স হ্যান্ডেলিং
         if ($request->ajax()) {
             return view('school.student.partials.table', compact('students', 'activeStudents'))->render();
         }
@@ -184,6 +185,9 @@ class StudentController extends Controller
                 'role'      => 'student',
             ]);
 
+            if (method_exists($user, 'assignRole')) {
+                    $user->assignRole('student');
+                }
             // ২. স্টুডেন্ট তৈরি (school_category_id সহ)
             $student = Student::create([
                 'user_id'                => $user->id,
@@ -337,7 +341,7 @@ class StudentController extends Controller
 
         // Password update only if provide
 
-        return redirect()->back()->with([
+        return redirect()->route('students.index', $tenant)->with([
             'success' => 'Student updated successfully',
             'type' => 'success'
         ]);

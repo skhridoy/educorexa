@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Employee extends Model
+{
+    protected $fillable = [
+        'user_id', 'employee_id', 'designation', 
+        'phone_personal', 'address', 'joining_date', 
+        'salary', 'status'
+    ];
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+}

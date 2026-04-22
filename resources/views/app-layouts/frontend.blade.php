@@ -2,7 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{{ $setting->site_name ?? 'EduCorexa' }} - Awesome Software To Manage Your School</title>
+    
+    <title>{{ $setting->meta_title ?? ($setting->site_name ?? 'EduCorexa') }}</title>
+    
+    <meta name="description" content="{{ $setting->meta_description ?? 'Default school management description' }}">
+    <meta name="keywords" content="{{ $setting->meta_keywords ?? 'school, erp, management' }}">
+    <meta name="author" content="EduCorexa">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $setting->meta_title ?? $setting->site_name }}">
+    <meta property="og:description" content="{{ $setting->meta_description }}">
+    <meta property="og:image" content="{{ asset($setting->og_image ?? 'frontend/img/default-seo.jpg') }}">
+
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     
     <link href="{{ $setting && $setting->favicon ? asset($setting->favicon) : asset('frontend/img/favicon.ico') }}" rel="icon">

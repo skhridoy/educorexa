@@ -16,12 +16,17 @@ class SettingController extends Controller
     public function update(Request $request) {
         $setting = SiteSetting::first() ?? new SiteSetting();
         
-        // টেক্সট ডাটা আপডেট
+        // সাধারণ টেক্সট ডাটা আপডেট
         $setting->site_name = $request->site_name;
         $setting->email = $request->email;
         $setting->phone = $request->phone;
         $setting->address = $request->address;
         $setting->footer_text = $request->footer_text;
+
+        // --- নতুন SEO ডাটা আপডেট ---
+        $setting->meta_title = $request->meta_title;
+        $setting->meta_description = $request->meta_description;
+        $setting->meta_keywords = $request->meta_keywords;
 
         // মেইন পাথ সেটআপ
         $basePath = 'uploads/settings';
@@ -29,10 +34,8 @@ class SettingController extends Controller
         // ১. লোগো হ্যান্ডেলিং (Wide Logo)
         if ($request->hasFile('logo_wide')) {
             $logoPath = public_path($basePath . '/logos');
-            // ফোল্ডার না থাকলে তৈরি করা
             if (!file_exists($logoPath)) mkdir($logoPath, 0755, true);
 
-            // পুরনো ফাইল ডিলিট করা
             if ($setting->logo_wide && file_exists(public_path($setting->logo_wide))) {
                 @unlink(public_path($setting->logo_wide));
             }
@@ -40,7 +43,6 @@ class SettingController extends Controller
             $file = $request->file('logo_wide');
             $fileName = 'logo_wide_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($logoPath, $fileName);
-            
             $setting->logo_wide = $basePath . '/logos/' . $fileName;
         }
 
@@ -56,7 +58,6 @@ class SettingController extends Controller
             $file = $request->file('logo_square');
             $fileName = 'logo_sq_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($squarePath, $fileName);
-            
             $setting->logo_square = $basePath . '/logos_square/' . $fileName;
         }
 
@@ -72,12 +73,26 @@ class SettingController extends Controller
             $file = $request->file('favicon');
             $fileName = 'fav_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move($favPath, $fileName);
-            
             $setting->favicon = $basePath . '/favicons/' . $fileName;
+        }
+
+        // ৪. OG Image হ্যান্ডেলিং (SEO Social Preview)
+        if ($request->hasFile('og_image')) {
+            $seoPath = public_path($basePath . '/seo');
+            if (!file_exists($seoPath)) mkdir($seoPath, 0755, true);
+
+            if ($setting->og_image && file_exists(public_path($setting->og_image))) {
+                @unlink(public_path($setting->og_image));
+            }
+
+            $file = $request->file('og_image');
+            $fileName = 'seo_og_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($seoPath, $fileName);
+            $setting->og_image = $basePath . '/seo/' . $fileName;
         }
 
         $setting->save();
 
-        return back()->with('success', 'Site settings updated successfully!');
+        return back()->with('success', 'Site settings and SEO updated successfully!');
     }
 }

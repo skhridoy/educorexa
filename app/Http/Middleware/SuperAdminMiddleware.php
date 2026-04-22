@@ -9,12 +9,20 @@ class SuperAdminMiddleware
 {
     public function handle($request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->role !== 'super_admin') {
-            abort(403);
-            return redirect()->route('super.login.form')->withErrors(['email' => 'Unauthorized']);
+        // ১. লগইন চেক
+        if (!Auth::check()) {
+            return redirect()->route('super.login.form');
         }
 
-        return $next($request);
+        $user = Auth::user();
+
+        // ২. চেক করুন সে কি মেইন সুপার অ্যাডমিন নাকি এমপ্লয়ি
+        // $user->role হলো আপনার users টেবিলের কলাম
+        if ($user->role === 'super_admin' || $user->hasRole('HR') || $user->role === 'employee') {
+            return $next($request);
+        }
+
+        // ৩. যদি কোনোটিই না হয় (যেমন student বা teacher ভুল করে এই লিঙ্কে আসলে)
+        abort(403, 'Unauthorized access to Super Admin Panel.');
     }
 }
-

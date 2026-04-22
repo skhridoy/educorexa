@@ -6,8 +6,12 @@ use App\Models\User;
 use App\Models\AboutSection;
 use App\Models\School;
 use App\Models\Slider;
+use App\Models\Student;
 use App\Models\SchoolOverview;
 use App\Models\Teacher;
+use App\Models\ContactMessage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 class SchoolWebsiteController extends Controller
 {
     public function home($tenant)
@@ -45,11 +49,14 @@ class SchoolWebsiteController extends Controller
             $teachers->prepend($adminData);
         }
 
+        $studentCount = Student::where('school_id', $school->id)->count();
+        $teacherCount = Teacher::where('school_id', $school->id)->count();
+
         $overviews = SchoolOverview::where('school_id', $school->id) 
                             ->orderBy('order_by', 'asc')
                             ->get();
         
-        return view('school.website.home', compact('school', 'notices', 'sliders', 'about', 'teachers', 'overviews'));
+        return view('school.website.home', compact('school', 'notices', 'sliders', 'about', 'teachers', 'studentCount', 'teacherCount', 'overviews'));
     }
 
     public function about($tenant)
@@ -58,9 +65,30 @@ class SchoolWebsiteController extends Controller
         return view('school.website.about-us', compact('school'));
     }
 
-    public function resultForm()
-    {
-        $school = app('currentSchool'); 
-        return view('school.website.result', compact('school'));
+    
+    public function storeMessage($tenant, Request $request) {
+        $school = DB::table('schools')->where('slug', $tenant)->first();
+        if (!$school) {
+            return response()->json(['status' => false, 'message' => 'School not found.'], 404);
+        }
+
+        $schoolId = $school->id;
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'required',
+            'message' => 'required'
+        ]);
+
+        ContactMessage::create([
+            'school_id' => $schoolId,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'message' => $request->message,
+        ]);
+
+        return back()->with('success', 'আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে!');
     }
+
 }

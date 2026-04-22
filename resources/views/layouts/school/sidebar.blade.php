@@ -339,6 +339,9 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.newsletter.send', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">Send Email</a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.message.index', ['tenant' => auth()->user()->school->slug]) }}" class="nav-link">Messages</a>
+                        </li>
                     </ul>
                 </div>
             </li>

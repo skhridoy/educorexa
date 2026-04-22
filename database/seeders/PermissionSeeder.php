@@ -13,24 +13,19 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // ক্যাশ ক্লিয়ার করা (Spatie-র জন্য জরুরি)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // কনফিগ ফাইল থেকে পারমিশনগুলো নেওয়া
-        $permissionGroups = config('permissions.permissions');
-
-        foreach ($permissionGroups as $group => $permissions) {
+        foreach (config('permissions.permissions') as $groupName => $permissions) {
             foreach ($permissions as $name => $displayName) {
-                // পারমিশন তৈরি করা (যদি আগে থেকে না থাকে)
-                Permission::firstOrCreate([
-                    'name' => $name,
-                    'guard_name' => 'web'
-                ]);
+                Permission::updateOrCreate(
+                    ['name' => $name, 'guard_name' => 'web'],
+                    ['group_name' => $groupName]
+                );
             }
         }
 
-        // উদাহরণস্বরূপ একটি 'Super Admin' রোল তৈরি করে সব পারমিশন দেওয়া
-        $adminRole = Role::firstOrCreate(['name' => 'school_admin', 'guard_name' => 'web']);
-        $adminRole->givePermissionTo(Permission::all());
+        // সুপার এডমিনকে সব পারমিশন দেওয়া
+        $superAdmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super_admin']);
+        $superAdmin->syncPermissions(\Spatie\Permission\Models\Permission::all());
     }
 }

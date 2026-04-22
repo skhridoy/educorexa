@@ -111,4 +111,40 @@ class AuthController extends Controller
         ]);
         return redirect(route('super.login.form'))->with('success', 'Super Admin account created. You can now login.');
     }
+
+    public function employeeLoginForm()
+{
+    // site_settings থেকে ডাটা নিয়ে আসা
+    $site = \DB::table('site_settings')->first();
+    return view('auth.employee-login', compact('site'));
+}
+
+    // 🔹 Employee Login Submit
+    public function employeeLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        // প্রথমে লগইন করার চেষ্টা করি
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            // চেক করছি ইউজারের রোলটি 'employee' টাইপ কি না
+            $role = \Spatie\Permission\Models\Role::where('name', $user->role)->first();
+
+            if ($role && $role->role_type === 'employee') {
+                return redirect()->route('employee.dashboard');
+            }
+
+            // যদি ইউজার এমপ্লয়ি না হয়, তবে লগআউট করে এরর দেওয়া
+            Auth::logout();
+            return redirect()->back()->withErrors(['email' => 'This portal is only for employees.']);
+        }
+
+        return redirect()->back()->withErrors(['email' => 'Invalid email or password.']);
+    }
 }

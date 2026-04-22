@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\SchoolSubCategoryController;
 use Illuminate\Support\Facades\Route;
@@ -35,13 +36,15 @@ use App\Http\Controllers\{
     FooterSettingController,
     SchoolOverviewController,
     LessonPlanController,
-    HolidayController
+    HolidayController,
+
 };
 use App\Http\Controllers\SuperAdmin\{
     SuperAdminController,
     RoleController,
     PermissionController,
-    SettingController
+    SettingController,
+    EmployeeController
 };
 
 Route::domain(config('app.main_domain'))->group(function () {
@@ -60,6 +63,16 @@ Route::domain(config('app.main_domain'))->group(function () {
         ->name('school.register.store');
 
 
+    // Employee Login Routes
+    Route::get('/employee/login', [AuthController::class, 'employeeLoginForm'])->name('employee.login.form');
+    Route::post('/employee/login', [AuthController::class, 'employeeLogin'])->name('employee.login.submit');
+    Route::get('/forgot-password', function () {
+        return "Password reset feature is coming soon!";
+    })->name('password.request');
+    // Employee Dashboard (Protected Area)
+    Route::middleware(['auth'])->prefix('employee')->name('employee.')->group(function () {
+        Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('dashboard');
+    });
     /*
     |----------------------------------
     | Super Admin Routes
@@ -82,28 +95,42 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::controller(SuperAdminController::class)->group(function () {
 
                     Route::get('/dashboard', 'dashboard')->name('dashboard');
+                    Route::middleware(['permission:super.roles.manage'])->group(function () {
+                        Route::resource('roles', RoleController::class);
+                        Route::resource('permissions', PermissionController::class);
+                       
+                    });
+                    Route::prefix('employees')->name('employees.')->group(function () {
+                        Route::get('/', [EmployeeController::class, 'index'])->name('index'); // এটি যোগ করা হলো
+                        Route::get('/create', [EmployeeController::class, 'create'])->name('create');
+                        Route::post('/store', [EmployeeController::class, 'store'])->name('store');
+                        Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('edit');
+                        Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('update');
+                        Route::get('/delete/{id}', [EmployeeController::class, 'destroy'])->name('destroy');
+                    });
+                    Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+                    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+                    Route::middleware(['permission:school.manage'])->group(function () {
+                        Route::prefix('schools')->name('schools.')->group(function () {
 
-                    Route::prefix('schools')->name('schools.')->group(function () {
-
-                        Route::get('/create', 'createSchool')->name('create');
-                        Route::post('/create', 'schoolStore')->name('store');
-                        Route::get('/pending', 'pending')->name('pending');
-                        Route::put('/{school}/approve', 'approve')->name('approve');
-                        Route::get('/rejected', 'rejected')->name('rejected');
-                        Route::post('/{school}/reject', 'rejectSchool')->name('reject');
-                        Route::delete('/{school}', 'destroy')->name('destroy');
-                        Route::get('/all-school', 'allSchools')->name('all');
+                            Route::get('/create', 'createSchool')->name('create');
+                            Route::post('/create', 'schoolStore')->name('store');
+                            Route::get('/pending', 'pending')->name('pending');
+                            Route::put('/{school}/approve', 'approve')->name('approve');
+                            Route::get('/rejected', 'rejected')->name('rejected');
+                            Route::post('/{school}/reject', 'rejectSchool')->name('reject');
+                            Route::delete('/{school}', 'destroy')->name('destroy');
+                            Route::get('/all-school', 'allSchools')->name('all');
+                        });
                     });
                     Route::get('/notifications/read-all', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.readAll');
-                    Route::resource('roles', RoleController::class);
-                    Route::resource('permissions', PermissionController::class);
+                    
                 });
+
+               
 
                 Route::get('profile', [SuperAdminController::class, 'Profile'])->name('profile');
                 Route::post('profile/store', [SuperAdminController::class, 'ProfileStore'])->name('profile.store');
-
-                Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
-                Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
                 
             });
@@ -130,6 +157,7 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
+            Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('contact.store');
             // Result Route 
             Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
             Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
@@ -362,6 +390,14 @@ Route::domain(config('app.main_domain'))->group(function () {
 
                     Route::get('/admin/newsletter/send', [NewsletterController::class, 'createMail'])->name('admin.newsletter.send');
                     Route::post('/admin/newsletter/send', [NewsletterController::class, 'sendMail'])->name('admin.newsletter.store_mail');
+                });
+                // Newsletter 
+                Route::middleware('permission:message.manage')->group(function () {
+
+                    Route::get('/admin/message', [ContactMessageController::class, 'index'])->name('admin.message.index');
+                    Route::delete('/admin/message/{id}', [ContactMessageController::class, 'destroy'])->name('admin.message.destroy');
+
+                    
                 });
             });
 

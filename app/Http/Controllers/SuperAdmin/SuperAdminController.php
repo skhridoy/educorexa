@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\School;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\SchoolApprovedMail;
@@ -206,57 +207,66 @@ class SuperAdminController extends Controller
 
         return redirect()->route('super.schools.all')->with('success', 'School created and activation email sent!');
     }
+// প্রোফাইল ভিউ মেথড (আপডেটেড)
     public function Profile() {
-        $id = Auth::user()->id;
-        $profileData = User::find($id);
+        $user = Auth::user();
+        
+        // যদি ইউজার সুপার এডমিন না হয়ে এমপ্লয়ি হয়, তবে তার এমপ্লয়ি ডাটা লোড হবে
+        $profileData = User::with('employee')->find($user->id);
         
         return view('super.profile.profile', compact('profileData'));
     }
 
+    // প্রোফাইল আপডেট মেথড (আপডেটেড লজিক)
     public function ProfileStore(Request $request)
     {
-        $id = Auth::user()->id;
-        $data = User::find($id);
+        $user = Auth::user();
+        $data = User::find($user->id);
         
-        // টেক্সট ফিল্ড আপডেট
+        // ১. ইউজার টেবিল আপডেট (কমন ফর অল)
         $data->name = $request->name;
         $data->email = $request->email;
         $data->phone = $request->phone;
 
-        // যদি ক্রপ করা ইমেজ ডাটা থাকে (Base64)
+        // ২. যদি এমপ্লয়ি হয়, তবে এমপ্লয়ি টেবিলের অতিরিক্ত তথ্য আপডেট
+        if ($data->role === 'employee' || $data->employee) {
+            $employee = Employee::where('user_id', $data->id)->first();
+            if ($employee) {
+                // আপনার এমপ্লয়ি টেবিলে যে কলামগুলো আছে সেগুলো এখানে দিন
+                $employee->designation = $request->designation;
+                $employee->address = $request->address;
+                $employee->save();
+            }
+        }
+
+        // ৩. ইমেজ হ্যান্ডলিং (ক্রপ করা WebP ফরম্যাট)
         if ($request->cropped_image) {
             $image_data = $request->cropped_image;
 
-            // Base64 স্ট্র্রিং থেকে ডাটা আলাদা করা
-            // ডাটা ফরম্যাট থাকে: data:image/webp;base64,UklGRmY...
             list($type, $image_data) = explode(';', $image_data);
             list(, $image_data)      = explode(',', $image_data);
             $image_data = base64_decode($image_data);
 
-            // ইউনিক ফাইলের নাম তৈরি (WebP ফরম্যাটে)
-            $imageName = 'super_admin_' . time() . '.webp';
-            $directory = public_path('uploads/super_admin/');
+            // রোল অনুযায়ী ফোল্ডার পাথ আলাদা করা (অর্গানাইজড রাখার জন্য)
+            $folder = $data->role === 'super_admin' ? 'super_admin' : 'employees';
+            $imageName = $folder . '_' . time() . '.webp';
+            $directory = public_path('uploads/' . $folder . '/');
 
-            // ডিরেক্টরি না থাকলে তৈরি করুন
             if (!file_exists($directory)) {
                 mkdir($directory, 0777, true);
             }
 
-            // পুরনো ছবি ডিলিট করা (যদি থাকে এবং ডিফল্ট ইমেজ না হয়)
+            // পুরনো ছবি ডিলিট
             if (!empty($data->photo) && file_exists($directory . $data->photo)) {
                 @unlink($directory . $data->photo);
             }
 
-            // ফাইলটি সার্ভারে সেভ করা
             file_put_contents($directory . $imageName, $image_data);
-
-            // ডাটাবেসে সেভ করার জন্য নাম সেট করা
             $data->photo = $imageName;
         }
 
         $data->save();
 
-        // সাকসেস মেসেজসহ ব্যাক করা
         $notification = array(
             'message' => 'Profile Updated Successfully',
             'alert-type' => 'success'
@@ -270,5 +280,30 @@ class SuperAdminController extends Controller
         auth()->user()->unreadNotifications->markAsRead();
         
         return response()->json(['status' => 'success']);
+    }
+    public function approveEmployee(Request $request, $employeeId) {
+        $employee = Employee::findOrFail($employeeId);
+        $user = $employee->user;
+
+        DB::transaction(function () use ($request, $employee, $user) {
+            // ১. এমপ্লয়ি স্ট্যাটাস একটিভ করা
+            $employee->update(['status' => 'active']);
+
+            // ২. রোল এসাইন করা (Spatie)
+            $role = Role::findById($request->role_id); // মডাল থেকে আসা রোল আইডি
+            $user->syncRoles([$role->name]);
+
+            // ৩. পারমিশন গ্রুপিং আপডেট
+            // রোলের পারমিশনগুলো অটোমেটিক ইউজার পেয়ে যাবে।
+        });
+
+        return back()->with('success', 'এমপ্লয়ি অ্যাপ্রুভ করা হয়েছে এবং পারমিশন কার্যকর হয়েছে।');
+    }
+    public function updateEmployeePermissions(Request $request, User $user)
+    {
+        // সুপার এডমিন এমপ্লয়িকে নির্দিষ্ট পারমিশন দিবে
+        $user->syncPermissions($request->permissions); // $request->permissions একটি অ্যারে হবে
+
+        return back()->with('success', 'Permissions updated for ' . $user->name);
     }
 }

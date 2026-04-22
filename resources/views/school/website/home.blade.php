@@ -62,6 +62,32 @@
         /* প্রথম কার্ডের ফেসবুক আইকন কালো রাখতে চাইলে এটি কাজ করবে */
         .row > div:first-child .fb { background-color: #000; }
 
+        /* Counter Section Design */
+        .counter-section {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+            padding: 80px 0;
+            color: white;
+        }
+
+        .counter-item i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .counter-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .counter-label {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
         /* মোবাইল ভিউতে (৯৯২ পিক্সেলের নিচে) পরিবর্তন */
         @media (max-width: 991.98px) {
             .school-name {
@@ -255,6 +281,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Counter Section -->
+     <div class="container-xxl counter-section my-6 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.1s">
+                    <i class="fa fa-users"></i>
+                    <span class="counter-val" data-toggle="counter-up">{{ $studentCount ?? 1200 }}</span>
+                    <p class="counter-label text-white mb-0">মোট শিক্ষার্থী</p>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.3s">
+                    <i class="fa fa-user-tie"></i>
+                    <span class="counter-val" data-toggle="counter-up">{{ $teacherCount ?? 45 }}</span>
+                    <p class="counter-label text-white mb-0">অভিজ্ঞ শিক্ষক</p>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.5s">
+                    <i class="fa fa-user-shield"></i>
+                    <span class="counter-val" data-toggle="counter-up">{{ $staffCount ?? 15 }}</span>
+                    <p class="counter-label text-white mb-0">সহকারী স্টাফ</p>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.7s">
+                    <i class="fa fa-award"></i>
+                    <span class="counter-val" data-toggle="counter-up">100</span>
+                    <p class="counter-label text-white mb-0">সাফল্যের হার (%)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Overviews Section -->
     <div class="container-xxl bg-light my-6 py-5" id="overview">
         <div class="container">
@@ -375,29 +433,47 @@
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <form action="#" method="POST">
+                    @if(session('success'))
+                        <div class="alert alert-success border-0 shadow-sm mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    <form action="{{ route('contact.store', ['tenant' => $school->slug]) }}" method="POST">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" placeholder="Your Name">
+                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name" placeholder="Your Name" value="{{ old('name') }}">
                                     <label for="name">Your Name</label>
+                                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" placeholder="Your Email">
-                                    <label for="email">Your Email</label>
+                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" id="email" placeholder="Your Email" value="{{ old('email') }}">
+                                    <label for="email">Your Email(Optional)</label>
+                                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" name="phone" class="form-control @error('phone') is-invalid @enderror" id="phone" placeholder="Your number" value="{{ old('phone') }}">
+                                    <label for="phone">Phone Number</label>
+                                    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-floating">
-                                    <textarea class="form-control" placeholder="Leave a message here" id="message" style="height: 150px"></textarea>
+                                    <textarea name="message" class="form-control @error('message') is-invalid @enderror" placeholder="Leave a message here" id="message" style="height: 150px">{{ old('message') }}</textarea>
                                     <label for="message">Message</label>
+                                    @error('message') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button class="btn btn-primary rounded-pill py-3 px-5" type="submit">Send Message</button>
+                                <button class="btn btn-primary rounded-pill py-3 px-5 shadow-sm transition" type="submit">
+                                    <i class="fas fa-paper-plane me-2"></i> Send Message
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -409,5 +485,14 @@
 @endsection
 
 @section('customJs')
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('[data-toggle="counter-up"]').counterUp({
+            delay: 10,
+            time: 2000
+        });
+    });
+</script>
 @endsection
