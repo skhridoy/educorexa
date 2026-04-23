@@ -10,14 +10,12 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        // মডিউল অনুযায়ী সাজিয়ে দেখানোর জন্য group_name সহ ডাটা আনা
         $permissions = Permission::orderBy('group_name')->get();
         return view('super.permissions.index', compact('permissions'));
     }
 
     public function create()
     {
-        // আগে থেকে থাকা গ্রুপগুলোর নাম সংগ্রহ করা (ড্রপডাউনের জন্য)
         $groups = Permission::select('group_name')->distinct()->pluck('group_name');
         return view('super.permissions.create', compact('groups'));
     }
@@ -26,11 +24,11 @@ class PermissionController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:permissions,name',
-            'group_name' => 'required' // মডিউল গ্রুপিং নিশ্চিত করতে
+            'group_name' => 'required'
         ]);
 
         Permission::create([
-            'name' => strtolower(str_replace(' ', '-', $request->name)), // নামকে স্লাগ ফরম্যাটে সেভ করা
+            'name' => strtolower(str_replace(' ', '-', $request->name)),
             'group_name' => $request->group_name,
             'guard_name' => 'web'
         ]);
@@ -38,6 +36,36 @@ class PermissionController extends Controller
         return redirect()
             ->route('super.permissions.index')
             ->with('success','Permission Created Successfully');
+    }
+
+    // --- এডিট মেথড যোগ করা হলো ---
+    public function edit($id)
+    {
+        $permission = Permission::findOrFail($id);
+        // ড্রপডাউনে গ্রুপ দেখানোর জন্য
+        $groups = Permission::select('group_name')->distinct()->pluck('group_name');
+        
+        return view('super.permissions.edit', compact('permission', 'groups'));
+    }
+
+    // --- আপডেট মেথড যোগ করা হলো ---
+    public function update(Request $request, $id)
+    {
+        $permission = Permission::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|unique:permissions,name,' . $id,
+            'group_name' => 'required'
+        ]);
+
+        $permission->update([
+            'name' => strtolower(str_replace(' ', '-', $request->name)),
+            'group_name' => $request->group_name,
+        ]);
+
+        return redirect()
+            ->route('super.permissions.index')
+            ->with('success','Permission Updated Successfully');
     }
 
     public function destroy(Permission $permission)

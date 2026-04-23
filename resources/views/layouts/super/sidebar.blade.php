@@ -75,6 +75,9 @@
             <li class="nav-item">
               <a href="{{ route('super.schools.pending') }}" class="nav-link {{ Request::is('super/schools/pending') ? 'active' : '' }}">Pending Requests</a>
             </li>
+            <div class="nav-item">
+              <a href="{{ route('super.schools.create') }}" class="nav-link {{ Request::is('super/schools/create') ? 'active' : '' }}">Create School</a>
+            </div>
           </ul>
         </div>
       </li>

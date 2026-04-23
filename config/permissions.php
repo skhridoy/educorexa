@@ -92,6 +92,7 @@ return [
         ],
 
         'Sms' => [
+            'message.manage'         => 'Manage Messages',
             'sms.manage'           => 'Manage SMS',
             'sms.send'             => 'Send SMS',
         ],
@@ -114,16 +115,37 @@ return [
         ],
 
         'Staff & HR' => [
+            'designation.manage' => 'Manage Designations',
+            'school.create' => 'Create School',
+            'school.edit' => 'Edit School',
+            'school.delete' => 'Delete School',
+            'school.view' => 'View School',
             'employee.manage' => 'Manage Employees',
             'employee.index'  => 'View Employees',
             'employee.create' => 'Add Employee',
             'employee.edit'   => 'Edit Employee',
             'employee.delete' => 'Delete Employee',
+            'payroll.manage' => 'Manage Payroll',
+            'payroll.view'   => 'View Payroll',
+            'payroll.create' => 'Create Payroll',
+            'payroll.edit'   => 'Edit Payroll',
+            'payroll.delete' => 'Delete Payroll',
+            'leave.manage'   => 'Manage Leaves',
+            'leave.view'     => 'View Leaves',
+            'leave.create'   => 'Create Leave',
+            'leave.edit'     => 'Edit Leave',
+            'leave.delete'   => 'Delete Leave',
+            
         ],
         'Super Admin Access' => [
             'school.manage' => 'Manage Schools',
             'super.roles.manage' => 'Manage Roles',
             'super.settings.manage' => 'Manage Settings',
+            'performance.manage' => 'Manage Performance',
+            'performance.view'   => 'View Performance',
+            'performance.create' => 'Create Performance',
+            'performance.edit'   => 'Edit Performance',
+            'performance.delete' => 'Delete Performance',
         ],
     ],
 
