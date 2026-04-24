@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\School;
+use Illuminate\Support\Facades\URL; // ১. URL ফাসাদ ইমপোর্ট করা জরুরি
 
 class IdentifySchool
 {
@@ -13,28 +14,32 @@ class IdentifySchool
         $host = $request->getHost();
         $mainDomain = config('app.main_domain', 'schoolerp.test');
 
-        $subdomain = str_replace('.' . $mainDomain, '', $host);
-
-        // ১. মেন ডোমেইন হলে এড়িয়ে যান (যেমন: schoolerp.test)
+        // ২. মেন ডোমেইন হলে এড়িয়ে যান
         if ($host === $mainDomain) {
             return $next($request);
         }
 
-        // ২. স্কুল খুঁজুন
+        $subdomain = str_replace('.' . $mainDomain, '', $host);
+
+        // ৩. স্কুল খুঁজুন
         $school = School::where('slug', $subdomain)->first();
 
-        // ৩. স্কুল না থাকলে বা ইনঅ্যাক্টিভ হলে সুনির্দিষ্ট এরর দিন
+        // ৪. স্কুল না থাকলে বা ইনঅ্যাক্টিভ হলে এরর দিন
         if (!$school) abort(404, 'School not found');
         
         if ($school->status !== 'approved' || !$school->is_active) {
             abort(403, 'This school is not approved or is currently inactive.');
         }
 
-        // ৪. গ্লোবালি শেয়ার করুন
+        // ৫. URL Default সেট করা (এটি স্কুল পাওয়ার পর এবং $next এর আগে হতে হবে)
+        // রাউট প্যারামিটার থেকে 'tenant' নিয়ে সেটি ডিফল্ট হিসেবে সেট করে দিন
+        URL::defaults(['tenant' => $subdomain]);
+
+        // ৬. গ্লোবালি শেয়ার করুন
         app()->instance('currentSchool', $school);
         view()->share('currentSchool', $school);
 
-        // ৫. রিকোয়েস্টে স্কুল আইডি ঢুকিয়ে দিন যাতে কন্ট্রোলারে $request->school_id পাওয়া যায়
+        // ৭. রিকোয়েস্টে স্কুল আইডি ঢুকিয়ে দিন
         $request->merge(['school_id' => $school->id]);
 
         return $next($request);

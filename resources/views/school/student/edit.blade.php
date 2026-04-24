@@ -41,7 +41,7 @@
                     <div class="card-body">
                         <h6 class="card-title">Update Student</h6>
                         <p class="card-description">Fill in the details below to update student to your school.</p>
-                        <form method="POST" action="{{ route('students.update', ['tenant' => auth()->user()->school->slug, 'student' => $student->id]) }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('students.update', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="row">

@@ -8,7 +8,7 @@
                     <div class="card-body">
 
                         <h6 class="card-title">Create Subject</h6>
-                        <form action="{{ route('subjects.store', ['tenant' => auth()->user()->school->slug]) }}"
+                        <form action="{{ route('subjects.store', ['tenant' => auth()->user()?->school?->slug]) }}"
                             method="POST">
                             @csrf
                             <div class="mb-3">
@@ -62,13 +62,13 @@
                                             <td class="text-capitalize">{{ $subject->type }}</td>
                                             <td>{{ $subject->description }}</td>
                                             <td>
-                                                <a href="{{ route('subjects.edit', ['tenant' => auth()->user()->school->slug, 'subject' => $subject->id]) }}"
+                                                <a href="{{ route('subjects.edit', ['tenant' => auth()->user()?->school?->slug, 'subject' => $subject->id]) }}"
                                                     class="btn btn-sm btn-warning badge"><i
                                                         class="fa-regular fa-pen-to-square"></i>
                                                 </a>
 
                                                 <form
-                                                    action="{{ route('subjects.destroy', ['tenant' => auth()->user()->school->slug, 'subject' => $subject->id]) }}"
+                                                    action="{{ route('subjects.destroy', ['tenant' => auth()->user()?->school?->slug, 'subject' => $subject->id]) }}"
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')

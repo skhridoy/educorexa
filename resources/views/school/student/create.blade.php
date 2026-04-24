@@ -75,14 +75,14 @@
 <div class="page-content">
     <nav class="page-breadcrumb d-flex justify-content-between align-items-center">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()?->school?->slug]) }}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Student Admission</li>
         </ol>
         <div class="d-flex gap-2">
-            <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()->school->slug]) }}" class="custom-btn btn btn-outline-primary btn-sm px-3">
+            <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()?->school?->slug]) }}" class="custom-btn btn btn-outline-primary btn-sm px-3">
                 <i class="link-icon" data-feather="download"></i> <span>Download Template</span>
             </a>
-            <a href="{{ route('students.importForm', ['tenant' => auth()->user()->school->slug]) }}" class="custom-btn btn btn-primary btn-sm px-3">
+            <a href="{{ route('students.importForm', ['tenant' => auth()->user()?->school?->slug]) }}" class="custom-btn btn btn-primary btn-sm px-3">
                 <i class="link-icon" data-feather="upload"></i> <span>Import Students</span>
             </a>
         </div>
@@ -99,7 +99,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('students.store', ['tenant' => auth()->user()->school->slug]) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('students.store', ['tenant' => auth()->user()?->school?->slug]) }}" enctype="multipart/form-data">
                         @csrf
 
                         <h5 class="form-section-title">Academic Information</h5>
@@ -282,7 +282,7 @@
 
             if(categoryId) {
                 $.ajax({
-                    url: "{{ route('get.subcategories', ['tenant' => auth()->user()->school->slug, 'categoryId' => ':id']) }}".replace(':id', categoryId),
+                    url: "{{ route('get.subcategories', ['tenant' => auth()->user()?->school?->slug, 'categoryId' => ':id']) }}".replace(':id', categoryId),
                     type: "GET",
                     dataType: "json",
                     success:function(data) {

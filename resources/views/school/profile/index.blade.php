@@ -35,7 +35,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Personal Information</h6>
-                    <form action="{{ route('user.profile.update', auth()->user()->school->slug) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Name</label>
@@ -97,7 +97,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Change Password</h6>
-                    <form action="{{ route('user.password.update', auth()->user()->school->slug) }}" method="POST">
+                    <form action="{{ route('user.password.update') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Present password</label>

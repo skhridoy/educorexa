@@ -48,14 +48,14 @@
                                     <td>{{ $teacher->email }}</td>
                                     <td>{{ $teacher->phone }}</td>
                                     <td>
-                                        <a class="btn btn-sm btn-primary badge" href="{{ route('teachers.show', ['tenant' => auth()->user()->school->slug, 'teacher' => $teacher->id]) }}">
+                                        <a class="btn btn-sm btn-primary badge" href="{{ route('teachers.show', ['tenant' => auth()->user()?->school?->slug, 'teacher' => $teacher->id]) }}">
                                             <i class="fa-regular fa-eye"></i>
                                         </a>
-                                        <a class="btn btn-sm btn-warning badge" href="{{ route('teachers.edit', ['tenant' => auth()->user()->school->slug, 'teacher' => $teacher->id]) }}">
+                                        <a class="btn btn-sm btn-warning badge" href="{{ route('teachers.edit', ['tenant' => auth()->user()?->school?->slug, 'teacher' => $teacher->id]) }}">
                                             <i class="fa-regular fa-pen-to-square"></i>
                                         </a>
                                         <!-- Add delete functionality if needed -->
-                                        <form class="m-0" action="{{ route('teachers.destroy', ['tenant' => auth()->user()->school->slug,'teacher' => $teacher->id]) }}" method="POST" style="display:inline;">
+                                        <form class="m-0" action="{{ route('teachers.destroy', ['tenant' => auth()->user()?->school?->slug,'teacher' => $teacher->id]) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger badge"><i class="fa-solid fa-trash"></i></button>

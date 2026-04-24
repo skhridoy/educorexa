@@ -15,7 +15,7 @@
                     <div class="card-body">
                         
                         <h6 class="card-title">Create Academic Year</h6>
-                        <form action="{{ route('academic-year.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
+                        <form action="{{ route('academic-year.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
@@ -57,12 +57,12 @@
                                         <td>{{ \Carbon\Carbon::parse($academicYear->end_date)->format('d-M-Y') }}</td>
                                         <td>
                                             @if($academicYear->is_active)
-                                                <form action="{{ route('academic-year.toggleInactive', ['tenant' => auth()->user()->school->slug, 'academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
+                                                <form action="{{ route('academic-year.toggleInactive', ['academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-primary badge">Active</button>
                                             </form>
                                             @else
-                                                <form action="{{ route('academic-year.toggleActive', ['tenant' => auth()->user()->school->slug, 'academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
+                                                <form action="{{ route('academic-year.toggleActive', ['academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-secondary badge">Inactive</button>
                                                 </form>
@@ -72,7 +72,7 @@
                                             <a href="#" class="btn btn-sm btn-warning badge">Edit</a>
 
                                             
-                                            <form action="{{ route('academic-year.destroy', ['tenant' => auth()->user()->school->slug,'academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('academic-year.destroy', ['academic_year' => $academicYear->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger badge">Delete</button>

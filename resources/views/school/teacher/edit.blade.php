@@ -41,7 +41,7 @@
                     <div class="card-body">
                         <h6 class="card-title">Update Teacher</h6>
                         <p class="card-description">Fill in the details below to update the teacher's information.</p>
-                        <form method="POST" action="{{ route('teachers.update', ['teacher' => $teacher->id, 'tenant' => auth()->user()->school->slug]) }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('teachers.update', ['teacher' => $teacher->id, 'tenant' => auth()->user()?->school?->slug]) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="row">
@@ -195,7 +195,7 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Update Teacher</button>
-                            <a href="{{ route('teachers.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-secondary">Cancel</a>
                         </form>
                     </div>
                 </div>

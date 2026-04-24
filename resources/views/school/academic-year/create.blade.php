@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h6 class="card-title">Add Academic Year</h6>
-                        <form action="{{ route('academic-year.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
+                        <form action="{{ route('academic-year.store') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
@@ -22,7 +22,7 @@
                                 <input type="date" class="form-control" id="end_date" name="end_date" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="{{ route('academic-year.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ route('academic-year.index') }}" class="btn btn-secondary">Cancel</a>
                         </form>
                     </div>  
                 </div>

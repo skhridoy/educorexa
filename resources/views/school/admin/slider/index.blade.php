@@ -23,7 +23,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">নতুন স্লাইডার যুক্ত করুন</h6>
-                    <form action="{{ route('sliders.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('sliders.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">টাইটেল (ঐচ্ছিক)</label>

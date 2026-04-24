@@ -91,7 +91,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('teachers.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary mt-3">Back to List</a>
+                    <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-secondary mt-3">Back to List</a>
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h6 class="card-title">নতুন নোটিশ তৈরি করুন</h6>
-                        <form action="{{ route('notices.store', ['tenant' => auth()->user()->school->slug]) }}"
+                        <form action="{{ route('notices.store') }}"
                               method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">

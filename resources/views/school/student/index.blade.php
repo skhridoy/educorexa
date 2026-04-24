@@ -101,10 +101,10 @@
                                 <h6 class="card-title">Active Students [{{ $activeStudents }}]</h6>
                             </div>
                             <div class="col-md-6 text-end">
-                                <a href="{{ route('students.export', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-success btn-sm">
+                                <a href="{{ route('students.export', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-success btn-sm">
                                     Export
                                 </a>
-                                <a href="{{ route('students.importForm', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-success btn-sm">
+                                <a href="{{ route('students.importForm', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-success btn-sm">
                                     import
                                 </a>
                             </div>
@@ -209,7 +209,7 @@ function loadStudents(url = null) {
     let query = $('#searchForm').serialize();
 
     if (!url) {
-        url = "{{ route('students.index', ['tenant' => auth()->user()->school->slug]) }}?" + query;
+        url = "{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}?" + query;
     }
 
     $.ajax({

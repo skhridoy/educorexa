@@ -8,7 +8,7 @@
                     <div class="card-body"> 
 
                         <h6 class="card-title">Create Exam</h6>
-                        <form action="{{ route('exams.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
+                        <form action="{{ route('exams.store', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST">
                             @csrf
                             
                             <div class="mb-3">
@@ -163,7 +163,7 @@
 
 
                                                 <form
-                                                    action="{{ route('exams.destroy', ['tenant' => auth()->user()->school->slug, 'exam' => $exam->id]) }}"
+                                                    action="{{ route('exams.destroy', ['tenant' => auth()->user()?->school?->slug, 'exam' => $exam->id]) }}"
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
@@ -230,7 +230,7 @@
             let toggle = $(this);
 
             $.ajax({
-                url: "{{ route('exams.status', ['tenant' => auth()->user()->school->slug, 'exam' => ':id']) }}"
+                url: "{{ route('exams.status', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
                     .replace(':id', examId),
                 type: "POST",
                 data: {
@@ -296,7 +296,7 @@
             let toggle = $(this);
 
             $.ajax({
-                url: "{{ route('exams.publish', ['tenant' => auth()->user()->school->slug, 'exam' => ':id']) }}"
+                url: "{{ route('exams.publish', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
                     .replace(':id', examId),
                 type: "POST",
                 data: {
@@ -320,7 +320,7 @@
 
             let id = $(this).data('id');
 
-            $.get("{{ route('exams.edit', ['tenant' => auth()->user()->school->slug, 'exam' => ':id']) }}"
+            $.get("{{ route('exams.edit', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
                 .replace(':id', id),
 
                 function(data){
@@ -363,7 +363,7 @@
 
                     $('#editForm').attr(
                         'action',
-                        "{{ route('exams.update', ['tenant' => auth()->user()->school->slug, 'exam' => ':id']) }}"
+                        "{{ route('exams.update', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
                             .replace(':id', id)
                     );
 

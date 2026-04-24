@@ -28,15 +28,16 @@ Route::domain(config('app.main_domain'))->group(function () {
 
     // --- Public Routes ---
     Route::get('/', [HomeController::class, 'index'])->name('main.home');
+    Route::get('/about-details', function () {return view('frontend.page.about_details'); })->name('about.details');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
     Route::get('/forgot-password', fn() => "Password reset feature coming soon!")->name('password.request');
 
     // --- Unified Auth Routes ---
     Route::controller(AuthController::class)->group(function () {
-        Route::get('/login', 'mainLoginForm')->name('login.form'); // মেইন লগইন পেজ
-        Route::post('/login', 'mainLogin')->name('login');        // মেইন লগইন সাবমিট
-        Route::post('/logout', 'mainLogout')->name('logout');     // মেইন লগআউট
+        Route::get('/login', 'mainLoginForm')->name('login.form'); 
+        Route::post('/login', 'mainLogin')->name('login');        
+        Route::post('/logout', 'mainLogout')->name('logout');     
     });
 
     // --- Dynamic Dashboard Redirector ---

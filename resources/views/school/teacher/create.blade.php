@@ -41,7 +41,7 @@
                     <div class="card-body">
                         <h6 class="card-title">Add New Teacher</h6>
                         <p class="card-description">Fill in the details below to add a new teacher to your school.</p>
-                        <form method="POST" action="{{ route('teachers.store', ['tenant' => auth()->user()->school->slug]) }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('teachers.store', ['tenant' => auth()->user()?->school?->slug]) }}" enctype="multipart/form-data">
                             @csrf
 
                             <div class="row">

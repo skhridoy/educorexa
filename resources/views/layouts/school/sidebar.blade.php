@@ -1,7 +1,7 @@
 <nav class="sidebar">
     <div class="sidebar-header">
-        <a href="{{ route('school.home', ['tenant' => auth()->user()->school->slug]) }}" class="sidebar-brand text-capitalize">
-            {{ auth()->user()->school->slug }}
+        <a href="{{ route('school.home') }}" class="sidebar-brand text-capitalize">
+            {{ $currentSchool->slug }}
         </a>
         <div class="sidebar-toggler not-active">
             <span></span>
@@ -16,13 +16,15 @@
             <li class="nav-item">
                 @php
                     $user = auth()->user();
-                    $tenant = $user->school->slug;
+                    // ১. ইউজার থেকে না নিয়ে সরাসরি মিডলওয়্যার থেকে আসা $currentSchool ব্যবহার করা হয়েছে 
+                    $tenant = $currentSchool->slug; 
                     $permissions = $user->getAllPermissions()->pluck('name')->toArray();
                     
-                    $dashboardRoute = match($user->role) {
-                        'student' => route('student.dashboard', ['tenant' => $tenant]),
-                        'teacher' => route('teacher.dashboard', ['tenant' => $tenant]),
-                        'school_admin' => route('school.dashboard', ['tenant' =>  $tenant]),
+                    // ২. URL::defaults সেট করা থাকায় ['tenant' => $tenant] আর লিখতে হবে না
+                    $dashboardRoute = match($user->role_type) { // লক্ষ্য করুন: আমি role_type ব্যবহার করেছি
+                        'student' => route('student.dashboard'),
+                        'teacher' => route('teacher.dashboard'),
+                        'school_admin', 'school_staff' => route('school.dashboard'),
                         default => '#'
                     };
                 @endphp

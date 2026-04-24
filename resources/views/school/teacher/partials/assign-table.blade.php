@@ -17,7 +17,7 @@
                 <td class="text-capitalize">{{ $assignment->subject->name }}</td>
                 <td>
                     <form
-                        action="{{ route('teacher.assign.destroy', ['tenant' => auth()->user()->school->slug, 'assignment' => $assignment->id]) }}"
+                        action="{{ route('teacher.assign.destroy', ['tenant' => auth()->user()?->school?->slug, 'assignment' => $assignment->id]) }}"
                         method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')

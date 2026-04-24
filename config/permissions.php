@@ -13,6 +13,18 @@ return [
             'assign.subject'        => 'Assign Subject to Class',
             'class.routine'         => 'Manage Class Routine',
             'syllabus.manage'       => 'Manage Syllabus',
+            'lesson.view'           => 'View Lessons',
+            'lesson.manage'         => 'Manage Lessons',
+            'homework.manage'       => 'Manage Homework',
+            'syllabus.view'        => 'View Syllabus',
+            'syllabus.download'    => 'Download Syllabus',
+            'syllabus.upload'      => 'Upload Syllabus',
+            'syllabus.delete'      => 'Delete Syllabus',
+            'syllabus.approve'     => 'Approve Syllabus',
+            'syllabus.reject'      => 'Reject Syllabus',
+            'syllabus.view_rejected' => 'View Rejected Syllabus',
+            'syllabus.view_approved' => 'View Approved Syllabus',
+        
         ],
 
         'Students & Admissions' => [
@@ -20,6 +32,7 @@ return [
             'student.manage'        => 'Manage Students',
             'student.idcard'        => 'Generate Student ID',
             'student.promotion'     => 'Handle Student Promotion',
+
         ],
 
         'Staff & HR' => [
@@ -29,6 +42,17 @@ return [
             'designation.manage'    => 'Manage Designations',
             'payroll.manage'        => 'Manage Payroll',
             'leave.manage'          => 'Manage Leaves',
+            'attendance.manage'     => 'Manage Staff Attendance',
+            'attendance.report'     => 'View Staff Attendance Reports',
+            'payroll.report'        => 'View Payroll Reports',
+            'staff.report'          => 'View Staff Reports',
+            'staff.idcard'          => 'Generate Staff ID',
+            'staff.promotion'       => 'Handle Staff Promotion',
+            'staff.transfer'        => 'Handle Staff Transfer',
+            'staff.termination'     => 'Handle Staff Termination',
+            'staff.leave'           => 'Manage Staff Leaves',
+            'staff.attendance'       => 'Manage Staff Attendance',
+            'staff.payroll'          => 'Manage Staff Payroll',
         ],
 
         'Attendance & Exams' => [
@@ -55,10 +79,18 @@ return [
             'email.send'            => 'Send Email Notifications',
         ],
 
+        'Settings' => [
+            'newsletter.manage'      => 'Manage Newsletter Subscribers',
+            'system.settings'       => 'Manage System Settings',
+            'slider.manage'         => 'Manage Homepage Sliders',
+            'gallery.manage'        => 'Manage Photo Gallery',
+        ],
+
         'SaaS Management (Super Admin/Employee Only)' => [
             'school.manage'         => 'View & Manage All Schools',
             'school.create'         => 'Create New School Instance',
-            'school.approve'        => 'Approve/Reject Schools', // এটি আপনার রাউট অনুযায়ী নতুন যোগ করা হয়েছে
+            'school.approve'        => 'Approve/Reject Schools', // এটি আপনার রাউট অনুযায়ী নতুন যোগ করা হয়ছে
+
             'school.delete'         => 'Delete School Data',
             'settings.manage'       => 'Manage Central System Settings',
             'super.roles.manage'    => 'Manage Roles & Permissions',
