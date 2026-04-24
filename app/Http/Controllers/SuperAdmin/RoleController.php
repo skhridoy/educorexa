@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleController extends Controller
 {
@@ -93,27 +94,27 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
-            'role_type' => 'required|in:school_admin,teacher,student,employee,custom',
+            'role_type' => 'required|in:school_admin,teacher,student,employee,custom,school_staff',
             'permissions' => 'nullable|array'
         ]);
 
         try {
             DB::transaction(function () use ($request, $role) {
-                $name = ($role->name === 'super_admin') ? 'super_admin' : $request->name;
-
                 $role->update([
-                    'name' => $name,
+                    'name' => $role->name === 'super_admin' ? 'super_admin' : $request->name,
                     'role_type' => $request->role_type
                 ]);
 
+                // পারমিশন সিঙ্ক করা
                 $role->syncPermissions($request->permissions ?? []);
+                
+                // সবচেয়ে গুরুত্বপূর্ণ: স্প্যাটি ক্যাশ রিসেট করা
+                app(PermissionRegistrar::class)->forgetCachedPermissions();
             });
 
-            return redirect()->route('super.roles.index')
-                             ->with('success', 'রোল আপডেট সফল হয়েছে।');
-
+            return redirect()->route('super.roles.index')->with('success', 'Update Successful');
         } catch (\Exception $e) {
-            return back()->with('error', 'আপডেট করতে সমস্যা হয়েছে।');
+            return back()->with('error', 'Update Failed: ' . $e->getMessage());
         }
     }
 
