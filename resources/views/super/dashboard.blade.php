@@ -140,7 +140,7 @@
                                                 @endif
                                             </td>
                                             <td class="text-center">
-                                                <a href="{{ route('super.schools.all') }}" class="btn btn-xs btn-outline-primary">
+                                                <a href="{{ route('manage.schools.all') }}" class="btn btn-xs btn-outline-primary">
                                                     <i data-feather="eye" class="icon-sm"></i> View
                                                 </a>
                                             </td>

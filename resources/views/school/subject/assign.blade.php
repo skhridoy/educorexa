@@ -18,7 +18,7 @@
                     <div class="card-body">
 
                         <h6 class="card-title">Assign Subject to Class</h6>
-                        <form action="{{ route('subjects.assign.store', ['tenant' => auth()->user()->school->slug]) }}"
+                        <form action="{{ route('subjects.assign.store', ['tenant' => auth()->user()?->school?->slug]) }}"
                             method="POST">
                             @csrf
                             <div class="mb-3">
@@ -50,7 +50,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-end">Assign</button>
-                            <a href="{{ route('subjects.index', ['tenant' => auth()->user()->school->slug]) }}"
+                            <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}"
                                 class="btn btn-secondary btn-end">Cancel</a>
                         </form>
                     </div>
@@ -140,7 +140,7 @@ function loadAssignments(url = null) {
     let query = $('#filterForm').serialize();
 
     if (!url) {
-        url = "{{ route('subjects.assign', ['tenant' => auth()->user()->school->slug]) }}?" + query;
+        url = "{{ route('subjects.assign', ['tenant' => auth()->user()?->school?->slug]) }}?" + query;
     }
 
     $.ajax({

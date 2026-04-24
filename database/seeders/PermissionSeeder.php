@@ -8,13 +8,12 @@ use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // ১. পারমিশন ক্যাশ ক্লিয়ার করা
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // ২. কনফিগ ফাইল থেকে পারমিশন তৈরি/আপডেট
         foreach (config('permissions.permissions') as $groupName => $permissions) {
             foreach ($permissions as $name => $displayName) {
                 Permission::updateOrCreate(
@@ -24,8 +23,16 @@ class PermissionSeeder extends Seeder
             }
         }
 
-        // সুপার এডমিনকে সব পারমিশন দেওয়া
-        $superAdmin = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super_admin']);
-        $superAdmin->syncPermissions(\Spatie\Permission\Models\Permission::all());
+        // ৩. সুপার এডমিন রোল তৈরি এবং সব পারমিশন অ্যাসাইন করা
+        $superAdmin = Role::firstOrCreate(
+            ['name' => 'super_admin', 'guard_name' => 'web'],
+            ['role_type' => 'super_admin'] // যদি role_type কলাম থাকে
+        );
+
+        // সব পারমিশন সিঙ্ক করা
+        $allPermissions = Permission::all();
+        $superAdmin->syncPermissions($allPermissions);
+        
+        $this->command->info('Permissions seeded and assigned to Super Admin successfully!');
     }
 }

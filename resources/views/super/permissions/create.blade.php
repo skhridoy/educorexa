@@ -60,12 +60,6 @@
                                    placeholder="Select from above or type new..." value="{{ old('group_name') }}"
                                    style="padding: 10px; border-radius: 8px;">
                             
-                            <!-- <datalist id="groupOptions">
-                                @foreach($groups as $group)
-                                    <option value="{{ $group }}">
-                                @endforeach
-                            </datalist> -->
-
                             @error('group_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

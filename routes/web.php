@@ -1,143 +1,107 @@
 <?php
 
-use App\Http\Controllers\ContactMessageController;
-use App\Http\Controllers\ResultController;
-use App\Http\Controllers\SchoolSubCategoryController;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\{
-    HomeController,
-    SchoolRegisterController,
-    SchoolWebsiteController,
-    AuthController,
-    DashboardController,
-    AcademicYearController,
-    SchoolCategoryController,
-    StudentController,
-    ClassesController,
-    SectionController,
-    SubjectController,
-    AdmissionController,
-    TeacherController,
-    TeacherAssignSubjectController,
-    ExamController,
-    AssignClassController,
-    MarkController,
-    NewsletterController,
-    ProfileController,
-    NoticeController,
-    AttendanceController,
-    FeeHeadController,
-    FeeAmountController,
-    StudentFeeController,
-    PaymentController,
-    SliderController,
-    AboutSectionController,
-    FooterSettingController,
-    SchoolOverviewController,
-    LessonPlanController,
-    HolidayController,
-
+    HomeController, SchoolRegisterController, SchoolWebsiteController,
+    AuthController, DashboardController, AcademicYearController,
+    SchoolCategoryController, StudentController, ClassesController,
+    SectionController, SubjectController, AdmissionController,
+    TeacherController, TeacherAssignSubjectController, ExamController,
+    AssignClassController, MarkController, NewsletterController,
+    ProfileController, NoticeController, AttendanceController,
+    FeeHeadController, FeeAmountController, StudentFeeController,
+    PaymentController, SliderController, AboutSectionController,
+    FooterSettingController, SchoolOverviewController, LessonPlanController,
+    HolidayController, ContactMessageController, SchoolSubCategoryController
 };
 use App\Http\Controllers\SuperAdmin\{
-    SuperAdminController,
-    RoleController,
-    PermissionController,
-    SettingController,
-    EmployeeController
+    SuperAdminController, RoleController, PermissionController,
+    SettingController, EmployeeController
 };
 
+/*
+|--------------------------------------------------------------------------
+| Main Domain Routes
+|--------------------------------------------------------------------------
+*/
 Route::domain(config('app.main_domain'))->group(function () {
 
-    /*
-    |----------------------------------
-    | Public Routes
-    |----------------------------------
-    */
+    // --- Public Routes ---
     Route::get('/', [HomeController::class, 'index'])->name('main.home');
+    Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
+    Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
+    Route::get('/forgot-password', fn() => "Password reset feature coming soon!")->name('password.request');
 
-    Route::get('/register-school', [SchoolRegisterController::class, 'create'])
-        ->name('school.register.form');
+    // --- Unified Auth Routes ---
+    Route::controller(AuthController::class)->group(function () {
+        Route::get('/login', 'mainLoginForm')->name('login.form'); // মেইন লগইন পেজ
+        Route::post('/login', 'mainLogin')->name('login');        // মেইন লগইন সাবমিট
+        Route::post('/logout', 'mainLogout')->name('logout');     // মেইন লগআউট
+    });
 
-    Route::post('/register-school', [SchoolRegisterController::class, 'store'])
-        ->name('school.register.store');
+    // --- Dynamic Dashboard Redirector ---
+    Route::get('/dashboard', function () {
+        if (auth()->user()->hasRole('super_admin')) {
+            return redirect()->route('super.dashboard');
+        } elseif (auth()->user()->hasRole('employee')) {
+            return redirect()->route('employee.dashboard');
+        }
+        return redirect('/');
+    })->middleware('auth')->name('common.dashboard');
 
+    Route::middleware(['auth'])->group(function () {
+        
+        // Schools Management: ইউআরএল হবে /manage/schools/...
+        Route::middleware(['permission:school.manage'])->prefix('manage')->name('manage.')->group(function () {
+            Route::get('/schools/all', [SuperAdminController::class, 'allSchools'])->name('schools.all');
+            Route::get('/schools/pending', [SuperAdminController::class, 'pending'])->name('schools.pending');
+            
+            // শুধু নির্দিষ্ট পারমিশন থাকলে স্কুল ক্রিয়েট বা ডিলিট করতে পারবে
+            Route::middleware(['permission:school.create'])->group(function () {
+                Route::get('/schools/create', [SuperAdminController::class, 'createSchool'])->name('schools.create');
+                Route::post('/schools/create', [SuperAdminController::class, 'schoolStore'])->name('schools.store');
+            });
 
-    // Employee Login Routes
-    Route::get('/employee/login', [AuthController::class, 'employeeLoginForm'])->name('employee.login.form');
-    Route::post('/employee/login', [AuthController::class, 'employeeLogin'])->name('employee.login.submit');
-    Route::get('/forgot-password', function () {
-        return "Password reset feature is coming soon!";
-    })->name('password.request');
-    // Employee Dashboard (Protected Area)
+            Route::middleware(['permission:school.delete'])->group(function () {
+                Route::delete('/schools/{school}', [SuperAdminController::class, 'destroy'])->name('schools.destroy');
+            });
+            Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
+            Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
+        });
+
+        Route::middleware(['permission:settings.manage'])->group(function () {
+            Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+            Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+        });
+        // Common Profile & Settings
+        Route::get('/profile', [SuperAdminController::class, 'Profile'])->name('profile');
+        Route::post('/profile/store', [SuperAdminController::class, 'ProfileStore'])->name('profile.store');
+    });
+
+    // --- 1. Super Admin ONLY Group ---
+    Route::middleware(['auth', 'superadmin'])->prefix('super-admin')->name('super.')->group(function () {
+        Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+        
+        // Roles & Employee Management (শুধু সুপার এডমিন পারবে)
+        Route::middleware(['permission:super.roles.manage'])->group(function () {
+            Route::resource('roles', RoleController::class);
+            Route::resource('permissions', PermissionController::class);
+        });
+        Route::resource('employees', EmployeeController::class);
+    });
+
+    // --- 2. Employee ONLY Group ---
     Route::middleware(['auth'])->prefix('employee')->name('employee.')->group(function () {
         Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('dashboard');
     });
-    /*
-    |----------------------------------
-    | Super Admin Routes
-    |----------------------------------
-    */
-    Route::prefix('super-admin')
-        ->name('super.')
-        ->group(function () {
+});
 
-            // Auth
-            Route::controller(AuthController::class)->group(function () {
-                Route::get('/login', 'superLoginForm')->name('login.form');
-                Route::post('/login', 'superLogin')->name('login');
-                Route::post('/logout', 'superLogout')->name('logout');
-            });
-
-            // Protected Routes
-            Route::middleware(['auth', 'superadmin'])->group(function () {
-
-                Route::controller(SuperAdminController::class)->group(function () {
-
-                    Route::get('/dashboard', 'dashboard')->name('dashboard');
-                    Route::middleware(['permission:super.roles.manage'])->group(function () {
-                        Route::resource('roles', RoleController::class);
-                        Route::resource('permissions', PermissionController::class);
-                       
-                    });
-                    Route::prefix('employees')->name('employees.')->group(function () {
-                        Route::get('/', [EmployeeController::class, 'index'])->name('index'); // এটি যোগ করা হলো
-                        Route::get('/create', [EmployeeController::class, 'create'])->name('create');
-                        Route::post('/store', [EmployeeController::class, 'store'])->name('store');
-                        Route::get('/edit/{id}', [EmployeeController::class, 'edit'])->name('edit');
-                        Route::post('/update/{id}', [EmployeeController::class, 'update'])->name('update');
-                        Route::get('/delete/{id}', [EmployeeController::class, 'destroy'])->name('destroy');
-                    });
-                    Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
-                    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
-                    Route::middleware(['permission:school.manage'])->group(function () {
-                        Route::prefix('schools')->name('schools.')->group(function () {
-
-                            Route::get('/create', 'createSchool')->name('create');
-                            Route::post('/create', 'schoolStore')->name('store');
-                            Route::get('/pending', 'pending')->name('pending');
-                            Route::put('/{school}/approve', 'approve')->name('approve');
-                            Route::get('/rejected', 'rejected')->name('rejected');
-                            Route::post('/{school}/reject', 'rejectSchool')->name('reject');
-                            Route::delete('/{school}', 'destroy')->name('destroy');
-                            Route::get('/all-school', 'allSchools')->name('all');
-                        });
-                    });
-                    Route::get('/notifications/read-all', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.readAll');
-                    
-                });
-
-               
-
-                Route::get('profile', [SuperAdminController::class, 'Profile'])->name('profile');
-                Route::post('profile/store', [SuperAdminController::class, 'ProfileStore'])->name('profile.store');
-
-                
-            });
-        });
-
-
-    // School Routes
+/*
+|--------------------------------------------------------------------------
+| Tenant (School) Routes
+|--------------------------------------------------------------------------
+*/
+// School Routes
     Route::domain('{tenant}.' . config('app.main_domain'))
         ->middleware(['identify.school'])
         ->scopeBindings()
@@ -402,6 +366,3 @@ Route::domain(config('app.main_domain'))->group(function () {
             });
 
         });
-});
-
-

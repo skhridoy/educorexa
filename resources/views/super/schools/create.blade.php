@@ -29,12 +29,18 @@
 <div class="page-content">
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item">
+                @php 
+                    $user = auth()->user();
+                    $isSuperAdmin = ($user->role === 'super_admin');
+                @endphp
+                <a href="{{ $isSuperAdmin ? route('super.dashboard') : route('employee.dashboard') }}">Dashboard</a>
+            </li>
             <li class="breadcrumb-item active" aria-current="page">Add School</li>
         </ol>
     </nav>
 
-    <form action="{{ route('super.schools.store') }}" method="POST">
+    <form action="{{ route('manage.schools.store') }}" method="POST">
         @csrf
         <div class="row">
             {{-- School Information --}}

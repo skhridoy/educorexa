@@ -55,7 +55,7 @@
                     </div>
                     <ul class="list-unstyled p-1">
                         <li class="dropdown-item py-2">
-                            <a href="{{ route('super.profile') }}" class="text-body ms-0 d-flex align-items-center">
+                            <a href="{{ route('profile') }}" class="text-body ms-0 d-flex align-items-center">
                                 <i class="me-2 icon-md" data-feather="user"></i>
                                 <span>Profile</span>
                             </a>
@@ -64,7 +64,7 @@
                         {{-- সুপার অ্যাডমিন হলে সেটিংস দেখাবে --}}
                         @if($user->role === 'super_admin')
                         <li class="dropdown-item py-2">
-                            <a href="{{ route('super.settings.edit') }}" class="text-body ms-0 d-flex align-items-center">
+                            <a href="{{ route('settings.edit') }}" class="text-body ms-0 d-flex align-items-center">
                                 <i class="me-2 icon-md" data-feather="settings"></i>
                                 <span>Settings</span>
                             </a>
@@ -77,7 +77,7 @@
                                 <i class="me-2 icon-md text-danger" data-feather="log-out"></i>
                                 <span class="text-danger">Log Out</span>
                             </a>
-                            <form id="logout-form" action="{{ route('super.logout') }}" method="POST" class="d-none">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
                         </li>

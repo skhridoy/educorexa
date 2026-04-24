@@ -15,7 +15,7 @@
                     <div class="card-body">
                         
                         <h6 class="card-title">Assign Subject to Class</h6>
-                        <form action="{{ route('subjects.assign.update', ['tenant' => auth()->user()->school->slug, 'assignment' => $assignment->id]) }}" method="POST">
+                        <form action="{{ route('subjects.assign.update', ['tenant' => auth()->user()?->school?->slug, 'assignment' => $assignment->id]) }}" method="POST">
                             @csrf
                             @method('PUT')
                                 <div class="mb-3">
@@ -46,7 +46,7 @@
                                 </div>
                             
                             <button type="submit" class="btn btn-primary btn-end">Update</button>
-                            <a href="{{ route('subjects.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary btn-end">Cancel</a>
+                            <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-secondary btn-end">Cancel</a>
                         </form>
                     </div>
                 </div>
@@ -78,9 +78,9 @@
                                         <td>{{ $assignment->full_mark ?? 'Null' }}</td>
                                         <td>{{ $assignment->pass_mark ?? 'Null' }}</td>
                                         <td>
-                                            <a href="{{ route('subjects.assign.edit', ['tenant' => auth()->user()->school->slug,'assignment' => $assignment->id]) }}" class="btn btn-sm btn-warning badge">Edit</a>
+                                            <a href="{{ route('subjects.assign.edit', ['tenant' => auth()->user()?->school?->slug,'assignment' => $assignment->id]) }}" class="btn btn-sm btn-warning badge">Edit</a>
     
-                                            <form action="{{ route('subjects.assign.destroy', ['tenant' => auth()->user()->school->slug, 'assignment' => $assignment->id]) }}" method="POST" style="display:inline;">
+                                            <form action="{{ route('subjects.assign.destroy', ['tenant' => auth()->user()?->school?->slug, 'assignment' => $assignment->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger badge">Delete</button>

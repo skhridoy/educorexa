@@ -30,7 +30,7 @@
                 <div class="card-body">
                     <h6 class="card-title">Update {{ ($profileData->role === 'super_admin') ? 'Super Admin' : 'Employee' }} Profile</h6>
                     
-                    <form method="POST" action="{{ route('super.profile.store') }}" class="forms-sample">
+                    <form method="POST" action="{{ route('profile.store') }}" class="forms-sample">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Name</label>

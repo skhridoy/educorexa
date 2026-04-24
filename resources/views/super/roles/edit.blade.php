@@ -70,12 +70,12 @@
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Role Type <span class="text-danger">*</span></label>
-                                <select name="role_type" class="form-select border-secondary @error('role_type') is-invalid @enderror">
-                                    <option value="">Select Type</option>
-                                    <option value="school_admin" {{ old('role_type', $role->role_type) == 'school_admin' ? 'selected' : '' }}>School Admin</option>
-                                    <option value="teacher" {{ old('role_type', $role->role_type) == 'teacher' ? 'selected' : '' }}>Teacher</option>
-                                    <option value="student" {{ old('role_type', $role->role_type) == 'student' ? 'selected' : '' }}>Student</option>
-                                    <option value="employee" {{ old('role_type', $role->role_type) == 'employee' ? 'selected' : '' }}>Employee</option>
+                                <select name="role_type" class="form-select border-secondary" id="roleTypeId">
+                                    @foreach($role_types as $type)
+                                        <option value="{{ $type }}" {{ $role->role_type == $type ? 'selected' : '' }}>
+                                            {{ ucwords(str_replace('_', ' ', $type)) }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('role_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>

@@ -37,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         }
         
         // সুপার অ্যাডমিন বা মেইন ডোমেইনের জন্য
-        return redirect()->guest(route('super.login.form'));
+        return redirect()->guest(route('login.form'));
     });
 
     $exceptions->render(function (AccessDeniedHttpException $e, $request) {
@@ -45,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->route() && $request->route()->hasParameter('tenant')) {
                 return redirect()->guest(route('school.login.form', ['tenant' => $request->route()->parameter('tenant')]));
             }
-            return redirect()->guest(route('super.login.form'));
+            return redirect()->guest(route('login.form'));
         }
     });
 })->create();

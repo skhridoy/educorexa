@@ -46,7 +46,7 @@
                                         </td>
                                         <td>
                                             @if ($school->is_active)
-                                                <form action="{{ route('super.schools.reject', $school->id) }}" 
+                                                <form action="{{ route('manage.schools.reject', $school->id) }}" 
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     <button class="btn btn-warning btn-sm badge">
@@ -54,7 +54,7 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <form action="{{ route('super.schools.approve', $school->id) }}" 
+                                                <form action="{{ route('manage.schools.approve', $school->id) }}" 
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('PUT')
@@ -63,7 +63,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            <form action="{{ route('super.schools.destroy', $school->id) }}" 
+                                            <form action="{{ route('manage.schools.destroy', $school->id) }}" 
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')

@@ -5,18 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
-    // 🔹 School Admin / Teacher / Student Login Page
+    /*
+    |--------------------------------------------------------------------------
+    | School / Tenant Login (Subdomain)
+    |--------------------------------------------------------------------------
+    */
     public function loginForm()
     {
         $school = app('currentSchool');
         return view('auth.login', compact('school'));
     }
 
-    // 🔹 Unified Login
     public function login(Request $request)
     {
         $request->validate([
@@ -34,93 +38,39 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $tenant = $school->slug;
-
-            // 🔹 রোল অনুযায়ী রিডাইরেক্ট লজিক
-            if ($user->role === 'student') {
-                return redirect()->route('student.dashboard', ['tenant' => $tenant]);
-            } 
             
-            if ($user->role === 'teacher') {
+            // রিডাইরেক্ট করার সময় নিশ্চিত করা যে স্লাগ আছে
+            $tenant = $school->slug; 
+
+            if ($user->hasRole('student')) {
+                return redirect()->route('student.dashboard', ['tenant' => $tenant]);
+            }
+            
+            if ($user->hasRole('teacher')) {
                 return redirect()->route('teacher.dashboard', ['tenant' => $tenant]);
             }
 
-            if ($user->role === 'parent') {
+            if ($user->hasRole('parent')) {
                 return redirect()->route('parent.dashboard', ['tenant' => $tenant]);
             }
 
-            // ডিফল্টভাবে (যেমন অ্যাডমিন হলে) মেইন ড্যাশবোর্ডে যাবে
             return redirect()->route('school.dashboard', ['tenant' => $tenant]);
         }
 
-        return redirect()->route('school.login', ['tenant' => $request->route('tenant')])
-            ->withErrors(['email' => 'Invalid credentials']);
+        return redirect()->back()->withErrors(['email' => 'Invalid credentials']);
     }
 
-    // 🔹 Super Admin Login Page
-    public function superLoginForm()
+    /*
+    |--------------------------------------------------------------------------
+    | Main Domain Login (Super Admin & Employee)
+    |--------------------------------------------------------------------------
+    */
+    public function mainLoginForm()
     {
-        return view('auth.super-login');
+        return view('auth.main-login'); 
     }
 
-    // 🔹 Super Admin Login Submit
-    public function superLogin(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-
-        if (Auth::attempt([
-            'email' => $request->email,
-            'password' => $request->password,
-            'role' => 'super_admin'
-        ])) {
-            return redirect(route('super.dashboard'));
-        }
-
-        return redirect()->route('super.login.form')->withErrors(['email' => 'Invalid credentials']);
-    }
-
-    public function logout(Request $request, $tenant)
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('school.login.form', [
-            'tenant' => $tenant
-        ]);
-    }
-    public function superLogout(Request $request)
-    {
-        Auth::logout();
-        return redirect(route('super.login.form'));
-    }
-
-    // Super Admin create account (for testing)
-
-    public function createSuperAdmin()
-    {
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@schoolerp.com',
-            'password' => bcrypt('password'),
-            'role' => 'super_admin'
-        ]);
-        return redirect(route('super.login.form'))->with('success', 'Super Admin account created. You can now login.');
-    }
-
-    public function employeeLoginForm()
-{
-    // site_settings থেকে ডাটা নিয়ে আসা
-    $site = \DB::table('site_settings')->first();
-    return view('auth.employee-login', compact('site'));
-}
-
-    // 🔹 Employee Login Submit
-    public function employeeLogin(Request $request)
+    public function mainLogin(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -129,22 +79,65 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        // প্রথমে লগইন করার চেষ্টা করি
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            // চেক করছি ইউজারের রোলটি 'employee' টাইপ কি না
-            $role = \Spatie\Permission\Models\Role::where('name', $user->role)->first();
+            // ১. সুপার এডমিন চেক
+            if ($user->role === 'super_admin') {
+                return redirect()->route('super.dashboard');
+            }
 
+            // ২. এমপ্লয়ি চেক (Spatie Role Type)
+            $role = Role::where('name', $user->role)->first();
             if ($role && $role->role_type === 'employee') {
                 return redirect()->route('employee.dashboard');
             }
 
-            // যদি ইউজার এমপ্লয়ি না হয়, তবে লগআউট করে এরর দেওয়া
+            // ৩. যদি স্কুলের কোনো ইউজার এখানে লগইন করতে চায়
             Auth::logout();
-            return redirect()->back()->withErrors(['email' => 'This portal is only for employees.']);
+            return redirect()->back()->withErrors(['email' => 'এই পোর্টালটি শুধুমাত্র সুপার এডমিন এবং এমপ্লয়িদের জন্য।']);
         }
 
-        return redirect()->back()->withErrors(['email' => 'Invalid email or password.']);
+        return redirect()->back()->withErrors(['email' => 'ইমেইল বা পাসওয়ার্ড ভুল।']);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout Logic
+    |--------------------------------------------------------------------------
+    */
+    
+    // স্কুলের লগআউট
+    public function logout(Request $request, $tenant)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('school.login.form', ['tenant' => $tenant]);
+    }
+
+    // মেইন ডোমেইন লগআউট
+    public function mainLogout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect()->route('login.form');
+    }
+
+    // টেস্ট করার জন্য সুপার এডমিন তৈরি
+    public function createSuperAdmin()
+    {
+        User::updateOrCreate(
+            ['email' => 'superadmin@schoolerp.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => bcrypt('password'),
+                'role' => 'super_admin'
+            ]
+        );
+        return redirect(route('login.form'))->with('success', 'Super Admin account ready.');
     }
 }

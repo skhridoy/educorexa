@@ -7,23 +7,25 @@ use Illuminate\Http\Request;
 
 class Authenticate extends Middleware
 {
-    protected function redirectTo(Request $request)
+    protected function redirectTo(Request $request): ?string
     {
         if (! $request->expectsJson()) {
-
-            // Super Admin
+            // ১. সুপার এডমিন চেক
             if ($request->is('super-admin') || $request->is('super-admin/*')) {
-                return route('super.login.form');
+                return route('login.form');
             }
 
-            // Tenant Subdomain
-            if ($request->route('tenant')) {
-                return route('school.login.form', [
-                    'tenant' => $request->route('tenant')
-                ]);
+            // ২. টেন্যান্ট চেক (সাবডোমেইন বা রুট প্যারামিটার থেকে)
+            $tenant = $request->route('tenant') ?? explode('.', $request->getHost())[0];
+
+            // যদি টেন্যান্ট প্যারামিটার থাকে বা সাবডোমেইন হিসেবে থাকে
+            if ($tenant && !in_array($tenant, ['www', 'educorexa.com'])) {
+                return route('school.login.form', ['tenant' => $tenant]);
             }
 
-            return '/';
+            return route('login.form'); // ডিফল্ট সুপার এডমিন লগইন
         }
+        
+        return null;
     }
 }

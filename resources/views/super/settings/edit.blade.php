@@ -23,7 +23,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('super.settings.update') }}" method="POST" enctype="multipart/form-data" class="forms-sample">
+                    <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data" class="forms-sample">
                         @csrf
                         
                         <div class="row">

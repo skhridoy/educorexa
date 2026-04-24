@@ -10,27 +10,36 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        // 🔹 যদি user logged in না থাকে
-        if (!Auth::check()) {
+        $user = Auth::user();
 
-            // Super Admin Domain
+        // ১. যদি ইউজার লগইন করা না থাকে
+        if (!Auth::check()) {
             if ($request->is('super-admin') || $request->is('super-admin/*')) {
-                return redirect()->route('super.login.form');
+                return redirect()->route('login.form'); // মেইন লগইন
             }
 
-            // School Subdomain
             if ($request->route('tenant')) {
-                return redirect()->route('school.login.form', [
-                    'tenant' => $request->route('tenant')
-                ]);
+                return redirect()->route('school.login.form', ['tenant' => $request->route('tenant')]);
             }
 
             return redirect('/');
         }
 
-        // 🔹 Role check
-        if (!in_array(Auth::user()->role, $roles)) {
-            abort(403, 'Unauthorized');
+        // ২. টেন্যান্ট সিকিউরিটি চেক (খুবই গুরুত্বপূর্ণ)
+        // নিশ্চিত করা যে স্কুলের স্টাফ শুধু তার নিজের স্কুলের স্লাগেই এক্সেস পাচ্ছে
+        $routeTenant = $request->route('tenant');
+        if ($routeTenant && $user->school) {
+            if ($user->school->slug !== $routeTenant && !$user->hasRole('super_admin')) {
+                Auth::logout();
+                return redirect()->route('school.login.form', ['tenant' => $routeTenant])
+                                 ->withErrors(['email' => 'আপনি এই স্কুলের মেম্বার নন।']);
+            }
+        }
+
+        // ৩. Spatie Role Check
+        // আপনার সিস্টেমে একাধিক রোল থাকতে পারে, তাই hasAnyRole ব্যবহার করা ভালো
+        if (!$user->hasAnyRole($roles)) {
+            abort(403, 'আপনার এই পেজে প্রবেশের অনুমতি নেই।');
         }
 
         return $next($request);

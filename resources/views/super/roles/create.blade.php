@@ -137,10 +137,11 @@
                                 <label for="roleTypeId" class="form-label text-dark fw-bold">Role Type <span class="text-danger">*</span></label>
                                 <select name="role_type" class="form-select border-secondary shadow-none @error('role_type') is-invalid @enderror" id="roleTypeId">
                                     <option value="">-- Choose Role Type --</option>
-                                    <option value="school_admin" {{ old('role_type') == 'school_admin' ? 'selected' : '' }}>School Admin</option>
-                                    <option value="employee" {{ old('role_type') == 'employee' ? 'selected' : '' }}>Employee</option>
-                                    <option value="teacher" {{ old('role_type') == 'teacher' ? 'selected' : '' }}>Teacher</option>
-                                    <option value="student" {{ old('role_type') == 'student' ? 'selected' : '' }}>Student</option>
+                                    @foreach($role_types as $type)
+                                        <option value="{{ $type }}" {{ old('role_type') == $type ? 'selected' : '' }}>
+                                            {{ ucwords(str_replace('_', ' ', $type)) }} 
+                                        </option>
+                                    @endforeach
                                 </select>
                                 @error('role_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 <small class="text-muted mt-1 d-block">This defines which system modules this role can access.</small>
@@ -167,34 +168,37 @@
                             </div>
                         </div>
 
+                     
                         {{-- পারমিশন গ্রুপিং (Responsive & Equal Height) --}}
                         <div class="permission-section">
-                            {{-- row-cols-1: মোবাইলে ১টি, row-cols-md-2: ট্যাবে ২টি, row-cols-xl-3: বড় স্ক্রিনে ৩টি কার্ড দেখাবে --}}
                             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                                @foreach($permissions->groupBy('group_name') as $group => $groupPermissions)
+                                {{-- কন্ট্রোলার থেকে আসা $permissions কে গ্রুপ করে লুপ চালানো হচ্ছে --}}
+                                @foreach($permissions->groupBy('group_name') as $groupName => $groupPermissions)
                                     <div class="col">
-                                        <div class="permission-group-card h-100 shadow-sm border"> {{-- h-100 কার্ডগুলোকে সমান বড় রাখবে --}}
+                                        <div class="permission-group-card h-100 shadow-sm border">
                                             <div class="permission-group-header bg-soft-info p-3 border-bottom d-flex justify-content-between align-items-center">
                                                 <h6 class="permission-group-title text-uppercase mb-0" style="font-size: 0.8rem;">
-                                                    <i data-feather="layers" class="icon-sm me-1"></i> {{ $group }}
+                                                    <i data-feather="layers" class="icon-sm me-1"></i> {{ $groupName }}
                                                 </h6>
                                                 <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input select-group" id="group_{{ Str::slug($group) }}">
-                                                    <label class="form-check-label small text-primary fw-bold" for="group_{{ Str::slug($group) }}">Select All</label>
+                                                    <input type="checkbox" class="form-check-input select-group" id="group_{{ Str::slug($groupName) }}">
+                                                    <label class="form-check-label small text-primary fw-bold" for="group_{{ Str::slug($groupName) }}">Select All</label>
                                                 </div>
                                             </div>
                                             <div class="permission-group-body p-3">
                                                 <div class="row g-2">
                                                     @foreach($groupPermissions as $permission)
-                                                    <div class="col-12 col-sm-6"> {{-- ছোট মোবাইলেও নামগুলো যাতে সুন্দর দেখায় --}}
+                                                    <div class="col-12 col-sm-6">
                                                         <div class="form-check custom-check">
                                                             <input class="form-check-input permission-checkbox" 
                                                                 type="checkbox" 
                                                                 name="permissions[]" 
                                                                 value="{{ $permission->name }}" 
-                                                                id="perm_{{ $permission->id }}">
-                                                            <label class="form-check-label permission-label small" for="perm_{{ $permission->id }}" data-perm-name="{{ $permission->name }}">
-                                                                {{ $permission->name }}
+                                                                id="perm_{{ $permission->id }}"
+                                                                {{ (is_array(old('permissions')) && in_array($permission->name, old('permissions'))) ? 'checked' : '' }}>
+                                                            <label class="form-check-label permission-label small" for="perm_{{ $permission->id }}">
+                                                                {{-- নাম সুন্দর দেখানোর জন্য ট্রান্সফর্ম --}}
+                                                                {{ str_replace(['.', '-'], ' ', $permission->name) }}
                                                             </label>
                                                         </div>
                                                     </div>
@@ -232,15 +236,6 @@
             feather.replace();
         }
 
-        // --- JS অটোমেশন: পারমিশন নামগুলোকে সুন্দর করা ---
-        document.querySelectorAll('.permission-label').forEach(label => {
-            const rawName = label.getAttribute('data-perm-name');
-            // হাইফেন বা ডট সরিয়ে বড় হাতের অক্ষরে পরিবর্তন
-            const cleanName = rawName
-                .replace(/[.-]/g, ' ')
-                .replace(/\b\w/g, l => l.toUpperCase());
-            label.textContent = cleanName;
-        });
 
         const checkAll = document.querySelector('#checkAll');
         const checkboxes = document.querySelectorAll('.permission-checkbox');
