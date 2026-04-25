@@ -4,6 +4,92 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property int $school_id
+ * @property int $academic_year_id
+ * @property int $class_id
+ * @property int|null $school_category_id
+ * @property int $section_id
+ * @property string $student_id
+ * @property int|null $roll
+ * @property string $name
+ * @property string|null $previous_school
+ * @property string|null $previous_class
+ * @property string|null $fathers_name
+ * @property string|null $mothers_name
+ * @property string|null $father_nid
+ * @property string|null $mother_nid
+ * @property string|null $student_birth_nid
+ * @property string|null $contact_number
+ * @property string $password
+ * @property string|null $photo
+ * @property string $status
+ * @property int|null $created_by
+ * @property string|null $religion
+ * @property string|null $gender
+ * @property string|null $date_of_birth
+ * @property string|null $admission_date
+ * @property string|null $blood_group
+ * @property string|null $address
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $school_sub_category_id
+ * @property-read \App\Models\AcademicYear|null $academicYear
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Attendance> $attendances
+ * @property-read int|null $attendances_count
+ * @property-read \App\Models\SchoolCategory|null $category
+ * @property-read \App\Models\Classes|null $class
+ * @property-read \App\Models\User|null $creator
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StudentFee> $fees
+ * @property-read int|null $fees_count
+ * @property-read \App\Models\SchoolSubCategory|null $group
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Mark> $marks
+ * @property-read int|null $marks_count
+ * @property-read \App\Models\School|null $school
+ * @property-read \App\Models\Section|null $section
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StudentSession> $sessions
+ * @property-read int|null $sessions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StudentFee> $unpaidFees
+ * @property-read int|null $unpaid_fees_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereAcademicYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereAdmissionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereBloodGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereClassId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereContactNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereDateOfBirth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereFatherNid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereFathersName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereMotherNid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereMothersName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student wherePhoto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student wherePreviousClass($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student wherePreviousSchool($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereReligion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereRoll($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSchoolCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSchoolSubCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereStudentBirthNid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereStudentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Student whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Student extends Model
 {
     protected $fillable = [

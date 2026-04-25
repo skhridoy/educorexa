@@ -155,30 +155,18 @@
 			
 	</div>
 
-    <!-- core:js -->
-    <script src="{{ asset('../assets/vendors/core/core.js') }}"></script>
-	<!-- endinject -->
-
-	<!-- Plugin js for this page -->
-	<script src="{{ asset('../assets/vendors/flatpickr/flatpickr.min.js') }}"></script>
-	<script src="{{ asset('../assets/vendors/apexcharts/apexcharts.min.js') }}"></script>
-	<!-- End plugin js for this page -->
-
-	<!-- Cropper Js  -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-	<!-- inject:js -->
-	<script src="{{ asset('../assets/vendors/feather-icons/feather.min.js') }}"></script>
-	<script src="{{ asset('../assets/js/template.js') }}"></script>
-	<!-- endinject -->
-
-	<!-- Custom js for this page -->
-	<script src="{{ asset('../assets/js/dashboard-dark.js') }}"></script>
-	<script src="https://unpkg.com/feather-icons"></script>
-	<!-- End custom js for this page -->
-	 <!-- JS Files -->
+    <script src="{{ asset('assets/vendors/core/core.js') }}"></script>
+    @stack('plugin-scripts') {{-- এখানে প্লাগইন স্ক্রিপ্টগুলো আসবে --}}
+    <script src="{{ asset('assets/vendors/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('assets/js/template.js') }}"></script>
+    <script src="{{ asset('assets/js/dashboard-dark.js') }}"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    
     <script src="{{ asset('assets/js/app.js') }}"></script>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @yield('customJs')
+	@stack('customJs')
 </body>
 </html>

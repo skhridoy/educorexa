@@ -12,11 +12,12 @@ use App\Http\Controllers\{
     FeeHeadController, FeeAmountController, StudentFeeController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
-    HolidayController, ContactMessageController, SchoolSubCategoryController
+    HolidayController, ContactMessageController, SchoolSubCategoryController, 
 };
+use App\Http\Controllers\SuperAdmin\FrontendSectionController;
 use App\Http\Controllers\SuperAdmin\{
-    SuperAdminController, RoleController, PermissionController,
-    SettingController, EmployeeController
+    SuperAdminController, RoleController,
+    SettingController, EmployeeController, PermissionController
 };
 
 /*
@@ -77,6 +78,18 @@ Route::domain(config('app.main_domain'))->group(function () {
         // Common Profile & Settings
         Route::get('/profile', [SuperAdminController::class, 'Profile'])->name('profile');
         Route::post('/profile/store', [SuperAdminController::class, 'ProfileStore'])->name('profile.store');
+
+        Route::middleware(['permission:frontend.manage'])->prefix('manage/frontend')->name('manage.frontend.')->group(function () {
+            // সেকশন লিস্ট দেখার জন্য
+            Route::get('/manage-sections', [FrontendSectionController::class, 'index'])->name('index');
+            
+            // সেকশন স্ট্যাটাস আপডেট (AJAX)
+            Route::post('/update-section-status', [FrontendSectionController::class, 'updateStatus'])->name('update.status');
+            
+            // সেকশন কন্টেন্ট এডিট করার জন্য (ঐচ্ছিক)
+            Route::get('/edit-section/{id}', [FrontendSectionController::class, 'edit'])->name('edit');
+            Route::post('/update-section/{id}', [FrontendSectionController::class, 'update'])->name('update');
+        });
     });
 
     // --- 1. Super Admin ONLY Group ---

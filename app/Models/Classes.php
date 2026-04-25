@@ -5,6 +5,40 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TeacherAssignSubject;
 
+/**
+ * @property int $id
+ * @property int $school_id
+ * @property string $name
+ * @property string|null $code
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $school_category_id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Admission> $admissions
+ * @property-read int|null $admissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssignClass> $assignments
+ * @property-read int|null $assignments_count
+ * @property-read \App\Models\SchoolCategory|null $category
+ * @property-read \App\Models\School $school
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Student> $students
+ * @property-read int|null $students_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subject> $subjects
+ * @property-read int|null $subjects_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, TeacherAssignSubject> $teacherAssignments
+ * @property-read int|null $teacher_assignments_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereSchoolCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Classes whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Classes extends Model
 {
     protected $fillable = [

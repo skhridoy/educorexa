@@ -4,6 +4,31 @@ namespace App\Models;
 use App\Models\TeacherAssignSubject;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $school_id
+ * @property string $name
+ * @property string|null $code
+ * @property string|null $type
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Classes> $classes
+ * @property-read int|null $classes_count
+ * @property-read \App\Models\School $school
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereSchoolId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Subject whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Subject extends Model
 {
     protected $fillable = ['id', 'school_id', 'name', 'code', 'type', 'description'];

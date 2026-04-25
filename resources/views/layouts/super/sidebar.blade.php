@@ -2,7 +2,7 @@
 @php
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
-    
+    $isFrontendMenuOpen = Request::is('manage/frontend*');
     // রাউট ফাইল অনুযায়ী স্কুলের সব রাউট 'manage.' দিয়ে শুরু
     $schoolRoutePrefix = 'manage.'; 
     
@@ -122,7 +122,26 @@
           </li>
           @endcan
       @endif
-
+      @can('frontend.manage')
+      <li class="nav-item nav-category">Frontend</li>
+      <li class="nav-item {{ $isFrontendMenuOpen ? 'active' : '' }}">
+        <a class="nav-link" data-bs-toggle="collapse" href="#frontendMenu" role="button" aria-expanded="{{ $isFrontendMenuOpen ? 'true' : 'false' }}">
+          <i class="link-icon" data-feather="layout"></i>
+          <span class="link-title">Landing Page</span>
+          <i class="link-arrow" data-feather="chevron-down"></i>
+        </a>
+        <div class="collapse {{ $isFrontendMenuOpen ? 'show' : '' }}" id="frontendMenu">
+          <ul class="nav sub-menu">
+            <li class="nav-item">
+              <a href="{{ route('manage.frontend.index') }}" class="nav-link {{ Request::is('manage/frontend/manage-sections') ? 'active' : '' }}">
+                  Manage Sections
+              </a>
+            </li>
+            {{-- ভবিষ্যতে এখানে Slider, Testimonials বা Gallery এর লিংক যোগ করতে পারবেন --}}
+          </ul>
+        </div>
+      </li>
+      @endcan
       {{-- Profile (For everyone) --}}
       <li class="nav-item nav-category">User</li>
       <li class="nav-item {{ Request::is('profile*') ? 'active' : '' }}">

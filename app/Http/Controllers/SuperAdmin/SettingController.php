@@ -5,6 +5,7 @@ namespace App\Http\Controllers\superadmin;
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use App\Models\FrontendSection;
 
 class SettingController extends Controller
 {
@@ -94,5 +95,18 @@ class SettingController extends Controller
         $setting->save();
 
         return back()->with('success', 'Site settings and SEO updated successfully!');
+    }
+
+    public function toggleSection(Request $request) {
+        // শুধুমাত্র সুপার এডমিন চেক
+        if(auth()->user()->role !== 'super_admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $section = FrontendSection::findOrFail($request->id);
+        $section->status = $request->status;
+        $section->save();
+
+        return response()->json(['success' => 'Status updated!']);
     }
 }

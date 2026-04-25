@@ -102,9 +102,77 @@
 @endsection
 
 @section('customJs')
-{{-- JS কোড আপনার আগের মতোই থাকবে, কোনো পরিবর্তনের প্রয়োজন নেই --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
-    // ... আপনার আগের দেওয়া জাভাস্ক্রিপ্ট কোডটি এখানে দিন ...
+    document.addEventListener('DOMContentLoaded', function () {
+        let cropper;
+        const imageInput = document.getElementById('imageInput');
+        const imageToCrop = document.getElementById('imageToCrop');
+        const modalElement = document.getElementById('cropperModal');
+        const cropperModal = new bootstrap.Modal(modalElement);
+        const croppedImageInput = document.getElementById('croppedImage');
+        const finalPreview = document.getElementById('finalPreview');
+        const finalPreviewContainer = document.getElementById('finalPreviewContainer');
+
+        // ১. ইমেজ সিলেক্ট করলে যা হবে
+        imageInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    imageToCrop.src = event.target.result;
+                    // ইনপুট ভ্যালু ক্লিয়ার করে দেওয়া যাতে একই ছবি বারবার সিলেক্ট করা যায়
+                    cropperModal.show();
+                };
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        // ২. মোডাল ওপেন হওয়ার পর ক্রপার ইনিশিয়ালাইজ করা
+        modalElement.addEventListener('shown.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, 
+                viewMode: 1, // মোড ২ এর বদলে ১ ট্রাই করুন, এটি বেশি স্টেবল
+                autoCropArea: 1,
+                checkOrientation: false,
+            });
+        });
+
+        // ৩. মোডাল বন্ধ হলে ক্রপার ডেস্ট্রয় করা
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            imageInput.value = ""; // ইনপুট রিসেট
+        });
+
+        // ৪. ক্রপ বাটনে ক্লিক করলে ডাটা সেভ করা
+        document.getElementById('cropAndSave').addEventListener('click', function () {
+            if (cropper) {
+                const canvas = cropper.getCroppedCanvas({
+                    width: 400,
+                    height: 400,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+
+                const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+                // হিডেন ইনপুটে ডাটা সেট করা
+                croppedImageInput.value = base64Image;
+
+                // প্রিভিউ আপডেট করা
+                finalPreview.src = base64Image;
+                finalPreviewContainer.style.display = 'block';
+
+                // মোডাল বন্ধ করা
+                cropperModal.hide();
+            }
+        });
+    });
 </script>
 @endsection
