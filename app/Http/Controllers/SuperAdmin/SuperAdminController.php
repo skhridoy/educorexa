@@ -91,7 +91,7 @@ class SuperAdminController extends Controller
             \Log::error("Approval Email failed: " . $e->getMessage());
         }
 
-        return redirect()->route('super.schools.all')->with('success', 'School Approved & Welcome Email Sent!');
+        return redirect()->route('manage.schools.all')->with('success', 'School Approved & Welcome Email Sent!');
     }
         
     public function allSchools()
@@ -126,7 +126,7 @@ class SuperAdminController extends Controller
         $school->delete();
 
         return redirect()
-            ->route('super.schools.all')
+            ->route('manage.schools.all')
             ->with('success', 'School deleted successfully!');
     }
 
@@ -205,7 +205,7 @@ class SuperAdminController extends Controller
             \Log::error("Direct Registration Mail Error: " . $e->getMessage());
         }
 
-        return redirect()->route('super.schools.all')->with('success', 'School created and activation email sent!');
+        return redirect()->route('manage.schools.all')->with('success', 'School created and activation email sent!');
     }
 // প্রোফাইল ভিউ মেথড (আপডেটেড)
     public function Profile() {
