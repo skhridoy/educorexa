@@ -65,6 +65,14 @@
                                 <input type="text" name="btn1_link" class="form-control" value="{{ $content['btn1_link'] ?? '#' }}">
                             </div>
                             <div class="col-md-3 mb-3">
+                                <label class="form-label">Secondary Btn Text</label>
+                                <input type="text" name="btn2_text" class="form-control" value="{{ $content['btn2_text'] ?? 'Book a Demo' }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Secondary Btn Link</label>
+                                <input type="text" name="btn2_link" class="form-control" value="{{ $content['btn2_link'] ?? '#' }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Stats 1 (Schools)</label>
                                 <input type="text" name="stat1_val" class="form-control" value="{{ $content['stat1_val'] ?? '500+' }}">
                             </div>

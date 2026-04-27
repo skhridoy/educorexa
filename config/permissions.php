@@ -90,10 +90,12 @@ return [
             'school.manage'         => 'View & Manage All Schools',
             'school.create'         => 'Create New School Instance',
             'school.approve'        => 'Approve/Reject Schools', // এটি আপনার রাউট অনুযায়ী নতুন যোগ করা হয়ছে
-
+            'frontend.manage'       => 'Manage Frontend Sections',
+            'school.reject'         => 'Reject School Data',
             'school.delete'         => 'Delete School Data',
             'settings.manage'       => 'Manage Central System Settings',
             'super.roles.manage'    => 'Manage Roles & Permissions',
+            'contact.messages.view'   => 'View Contact Messages',
         ],
     ],
 ];

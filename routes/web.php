@@ -12,7 +12,7 @@ use App\Http\Controllers\{
     FeeHeadController, FeeAmountController, StudentFeeController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
-    HolidayController, ContactMessageController, SchoolSubCategoryController, 
+    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController
 };
 use App\Http\Controllers\SuperAdmin\FrontendSectionController;
 use App\Http\Controllers\SuperAdmin\{
@@ -30,6 +30,7 @@ Route::domain(config('app.main_domain'))->group(function () {
     // --- Public Routes ---
     Route::get('/', [HomeController::class, 'index'])->name('main.home');
     Route::get('/about-details', function () {return view('frontend.page.about_details'); })->name('about.details');
+    Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
     Route::get('/forgot-password', fn() => "Password reset feature coming soon!")->name('password.request');
@@ -52,6 +53,7 @@ Route::domain(config('app.main_domain'))->group(function () {
     })->middleware('auth')->name('common.dashboard');
 
     Route::middleware(['auth'])->group(function () {
+
         
         // Schools Management: ইউআরএল হবে /manage/schools/...
         Route::middleware(['permission:school.manage'])->prefix('manage')->name('manage.')->group(function () {
@@ -67,8 +69,21 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::middleware(['permission:school.delete'])->group(function () {
                 Route::delete('/schools/{school}', [SuperAdminController::class, 'destroy'])->name('schools.destroy');
             });
-            Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
-            Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
+            Route::middleware(['permission:school.reject'])->group(function () {
+                Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
+                Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
+            });
+
+            Route::middleware(['permission:school.approve'])->group(function () {
+                Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approveSchool'])->name('schools.approve');
+            });
+
+            Route::middleware(['permission:contact.messages.view'])->group(function () {
+                Route::get('/contact-messages', [MainContactMsgController::class, 'index'])->name('contact.index');
+                Route::get('/contact-messages/{id}', [MainContactMsgController::class, 'show'])->name('contact.show');
+                Route::delete('/contact-messages/{id}', [MainContactMsgController::class, 'destroy'])->name('contact.destroy');
+
+            });
         });
 
         Route::middleware(['permission:settings.manage'])->group(function () {

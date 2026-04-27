@@ -99,4 +99,6 @@ class FrontendSectionController extends Controller
 
         return redirect()->route('manage.frontend.index')->with('success', 'Hero section updated with image!');
     }
+
+    
 }

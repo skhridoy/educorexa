@@ -121,6 +121,14 @@
             </a>
           </li>
           @endcan
+          @can('contact.messages.view')
+          <li class="nav-item">
+            <a href="{{ route('manage.contact.index') }}" class="nav-link">
+              <i class="link-icon" data-feather="box"></i>
+              <span class="link-title">Call Request</span>
+            </a>
+          </li>
+          @endcan
       @endif
       @can('frontend.manage')
       <li class="nav-item nav-category">Frontend</li>

@@ -8,9 +8,9 @@
 	<meta name="author" content="NobleUI">
 	<meta name="keywords" content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
     
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 	<link href="{{ $setting && $setting->favicon ? asset('storage/' . $setting->favicon) : asset('frontend/img/favicon.ico') }}" rel="icon">
     <title>@yield('title', 'Super Admin Dashboard')</title>
-
     <!-- Fonts -->
     @include('layouts._css')
 	<style>

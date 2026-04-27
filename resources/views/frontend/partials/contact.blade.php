@@ -59,7 +59,15 @@
             <div class="col-lg-7">
                 <div class="card border-0 shadow-lg rounded-4 p-4 p-lg-5">
                     {{-- ফর্মটি আপনার লিড কালেকশন রাউটে হিট করবে --}}
-                    <form action="#" method="POST">
+                    {{-- Success Message Alert --}}
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                            <strong>ধন্যবাদ!</strong> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('contact.store') }}" method="POST">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
