@@ -3,9 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="description" content="{{ $setting->meta_description ?? 'EduCorexa - The Most Reliable ERP Software for Schools' }}">
+    <meta name="keywords" content="{{ $setting->meta_keywords ?? 'School ERP, Education Management Software, Smart School Solution' }}">
+    <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset($setting->favicon ?? 'frontend/img/favicon.ico') }}">
     
+    {{-- টাইটেল সেকশন, যদি $setting না থাকে তবে ডিফল্ট নাম দেখাবে --}}    
     {{-- $setting ভেরিয়েবল না থাকলে ডিফল্ট নাম দেখাবে --}}
-    <title>@yield('title', $setting->site_name ?? 'EduCorexa')</title>
+    <title>@yield('title', $setting->site_name ?? 'EduCorexa') - @yield('subtitle', $setting->meta_title ?? 'EduCorexa')</title>
     
     <link rel="stylesheet" href="{{ asset('assets/vendors/core/core.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendors/feather-icons/feather.css') }}">

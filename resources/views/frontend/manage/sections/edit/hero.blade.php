@@ -142,7 +142,7 @@
     // মোডাল পুরোপুরি ওপেন হলে ক্রপার শুরু হবে
     document.getElementById('cropperModal').addEventListener('shown.bs.modal', function () {
         cropper = new Cropper(cropperImage, {
-            aspectRatio: 600 / 500,
+            aspectRatio: 700 / 496,
             viewMode: 1,
         });
     });
@@ -160,8 +160,8 @@
         if (!cropper) return;
 
         const canvas = cropper.getCroppedCanvas({
-            width: 800,
-            height: 666,
+            width: 700,
+            height: 496,
         });
         
         const base64 = canvas.toDataURL('image/png');

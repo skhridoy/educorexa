@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
-	<meta name="author" content="NobleUI">
-	<meta name="keywords" content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+	<meta name="description" content="{{ $setting->meta_description ?? 'EduCorexa - The Most Reliable ERP Software for Schools' }}">
+    <meta name="keywords" content="{{ $setting->meta_keywords ?? 'School ERP, Education Management Software, Smart School Solution' }}">
+    <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">
     
     <meta name="csrf-token" content="{{ csrf_token() }}">
-	<link href="{{ $setting && $setting->favicon ? asset('storage/' . $setting->favicon) : asset('frontend/img/favicon.ico') }}" rel="icon">
-    <title>@yield('title', 'Super Admin Dashboard')</title>
+	
+    <title>
+        @hasSection('title')
+            @yield('title') | {{ $setting->site_name ?? 'EduCorexa' }}
+        @else
+            @auth
+                {{-- roles টেবিলের name কলাম অনুযায়ী টাইটেল --}}
+                @php
+                    $roleName = Str::headline(auth()->user()->role); 
+                @endphp
+                {{ $roleName }} Dashboard | {{ $setting->site_name ?? 'EduCorexa' }}
+            @else
+                {{ $setting->site_name ?? 'EduCorexa' }}
+            @endauth
+        @endif
+    </title>
     <!-- Fonts -->
     @include('layouts._css')
 	<style>
