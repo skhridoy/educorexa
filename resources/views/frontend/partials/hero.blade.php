@@ -23,7 +23,7 @@
                     <a href="{{ $heroContent['btn1_link'] ?? '#' }}" class="btn btn-primary px-5 py-3 rounded-pill fw-bold shadow-lg">
                         {{ $heroContent['btn1_text'] ?? 'Get Started Free' }}
                     </a>
-                    <a href="{{ $heroContent['btn2_link'] ?? '#' }}" class="btn btn-outline-dark px-5 py-3 rounded-pill fw-bold">
+                    <a target="_blank" href="{{ $heroContent['btn2_link'] ?? '#' }}" class="btn btn-outline-dark px-5 py-3 rounded-pill fw-bold">
                         {{ $heroContent['btn2_text'] ?? 'View Demo' }}
                     </a>
                 </div>
