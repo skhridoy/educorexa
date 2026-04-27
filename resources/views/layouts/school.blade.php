@@ -4,17 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @php $school = app('currentSchool'); @endphp
 
     @if($school && $school->favicon)
-        <link rel="icon" type="image/{{ pathinfo($school->favicon, PATHINFO_EXTENSION) }}" href="{{ asset($school->favicon) }}">
+        <link rel="shortcut icon" type="image/png" href="{{ asset($school->favicon) }}?v={{ time() }}">
     @else
         <link rel="icon" type="image/png" href="{{ asset('default-favicon.png') }}">
     @endif
 
-    <title>{{ $school->name ?? 'EduOrbit School ERP' }}</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>
+        @hasSection('title')
+            @yield('title') | {{ $currentSchool->name ?? 'EduCorexa' }}
+        @else
+            {{-- ২. অন্যথায় রোল অনুযায়ী অটোমেটিক টাইটেল --}}
+            @auth
+                @php
+                    $user = auth()->user();
+                    // রোলের নামগুলো সুন্দর করে দেখানো
+                    $roleTitle = match($user->role) {
+                        'school_admin', 'school_staff' => 'Admin',
+                        'teacher' => 'Teacher',
+                        'student' => 'Student',
+                        default => 'Dashboard'
+                    };
+                @endphp
+                {{ $roleTitle }} Dashboard | {{ $currentSchool->name ?? 'EduCorexa' }}
+            @else
+                Dashboard | {{ $currentSchool->name ?? 'EduCorexa' }}
+            @endauth
+        @endif
+    </title>
+   
 
     @include('layouts._css')
     <style>

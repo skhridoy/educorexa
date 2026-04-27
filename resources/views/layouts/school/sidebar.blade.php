@@ -21,7 +21,7 @@
                     $permissions = $user->getAllPermissions()->pluck('name')->toArray();
                     
                     // ২. URL::defaults সেট করা থাকায় ['tenant' => $tenant] আর লিখতে হবে না
-                    $dashboardRoute = match($user->role_type) { // লক্ষ্য করুন: আমি role_type ব্যবহার করেছি
+                    $dashboardRoute = match($user->role) { // লক্ষ্য করুন: আমি role_type ব্যবহার করেছি
                         'student' => route('student.dashboard'),
                         'teacher' => route('teacher.dashboard'),
                         'school_admin', 'school_staff' => route('school.dashboard'),

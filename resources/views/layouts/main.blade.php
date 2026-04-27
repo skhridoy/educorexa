@@ -8,7 +8,7 @@
     <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">
     
     <meta name="csrf-token" content="{{ csrf_token() }}">
-	
+	<link rel="shortcut icon" type="image/png" href="{{ asset($setting->favicon) }}?v={{ time() }}">
     <title>
         @hasSection('title')
             @yield('title') | {{ $setting->site_name ?? 'EduCorexa' }}
@@ -25,6 +25,7 @@
         @endif
     </title>
     <!-- Fonts -->
+
     @include('layouts._css')
 	<style>
 		/* নোটিফিকেশন ড্রপডাউনটি ডান দিক থেকে এলাইন হবে */
