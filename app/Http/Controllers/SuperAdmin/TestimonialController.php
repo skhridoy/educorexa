@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 
-class TestimonialController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TestimonialController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:testimonial.approve');
+        return [
+            new Middleware('permission:testimonial.approve', only: ['index', 'approve', 'reject']),
+        ];
     }
     public function index()
     {
