@@ -139,6 +139,15 @@
             background: var(--navy);
             color: #fff;
         }
+        .btn-lg-square {
+            width: 55px;
+            height: 55px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
     </style>
 @endsection
 
@@ -155,7 +164,7 @@
                         <i class="fa fa-university"></i>
                         <h4 class="fw-bold mb-3">Online Admission</h4>
                         <p class="text-muted mb-4">Start your journey with us today. Our online admission process is simple and transparent.</p>
-                        <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-outline-primary rounded-pill">Apply Now</a>
+                        <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-navy rounded-pill py-2 px-4">Apply Now</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
@@ -163,7 +172,7 @@
                         <i class="fa fa-book-open"></i>
                         <h4 class="fw-bold mb-3">Academic Program</h4>
                         <p class="text-muted mb-4">We offer a wide range of academic programs designed to foster intellectual growth and skill development.</p>
-                        <a href="#overview" class="btn btn-outline-primary rounded-pill">View Details</a>
+                        <a href="#overview" class="btn btn-navy rounded-pill py-2 px-4">View Details</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
@@ -171,7 +180,7 @@
                         <i class="fa fa-file-invoice"></i>
                         <h4 class="fw-bold mb-3">Public Results</h4>
                         <p class="text-muted mb-4">Easily check examination results online. Stay updated with your child's academic progress.</p>
-                        <a href="#home" class="btn btn-outline-primary rounded-pill">Check Result</a>
+                        <a href="#home" class="btn btn-navy rounded-pill py-2 px-4">Check Result</a>
                     </div>
                 </div>
             </div>

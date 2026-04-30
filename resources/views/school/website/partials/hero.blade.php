@@ -4,16 +4,16 @@
             @forelse($sliders as $key => $slider)
                 <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
                     <img class="w-100" src="{{ asset($slider->image) }}" alt="Image" style="height: 600px; object-fit: cover;">
-                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                        <div class="p-3" style="max-width: 900px; background: rgba(0, 33, 71, 0.7); border-radius: 10px;">
-                            <h5 class="text-white text-uppercase mb-3 animated slideInDown" style="letter-spacing: 3px;">{{ $slider->subtitle ?? $school->address }}</h5>
-                            <h1 class="display-3 text-white mb-4 animated slideInDown fw-bold">{{ $slider->title ?? $school->name }}</h1>
+                    <div class="carousel-caption">
+                        <div class="hero-box text-center">
+                            <h6 class="text-white text-uppercase mb-3" style="letter-spacing: 2px; font-weight: 600;">{{ $slider->subtitle ?? 'The Best School in the Area' }}</h6>
+                            <h1 class="display-4 text-white mb-4 fw-bold">{{ $slider->title ?? $school->name }}</h1>
                             
-                            {{-- Result Search Box (Classic style) --}}
-                            <div class="mx-auto mt-4 animated fadeInUp" style="max-width: 500px;">
+                            {{-- Result Search Box --}}
+                            <div class="mx-auto mt-4" style="max-width: 500px;">
                                 <form id="resultSearchForm" class="d-flex">
                                     @csrf
-                                    <input type="text" name="student_id" id="student_id" class="form-control border-0 rounded-start py-3" placeholder="Enter Student ID (e.g. STD-001)" required>
+                                    <input type="text" name="student_id" id="student_id" class="form-control border-0 rounded-start py-3" placeholder="Enter Student ID (e.g. STD-261002)" required>
                                     <button type="submit" id="submitBtn" class="btn btn-gold rounded-end px-4 fw-bold">
                                         <span class="btn-text">Search</span>
                                         <span class="spinner-border spinner-border-sm d-none"></span>
@@ -22,8 +22,8 @@
                             </div>
 
                             <div class="mt-4">
-                                <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-gold py-md-3 px-md-5 me-3 animated slideInLeft fw-bold">Apply Now</a>
-                                <a href="#contact" class="btn btn-outline-light py-md-3 px-md-5 animated slideInRight fw-bold">Contact Us</a>
+                                <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-gold py-md-3 px-md-5 me-3 fw-bold">Apply Now</a>
+                                <a href="#contact" class="btn btn-outline-light py-md-3 px-md-5 fw-bold">Contact Us</a>
                             </div>
                         </div>
                     </div>
@@ -31,11 +31,26 @@
             @empty
                 <div class="carousel-item active">
                     <img class="w-100" src="{{ asset('main/img/hero.jpg') }}" alt="Image" style="height: 600px; object-fit: cover;">
-                    <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                        <div class="p-3" style="max-width: 700px; background: rgba(0, 33, 71, 0.7); border-radius: 10px;">
-                            <h1 class="display-3 text-white mb-4 animated slideInDown fw-bold">Welcome to {{ $school->name ?? 'Our School' }}</h1>
-                            <p class="fs-5 fw-medium text-white mb-4 pb-2">Dedicated to excellence in education and building a better future for every student.</p>
-                            <a href="#about" class="btn btn-gold py-md-3 px-md-5 me-3 animated slideInLeft fw-bold">Learn More</a>
+                    <div class="carousel-caption">
+                        <div class="hero-box text-center">
+                            <h6 class="text-white text-uppercase mb-3" style="letter-spacing: 2px; font-weight: 600;">Welcome to Our School</h6>
+                            <h1 class="display-4 text-white mb-4 fw-bold">Welcome to {{ $school->name ?? 'Our School' }}</h1>
+                            
+                            {{-- Result Search Box --}}
+                            <div class="mx-auto mt-4" style="max-width: 500px;">
+                                <form id="resultSearchForm" class="d-flex">
+                                    @csrf
+                                    <input type="text" name="student_id" id="student_id" class="form-control border-0 rounded-start py-3" placeholder="Enter Student ID (e.g. STD-261002)" required>
+                                    <button type="submit" id="submitBtn" class="btn btn-gold rounded-end px-4 fw-bold">
+                                        <span class="btn-text">Search</span>
+                                        <span class="spinner-border spinner-border-sm d-none"></span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="#about" class="btn btn-gold py-md-3 px-md-5 fw-bold">Learn More</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,6 +94,14 @@
         color: #002147; 
         transform: translateY(-2px);
     }
+    .btn-lg-square {
+        width: 60px;
+        height: 60px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
     .carousel-item {
         min-height: 600px;
         background-color: #002147;
@@ -88,10 +111,43 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, .4);
-        z-index: 5;
+        background: none !important;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hero-box {
+        background: rgba(0, 33, 71, 0.9) !important;
+        padding: 60px 40px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.1);
+        max-width: 850px;
+        margin: 15px;
     }
     .bg-navy { background-color: #002147 !important; }
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 1.8rem !important;
+        }
+        .hero-box {
+            padding: 30px 20px !important;
+        }
+        .carousel-item {
+            min-height: 500px !important;
+        }
+        #resultSearchForm {
+            flex-direction: column;
+        }
+        #resultSearchForm input {
+            border-radius: 5px !important;
+            margin-bottom: 10px;
+        }
+        #resultSearchForm button {
+            border-radius: 5px !important;
+        }
+    }
 </style>
 
 @push('customJs')

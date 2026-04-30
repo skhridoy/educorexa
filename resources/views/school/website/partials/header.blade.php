@@ -22,16 +22,18 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 px-4 px-lg-5">
-    <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
-        @if($school && $school->logo)
-            <img src="{{ asset($school->logo) }}" alt="Logo" style="height: 50px;" class="me-2">
-        @endif
-        <h2 class="m-0 text-navy fw-bold" style="font-size: 1.5rem;">{{ $school->name ?? 'Edu Corexa' }}</h2>
-    </a>
-    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
+    <div class="container-fluid d-flex justify-content-between align-items-center py-2 py-lg-0">
+        <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+            @if($school && $school->logo)
+                <img src="{{ asset($school->logo) }}" alt="Logo" style="height: 45px;" class="me-2">
+            @endif
+            <h2 class="m-0 text-navy fw-bold school-name-text d-none d-lg-inline" style="font-size: 1.5rem;">{{ $school->name ?? 'Edu Corexa' }}</h2>
+        </a>
+        <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="collapse navbar-collapse px-4 px-lg-0" id="navbarCollapse">
         <div class="navbar-nav ms-auto py-4 py-lg-0">
             <a href="#home" class="nav-item nav-link active">Home</a>
             <a href="{{ $school ? route('school.about', ['tenant' => $school->slug]) : '#' }}" class="nav-item nav-link">About</a>
@@ -78,5 +80,14 @@
     .navbar-light .navbar-nav .nav-link:hover,
     .navbar-light .navbar-nav .nav-link.active {
         color: #F9B800;
+    }
+    @media (max-width: 991.98px) {
+        .navbar-light .navbar-nav .nav-link {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .navbar-brand img {
+            height: 40px !important;
+        }
     }
 </style>
