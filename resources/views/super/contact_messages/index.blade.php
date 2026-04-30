@@ -8,62 +8,72 @@
                 <li class="breadcrumb-item active" aria-current="page">Contact Messages</li>
             </ol>
         </nav>
-        <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Contact Messages</h4>
+        </div>
+
+        <div class="row g-4">
+            @forelse($messages as $msg)
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
                     <div class="card-body">
-                        <h6 class="card-title">Contact Messages</h6>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Phone</th>
-                                        <th>School Name</th>
-                                        <th>Message</th>
-                                        <th>Submitted At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($messages as $msg)
-                                    <tr>
-                                        <td>{{ $msg->name }}</td>
-                                        <td>{{ $msg->phone }}</td>
-                                        <td>{{ $msg->school_name }}</td>
-                                        <td>{{ Str::limit($msg->message, 50) }}</td>
-                                        <td>{{ $msg->created_at->format('d M Y, h:i A') }}</td>
-                                        <td>
-                                            {{-- View Details Button --}}
-                                            <a href="{{ route('manage.contact.show', $msg->id) }}" class="btn btn-sm btn-info">
-                                                <i data-feather="eye" class="icon-sm"></i>
-                                            </a>
-
-                                            {{-- Delete Button --}}
-                                            <form action="{{ route('manage.contact.destroy', $msg->id) }}" method="POST" class="d-inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this)">
-                                                    <i data-feather="trash-2" class="icon-sm"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">No contact messages found.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-
-                            {{-- Pagination Links --}}
-                            {{ $messages->links() }}
+                        <div class="d-flex align-items-center mb-3">
+                            @php 
+                                $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-danger', 'bg-warning'];
+                                $bgClass = $colors[$loop->index % count($colors)];
+                            @endphp
+                            <div class="{{ $bgClass }} text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold me-3" style="width:50px; height:50px;">
+                                {{ strtoupper(substr($msg->name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ $msg->name }}</h6>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                    {{ $msg->school_name }}
+                                </small>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                    <i data-feather="phone" style="width: 12px; height: 12px;" class="me-1"></i> {{ $msg->phone }}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted small fst-italic mb-3">"{{ Str::limit($msg->message, 120) }}"</p>
+                        
+                        <small class="text-muted d-block mt-auto" style="font-size: 0.7rem;">
+                            <i data-feather="clock" style="width: 12px; height: 12px;" class="me-1"></i> {{ $msg->created_at->format('d M Y, h:i A') }}
+                        </small>
+                    </div>
+                    <div class="card-footer bg-transparent border-top pt-3 pb-3 d-flex justify-content-end align-items-center">
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('manage.contact.show', $msg->id) }}" class="btn btn-sm btn-light border shadow-sm text-primary fw-bold px-3" title="View Details">
+                                <i data-feather="eye" style="width: 14px; height: 14px;" class="me-1"></i> View
+                            </a>
+                            <form action="{{ route('manage.contact.destroy', $msg->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-sm btn-light border text-danger shadow-sm px-3 fw-bold" title="Delete" onclick="confirmDelete(this)">
+                                    <i data-feather="trash-2" style="width: 14px; height: 14px;" class="me-1"></i> Delete
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+            @empty
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-light rounded-4">
+                    <i data-feather="mail" class="text-muted mb-3" style="width: 40px; height: 40px;"></i>
+                    <h5 class="text-muted">No messages found.</h5>
+                    <p class="text-muted small">New contact messages will appear here.</p>
+                </div>
+            </div>
+            @endforelse
         </div>
+
+        @if($messages->hasPages())
+        <div class="mt-4">
+            {{ $messages->links() }}
+        </div>
+        @endif
     </div>
 @endsection
 

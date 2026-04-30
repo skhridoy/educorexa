@@ -51,7 +51,7 @@
         <!-- Navbar & Hero Start -->
         <div class="container-xxl position-relative p-0" id="home">
             @include('school.website.partials.header')
-        <!-- Navbar & Hero End -->
+        </div>
         @yield('content')
         <!-- Feature Start -->
         <!-- Feature End -->
@@ -84,6 +84,6 @@
     <!-- Template Javascript -->
     <script src="{{asset('frontend/js/main.js')}}"></script>
     
-    @yield('customJs')
+    @stack('customJs')
 </body>
 </html>

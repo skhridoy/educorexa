@@ -5,6 +5,7 @@
         @foreach($teachers as $teacher)
             <div>
                 <p>{{ $teacher->name }}</p>
+                
             </div>
         @endforeach
     </div>

@@ -121,6 +121,23 @@
             </a>
           </li>
           @endcan
+
+          {{-- Subscription Packages (Only Super Admin) --}}
+          @if($isSuperAdmin)
+          <li class="nav-item {{ Request::is('super-admin/subscription-packages*') ? 'active' : '' }}">
+            <a href="{{ route('super.subscription-packages.index') }}" class="nav-link">
+              <i class="link-icon" data-feather="package"></i>
+              <span class="link-title">Subscription Packages</span>
+            </a>
+          </li>
+          <li class="nav-item {{ Request::is('super-admin/testimonials*') ? 'active' : '' }}">
+            <a href="{{ route('super.testimonials.index') }}" class="nav-link">
+              <i class="link-icon" data-feather="message-square"></i>
+              <span class="link-title">Testimonials</span>
+            </a>
+          </li>
+          @endif
+          
           @can('contact.messages.view')
           <li class="nav-item">
             <a href="{{ route('manage.contact.index') }}" class="nav-link">

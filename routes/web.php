@@ -12,12 +12,13 @@ use App\Http\Controllers\{
     FeeHeadController, FeeAmountController, StudentFeeController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
-    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController
+    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController, ReviewController
 };
 use App\Http\Controllers\SuperAdmin\FrontendSectionController;
 use App\Http\Controllers\SuperAdmin\{
     SuperAdminController, RoleController,
-    SettingController, EmployeeController, PermissionController
+    SettingController, EmployeeController, PermissionController,
+    SubscriptionPackageController, TestimonialController
 };
 
 /*
@@ -117,6 +118,9 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::resource('permissions', PermissionController::class);
         });
         Route::resource('employees', EmployeeController::class);
+        Route::resource('subscription-packages', SubscriptionPackageController::class);
+        Route::patch('testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggleStatus'])->name('testimonials.toggle');
+        Route::resource('testimonials', TestimonialController::class);
     });
 
     // --- 2. Employee ONLY Group ---
@@ -174,6 +178,8 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::middleware(['is_admin'])->group(function () {
                     Route::get('admin/dashboard', [DashboardController::class, 'index'])
                         ->name('school.dashboard');
+                    Route::get('admin/review/create', [ReviewController::class, 'create'])->name('school.review.create');
+                    Route::post('admin/review/store', [ReviewController::class, 'store'])->name('school.review.store');
                 });
                 Route::get('/profile', [ProfileController::class, 'index'])->name('user.profile');
                 Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('user.profile.update');

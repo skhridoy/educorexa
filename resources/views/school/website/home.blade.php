@@ -2,394 +2,359 @@
 
 @section('customCSS')
     <style>
-        .school-logo {
-            height: 50px;
-            width: auto;
+        :root {
+            --navy: #002147;
+            --gold: #F9B800;
+            --white: #FFFFFF;
+            --gray-light: #F8F9FA;
+            --transition: all 0.3s ease;
         }
-        .school-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            white-space: normal; 
-            line-height: 1.2;
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            color: #444;
         }
-        .hero-header {
-            overflow: hidden;
+
+        .text-navy { color: var(--navy); }
+        .bg-navy { background-color: var(--navy) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+
+        /* Section Title */
+        .section-header {
+            position: relative;
+            padding-bottom: 20px;
+            margin-bottom: 50px;
         }
-        .carousel-item {
-            transition: transform 0.6s ease-in-out;
+        .section-header::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background: var(--gold);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
         }
-        /* ইমেজ সাইজ কন্ট্রোল করার জন্য */
-        .hero-header img {
-            max-height: 500px;
-            object-fit: contain;
+        .section-header.text-start::after {
+            left: 0;
+            transform: none;
         }
-      
-        .teacher-item {
-            transition: transform 0.3s ease;
+
+        /* Pillar Boxes */
+        .pillar-box {
+            background: #fff;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 5px solid var(--gold);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            margin-top: 0;
+            position: relative;
+            z-index: 20;
+            height: 100%;
             border-radius: 10px;
         }
-        
-        .teacher-item h5 {
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        /* সোশ্যাল বাটন ডিজাইন */
-        .social-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            transition: opacity 0.3s;
-        }
-
-        .social-btn:hover {
-            opacity: 0.8;
+        .pillar-box:hover {
+            transform: translateY(-10px);
+            background: var(--navy);
             color: #fff;
         }
-
-        /* আইকন কালার আপনার ছবির মতো */
-        .fb { background-color: #000; } /* প্রথমজন কালো, বাকিরা লাল */
-        .tw { background-color: #bb0000; }
-        .ln { background-color: #bb0000; }
-        .inst { background-color: #bb0000; }
-
-        /* প্রথম কার্ডের ফেসবুক আইকন কালো রাখতে চাইলে এটি কাজ করবে */
-        .row > div:first-child .fb { background-color: #000; }
-
-        /* Counter Section Design */
-        .counter-section {
-            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
-            padding: 80px 0;
-            color: white;
+        .pillar-box:hover h4, .pillar-box:hover p {
+            color: #fff;
         }
-
-        .counter-item i {
+        .pillar-box i {
             font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.9;
+            color: var(--navy);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .pillar-box:hover i {
+            color: var(--gold);
         }
 
-        .counter-val {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 5px;
-            display: block;
+        /* About Section */
+        .about-img-wrap {
+            position: relative;
+            padding: 30px;
+        }
+        .about-img-wrap::before {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            background: var(--navy);
+            top: 0;
+            left: 0;
+            z-index: -1;
+            border-radius: 10px;
         }
 
-        .counter-label {
-            font-size: 1.1rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        /* মোবাইল ভিউতে (৯৯২ পিক্সেলের নিচে) পরিবর্তন */
-        @media (max-width: 991.98px) {
-            .school-name {
-                font-size: 1.1rem; /* মোবাইলে নাম ছোট দেখাবে */
-                max-width: 200px;  /* টেক্সট র‍্যাপ করার জন্য একটি নির্দিষ্ট উইডথ */
-            }
-        .school-logo {
-                height: 40px; /* মোবাইলে লোগো সামান্য ছোট */
-            }
+        /* Stats Counter */
+        .stats-bar {
+            background: var(--navy);
+            padding: 80px 0;
+            color: #fff;
         }
 
-        /* আরও ছোট স্ক্রিন (যেমন: iPhone SE বা ছোট ফোন) */
-        @media (max-width: 575.98px) {
-            .school-name {
-                font-size: 0.95rem;
-                max-width: 150px;
-            }
+        /* Notice & News */
+        .notice-card {
+            background: #fff;
+            border-left: 5px solid var(--navy);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        .notice-card:hover {
+            border-left-color: var(--gold);
+            transform: translateX(5px);
+        }
+
+        /* Teachers */
+        .teacher-item {
+            background: #fff;
+            border: 1px solid #eee;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .teacher-item:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .teacher-item img {
+            transition: var(--transition);
+        }
+        .teacher-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Buttons */
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy);
+            font-weight: 700;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+        .btn-gold:hover {
+            background: var(--navy);
+            color: #fff;
         }
     </style>
 @endsection
 
 @section('content')
-@include('school.website.partials.hero')
-</div>
-    <div class="container-xxl py-6">
+    {{-- Hero Section --}}
+    @include('school.website.partials.hero')
+
+    {{-- Pillar Boxes --}}
+    <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="feature-item bg-light rounded text-center p-5">
-                        <i class="fa fa-4x fa-graduation-cap text-primary mb-4"></i>
-                        <h5 class="mb-3">মানসম্মত শিক্ষা</h5>
-                        <p class="m-0">অভিজ্ঞ শিক্ষক মন্ডলী দ্বারা আধুনিক ও ডিজিটাল পদ্ধতিতে পাঠদান নিশ্চিত করা হয়।</p>
+                    <div class="pillar-box">
+                        <i class="fa fa-university"></i>
+                        <h4 class="fw-bold mb-3">Online Admission</h4>
+                        <p class="text-muted mb-4">Start your journey with us today. Our online admission process is simple and transparent.</p>
+                        <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-outline-primary rounded-pill">Apply Now</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="feature-item bg-light rounded text-center p-5">
-                        <i class="fa fa-4x fa-microscope text-primary mb-4"></i>
-                        <h5 class="mb-3">আধুনিক ল্যাব</h5>
-                        <p class="m-0">শিক্ষার্থীদের ব্যবহারিক জ্ঞান বৃদ্ধির জন্য রয়েছে সুসজ্জিত বিজ্ঞান ও কম্পিউটার ল্যাব।</p>
+                    <div class="pillar-box">
+                        <i class="fa fa-book-open"></i>
+                        <h4 class="fw-bold mb-3">Academic Program</h4>
+                        <p class="text-muted mb-4">We offer a wide range of academic programs designed to foster intellectual growth and skill development.</p>
+                        <a href="#overview" class="btn btn-outline-primary rounded-pill">View Details</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="feature-item bg-light rounded text-center p-5">
-                        <i class="fa fa-4x fa-book-reader text-primary mb-4"></i>
-                        <h5 class="mb-3">সমৃদ্ধ লাইব্রেরি</h5>
-                        <p class="m-0">হাজারো বইয়ের সংগ্রহ নিয়ে আমাদের লাইব্রেরি শিক্ষার্থীদের জ্ঞান তৃষ্ণা মিটিয়ে থাকে।</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Notice Board -->
-    <div class="container-xxl py-6" id="notice">
-        <div class="container">
-            <div class="row g-5">
-                <div class="col-lg-8 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="d-flex align-items-center mb-4">
-                        <h1 class="mb-0">Notice Board</h1>
-                        <span class="bg-primary mx-3" style="width: 50px; height: 2px;"></span>
-                    </div>
-                    
-                    <div class="notice-container bg-white shadow-sm rounded p-4 border-top border-4 border-primary">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width: 15%">Date</th>
-                                        <th>Title</th>
-                                        <th style="width: 15%">Download</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                @forelse($notices as $notice)
-                                <tr>
-                                    <td>
-                                        <div class="bg-primary text-white text-center rounded p-1">
-                                            <span class="d-block fw-bold">{{ \Carbon\Carbon::parse($notice->notice_date)->format('d') }}</span>
-                                            <small>{{ \Carbon\Carbon::parse($notice->notice_date)->format('M, Y') }}</small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <h6 class="mb-1">{{ $notice->title }}</h6>
-                                        <small class="text-muted">Published: {{ $notice->created_at->diffForHumans() }}</small>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($notice->file)
-                                            <a href="{{ asset($notice->file) }}" target="_blank" class="btn btn-outline-danger btn-sm rounded-circle shadow-sm">
-                                                <i class="fa fa-file-pdf"></i>
-                                            </a>
-                                        @else
-                                            <span class="text-muted small">N/A</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center py-4 text-muted">বর্তমানে কোনো নোটিশ নেই।</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-end mt-3">
-                            <a href="#" class="btn btn-link text-primary p-0">সকল নোটিশ দেখুন <i class="fa fa-arrow-right ms-1"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="bg-light rounded p-4 mb-4">
-                        <h5 class="mb-4 border-bottom pb-2">গুরুত্বপূর্ণ লিংক</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-3">
-                                <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="text-decoration-none text-dark d-flex align-items-center" target="_blank">
-                                    <i class="fa fa-chevron-right text-primary me-2 small"></i> অনলাইন ভর্তি ফরম
-                                </a>
-                            </li>
-                            <li class="mb-3">
-                                <a href="#" class="text-decoration-none text-dark d-flex align-items-center">
-                                    <i class="fa fa-chevron-right text-primary me-2 small"></i> একাডেমিক ক্যালেন্ডার
-                                </a>
-                            </li>
-                            <li class="mb-3">
-                                <a href="#" class="text-decoration-none text-dark d-flex align-items-center">
-                                    <i class="fa fa-chevron-right text-primary me-2 small"></i> পাঠ্যক্রম ও সিলেবাস
-                                </a>
-                            </li>
-                            <li class="mb-0">
-                                <a href="#" class="text-decoration-none text-dark d-flex align-items-center">
-                                    <i class="fa fa-chevron-right text-primary me-2 small"></i> ডিজিটাল ক্লাস রুটিন
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-primary rounded p-4 text-white">
-                        <h5 class="text-white mb-3">সহায়তা প্রয়োজন?</h5>
-                        <p class="small mb-4">ভর্তি সংক্রান্ত বা অন্য কোনো তথ্যের জন্য আমাদের সাথে যোগাযোগ করুন।</p>
-                        <div class="d-flex align-items-center">
-                            <div class="btn-square bg-white text-primary rounded-circle me-3">
-                                <i class="fa fa-phone-alt"></i>
-                            </div>
-                            <h6 class="text-white mb-0">+০১৮০০-০০০০০০</h6>
-                        </div>
+                    <div class="pillar-box">
+                        <i class="fa fa-file-invoice"></i>
+                        <h4 class="fw-bold mb-3">Public Results</h4>
+                        <p class="text-muted mb-4">Easily check examination results online. Stay updated with your child's academic progress.</p>
+                        <a href="#home" class="btn btn-outline-primary rounded-pill">Check Result</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- About section -->
+    {{-- About Us Section --}}
     <div class="container-xxl py-6" id="about">
         <div class="container">
-            <div class="row g-5 flex-column-reverse flex-lg-row">
-                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <h1 class="mb-4">{{ $about->title ?? 'একটি উজ্জ্বল ভবিষ্যৎ গড়ার প্রত্যয়ে আমাদের পথচলা' }}</h1>
-                    <p class="mb-4">{{ $about->description ?? 'আমাদের লক্ষ্য শুধু পাঠ্যবইয়ের শিক্ষা নয়, বরং নৈতিকতা ও আধুনিক প্রযুক্তির সমন্বয়ে প্রতিটি শিক্ষার্থীকে একজন সুনাগরিক হিসেবে গড়ে তোলা।' }}</p>
-                    
-                    <div class="d-flex mb-4">
-                        <div class="flex-shrink-0 btn-square rounded-circle bg-primary text-white">
-                            <i class="fa fa-check"></i>
-                        </div>
-                        <div class="ms-4">
-                            <h5>{{ $about->feature_1_title ?? 'শৃঙ্খলামূলক পরিবেশ' }}</h5>
-                            <p class="mb-0">{{ $about->feature_1_desc ?? 'শিক্ষার্থীদের জন্য নিরাপদ, মনোরম এবং কঠোর শৃঙ্খলাবদ্ধ একাডেমিক পরিবেশ।' }}</p>
-                        </div>
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow zoomIn" data-wow-delay="0.1s">
+                    <div class="about-img-wrap">
+                        @if($about && $about->image)
+                            <img class="img-fluid rounded shadow" src="{{ asset($about->image) }}" alt="About">
+                        @else
+                            <img class="img-fluid rounded shadow" src="{{ asset('img/school-building.jpg') }}" alt="Default About">
+                        @endif
                     </div>
-
-                    <div class="d-flex mb-4">
-                        <div class="flex-shrink-0 btn-square rounded-circle bg-primary text-white">
-                            <i class="fa fa-check"></i>
-                        </div>
-                        <div class="ms-4">
-                            <h5>{{ $about->feature_2_title ?? 'সহ-শিক্ষা কার্যক্রম' }}</h5>
-                            <p class="mb-0">{{ $about->feature_2_desc ?? 'খেলাধুলা, বিতর্ক প্রতিযোগিতা ও সাংস্কৃতিক অনুষ্ঠানের মাধ্যমে মেধা বিকাশের সুযোগ।' }}</p>
-                        </div>
-                    </div>
-
-                    <a href="{{ $about->button_url ?? '#' }}" class="btn btn-primary py-sm-3 px-sm-5 rounded-pill mt-3">
-                        {{ $about->button_text ?? 'আরও জানুন' }}
-                    </a>
                 </div>
-
-                <div class="col-lg-6">
-                    @if($about && $about->image)
-                        <img class="img-fluid rounded wow zoomIn" data-wow-delay="0.5s" src="{{ asset($about->image) }}" alt="School Campus">
-                    @else
-                        <img class="img-fluid rounded wow zoomIn" data-wow-delay="0.5s" src="{{ asset('img/school-building.jpg') }}" alt="Default Campus">
-                    @endif
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="section-header text-start">
+                        <h5 class="text-navy text-uppercase fw-bold mb-2">Welcome to Our School</h5>
+                        <h2 class="display-6 fw-bold mb-0">{{ $about->title ?? 'Building a Brighter Future Together' }}</h2>
+                    </div>
+                    <p class="mb-4">{{ $about->description ?? 'We are committed to providing a holistic education that empowers students to reach their full potential and become responsible citizens.' }}</p>
+                    <div class="row g-4 mb-4">
+                        <div class="col-sm-6">
+                            <h5 class="mb-3"><i class="fa fa-check text-gold me-3"></i>Modern Labs</h5>
+                            <p class="small text-muted">Well-equipped science and computer labs for practical learning.</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h5 class="mb-3"><i class="fa fa-check text-gold me-3"></i>Expert Teachers</h5>
+                            <p class="small text-muted">Highly qualified and dedicated educators committed to student success.</p>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-navy py-3 px-5 rounded-pill">Learn More About Us</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Counter Section -->
-     <div class="container-xxl counter-section my-6 wow fadeInUp" data-wow-delay="0.1s">
+    {{-- Stats Bar --}}
+    <div class="container-fluid stats-bar my-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
             <div class="row g-4">
-                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.1s">
-                    <i class="fa fa-users"></i>
-                    <span class="counter-val" data-toggle="counter-up">{{ $studentCount ?? 1200 }}</span>
-                    <p class="counter-label text-white mb-0">মোট শিক্ষার্থী</p>
+                <div class="col-md-3 text-center">
+                    <i class="fa fa-users fa-3x text-gold mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $studentCount ?? 1200 }}</h2>
+                    <p class="text-uppercase mb-0">Total Students</p>
                 </div>
-                
-                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.3s">
-                    <i class="fa fa-user-tie"></i>
-                    <span class="counter-val" data-toggle="counter-up">{{ $teacherCount ?? 45 }}</span>
-                    <p class="counter-label text-white mb-0">অভিজ্ঞ শিক্ষক</p>
+                <div class="col-md-3 text-center">
+                    <i class="fa fa-user-tie fa-3x text-gold mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $teacherCount ?? 45 }}</h2>
+                    <p class="text-uppercase mb-0">Expert Teachers</p>
                 </div>
-                
-                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.5s">
-                    <i class="fa fa-user-shield"></i>
-                    <span class="counter-val" data-toggle="counter-up">{{ $staffCount ?? 15 }}</span>
-                    <p class="counter-label text-white mb-0">সহকারী স্টাফ</p>
+                <div class="col-md-3 text-center">
+                    <i class="fa fa-award fa-3x text-gold mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">100</h2>
+                    <p class="text-uppercase mb-0">Success Rate (%)</p>
                 </div>
-                
-                <div class="col-md-6 col-lg-3 text-center counter-item wow fadeIn" data-wow-delay="0.7s">
-                    <i class="fa fa-award"></i>
-                    <span class="counter-val" data-toggle="counter-up">100</span>
-                    <p class="counter-label text-white mb-0">সাফল্যের হার (%)</p>
+                <div class="col-md-3 text-center">
+                    <i class="fa fa-graduation-cap fa-3x text-gold mb-3"></i>
+                    <h2 class="text-white mb-2" data-toggle="counter-up">25</h2>
+                    <p class="text-uppercase mb-0">Years of Excellence</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Overviews Section -->
-    <div class="container-xxl bg-light my-6 py-5" id="overview">
+    {{-- News & Notice Board --}}
+    <div class="container-xxl py-5" id="notice">
         <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="section-header text-start">
+                        <h2 class="fw-bold">Latest Notice Board</h2>
+                    </div>
+                    <div class="pe-lg-4">
+                        @forelse($notices as $notice)
+                            <div class="notice-card p-4 mb-3 d-flex align-items-center">
+                                <div class="bg-navy text-white text-center rounded p-2 me-4" style="min-width: 70px;">
+                                    <h4 class="mb-0 text-white fw-bold">{{ \Carbon\Carbon::parse($notice->notice_date)->format('d') }}</h4>
+                                    <small class="text-uppercase">{{ \Carbon\Carbon::parse($notice->notice_date)->format('M') }}</small>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="fw-bold mb-1">{{ $notice->title }}</h5>
+                                    <small class="text-muted"><i class="far fa-clock me-2"></i>Published: {{ $notice->created_at->diffForHumans() }}</small>
+                                </div>
+                                @if($notice->file)
+                                    <a href="{{ asset($notice->file) }}" target="_blank" class="btn btn-sm btn-outline-danger rounded-circle ms-3">
+                                        <i class="fa fa-file-pdf"></i>
+                                    </a>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="alert alert-light border">No notices published yet.</div>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="section-header text-start">
+                        <h2 class="fw-bold">Important Links</h2>
+                    </div>
+                    <div class="list-group list-group-flush shadow-sm rounded border">
+                        <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom">
+                            <i class="fa fa-caret-right text-gold me-3"></i>Online Admission Form
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action p-3 border-0 border-bottom">
+                            <i class="fa fa-caret-right text-gold me-3"></i>Academic Calendar
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action p-3 border-0 border-bottom">
+                            <i class="fa fa-caret-right text-gold me-3"></i>Syllabus & Curriculum
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action p-3 border-0">
+                            <i class="fa fa-caret-right text-gold me-3"></i>Class Routine
+                        </a>
+                    </div>
+                    <div class="bg-navy rounded p-5 mt-5 text-white">
+                        <h4 class="text-white mb-4">Admission Inquiry</h4>
+                        <p class="small opacity-75 mb-4">Contact our admission office for any queries regarding student enrollment and fee structure.</p>
+                        <h5 class="text-white mb-0"><i class="fa fa-phone-alt text-gold me-3"></i>{{ $school->phone }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Overview Section --}}
+    <div class="container-xxl py-5 bg-light" id="overview">
+        <div class="container py-5">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h2 class="fw-bold">Our Academic Highlights</h2>
+            </div>
             @isset($overviews)
                 @foreach($overviews as $overview)
-                    <div class="row g-5 py-5 align-items-center {{ $loop->iteration % 2 == 0 ? 'flex-column-reverse flex-lg-row' : '' }}">
-                        
-                        {{-- বিজোড় (Odd) রো-তে ইমেজ বামে থাকবে --}}
-                        @if($loop->iteration % 2 != 0)
-                            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                                <img class="img-fluid rounded" src="{{ asset($overview->image) }}" alt="{{ $overview->title }}">
-                            </div>
-                        @endif
-
-                        {{-- টেক্সট সেকশন --}}
-                        <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
-                            <div class="d-flex align-items-center mb-4">
-                                {{-- বেঙ্গলি বা ইংলিশ নাম্বারিং (str_pad দিয়ে ০২ ফরম্যাট) --}}
-                                <h1 class="mb-0">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</h1>
-                                <span class="bg-primary mx-2" style="width: 30px; height: 2px;"></span>
-                                <h5 class="mb-0">{{ $overview->title }}</h5>
-                            </div>
+                    <div class="row g-5 align-items-center mb-5 {{ $loop->iteration % 2 == 0 ? 'flex-row-reverse' : '' }}">
+                        <div class="col-lg-6 wow zoomIn" data-wow-delay="0.1s">
+                            <img class="img-fluid rounded shadow-lg" src="{{ asset($overview->image) }}" alt="Overview">
+                        </div>
+                        <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                            <h3 class="fw-bold mb-4 text-navy">{{ $overview->title }}</h3>
                             <p class="mb-4">{{ $overview->description }}</p>
-                            
-                            {{-- ফিচার লিস্ট (কমা দিয়ে সেভ করা ডাটা অ্যারেতে রূপান্তর) --}}
                             @if($overview->features)
-                                @foreach(explode(',', $overview->features) as $feature)
-                                    <p class="{{ $loop->last ? 'mb-0' : 'mb-2' }}">
-                                        <i class="fa fa-check-circle text-primary me-3"></i>{{ trim($feature) }}
-                                    </p>
-                                @endforeach
+                                <div class="row g-2">
+                                    @foreach(explode(',', $overview->features) as $feature)
+                                        <div class="col-sm-6">
+                                            <i class="fa fa-check text-gold me-3"></i>{{ trim($feature) }}
+                                        </div>
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
-
-                        {{-- জোড় (Even) রো-তে ইমেজ ডানে থাকবে --}}
-                        @if($loop->iteration % 2 == 0)
-                            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                                <img class="img-fluid rounded" src="{{ asset($overview->image) }}" alt="{{ $overview->title }}">
-                            </div>
-                        @endif
-
                     </div>
                 @endforeach
             @endisset
         </div>
     </div>
-    <!-- Teachers Gellery -->
-    <div class="container-xxl py-3">
-        <div class="container text-center">
-            <h2 class="mb-5 fw-bold"><span class="text-danger">Our</span> Respectfull Teachers !</h2>
-            
-            <div class="row g-4 justify-content-center">
-                @foreach($teachers as $teacher)
-                <div class="col-lg-3 col-md-6 mb-4 ">
-                    <div class="teacher-item bg-light py-4 ">
-                        <div class="mb-3 d-flex justify-content-center">
-                            <div class="rounded-circle overflow-hidden" style="width: 200px; height: 200px; background: #f0f0f0;">
-                                <img class="img-fluid" src="{{ asset($teacher->photo) }}" alt="{{ $teacher->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                        </div>
 
-                        <h5 class="mb-1 fw-bold text-dark">{{ $teacher->name }}</h5>
-                        <p class="text-muted small mb-2" style="line-height: 1;">{{ $teacher->designation ?? ''  }} | {{ $teacher->subject->name ?? '' }}</p>
-                        <p class="text-muted small mb-3" style="line-height: 1;">{{ $teacher->qualification ?? '' }}</p>
-                        <div class="d-flex justify-content-center gap-2">
-                            @if($teacher->facebook)
-                                <a href="{{ $teacher->facebook }}" class="social-btn fb" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                            @endif
-                            @if($teacher->twitter)
-                                <a href="{{ $teacher->twitter }}" class="social-btn tw" target="_blank"><i class="fab fa-twitter"></i></a>
-                            @endif
-                            @if($teacher->linkedin)
-                                <a href="{{ $teacher->linkedin }}" class="social-btn ln" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-                            @endif
-                            @if($teacher->insta)
-                                <a href="{{ $teacher->insta }}" class="social-btn inst" target="_blank"><i class="fab fa-instagram"></i></a>
-                            @endif
+    {{-- Teachers Gallery --}}
+    <div class="container-xxl py-5">
+        <div class="container py-5">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h2 class="fw-bold">Our Professional Educators</h2>
+                <p class="text-muted">Dedicated teachers committed to student-centered learning.</p>
+            </div>
+            <div class="row g-4">
+                @foreach($teachers as $teacher)
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ 0.1 * $loop->index }}s">
+                    <div class="teacher-item text-center">
+                        <div class="position-relative overflow-hidden mb-4 mx-auto" style="width: 200px; height: 200px;">
+                            <img class="img-fluid rounded-circle w-100 h-100" 
+                                 src="{{ $teacher->photo ? asset($teacher->photo) : 'https://ui-avatars.com/api/?name='.urlencode($teacher->name).'&background=002147&color=fff' }}" 
+                                 alt="{{ $teacher->name }}" 
+                                 style="object-fit: cover; border: 5px solid #f8f9fa;">
+                        </div>
+                        <div class="p-4">
+                            <h5 class="fw-bold mb-1">{{ $teacher->name }}</h5>
+                            <small class="text-navy fw-bold">{{ $teacher->designation ?? 'Teacher' }}</small>
+                            <div class="d-flex justify-content-center mt-3">
+                                @if($teacher->facebook) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->facebook }}"><i class="fab fa-facebook-f"></i></a> @endif
+                                @if($teacher->twitter) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->twitter }}"><i class="fab fa-twitter"></i></a> @endif
+                                @if($teacher->linkedin) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->linkedin }}"><i class="fab fa-linkedin-in"></i></a> @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -397,102 +362,79 @@
             </div>
         </div>
     </div>
-    <!-- Contact  -->
-    <div class="container-xxl py-6" id="contact">
+
+    {{-- Contact Section --}}
+    <div class="container-xxl py-5" id="contact">
         <div class="container">
             <div class="row g-5">
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <h1 class="mb-3">Get In Touch</h1>
-                    <p class="mb-4">If you have any queries regarding admission or academic information, please contact our office.</p>
-                    <div class="d-flex mb-4">
-                        <div class="flex-shrink-0 btn-square rounded-circle bg-primary text-white">
-                            <i class="fa fa-phone-alt"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="mb-2">Call Us</p>
-                            <h5 class="mb-0">{{ $school->phone ?? '+880 1XXX XXXXXX' }}</h5>
+                    <div class="section-header text-start">
+                        <h2 class="fw-bold">Get In Touch</h2>
+                    </div>
+                    <p class="mb-5">Have questions? Reach out to us. We're here to help you with any information you need about our school.</p>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="btn-square bg-navy text-white rounded-circle me-4"><i class="fa fa-phone-alt"></i></div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-navy">Call Us</h6>
+                            <span>{{ $school->phone ?? '+880 1XXX XXXXXX' }}</span>
                         </div>
                     </div>
-                    <div class="d-flex mb-4">
-                        <div class="flex-shrink-0 btn-square rounded-circle bg-primary text-white">
-                            <i class="fa fa-envelope"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="mb-2">Mail Us</p>
-                            <h5 class="mb-0">{{ $school->email ?? 'info@school.edu.bd' }}</h5>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="btn-square bg-navy text-white rounded-circle me-4"><i class="fa fa-envelope-open"></i></div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-navy">Email Us</h6>
+                            <span>{{ $school->email ?? 'info@school.edu.bd' }}</span>
                         </div>
                     </div>
-                    <div class="d-flex mb-0">
-                        <div class="flex-shrink-0 btn-square rounded-circle bg-primary text-white">
-                            <i class="fa fa-map-marker-alt"></i>
-                        </div>
-                        <div class="ms-3">
-                            <p class="mb-2">Location</p>
-                            <h5 class="mb-0">{{ $school->address ?? 'Dhaka, Bangladesh' }}</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="btn-square bg-navy text-white rounded-circle me-4"><i class="fa fa-map-marker-alt"></i></div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-navy">Location</h6>
+                            <span>{{ $school->address ?? 'Dhaka, Bangladesh' }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
-                    @if(session('success'))
-                        <div class="alert alert-success border-0 shadow-sm mb-4">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    <form action="{{ route('contact.store', ['tenant' => $school->slug]) }}" method="POST">
-                        @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="name" placeholder="Your Name" value="{{ old('name') }}">
-                                    <label for="name">Your Name</label>
-                                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="bg-light rounded p-5">
+                        @if(session('success'))
+                            <div class="alert alert-success border-0 shadow-sm mb-4">{{ session('success') }}</div>
+                        @endif
+                        <form action="{{ route('contact.store', ['tenant' => $school->slug]) }}" method="POST">
+                            @csrf
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" name="name" class="form-control border-0 py-3" placeholder="Your Name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="email" name="email" class="form-control border-0 py-3" placeholder="Your Email">
+                                </div>
+                                <div class="col-12">
+                                    <input type="text" name="phone" class="form-control border-0 py-3" placeholder="Phone Number" required>
+                                </div>
+                                <div class="col-12">
+                                    <textarea name="message" class="form-control border-0 py-3" placeholder="Message" rows="5" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-navy w-100 py-3 rounded-pill fw-bold" type="submit">Send Message</button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" id="email" placeholder="Your Email" value="{{ old('email') }}">
-                                    <label for="email">Your Email(Optional)</label>
-                                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="number" name="phone" class="form-control @error('phone') is-invalid @enderror" id="phone" placeholder="Your number" value="{{ old('phone') }}">
-                                    <label for="phone">Phone Number</label>
-                                    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    <textarea name="message" class="form-control @error('message') is-invalid @enderror" placeholder="Leave a message here" id="message" style="height: 150px">{{ old('message') }}</textarea>
-                                    <label for="message">Message</label>
-                                    @error('message') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary rounded-pill py-3 px-5 shadow-sm transition" type="submit">
-                                    <i class="fas fa-paper-plane me-2"></i> Send Message
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 @endsection
 
-@section('customJs')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('[data-toggle="counter-up"]').counterUp({
-            delay: 10,
-            time: 2000
+@push('customJs')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('[data-toggle="counter-up"]').counterUp({
+                delay: 10,
+                time: 2000
+            });
         });
-    });
-</script>
-@endsection
+    </script>
+@endpush

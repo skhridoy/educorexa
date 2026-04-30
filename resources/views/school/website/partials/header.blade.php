@@ -1,50 +1,82 @@
-<div class="container-xxl position-relative p-0" id="home">
-    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-        <a href="{{ url('/') }}" class="navbar-brand p-0 d-flex align-items-center">
-            @if($school && $school->logo)
-                <img src="{{ asset($school->logo) }}" alt="Logo" class="school-logo me-2">
-            @endif
-            
-            <h3 class="m-0 school-name">
-                {{ $school->name ?? 'Edu Corexa' }}
-            </h3>
-        </a>
-        <button class="navbar-toggler rounded-pill collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-expanded="false">
-            <span class="fa fa-bars"></span>
-        </button>
-
-        <div class="navbar-collapse collapse" id="navbarCollapse">
-            <div class="navbar-nav mx-auto py-0">
-                <a href="#home" class="nav-item nav-link active">Home</a>
-                {{-- এখানে optional() ব্যবহার করা হয়েছে যেন $school না থাকলেও এরর না দেয় --}}
-                <a href="{{ $school ? route('school.about', ['tenant' => $school->slug]) : '#' }}" class="nav-item nav-link">About Us</a>
-                <a href="#features" class="nav-item nav-link">Notice Board</a>
-                <a href="#overview" class="nav-item nav-link">Academic</a>
-                <a href="#contact" class="nav-item nav-link">Contact</a>
+<!-- Top Bar -->
+<div class="container-fluid bg-navy px-5 d-none d-lg-block">
+    <div class="row gx-0 align-items-center" style="height: 45px;">
+        <div class="col-lg-8 text-start">
+            <div class="d-inline-flex align-items-center me-4 text-white small">
+                <i class="fa fa-phone-alt me-2"></i>{{ $school->phone ?? '+880 1XXX XXXXXX' }}
             </div>
-
-            @auth
-                @php
-                    $user = auth()->user();
-                    // যদি ইউজার লগইন থাকে, তবে তার স্কুল থেকেই স্লাগ নেওয়া ভালো
-                    $tenant = $user->school->slug ?? ($school->slug ?? '');
-                        
-                    $dashboardRoute = match($user->role) {
-                        'student' => route('student.dashboard', ['tenant' => $tenant]),
-                        'teacher' => route('teacher.dashboard', ['tenant' => $tenant]),
-                        'school_admin' => route('school.dashboard', ['tenant' => $tenant]),
-                        default => '#'
-                    };
-                @endphp
-                <a href="{{ $dashboardRoute }}" class="btn btn-light rounded-pill py-2 px-4 d-lg-block">Dashboard</a>
-            @else
-                {{-- লগইন বাটনের ক্ষেত্রেও একটি চেক বসানো হয়েছে --}}
-                @if($school)
-                    <a href="{{ route('school.login.form', ['tenant' => $school->slug]) }}" class="btn btn-light rounded-pill py-2 px-4 d-lg-block">Login</a>
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-light rounded-pill py-2 px-4 d-lg-block">Login</a>
-                @endif
-            @endauth
+            <div class="d-inline-flex align-items-center text-white small">
+                <i class="fa fa-envelope-open me-2"></i>{{ $school->email ?? 'info@school.edu.bd' }}
+            </div>
         </div>
-    </nav>
+        <div class="col-lg-4 text-end">
+            <div class="d-inline-flex align-items-center">
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-twitter"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top p-0 px-4 px-lg-5">
+    <a href="{{ url('/') }}" class="navbar-brand d-flex align-items-center">
+        @if($school && $school->logo)
+            <img src="{{ asset($school->logo) }}" alt="Logo" style="height: 50px;" class="me-2">
+        @endif
+        <h2 class="m-0 text-navy fw-bold" style="font-size: 1.5rem;">{{ $school->name ?? 'Edu Corexa' }}</h2>
+    </a>
+    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto py-4 py-lg-0">
+            <a href="#home" class="nav-item nav-link active">Home</a>
+            <a href="{{ $school ? route('school.about', ['tenant' => $school->slug]) : '#' }}" class="nav-item nav-link">About</a>
+            <a href="#notice" class="nav-item nav-link">Notice</a>
+            <a href="#overview" class="nav-item nav-link">Academic</a>
+            <a href="#contact" class="nav-item nav-link">Contact</a>
+        </div>
+        @auth
+            @php
+                $user = auth()->user();
+                $tenant = $user->school->slug ?? ($school->slug ?? '');
+                $dashboardRoute = match($user->role) {
+                    'student' => route('student.dashboard', ['tenant' => $tenant]),
+                    'teacher' => route('teacher.dashboard', ['tenant' => $tenant]),
+                    'school_admin' => route('school.dashboard', ['tenant' => $tenant]),
+                    default => '#'
+                };
+            @endphp
+            <a href="{{ $dashboardRoute }}" class="btn btn-navy rounded-pill py-2 px-4 ms-lg-3">Dashboard</a>
+        @else
+            <a href="{{ $school ? route('school.login.form', ['tenant' => $school->slug]) : route('login') }}" class="btn btn-navy rounded-pill py-2 px-4 ms-lg-3">Login</a>
+        @endauth
+    </div>
+</nav>
+
+<style>
+    .bg-navy { background-color: #002147 !important; }
+    .text-navy { color: #002147 !important; }
+    .btn-navy { 
+        background-color: #002147; 
+        color: #fff; 
+        border: none;
+        transition: 0.3s;
+    }
+    .btn-navy:hover { 
+        background-color: #F9B800; 
+        color: #002147; 
+    }
+    .navbar-light .navbar-nav .nav-link {
+        color: #002147;
+        font-weight: 600;
+        padding: 25px 15px;
+    }
+    .navbar-light .navbar-nav .nav-link:hover,
+    .navbar-light .navbar-nav .nav-link.active {
+        color: #F9B800;
+    }
+</style>

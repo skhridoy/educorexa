@@ -96,6 +96,7 @@ return [
             'settings.manage'       => 'Manage Central System Settings',
             'super.roles.manage'    => 'Manage Roles & Permissions',
             'contact.messages.view'   => 'View Contact Messages',
+            'testimonial.approve'   => 'Approve/Manage Testimonials',
         ],
     ],
 ];

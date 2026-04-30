@@ -285,6 +285,15 @@
                 </a>
             </li>
             @endif
+
+            @if($user->hasRole('school_admin'))
+            <li class="nav-item mt-2">
+                <a href="{{ route('school.review.create', ['tenant' => $tenant]) }}" class="nav-link">
+                    <i class="link-icon text-warning" data-feather="star"></i>
+                    <span class="link-title text-warning fw-bold">Submit Review</span>
+                </a>
+            </li>
+            @endif
             @endif
         </ul>
     </div>

@@ -8,70 +8,52 @@
 
         <div class="swiper testimonialSwiper pb-5">
             <div class="swiper-wrapper">
-                
-                <div class="swiper-slide p-2">
-                    <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light">
-                        <div class="stars mb-3 text-warning small">
-                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        </div>
-                        <p class="text-muted small mb-4 fst-italic">"EduCorexa ব্যবহার করার পর আমাদের স্কুলের ফি কালেকশন অনেক সহজ হয়ে গেছে। এখন সবকিছু অটোমেটিক হয়।"</p>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">A</div>
-                            <div>
-                                <h6 class="fw-bold mb-0 small">Abdullah Al Mamun</h6>
-                                <small class="text-muted x-small">Principal, ABC School</small>
+                @if(isset($testimonials) && $testimonials->count() > 0)
+                    @foreach($testimonials as $testimonial)
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light">
+                            <div class="stars mb-3 text-warning small">
+                                @for($i=1; $i<=5; $i++)
+                                    <i class="bi bi-star-fill {{ $i <= $testimonial->rating ? 'text-warning' : 'text-muted opacity-25' }}"></i>
+                                @endfor
+                            </div>
+                            <p class="text-muted small mb-4 fst-italic">"{{ $testimonial->message }}"</p>
+                            <div class="d-flex align-items-center">
+                                @php
+                                    $imageUrl = $testimonial->user_id && $testimonial->user && $testimonial->user->photo 
+                                                ? asset('uploads/profiles/' . $testimonial->user->photo) 
+                                                : ($testimonial->image ? asset($testimonial->image) : null);
+                                @endphp
+                                @if($imageUrl)
+                                    <img src="{{ $imageUrl }}" alt="image" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover; flex-shrink: 0;">
+                                @else
+                                    @php 
+                                        $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-danger', 'bg-warning'];
+                                        $bgClass = $colors[$loop->index % count($colors)];
+                                    @endphp
+                                    <div class="{{ $bgClass }} text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">
+                                        {{ strtoupper(substr($testimonial->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                <div>
+                                    <h6 class="fw-bold mb-0 small">{{ $testimonial->name }}</h6>
+                                    <small class="text-muted x-small">
+                                        {{ $testimonial->designation }}
+                                        @if($testimonial->designation && $testimonial->institution_name) , @endif
+                                        {{ $testimonial->institution_name }}
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="swiper-slide p-2">
-                    <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light">
-                        <div class="stars mb-3 text-warning small">
-                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        </div>
-                        <p class="text-muted small mb-4 fst-italic">"সফটওয়্যারটির ইন্টারফেস খুবই ইউজার ফ্রেন্ডলি। আমাদের শিক্ষকরা খুব দ্রুত এটি চালানো শিখে নিয়েছেন।"</p>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">S</div>
-                            <div>
-                                <h6 class="fw-bold mb-0 small">Sharmin Akter</h6>
-                                <small class="text-muted x-small">Admin Head, City Academy</small>
-                            </div>
+                    @endforeach
+                @else
+                    <div class="swiper-slide p-2">
+                        <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light text-center py-5">
+                            <p class="text-muted fst-italic mb-0">No testimonials available yet.</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="swiper-slide p-2">
-                    <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light">
-                        <div class="stars mb-3 text-warning small">
-                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        </div>
-                        <p class="text-muted small mb-4 fst-italic">"সাপোর্ট টিম খুবই প্রফেশনাল। যেকোনো সমস্যায় নক দিলেই দ্রুত সমাধান পাওয়া যায়। দারুণ সলিউশন।"</p>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">K</div>
-                            <div>
-                                <h6 class="fw-bold mb-0 small">Kamrul Hasan</h6>
-                                <small class="text-muted x-small">Director, Model School</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="swiper-slide p-2">
-                    <div class="testimonial-card p-4 rounded-4 border-0 shadow-sm h-100 bg-light">
-                        <div class="stars mb-3 text-warning small">
-                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        </div>
-                        <p class="text-muted small mb-4 fst-italic">"অনলাইন এক্সাম এবং রেজাল্ট পাবলিশিং ফিচারটি আমাদের অনেক সময় বাঁচিয়ে দিচ্ছে। খুবই কার্যকর।"</p>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">R</div>
-                            <div>
-                                <h6 class="fw-bold mb-0 small">Rakibul Islam</h6>
-                                <small class="text-muted x-small">Secretary, Ideal School</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endif
 
             </div>
             <div class="swiper-pagination"></div>
