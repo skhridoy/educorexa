@@ -1,109 +1,118 @@
 @extends('layouts.school')
 
 @section('customCSS')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    @include('school.others._modern_design_styles')
 @endsection
 @section('content')
-<div class="page-content">
-    <div class="row">
-        {{-- ক্রিয়েট ফর্ম --}}
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-title">Add Overview</h6>
-                    <form action="{{ route('overview.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" name="title" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <input type="text" name="description" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Features (কমা দিয়ে লিখুন)</label>
-                            <textarea name="features" class="form-control" placeholder="Feature 1, Feature 2"></textarea>
-                        </div>
-                        <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="cropperModalLabel">ইমেজ ক্রপ করুন</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="img-container">
-                                            <img id="imageToCrop" src="" style="max-width: 100%;">
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
-                                        <button type="button" id="cropAndSave" class="btn btn-primary">Crop & Apply</button>
-                                    </div>
+    <div class="page-content">
+        <div class="container-fluid">
+            <div class="page-header-card mb-4">
+                <div class="page-header-content">
+                    <h1 class="page-title"><i class="fa-solid fa-eye me-2"></i> School Overview</h1>
+                    <p class="page-subtitle">Create and manage school overview entries with image, title and feature summary.</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="form-card">
+                        <h5 class="mb-4 fw-bold text-primary"><i class="fa-solid fa-plus-circle me-2"></i> Add Overview</h5>
+                        <form action="{{ route('overview.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Features (কমা দিয়ে লিখুন)</label>
+                                <textarea name="features" class="form-control" placeholder="Feature 1, Feature 2"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Upload Image</label>
+                                <input type="file" id="imageInput" class="form-control" accept="image/*">
+                                <input type="hidden" name="cropped_image" id="croppedImage">
+                                <div class="mt-3" id="finalPreviewContainer" style="display: none;">
+                                    <label class="d-block mb-1">Cropped Preview:</label>
+                                    <img id="finalPreview" src="" width="150" class="img-thumbnail">
                                 </div>
                             </div>
+
+                            <button type="submit" class="btn btn-primary-gradient">Save Overview</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="data-table-card">
+                        <div class="table-header">
+                            <h5 class="table-title"><i class="fa-solid fa-list-check me-2"></i> Overview List</h5>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Upload Image</label>
-                            <input type="file" id="imageInput" class="form-control" accept="image/*">
-                            <input type="hidden" name="cropped_image" id="croppedImage">
-                            
-                            {{-- ক্রপ করার পর ছোট প্রিভিউ দেখানোর জন্য --}}
-                            <div class="mt-2" id="finalPreviewContainer" style="display: none;">
-                                <label class="d-block mb-1">Cropped Preview:</label>
-                                <img id="finalPreview" src="" width="150" class="img-thumbnail">
-                            </div>
+                        <div class="table-responsive px-3 pb-3">
+                            <table class="table data-table mb-0 align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Image</th>
+                                        <th>Title</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($overviews as $item)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td><img src="{{ asset($item->image) }}" width="50" class="rounded"></td>
+                                            <td>{{ $item->title }}</td>
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                    <a href="{{ route('overview.edit', ['tenant' => auth()->user()->school->slug, $overview = $item->id]) }}" class="btn btn-sm btn-primary btn-action">
+                                                        <i class="fa-regular fa-pen-to-square"></i>
+                                                    </a>
+                                                    <form action="{{ route('overview.destroy', ['tenant' => auth()->user()->school->slug, $overview = $item->id]) }}" method="POST" class="d-inline">
+                                                        @csrf @method('DELETE')
+                                                        <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger btn-action">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- ডাটা টেবিল --}}
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-title">Overview List</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Image</th>
-                                    <th>Title</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($overviews as $item)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td><img src="{{ asset($item->image) }}" width="50"></td>
-                                    <td>{{ $item->title }}</td>
-                                    <td>
-                                        <a href="{{ route('overview.edit', ['tenant' => auth()->user()->school->slug, $overview = $item->id]) }}" class="btn btn-sm btn-primary badge"><i
-                                                            class="fa-regular fa-pen-to-square"></i>
-                                        </a>
-                                        <form action="{{ route('overview.destroy', ['tenant' => auth()->user()->school->slug, $overview = $item->id]) }}" method="POST" class="d-inline">
-                                            @csrf @method('DELETE')
-                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-sm btn-danger badge"><i
-                                                            class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cropperModalLabel">ইমেজ ক্রপ করুন</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="img-container">
+                            <img id="imageToCrop" src="" style="max-width: 100%;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+                        <button type="button" id="cropAndSave" class="btn btn-primary">Crop & Apply</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('customJs')

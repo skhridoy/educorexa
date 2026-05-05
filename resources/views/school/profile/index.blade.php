@@ -1,6 +1,7 @@
 @extends('layouts.school')
 
 @section('customCSS')
+    @include('school.others._modern_design_styles')
 
 <style>
     .preview { overflow: hidden; width: 160px; height: 160px; border: 1px solid #727cf5; border-radius: 50%; }

@@ -2,202 +2,199 @@
 
 @section('customCSS')
 <style>
-    .school-logo {
-            height: 50px;
-            width: auto;
-        }
-        .school-name {
-            font-size: 1.75rem;
-            font-weight: 700;
-            white-space: normal; 
-            line-height: 1.2;
-        }
-    /* ১. হিরো হেডার ডিজাইন ঠিক করা (আগের সমস্যা সমাধানের জন্য) */
+    :root {
+        --primary-navy: #002147;
+        --accent-gold: #ffcc00;
+        --soft-bg: #f8fafc;
+    }
+
+    body {
+        background-color: var(--soft-bg);
+    }
+
     .hero-header-wrapper {
-        margin-top: 0 !important; /* হেডার ওভারল্যাপ সমস্যা সমাধান */
+        margin-top: 0 !important;
     }
     
     .hero-header {
-        background: linear-gradient(rgba(101, 113, 255, .9), rgba(101, 113, 255, .9));
-        margin-bottom: 50px;
+        background: linear-gradient(135deg, var(--primary-navy) 0%, #003366 100%);
+        padding: 80px 0;
+        margin-bottom: -100px;
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
     }
 
-    /* ২. লোগো এবং আইকন কন্টেইনার */
-    .logo-container {
+    .login-card {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+    }
+
+    .logo-box {
+        width: 100px;
+        height: 100px;
+        background: white;
+        border-radius: 20px;
+        padding: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 25px;
-        position: relative;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        margin-bottom: 24px;
     }
 
-    .school-logo-img {
-        width: 100px;
-        height: 100px;
-        object-fit: contain; /* লোগো পুরো দেখানোর জন্য */
-        border-radius: 15px; /* হালকা গোল করার জন্য */
-        padding: 10px;
-        background: white; /* লোগো হাইলাইট করার জন্য সাদা ব্যাকগ্রাউন্ড */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* সুন্দর শ্যাডো */
+    .logo-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
     }
 
-    /* ৩. ইনপুট আইকন ডিজাইন ঠিক করা */
-    .login-form .input-group-text {
-        background-color: #f8f9fa; /* হালকা গ্রে ব্যাকগ্রাউন্ড */
-        border-right: none;
-        color: #7c85ff; /* আপনার প্রাইমারি কালারের হালকা শেড */
-        padding-left: 15px;
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
     }
 
-    .login-form .form-control {
-        border-left: none;
-        padding-left: 5px;
-    }
-
-    .login-form .form-control:focus {
-        border-color: #ced4da; /* ডিফল্ট বর্ডার রাখা */
-        box-shadow: none; /* ফোকাস শ্যাডো সরানো */
-    }
-    
-    .login-form .input-group:focus-within {
-        border-radius: 5px;
-        border: 2px solid #6571ff; /* ফোকাস করলে পুরো গ্রুপ বর্ডার হবে */
-    }
-    
-    .login-form .input-group:focus-within .input-group-text {
-        border-color: transparent;
-    }
-
-    /* ৪. বাটন এনিমেশন */
-    .btn-submit {
-        background-color: #6571ff;
-        border-color: #6571ff;
+    .input-group {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1.5px solid #e2e8f0;
         transition: all 0.3s ease;
     }
-    .btn-submit:hover {
-        background-color: #4e59d4 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(101, 113, 255, 0.3);
+
+    .input-group:focus-within {
+        border-color: var(--primary-navy);
+        box-shadow: 0 0 0 4px rgba(0, 33, 71, 0.05);
     }
 
-    @media (max-width: 991.98px) {
-            .school-name {
-                font-size: 1.1rem; /* মোবাইলে নাম ছোট দেখাবে */
-                max-width: 200px;  /* টেক্সট র‍্যাপ করার জন্য একটি নির্দিষ্ট উইডথ */
-            }
-        .school-logo {
-                height: 40px; /* মোবাইলে লোগো সামান্য ছোট */
-            }
-        }
+    .input-group-text {
+        background: #f8fafc;
+        border: none;
+        color: #94a3b8;
+        padding-left: 16px;
+    }
 
-        /* আরও ছোট স্ক্রিন (যেমন: iPhone SE বা ছোট ফোন) */
-        @media (max-width: 575.98px) {
-            .school-name {
-                font-size: 0.95rem;
-                max-width: 150px;
-            }
-        }
+    .form-control {
+        border: none;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        background: transparent;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .btn-login {
+        background: var(--primary-navy);
+        border: none;
+        color: white;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        margin-top: 12px;
+    }
+
+    .btn-login:hover {
+        background: #003366;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 33, 71, 0.2);
+        color: white;
+    }
+
+    .auth-link {
+        color: var(--primary-navy);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .auth-link:hover {
+        color: #003366;
+    }
+
+    .brand-text {
+        font-family: 'Outfit', sans-serif;
+        color: white;
+        font-weight: 800;
+    }
 </style>
 @endsection
 
 @section('content')
-<div class="container-xxl position-relative p-0 hero-header-wrapper">
-    
-
-    {{-- হিরো সেকশন --}}
-    <div class="container-xxl bg-primary hero-header">
+<div class="hero-header-wrapper">
+    <div class="hero-header text-center">
         <div class="container">
-            <div class="row g-5 align-items-center">
-                <div class="text-center">
-                    <h2 class="display-6 fw-bold text-white animated slideInDown">
-                        {{ $school->name ?? 'School Name' }}
-                    </h2>
-                    <p class="text-white small animated slideInDown">নিরাপদ ড্যাশবোর্ডে লগইন করুন</p>
-                </div>
-            </div>
+            <h1 class="brand-text display-4 mb-2">{{ $school->name ?? 'School Name' }}</h1>
+            <p class="text-white opacity-75 fs-5">Academic Elite ERP Portal</p>
         </div>
     </div>
 </div>
 
-{{-- লগইন কার্ড সেকশন --}}
-<div class="container-fluid bg-light me-5">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                    <div class="card-body p-4 p-md-5 login-form">
-                        <div class="text-center mb-4">
-                            {{-- ৪. ডাইনামিক স্কুল লোগো সেকশন --}}
-                            <div class="logo-container">
-                                @if($school->logo)
-                                    <img src="{{ asset($school->logo) }}" alt="{{ $school->name }} Logo" class="school-logo-img">
-                                @else
-                                    {{-- লোগো না থাকলে ডিফল্ট লোকো (Blue Box with Icon) --}}
-                                    <div class="d-inline-flex align-items-center justify-content-center" 
-                                         style="background-color: #6571ff; width: 80px; height: 80px; border-radius: 20px;">
-                                        <i class="fas fa-university text-white fa-2x"></i>
-                                    </div>
-                                @endif
+<div class="container py-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8 px-4 px-md-0">
+            <div class="card login-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center">
+                        <div class="logo-box">
+                            @if($school->logo)
+                                <img src="{{ asset($school->logo) }}" alt="Logo">
+                            @else
+                                <i class="fas fa-university fa-2x text-primary"></i>
+                            @endif
+                        </div>
+                        <h2 class="fw-bolder text-dark mb-1">Welcome Back!</h2>
+                        <p class="text-muted mb-4">Please enter your credentials to access your dashboard.</p>
+                    </div>
+
+                    <form action="{{ route('school.login', ['tenant' => $school->slug]) }}" method="POST">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="name@school.edu" required autofocus>
                             </div>
-                            
-                            <h2 class="fw-bold text-dark mb-1">Welcome Back</h2>
-                            <p class="text-muted small">লগইন করতে আপনার ইমেইল ও পাসওয়ার্ড দিন</p>
+                            @error('email')
+                                <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                            @enderror
                         </div>
 
-                        {{-- লগইন ফর্ম --}}
-                        <form action="{{ route('school.login', ['tenant' => $school->slug]) }}" method="POST">
-                            @csrf
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold text-muted small">Email Address</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-end-0">
-                                        {{-- ২. FontAwesome আইকন ব্যবহার --}}
-                                        <i class="fas fa-envelope"></i>
-                                    </span>
-                                    <input type="email" name="email" 
-                                           class="form-control @error('email') is-invalid @enderror" 
-                                           value="{{ old('email') }}"
-                                           placeholder="admin@school.com" required autofocus>
-                                </div>
-                                @error('email')
-                                    <span class="text-danger small mt-1 d-block">{{ $message }}</span>
-                                @enderror
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label">Password</label>
+                                <a href="#" class="auth-link small">Forgot Password?</a>
                             </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <label class="form-label fw-semibold text-muted small">Password</label>
-                                    <a href="#" class="text-decoration-none small text-primary fw-medium">Forgot Password?</a>
-                                </div>
-                                <div class="input-group">
-                                    <span class="input-group-text border-end-0">
-                                        <i class="fas fa-key"></i>
-                                    </span>
-                                    <input type="password" name="password" id="password"
-                                           class="form-control @error('password') is-invalid @enderror" 
-                                           placeholder="••••••••" required>
-                                </div>
-                                @error('password')
-                                    <span class="text-danger small mt-1 d-block">{{ $message }}</span>
-                                @enderror
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                             </div>
-
-                            <div class="mb-4 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                <label class="form-check-label text-muted small" for="remember">Remember me</label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold text-white shadow-sm btn-submit">
-                                Sign In <i class="fas fa-sign-in-alt ms-2"></i>
-                            </button>
-                        </form>
-
-                        <div class="text-center mt-4 pt-2">
-                            <p class="text-muted small">Don't have a school account? 
-                                <a href="{{ route('school.register.form') }}" class="fw-bold text-decoration-none text-primary">Request Registration</a>
-                            </p>
+                            @error('password')
+                                <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                            @enderror
                         </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label text-muted small" for="remember">Keep me logged in</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-login w-100">
+                            Sign In to Portal <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-5">
+                        <p class="text-muted small">
+                            Looking to join? <a href="{{ route('school.register.form') }}" class="auth-link">Request Enrollment</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -207,6 +204,5 @@
 @endsection
 
 @section('customJs')
-{{-- Feater Icon কাজ না করলে, FontAwesome ব্যবহার করা নিরাপদ --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 @endsection

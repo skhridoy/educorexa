@@ -1,76 +1,56 @@
 @php
-    // লুপ থেকে আসা $section এর content ডিকোড করা হচ্ছে
-    $heroContent = json_decode($section->content, true);
+    use App\Models\FrontendSection;
+
+    // Load from passed $section (when home renders dynamic sections) otherwise fetch from DB
+    $heroSection = $section ?? FrontendSection::where('key', 'hero')->first();
+    $heroContent = [];
+    if($heroSection) {
+        $heroContent = json_decode($heroSection->content, true) ?? [];
+    }
+
+    // Defaults
+    $title = $heroContent['title'] ?? 'আপনার স্কুল ম্যানেজমেন্টকে <span class="text-primary italic">সহজ, দ্রুত ও স্মার্ট</span> করুন';
+    $subtitle = $heroContent['subtitle'] ?? 'স্মার্ট এডুকেশন সলিউশন';
+    $description = $heroContent['description'] ?? 'আধুনিক প্রযুক্তির সমন্বয়ে আপনার শিক্ষা প্রতিষ্ঠান পরিচালনা করুন আরও দক্ষতার সাথে।';
+    $btn1_text = $heroContent['btn1_text'] ?? 'ফ্রি ট্রায়াল শুরু করুন';
+    $btn1_link = $heroContent['btn1_link'] ?? url('/register');
+    $btn2_text = $heroContent['btn2_text'] ?? 'ডেমো দেখুন';
+    $btn2_link = $heroContent['btn2_link'] ?? '#';
+    $image = isset($heroContent['image']) ? (Str::startsWith($heroContent['image'], ['http://','https://']) ? $heroContent['image'] : asset($heroContent['image'])) : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCWHbHoBM_EQblc-eWrh802ya615yE3r6UQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-4hK92pD6RG1C6yBdifB-cmZYhS3mjX9nmgVhRgkhSK3a2YX2ZEILIV36FFlwTL9pzFalpXRP1lTOUcY6_ohEFBix6X2uvS1gpAkK6uukxTCMakDZn-8tJdm5YHTqqvRTh35U0nA5CK-tYPPTaLEcdU7t8aze4qApZHi-qCYEPMdwHFsx96UsebHp_dqo';
 @endphp
 
-@if($heroContent)
-    
-<section class="hero-section py-5 position-relative overflow-hidden" style="padding-top: 140px !important; background: linear-gradient(180deg, var(--bg-color) 0%, #EEF2FF 100%);">
-    <!-- Abstract Blobs -->
-    <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-primary opacity-10" style="width: 500px; height: 500px; filter: blur(80px); z-index: 0;"></div>
-    <div class="position-absolute bottom-0 end-0 translate-middle-y rounded-circle bg-info opacity-10" style="width: 400px; height: 400px; filter: blur(60px); z-index: 0;"></div>
-    
-    <div class="container px-lg-5 position-relative" style="z-index: 1;">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-7 text-center text-lg-start">
-                <div class="d-inline-flex align-items-center px-3 py-1 rounded-pill mb-4 glass-card border-primary shadow-sm" style="border-color: rgba(79, 70, 229, 0.2) !important;">
-                    <span class="badge bg-primary rounded-pill me-2">New</span>
-                    <span class="text-primary fw-semibold small">{{ $heroContent['subtitle'] ?? 'Smart School ERP Solution' }}</span>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-48 pb-32 px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-24 relative z-10">
+        <div class="md:w-1/2 space-y-12">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-container/10 border border-primary-container/20 rounded-full text-primary font-label-sm">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    {{ $subtitle }}
                 </div>
-                
-                <h1 class="display-4 mb-4 lh-sm fw-bolder text-dark">
-                    {!! $heroContent['title'] ?? 'The Most Reliable <span class="gradient-text">ERP Software</span>' !!}
+                <h1 class="font-display-xl text-display-xl text-on-background leading-tight">
+                    {!! $title !!}
                 </h1>
-                <p class="text-muted mb-5 fs-5 px-md-5 px-lg-0" style="max-width: 600px; line-height: 1.8;">
-                    {{ $heroContent['description'] ?? 'প্রতিষ্ঠানের সব কাজ এখন হবে এক ক্লিকে।' }}
-                </p>
-                
-                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
-                    <a href="{{ $heroContent['btn1_link'] ?? '#' }}" class="btn px-5 py-3 rounded-pill fw-bold shadow-lg-hover text-white d-flex align-items-center" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none;">
-                        {{ $heroContent['btn1_text'] ?? 'Get Started Free' }} <i class="bi bi-arrow-right-short fs-4 ms-1"></i>
-                    </a>
-                    <a target="_blank" href="{{ $heroContent['btn2_link'] ?? '#' }}" class="btn glass-card px-5 py-3 rounded-pill fw-bold shadow-lg-hover text-dark border-0 d-flex align-items-center">
-                        <i class="bi bi-play-circle-fill text-primary fs-5 me-2"></i> {{ $heroContent['btn2_text'] ?? 'View Demo' }}
-                    </a>
-                </div>
-                
-                <div class="row mt-5 pt-4 d-none d-sm-flex">
-                    <div class="col-6 col-md-4">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle bg-white text-primary shadow-sm me-3" style="width: 50px; height: 50px;">
-                                <i class="bi bi-buildings"></i>
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">{{ $heroContent['stat1_val'] ?? '500+' }}</h4>
-                                <p class="small text-muted mb-0">Active Schools</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-5">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-circle bg-white text-primary shadow-sm me-3" style="width: 50px; height: 50px;">
-                                <i class="bi bi-headset"></i>
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">{{ $heroContent['stat2_val'] ?? '24/7' }}</h4>
-                                <p class="small text-muted mb-0">Technical Support</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-            
-            <div class="col-lg-5 d-none d-lg-block">
-                <div class="hero-image-wrapper position-relative">
-                    <!-- Image Backdrop -->
-                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 bg-primary opacity-10 rounded-circle" style="filter: blur(40px);"></div>
-                    @php
-                        $heroImage = isset($heroContent['image']) ? asset($heroContent['image']) : asset('frontend/img/hero.png');
-                    @endphp
-                    <img src="{{ $heroImage }}" class="img-fluid animate-up-down position-relative z-1 drop-shadow-2xl" alt="EduCorexa Hero" style="filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));">
-                </div>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                {{ $description }}
+            </p>
+            <div class="flex flex-wrap gap-4 pt-4">
+                <a href="{{ $btn1_link }}" class="px-8 py-4 hero-gradient text-white font-bold rounded-xl shadow-xl shadow-indigo-500/30 flex items-center gap-2 hover:scale-[1.02] transition-transform">
+                    {{ $btn1_text }}
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+                <a href="{{ $btn2_link }}" class="px-8 py-4 bg-white border border-outline-variant text-on-surface font-bold rounded-xl flex items-center gap-2 hover:bg-slate-50 transition-colors">
+                    {{ $btn2_text }}
+                </a>
+            </div>
+        </div>
+        <div class="md:w-1/2 relative">
+            <div class="absolute -top-12 -left-12 w-64 h-64 bg-primary/20 rounded-full blur-[100px] opacity-50"></div>
+            <div class="absolute -bottom-12 -right-12 w-64 h-64 bg-tertiary/20 rounded-full blur-[100px] opacity-50"></div>
+            <div class="relative glass-card p-6 rounded-[2.5rem] shadow-2xl border-white/40 bg-white/40">
+                <img alt="app.bd Dashboard Preview" class="rounded-[2rem] w-full h-auto object-cover shadow-lg" src="{{ $image }}"/>
             </div>
         </div>
     </div>
 </section>
-@endif

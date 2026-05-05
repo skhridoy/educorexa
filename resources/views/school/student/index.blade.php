@@ -1,127 +1,68 @@
 @extends('layouts.school')
 @section('customCSS')
-<style>
-    .pagination{
-        justify-content: center;
-        
-    }
-
-    /* pagination item */
-    .pagination .page-link{
-    border-radius: 50%!important;
-        margin: 0 4px;
-        width: 32px;
-        height: 33px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        transition: all .2s ease;
-    }
-
-    /* hover */
-    .pagination .page-link:hover{
-        background:#0d6efd;
-        color:#fff;
-        border-color:#0d6efd;
-    }
-
-    /* active page */
-    .pagination .page-item.active .page-link{
-        background:#0d6efd;
-        border-color:#0d6efd;
-
-        color:#fff;
-    }
-
-    /* remove focus shadow */
-    .pagination .page-link:focus{
-        box-shadow:none;
-    }
-</style>
+    @include('school.others._modern_design_styles')
 @endsection
 @section('content')
 <div class="page-content">
-    <div class="row justify-content-center">
-        <div class="col-md-12 mt-4">
-            <div class="card">
-                
-                    <div class="card-body">
-                        <form id="searchForm" class="mb-4">
-                            <div class="row">
-
-                                <div class="col-lg-3 mb-3">
-                                    <div class="position-relative">
-                                        <input type="text"
-                                            class="form-control pe-5"
-                                            name="student_id"
-                                            placeholder="Search by student id">
-
-                                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3"
-                                            style="cursor:pointer; display:none;">
-                                            ❌
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <div class="position-relative">
-                                        <input type="text" class="form-control"
-                                        name="name"
-                                        placeholder="Search by name">
-                                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3"
-                                            style="cursor:pointer; display:none;">
-                                            ❌
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <div class="position-relative">
-                                    <input type="text" class="form-control"
-                                        name="contact"
-                                        placeholder="Search by contact">
-                                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3"
-                                            style="cursor:pointer; display:none;">
-                                            ❌
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <button type="submit"
-                                            class="form-control btn btn-primary">
-                                        Refresh
-                                    </button>
-                                </div>
-
-                            </div>
-                        </form>
-                        <div class="row d-flex">
-                            <div class="col-md-6">
-                                <h6 class="card-title">Active Students [{{ $activeStudents }}]</h6>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <a href="{{ route('students.export', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-success btn-sm">
-                                    Export
-                                </a>
-                                <a href="{{ route('students.importForm', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-success btn-sm">
-                                    import
-                                </a>
-                            </div>
-                        </div>
-                        <div id="loadingSpinner" class="text-center my-3" style="display:none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                        <div id="studentTable">
-                            @include('school.student.partials.table')
-                        </div>
-                        
-                    </div>
-                </div>
+    <div class="container-fluid">
+        {{-- Page Header --}}
+        <div class="page-header-card mb-4">
+            <div class="page-header-content">
+                <h1 class="page-title"><i class="fa-solid fa-user-graduate me-2"></i> Students Management</h1>
+                <p class="page-subtitle">Manage and view all students in your school</p>
             </div>
         </div>
+
+        {{-- Search & Filters --}}
+        <div class="search-card">
+            <form id="searchForm" class="mb-0">
+                <div class="row g-3">
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" name="student_id" placeholder="Search by Student ID">
+                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer; display:none;">❌</span>
+                    </div>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" name="name" placeholder="Search by Name">
+                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer; display:none;">❌</span>
+                    </div>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" name="contact" placeholder="Search by Contact">
+                        <span class="clear-btn position-absolute top-50 end-0 translate-middle-y me-3" style="cursor:pointer; display:none;">❌</span>
+                    </div>
+                    <div class="col-lg-3">
+                        <button type="submit" class="btn btn-primary w-100" style="padding: 12px; border-radius: 10px; font-weight: 600;">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- Data Table Card --}}
+        <div class="data-table-card">
+            <div class="table-header">
+                <h5 class="table-title"><i class="fa-solid fa-list me-2"></i> Active Students [{{ $activeStudents ?? 0 }}]</h5>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('students.importForm', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-primary" style="border-radius: 8px;">
+                        <i class="fa-solid fa-upload me-1"></i> Import
+                    </a>
+                    <a href="{{ route('students.export', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-success" style="border-radius: 8px;">
+                        <i class="fa-solid fa-download me-1"></i> Export
+                    </a>
+                </div>
+            </div>
+
+            <div id="loadingSpinner" class="text-center py-5" style="display:none;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Loading students...</p>
+            </div>
+
+            <div id="studentTable">
+                @include('school.student.partials.table')
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 @endsection
 
@@ -203,31 +144,41 @@ $(document).on('click', '.clear-btn', function() {
 
 // 🔥 Main Load Function
 function loadStudents(url = null) {
-
     $('#loadingSpinner').show();
 
-    let query = $('#searchForm').serialize();
+    // সার্চ ফর্মের সব ডাটা অবজেক্ট আকারে নিন
+    let formData = $('#searchForm').serialize();
+    
+    let finalUrl;
 
-    if (!url) {
-        url = "{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}?" + query;
+    if (url) {
+        // যদি পেজিনেশন লিঙ্ক থেকে ইউআরএল আসে, সেটার সাথে সার্চ কুয়েরি অ্যাপেন্ড করুন
+        // যাতে পেজ চেঞ্জ হলেও ফিল্টার ঠিক থাকে
+        finalUrl = url + (url.includes('?') ? '&' : '?') + formData;
+    } else {
+        // প্রথমবার লোড বা সার্চ করার সময়
+        finalUrl = "{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}?" + formData;
     }
 
     $.ajax({
-        url: url,
+        url: finalUrl,
         type: "GET",
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest' // এটি লারাভেলকে বুঝতে সাহায্য করে যে এটি AJAX রিকোয়েস্ট
+        },
         success: function(data) {
-
-            // Smooth fade animation
             $('#studentTable').fadeOut(150, function() {
                 $(this).html(data).fadeIn(150);
             });
-
+            
+            // ইউআরএল বার আপডেট করুন (ঐচ্ছিক, যাতে রিফ্রেশ দিলেও একই পেজে থাকে)
+            window.history.pushState({}, null, finalUrl);
         },
         complete: function() {
             $('#loadingSpinner').hide();
         },
         error: function() {
-            alert('Something went wrong');
+            console.log('Error fetching data');
         }
     });
 }

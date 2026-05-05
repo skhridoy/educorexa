@@ -1,119 +1,87 @@
 @extends('layouts.main')
+@section('customCSS') @include('layouts._shared_styles') @endsection
 
 @section('content')
-    <div class="page-content">
-        <nav class="page-breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('manage.frontend.index') }}">Frontend</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Contact Messages</li>
-            </ol>
-        </nav>
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="mb-0">Contact Messages</h4>
-        </div>
+<div class="page-content">
+    <ul class="edu-bc">
+        <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+        <li><span>/</span></li>
+        <li class="active">Contact Messages</li>
+    </ul>
 
-        <div class="row g-4">
-            @forelse($messages as $msg)
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            @php 
-                                $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-danger', 'bg-warning'];
-                                $bgClass = $colors[$loop->index % count($colors)];
-                            @endphp
-                            <div class="{{ $bgClass }} text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold me-3" style="width:50px; height:50px;">
-                                {{ strtoupper(substr($msg->name, 0, 1)) }}
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-0">{{ $msg->name }}</h6>
-                                <small class="text-muted d-block" style="font-size: 0.75rem;">
-                                    {{ $msg->school_name }}
-                                </small>
-                                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                    <i data-feather="phone" style="width: 12px; height: 12px;" class="me-1"></i> {{ $msg->phone }}
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <p class="text-muted small fst-italic mb-3">"{{ Str::limit($msg->message, 120) }}"</p>
-                        
-                        <small class="text-muted d-block mt-auto" style="font-size: 0.7rem;">
-                            <i data-feather="clock" style="width: 12px; height: 12px;" class="me-1"></i> {{ $msg->created_at->format('d M Y, h:i A') }}
-                        </small>
-                    </div>
-                    <div class="card-footer bg-transparent border-top pt-3 pb-3 d-flex justify-content-end align-items-center">
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('manage.contact.show', $msg->id) }}" class="btn btn-sm btn-light border shadow-sm text-primary fw-bold px-3" title="View Details">
-                                <i data-feather="eye" style="width: 14px; height: 14px;" class="me-1"></i> View
-                            </a>
-                            <form action="{{ route('manage.contact.destroy', $msg->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-sm btn-light border text-danger shadow-sm px-3 fw-bold" title="Delete" onclick="confirmDelete(this)">
-                                    <i data-feather="trash-2" style="width: 14px; height: 14px;" class="me-1"></i> Delete
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div class="col-12 text-center py-5">
-                <div class="p-5 bg-light rounded-4">
-                    <i data-feather="mail" class="text-muted mb-3" style="width: 40px; height: 40px;"></i>
-                    <h5 class="text-muted">No messages found.</h5>
-                    <p class="text-muted small">New contact messages will appear here.</p>
-                </div>
-            </div>
-            @endforelse
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="edu-page-title"><i class="fa-solid fa-envelope-open-text me-2" style="color:#4f46e5;"></i> Contact Messages</h2>
+            <p class="edu-page-sub">Read and respond to inquiries from prospective clients.</p>
         </div>
-
-        @if($messages->hasPages())
-        <div class="mt-4">
-            {{ $messages->links() }}
-        </div>
-        @endif
+        <span class="badge-indigo" style="font-size:0.82rem; padding:6px 14px;">
+            {{ $messages->count() }} Messages
+        </span>
     </div>
+
+    <div class="row g-4">
+        @forelse($messages as $msg)
+        <div class="col-md-6 col-lg-4">
+            <div class="edu-panel h-100" style="display:flex; flex-direction:column;">
+                <div class="edu-panel-bd" style="flex:1;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div style="width:50px; height:50px; border-radius:12px; background:#eef2ff; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.2rem; flex-shrink:0;">
+                            {{ strtoupper(substr($msg->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h6 style="font-weight:700; color:#1e293b; margin:0; font-size:0.95rem;">{{ $msg->name }}</h6>
+                            <p style="margin:0; font-size:0.75rem; color:#4f46e5; font-weight:600;">{{ $msg->school_name }}</p>
+                            <p style="margin:4px 0 0; font-size:0.75rem; color:#94a3b8;">
+                                <i data-feather="phone" style="width:11px; height:11px; margin-right:4px;"></i> {{ $msg->phone }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <p style="color:#64748b; font-size:0.875rem; line-height:1.6; margin-bottom:16px;">
+                        "{{ Str::limit($msg->message, 120) }}"
+                    </p>
+                    
+                    <div style="margin-top:auto; font-size:0.72rem; color:#94a3b8; display:flex; align-items:center; gap:5px;">
+                        <i data-feather="clock" style="width:12px; height:12px;"></i> {{ $msg->created_at->format('d M Y, h:i A') }}
+                    </div>
+                </div>
+
+                <div style="padding:16px 28px; background:#fafbff; border-top:1px solid #f8fafc; display:flex; justify-content:flex-end; align-items:center; border-radius:0 0 16px 16px; gap:8px;">
+                    <a href="{{ route('manage.contact.show', $msg->id) }}" class="btn-edu btn-edu-light" style="padding:7px 16px; font-size:0.8rem;">
+                        <i data-feather="eye" style="width:14px; height:14px;"></i> View Message
+                    </a>
+                    <form action="{{ route('manage.contact.destroy', $msg->id) }}" method="POST" class="d-inline">
+                        @csrf @method('DELETE')
+                        <button type="button" class="act-btn del" title="Delete" onclick="confirmDelete(this)">
+                            <i data-feather="trash-2" style="width:14px; height:14px;"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @empty
+        <div class="col-12 edu-empty">
+            <i class="fa-solid fa-inbox"></i>
+            <p>No messages found.</p>
+        </div>
+        @endforelse
+    </div>
+
+    @if($messages->hasPages())
+    <div class="mt-4">
+        {{ $messages->links() }}
+    </div>
+    @endif
+</div>
 @endsection
 
 @section('customJs')
 <script>
-    function confirmDelete(button) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this message?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit the form
-                button.closest('form').submit();
-
-            }
-        })
-    }
-    @if($errors->any())
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: '{{ $errors->first() }}', // প্রথম এরর মেসেজটি দেখাবে
-            confirmButtonColor: '#3085d6',
-        });
-    @endif
-    @if(session('success'))
-    Swal.fire({
-        icon: '{{ session('type', 'success') }}',
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        timer: 1500,
-        showConfirmButton: false
-    });
-    @endif
+function confirmDelete(btn) {
+    Swal.fire({ title:'Delete Message?', text:'This action will remove the record permanently.',
+        icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', cancelButtonColor:'#6b7280',
+        confirmButtonText:'Yes, delete' })
+        .then(r => { if(r.isConfirmed) btn.closest('form').submit(); });
+}
 </script>
 @endsection

@@ -1,0 +1,587 @@
+/* =====================================================
+   EduCorexa Global Design System — stitch-design.css
+   Based on Stitch "Admin Dashboard" design
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap');
+
+/* ===== Design Tokens ===== */
+:root {
+    --primary:        #4f46e5;
+    --primary-dark:   #3730a3;
+    --primary-light:  #eef2ff;
+    --surface:        #f8fafc;
+    --surface-card:   #ffffff;
+    --navy:           #1e293b;
+    --text-main:      #1e293b;
+    --text-muted:     #64748b;
+    --text-faint:     #94a3b8;
+    --border:         #f1f5f9;
+    --shadow-sm:      0px 4px 20px rgba(15, 23, 42, 0.05);
+    --shadow-md:      0px 8px 30px rgba(15, 23, 42, 0.10);
+    --radius:         12px;
+    --radius-lg:      16px;
+}
+
+/* ===== Base ===== */
+body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: var(--surface) !important;
+    color: var(--text-main);
+}
+
+h1, h2, h3, h4, h5, h6, .font-outfit {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ===== Page Wrapper ===== */
+.page-content {
+    padding: 32px !important;
+    background-color: var(--surface);
+    min-height: 100vh;
+}
+@media (max-width: 768px) {
+    .page-content { padding: 16px !important; }
+}
+
+/* =====================================================
+   LAYOUT STRUCTURE (replaces core.css + style.css)
+   ===================================================== */
+
+/* Sidebar — handled by .edu-sidebar (see sidebar section below) */
+
+/* Main content pushed right of sidebar */
+.page-wrapper {
+    margin-left: 260px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.25s ease;
+}
+
+/* Top Navbar */
+.navbar {
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    width: 100%;
+}
+
+/* Sidebar body scrollable */
+.sidebar .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+/* Sidebar toggler hamburger */
+.sidebar-toggler {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.sidebar-toggler span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+.sidebar-toggler:hover { background: var(--surface); }
+
+/* Sidebar header layout */
+.sidebar .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+/* Collapsed sidebar (mobile) */
+@media (max-width: 991px) {
+    .edu-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+    body.sidebar-open .edu-sidebar {
+        transform: translateX(0);
+    }
+    .page-wrapper {
+        margin-left: 0 !important;
+    }
+}
+
+/* Folded sidebar (desktop) */
+@media (min-width: 992px) {
+    body.sidebar-folded .edu-sidebar {
+        width: 80px;
+    }
+    body.sidebar-folded .page-wrapper {
+        margin-left: 80px;
+    }
+    body.sidebar-folded .edu-brand-name,
+    body.sidebar-folded .edu-brand-sub,
+    body.sidebar-folded .edu-nav-category,
+    body.sidebar-folded .edu-nav-link span,
+    body.sidebar-folded .edu-arrow {
+        display: none !important;
+    }
+    body.sidebar-folded .edu-nav-link {
+        justify-content: center;
+        padding: 12px;
+    }
+    body.sidebar-folded .edu-sidebar-header {
+        padding: 18px 0;
+        justify-content: center;
+    }
+    body.sidebar-folded .edu-brand {
+        justify-content: center;
+    }
+}
+
+/* Sidebar nav ul reset */
+.sidebar .nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.sidebar .nav .nav-item {
+    list-style: none;
+}
+
+/* Search form in navbar */
+.search-form .input-group {
+    background: var(--surface);
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+.search-form .input-group-text {
+    background: transparent;
+    border: none;
+    padding: 0 12px;
+    color: var(--text-faint);
+}
+.search-form .form-control {
+    background: transparent;
+    border: none;
+    box-shadow: none !important;
+    font-size: 0.875rem;
+}
+
+/* Navbar content flex layout */
+.navbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 24px !important;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    border: none !important;
+    box-shadow: 0 8px 40px rgba(15,23,42,0.12) !important;
+    border-radius: 16px !important;
+}
+.dropdown-item {
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    transition: background 0.15s;
+}
+.dropdown-item:hover {
+    background: var(--surface) !important;
+    color: var(--navy) !important;
+}
+
+
+/* Feather icon sizing utility */
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+
+/* =====================================================
+   EduCorexa SIDEBAR  (edu- class system)
+   ===================================================== */
+.edu-sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #f1f5f9;
+    box-shadow: 4px 0 24px rgba(15,23,42,0.06);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* ── Header ── */
+.edu-sidebar-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.edu-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.edu-brand-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.35);
+    flex-shrink: 0;
+}
+
+.edu-brand-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #4f46e5;
+    line-height: 1.1;
+}
+
+.edu-brand-sub {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+}
+
+/* ── Scrollable body ── */
+.edu-sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 0 24px;
+}
+.edu-sidebar-body::-webkit-scrollbar { width: 3px; }
+.edu-sidebar-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+/* ── Nav list ── */
+.edu-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.edu-nav-item {
+    list-style: none;
+}
+
+/* Category labels */
+.edu-nav-category {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    padding: 14px 20px 4px;
+    list-style: none;
+}
+
+/* Nav links */
+.edu-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    line-height: 1.3;
+    cursor: pointer;
+}
+.edu-nav-link:hover {
+    color: #4f46e5;
+    background: #eef2ff;
+    text-decoration: none;
+}
+.edu-nav-link.active {
+    color: #4f46e5;
+    background: #eef2ff;
+    font-weight: 600;
+    border-left: 3px solid #4f46e5;
+    border-radius: 0 8px 8px 0;
+    margin-left: 5px;
+    padding-left: 11px;
+}
+
+/* Feather icons inside links */
+.edu-nav-link i,
+.edu-nav-link svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+/* Chevron arrow for collapsible items */
+.edu-nav-link .edu-arrow {
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+    color: #94a3b8;
+}
+.edu-nav-link[aria-expanded="true"] .edu-arrow {
+    transform: rotate(180deg);
+}
+
+/* Sub-menu */
+.edu-sub-nav {
+    list-style: none;
+    margin: 2px 0 4px;
+    padding: 0;
+}
+.edu-sub-link {
+    display: block;
+    padding: 7px 14px 7px 42px;
+    margin: 1px 8px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    position: relative;
+}
+.edu-sub-link::before {
+    content: '';
+    position: absolute;
+    left: 26px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: background 0.15s;
+}
+.edu-sub-link:hover {
+    color: #4f46e5;
+    background: #eef2ff;
+    text-decoration: none;
+}
+.edu-sub-link:hover::before { background: #4f46e5; }
+.edu-sub-link.active {
+    color: #4f46e5;
+    font-weight: 600;
+    background: #eef2ff;
+}
+.edu-sub-link.active::before { background: #4f46e5; }
+
+/* ── Responsive collapse ── */
+@media (max-width: 991px) {
+    .edu-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+    body.sidebar-open .edu-sidebar {
+        transform: translateX(0);
+    }
+}
+
+
+/* =====================================================
+   NAVBAR / HEADER
+   ===================================================== */
+.navbar {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: 0 28px !important;
+}
+
+/* =====================================================
+   CARDS (global override)
+   ===================================================== */
+.card {
+    background-color: var(--surface-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card:hover {
+    box-shadow: var(--shadow-md) !important;
+    border-color: #c7d2fe !important;
+    transform: translateY(-2px);
+}
+.card-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 1.05rem;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+.btn-edu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-edu-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+.btn-edu-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(79,70,229,0.4);
+}
+
+.btn-edu-light {
+    background: #f1f5f9;
+    color: #475569 !important;
+}
+.btn-edu-light:hover {
+    background: #e2e8f0;
+    color: #1e293b !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.btn-primary:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(79,70,229,0.4) !important;
+}
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+/* =====================================================
+   TABLES (edu-table system)
+   ===================================================== */
+.edu-table thead th {
+    background: #f8fafc !important;
+    color: #64748b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    padding: 16px 16px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-top: none !important;
+}
+.edu-table thead th:first-child { border-radius: 8px 0 0 8px; }
+.edu-table thead th:last-child  { border-radius: 0 8px 8px 0; }
+.edu-table tbody td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #f8fafc !important;
+    color: #475569 !important;
+}
+.edu-table tbody tr:last-child td { border-bottom: none !important; }
+.edu-table tbody tr:hover td { background: #fafbff !important; }
+
+/* Mobile Table Overrides (edu-table only) */
+@media (max-width: 768px) {
+    .edu-table thead { display: none !important; }
+    .edu-table tbody tr { display: block !important; padding: 15px !important; border-bottom: 8px solid #f8fafc !important; }
+    .edu-table tbody td { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 8px 0 !important; border: none !important; text-align: right !important; width: 100% !important; }
+    .edu-table tbody td::before { content: attr(data-label); font-weight: 700; font-size: 10px; text-transform: uppercase; color: #94a3b8; text-align: left; }
+    .edu-table tbody td:last-child { justify-content: center !important; border-top: 1px solid #f1f5f9 !important; margin-top: 10px !important; padding-top: 15px !important; }
+    .edu-table tbody td:last-child::before { display: none !important; }
+}
+
+/* =====================================================
+   TABLES (global fallback)
+   ===================================================== */
+.table:not(.edu-table) thead th {
+    background-color: #f8fafc !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.1em !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 16px !important;
+}
+.table:not(.edu-table) tbody td {
+    padding: 14px 16px !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+.table:not(.edu-table) tbody tr:hover td {
+    background-color: #fafbff !important;
+}
+
+/* =====================================================
+   BADGES (generic)
+   ===================================================== */
+.badge.bg-success {
+    background-color: #dcfce7 !important;
+    color: #16a34a !important;
+    font-weight: 700 !important;
+}
+.badge.bg-secondary {
+    background-color: #f1f5f9 !important;
+    color: #64748b !important;
+    font-weight: 700 !important;
+}
+.badge.bg-warning {
+    background-color: #fef3c7 !important;
+    color: #d97706 !important;
+    font-weight: 700 !important;
+}

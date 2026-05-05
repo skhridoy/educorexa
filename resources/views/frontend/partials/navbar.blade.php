@@ -1,189 +1,103 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top main-navigation shadow-sm">
-    <div class="container px-lg-5"> 
-        <a href="{{ url('/') }}" class="navbar-brand me-4">
-            @if(isset($setting) && $setting->logo_wide)
-                <img src="{{ asset($setting->logo_wide) }}" alt="{{ $setting->site_name }}" class="logo-img">
-            @else
-                <span class="fw-bolder text-primary fs-3" style="letter-spacing: -1px;">
-                    Edu<span class="text-dark">Corexa</span>
-                </span>
-            @endif
-        </a>
+<nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm font-manrope">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="{{ url('/') }}" class="flex items-center gap-3">
+                @if(isset($setting) && $setting->logo_wide)
+                    <img src="{{ asset($setting->logo_wide) }}" alt="{{ $setting->site_name }}" class="h-10 md:h-12 object-contain">
+                @else
+                    <span class="text-2xl font-black text-indigo-600 tracking-tighter">educorexa</span>
+                @endif
+            </a>
 
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pe-lg-4 text-center text-lg-start">
-                <li class="nav-item">
-                    <a href="{{ url('/') }}" class="nav-link {{ Request::is('/') ? 'active' : '' }}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#features" class="nav-link">Modules</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('about.details') }}" class="nav-link {{ Request::routeIs('about.details') ? 'active' : '' }}">About Us</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#pricing" class="nav-link">Pricing</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#contact" class="nav-link">Contact</a>
-                </li>
-            </ul>
-
-            <div class="nav-btns d-flex flex-column flex-lg-row align-items-center gap-3 mt-3 mt-lg-0">
-                <a href="{{ route('login') }}" class="btn btn-outline-primary border-0 fw-bold px-4 order-2 order-lg-1 rounded-pill">
-                    Login
-                </a>
-                <a href="{{ route('school.register.form') }}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm order-1 order-lg-2 w-100 w-lg-auto btn-register">
-                    Register School
-                </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="{{ url('/') }}" class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1 transition-all duration-300 {{ Request::is('/') ? 'active' : '' }}">Website</a>
+                <a href="#features" class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300">Online Admission</a>
+                <a href="#features" class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300">Attendance</a>
+                <a href="#features" class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300">Results</a>
+                <a href="#pricing" class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300">Fees</a>
             </div>
         </div>
+
+        <div class="hidden md:flex items-center gap-4">
+            @auth
+                <a href="{{ route('common.dashboard') }}" class="px-5 py-2 text-sm border border-indigo-600 text-indigo-600 rounded-lg font-semibold">Dashboard</a>
+            @else
+                <a href="{{ route('login.form') }}" class="px-5 py-2 text-sm text-slate-600 hover:text-indigo-500 transition-all">Login</a>
+                <a href="{{ route('school.register.form') }}" class="px-5 py-2 bg-primary text-on-primary font-bold rounded-lg shadow-lg">Get Started</a>
+            @endauth
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+            <button id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-menu" class="p-2 rounded-md text-slate-700 bg-white/60 border border-slate-200">
+                <svg id="menu-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg id="menu-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
     </div>
-</nav>
 
-<style>
-    /* Navbar রেসপন্সিভ ফিক্স */
-    .navbar-brand .logo-img {
-        height: 35px; /* মোবাইলে লোগো ছোট করা হয়েছে */
-        width: auto;
-    }
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="md:hidden hidden px-6 pb-4">
+        <div class="flex flex-col gap-3 pt-2">
+            <a href="{{ url('/') }}" class="py-2 text-indigo-600 font-semibold border-b border-slate-100">Website</a>
+            <a href="#features" class="py-2 text-slate-700">Online Admission</a>
+            <a href="#features" class="py-2 text-slate-700">Attendance</a>
+            <a href="#features" class="py-2 text-slate-700">Results</a>
+            <a href="#pricing" class="py-2 text-slate-700">Fees</a>
+        </div>
+        <div class="mt-3 flex flex-col gap-2">
+            @auth
+                <a href="{{ route('common.dashboard') }}" class="w-full text-center px-4 py-3 border border-indigo-600 rounded-lg text-indigo-600">Dashboard</a>
+            @else
+                <a href="{{ route('login.form') }}" class="w-full text-center px-4 py-3 rounded-lg border border-slate-200">Login</a>
+                <a href="{{ route('school.register.form') }}" class="w-full text-center px-4 py-3 rounded-lg bg-primary text-white font-bold">Get Started</a>
+            @endauth
+        </div>
+    </div>
 
-    @media (max-width: 991px) {
-        .main-navigation {
-            padding: 10px 0;
-        }
-        .navbar-collapse {
-            margin-top: 10px;
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        /* মোবাইলে বাটন যেন ফুল উইডথ হয় */
-        .nav-btns {
-            width: 100%;
-            flex-direction: column !important;
-        }
-        .nav-btns .btn {
-            width: 100% !important;
-            margin-bottom: 5px;
-        }
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open');
+            const menuCloseIcon = document.getElementById('menu-close');
 
-    /* Hero Section টাইপোগ্রাফি ফিক্স */
-    .display-4 {
-        font-size: calc(1.5rem + 1.5vw); /* রেসপন্সিভ ফন্ট সাইজ */
-        font-weight: 800;
-    }
+            btn.addEventListener('click', function() {
+                const expanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', String(!expanded));
+                menu.classList.toggle('hidden');
+                menuOpenIcon.classList.toggle('hidden');
+                menuCloseIcon.classList.toggle('hidden');
+            });
 
-    .hero-subtitle {
-        font-size: 0.9rem;
-        letter-spacing: 2px;
-        font-weight: 700;
-    }
-    /* ১. মেইন নেভিগেশন স্টাইল */
-    .main-navigation {
-        padding: 15px 0;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1050;
-    }
-    
-    .navbar.scrolled {
-        padding: 8px 0;
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
-    }
+            // Close mobile menu when clicking a link
+            menu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!menu.classList.contains('hidden')) {
+                        menu.classList.add('hidden');
+                        menuOpenIcon.classList.remove('hidden');
+                        menuCloseIcon.classList.add('hidden');
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
 
-    /* ২. ডাইনামিক লিঙ্ক ও আন্ডারলাইন */
-    .nav-link {
-        color: #4b5563 !important; /* NobleUI Slate Color */
-        font-weight: 600;
-        font-size: 15px;
-        padding: 10px 18px !important;
-        transition: 0.3s;
-    }
-
-    .nav-link:hover, .nav-link.active {
-        color: #6571ff !important;
-    }
-
-    @media (min-width: 992px) {
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 3px;
-            bottom: 0;
-            left: 50%;
-            background-color: #6571ff;
-            transition: all 0.3s;
-            transform: translateX(-50%);
-            border-radius: 10px;
-        }
-        .nav-link:hover::after, .nav-link.active::after {
-            width: 20px;
-        }
-    }
-
-    /* ৩. প্রফেশনাল বাটন ডিজাইন */
-    .btn-register {
-        background: linear-gradient(45deg, #6571ff, #4d59e6);
-        border: none;
-        transition: all 0.3s ease;
-    }
-
-    .btn-register:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(101, 113, 255, 0.3) !important;
-        background: linear-gradient(45deg, #4d59e6, #6571ff);
-    }
-
-    .btn-outline-primary:hover {
-        background-color: rgba(101, 113, 255, 0.08);
-        color: #6571ff !important;
-    }
-
-    /* ৪. মোবাইল রেসপন্সিভ */
-    @media (max-width: 991px) {
-        .navbar-collapse {
-            background: #fff;
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .nav-link.active {
-            background-color: rgba(101, 113, 255, 0.05);
-            border-radius: 12px;
-        }
-    }
-</style>
-
-<script>
-    // ১. স্ক্রল ইফেক্ট
-    window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar');
-        navbar.classList.toggle('scrolled', window.scrollY > 20);
-    });
-
-    // ২. স্মুথ স্ক্রল এবং একটিভ লিঙ্ক হ্যান্ডলিং (On-Page Sections-এর জন্য)
-    const sections = document.querySelectorAll('section[id]');
-    window.addEventListener('scroll', () => {
-        let scrollY = window.pageYOffset;
-        sections.forEach(current => {
-            const sectionHeight = current.offsetHeight;
-            const sectionTop = current.offsetTop - 100;
-            const sectionId = current.getAttribute('id');
-            
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                document.querySelector('.navbar-nav a[href*=' + sectionId + ']')?.classList.add('active');
-            } else {
-                document.querySelector('.navbar-nav a[href*=' + sectionId + ']')?.classList.remove('active');
-            }
+            // Add scroll effect
+            const navbar = document.querySelector('nav');
+            window.addEventListener('scroll', () => {
+                navbar.classList.toggle('scrolled', window.scrollY > 20);
+            });
         });
-    });
-</script>
+    </script>
+
+    <style>
+        nav.scrolled {
+            padding-top: 6px;
+            padding-bottom: 6px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 30px rgba(37,38,69,0.06);
+        }
+        .hero-gradient { background: linear-gradient(135deg, #4648d4 0%, #8127cf 100%); }
+    </style>
+</nav>

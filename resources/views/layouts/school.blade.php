@@ -139,6 +139,69 @@
             color: #ced4da !important;
             border-color: #1a253b !important;
         }
+
+        body.dark-mode .table, body.dark-mode .table td, body.dark-mode .table th {
+            color: #ced4da !important;
+            border-color: #1a253b !important;
+        }
+
+        /* Sidebar & Layout Premium Refinement (Matching Super Admin) */
+        .edu-sidebar {
+            background: #ffffff !important;
+            border-right: 1px solid #f1f5f9 !important;
+            box-shadow: 4px 0 24px rgba(15,23,42,0.06) !important;
+        }
+        .edu-sidebar .edu-sidebar-header {
+            border-bottom: 1px solid #f1f5f9 !important;
+            background: #ffffff !important;
+        }
+        .edu-sidebar .edu-brand-name {
+            color: #4f46e5 !important; /* Indigo like Super Admin */
+        }
+        .edu-sidebar .edu-brand-sub {
+            color: #94a3b8 !important;
+        }
+        .edu-sidebar .edu-nav-category {
+            color: #94a3b8 !important;
+            font-weight: 700 !important;
+            font-size: 10px !important;
+            letter-spacing: 0.1em !important;
+        }
+        .edu-sidebar .edu-nav-link {
+            color: #64748b !important;
+        }
+        .edu-sidebar .edu-nav-link:hover {
+            color: #4f46e5 !important;
+            background: #eef2ff !important;
+        }
+        .edu-sidebar .edu-nav-link.active {
+            color: #4f46e5 !important;
+            background: #eef2ff !important;
+            border-left: 3px solid #4f46e5 !important;
+            font-weight: 600 !important;
+        }
+        .edu-sidebar .edu-nav-link i, .edu-sidebar .edu-nav-link svg {
+            color: #94a3b8 !important;
+            width: 18px !important;
+            height: 18px !important;
+        }
+        .edu-sidebar .edu-nav-link.active i, .edu-sidebar .edu-nav-link.active svg {
+            color: #4f46e5 !important;
+        }
+        .edu-sidebar .edu-sub-link {
+            color: #64748b !important;
+        }
+        .edu-sidebar .edu-sub-link:hover, .edu-sidebar .edu-sub-link.active {
+            color: #4f46e5 !important;
+            background: #eef2ff !important;
+        }
+
+        /* Ensure page-wrapper doesn't overlap */
+        @media (min-width: 992px) {
+            .page-wrapper {
+                margin-left: 260px !important;
+            }
+        }
     </style>
 
     <script>

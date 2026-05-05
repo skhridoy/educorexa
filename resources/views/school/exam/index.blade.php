@@ -1,83 +1,139 @@
 @extends('layouts.school')
 
+@section('customCSS')
+    @include('school.others._modern_design_styles')
+@endsection
+
 @section('content')
-    <div class="page-content">
+<div class="page-content">
+    <div class="container-fluid">
+        {{-- Page Header --}}
+        <div class="page-header-card mb-4">
+            <div class="page-header-content">
+                <h1 class="page-title"><i class="fa-solid fa-pen me-2"></i> Exams Management</h1>
+                <p style="margin: 0; opacity: 0.85;">Create and manage exams for your school</p>
+            </div>
+        </div>
+
         <div class="row">
-            <div class="col-md-4 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body"> 
+            {{-- Form Column --}}
+            <div class="col-lg-4 mb-4">
+                <div class="form-card">
+                    <h6 class="mb-4 fw-bold text-primary">
+                        <i class="fa-solid fa-plus me-2"></i> Create Exam
+                    </h6>
+                    <form action="{{ route('exams.store', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST">
+                        @csrf
 
-                        <h6 class="card-title">Create Exam</h6>
-                        <form action="{{ route('exams.store', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST">
-                            @csrf
-                            
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Exam Name</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                    id="name" name="name" placeholder="উদা: ১ম সাময়িক পরীক্ষা" value="{{ old('name') }}" required>
-                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Exam Name</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                id="name" name="name" placeholder="e.g., 1st Semester Exam" value="{{ old('name') }}" required>
+                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="year_id" class="form-label">Academic Year</label>
+                            <select class="form-select @error('year_id') is-invalid @enderror" id="year_id" name="year_id" required>
+                                <option value="" selected disabled>Select Year</option>
+                                @foreach ($years as $year)
+                                    <option value="{{ $year->id }}" {{ old('year_id') == $year->id ? 'selected' : '' }}>
+                                        {{ $year->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('year_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="school_category_id" class="form-label">Category</label>
+                            <select class="form-select @error('school_category_id') is-invalid @enderror" name="school_category_id" required>
+                                <option value="" selected disabled>Select Category</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('school_category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('school_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="year_id" class="form-label">Academic Year</label>
-                                <select class="form-select @error('year_id') is-invalid @enderror" id="year_id" name="year_id" required>
-                                    <option value="" selected disabled>Select Year</option>
-                                    @foreach ($years as $year)
-                                        <option value="{{ $year->id }}" {{ old('year_id') == $year->id ? 'selected' : '' }}>
-                                            {{ $year->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <div class="col-6">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required>
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="school_category_id" class="form-label">School Category</label>
-                                <select class="form-select @error('school_category_id') is-invalid @enderror" name="school_category_id" required>
-                                    <option value="" selected disabled>Select Category</option>
-                                    @foreach ($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ old('school_category_id') == $cat->id ? 'selected' : '' }}>
-                                            {{ $cat->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <button type="submit" class="btn btn-primary-gradient w-100">
+                            <i class="fa-solid fa-check me-1"></i> Create Exam
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="start_date" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="end_date" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
-                                </div>
-                            </div>
+            {{-- Exams List Column --}}
+            <div class="col-lg-8">
+                <div class="data-table-card">
+                    <div class="table-header">
+                        <h5 class="table-title"><i class="fa-solid fa-list me-2"></i> All Exams</h5>
+                    </div>
 
-                            <button type="submit" class="btn btn-primary w-100">Create Exam</button>
-                        </form>
+                    <div class="table-responsive">
+                        <table class="table data-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Year</th>
+                                    <th>Category</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($exams as $exam)
+                                <tr>
+                                    <td data-label="Name" style="font-weight: 600;">{{ $exam->name }}</td>
+                                    <td data-label="Year">{{ $exam->year?->name ?? 'N/A' }}</td>
+                                    <td data-label="Category">{{ $exam->category?->name ?? 'N/A' }}</td>
+                                    <td data-label="Start Date">{{ $exam->start_date ? $exam->start_date->format('d M, Y') : 'N/A' }}</td>
+                                    <td data-label="End Date">{{ $exam->end_date ? $exam->end_date->format('d M, Y') : 'N/A' }}</td>
+                                    <td data-label="Actions" class="text-center">
+                                        <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="Edit" data-bs-toggle="modal" data-bs-target="#editExamModal" onclick="loadEditForm({{ $exam->id }})">
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </button>
+                                        <form action="{{ route('exams.destroy', ['tenant' => auth()->user()?->school?->slug, 'exam' => $exam->id]) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <i class="fa-solid fa-inbox fa-3x mb-3" style="color:#e2e8f0;"></i>
+                                        <p class="text-muted">No exams found.</p>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <!-- Edit exam -->
-            <div class="modal fade" id="editExamModal">
-                <div class="modal-dialog">
-                    <form id="editForm" method="POST">
-                        @csrf
-                        @method('PUT')
+        </div>
+    </div>
+</div>
 
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5>Edit Exam</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div class="modal-body" id="editBody">
-                                <!-- Dynamic Content Load হবে -->
-                            </div>
-
-                            <div class="modal-footer">
-                                <button class="btn btn-primary">Update</button>
-                            </div>
+<!-- Edit exam modal -->
                         </div>
                     </form>
                 </div>

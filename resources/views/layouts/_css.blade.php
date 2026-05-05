@@ -4,23 +4,15 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- End fonts -->
 
-	<!-- core:css -->
-	<link rel="stylesheet" href="{{ asset('../assets/vendors/core/core.css') }}">
-	<!-- endinject -->
-
-	<!-- Plugin css for this page -->
+	<!-- Plugin css -->
 	 <link rel="stylesheet" href="{{ asset('../assets/vendors/flatpickr/flatpickr.min.css') }}">
-	<!-- End plugin css for this page -->
 
-	<!-- inject:css -->
+	<!-- Feather Icons -->
 	<link rel="stylesheet" href="{{ asset('../assets/fonts/feather-font/css/iconfont.css') }}">
-	<link rel="stylesheet" href="{{ asset('../assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
-	<!-- endinject -->
 
-    <!-- Layout styles -->  
-    <link rel="stylesheet" href="{{ asset('../assets/css/demo1/style.css') }}">
-    <!-- End layout styles -->
+    <!-- Stitch Design System -->
+    <link rel="stylesheet" href="{{ asset('css/stitch-design.css') }}">
 	

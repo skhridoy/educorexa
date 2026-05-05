@@ -1,6 +1,7 @@
 @extends('layouts.school')
 
-@section('customCss')
+@section('customCSS')
+    @include('school.others._modern_design_styles')
 <style>
     .form-section-title {
         position: relative;

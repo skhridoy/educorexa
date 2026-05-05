@@ -1,153 +1,108 @@
 @extends('layouts.main')
-
 @section('customCSS')
+@include('layouts._shared_styles')
 <style>
-    .card { border-radius: 10px; border: none; }
-    .permission-section { background-color: #f8f9fa; border-radius: 12px; padding: 20px; }
+    .perm-card { background:#fff; border:1px solid #f1f5f9; border-radius:16px; box-shadow:0 2px 12px rgba(15,23,42,0.04); overflow:hidden; transition:all 0.2s; }
+    .perm-card:hover { border-color:#4f46e5; transform:translateY(-2px); box-shadow:0 8px 24px rgba(79,70,229,0.08); }
+    .perm-header { background:#fafbff; padding:12px 20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; }
+    .perm-title { font-family:'Outfit',sans-serif; font-weight:700; color:#4f46e5; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; margin:0; }
+    .perm-body { padding:15px 20px; }
     
-    .permission-group-card {
-        background-color: #fff;
-        border: 1px solid #e8ebf1;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        transition: all 0.3s ease;
-    }
-    .permission-group-card:hover { border-color: #6571ff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    
-    .permission-group-header {
-        background-color: #f1f3f7;
-        padding: 12px 15px;
-        border-bottom: 1px solid #e8ebf1;
-        border-radius: 10px 10px 0 0;
-    }
-    
-    .custom-check { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
-    .permission-label { 
-        font-size: 0.85rem; 
-        cursor: pointer; 
-        text-transform: capitalize;
-        word-break: break-word;
-    }
+    .form-check-edu { margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .form-check-edu input { width:16px; height:16px; cursor:pointer; border-color:#cbd5e1; }
+    .form-check-edu label { font-size:0.82rem; color:#475569; cursor:pointer; margin:0; text-transform:capitalize; }
+    .form-check-edu input:checked + label { color:#4f46e5; font-weight:700; }
+
+    .check-all-wrap { background:#eef2ff; border-radius:12px; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
 </style>
 @endsection
 
 @section('content')
 <div class="page-content">
-    <nav class="page-breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('super.roles.index') }}">Roles</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit Role</li>
-        </ol>
-    </nav>
+    <ul class="edu-bc">
+        <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+        <li><span>/</span></li>
+        <li><a href="{{ route('super.roles.index') }}">Roles</a></li>
+        <li><span>/</span></li>
+        <li class="active">Edit Role</li>
+    </ul>
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="edu-page-title"><i class="fa-solid fa-user-shield me-2" style="color:#4f46e5;"></i> Edit Role: {{ $role->name }}</h2>
+            <p class="edu-page-sub">Update role settings and modify module access permissions.</p>
+        </div>
+    </div>
 
     <form action="{{ route('super.roles.update', $role->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+        @csrf @method('PUT')
         
-        <div class="row">
-            {{-- Role Info Card --}}
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="card-title mb-0">Edit Role: <span class="text-primary">{{ $role->name }}</span></h6>
-                            <a href="{{ route('super.roles.index') }}" class="btn btn-sm btn-outline-secondary btn-icon-text">
-                                <i class="btn-icon-prepend" data-feather="arrow-left"></i> Back
-                            </a>
-                        </div>
-                        <hr class="mb-4">
-                        
+        <div class="edu-panel mb-4">
+            <div class="edu-panel-bd">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="edu-label">Role Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control edu-input @error('name') is-invalid @enderror" value="{{ old('name', $role->name) }}" required>
+                        @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <label class="edu-label">Role Category / Type <span class="text-danger">*</span></label>
+                        <select name="role_type" class="form-select edu-input @error('role_type') is-invalid @enderror" required>
+                            @foreach($role_types as $type)
+                                <option value="{{ $type }}" {{ (old('role_type', $role->role_type) == $type) ? 'selected' : '' }}>
+                                    {{ ucwords(str_replace('_', ' ', $type)) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('role_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @php $currentPermissions = $role->permissions->pluck('name')->toArray(); @endphp
+
+        <div class="check-all-wrap">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i data-feather="lock" style="width:18px; color:#4f46e5;"></i>
+                <span style="font-weight:700; color:#1e293b; font-size:0.9rem;">MODULE PERMISSIONS</span>
+            </div>
+            <div class="form-check form-switch" style="display:flex; align-items:center; gap:10px;">
+                <label class="form-check-label" for="checkAll" style="font-size:0.8rem; font-weight:700; color:#4f46e5; cursor:pointer;">SELECT ALL ACCESS</label>
+                <input class="form-check-input" type="checkbox" id="checkAll" style="width:40px; height:20px; cursor:pointer;">
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
+            @foreach($permissions->groupBy('group_name') as $groupName => $groupPermissions)
+            <div class="col">
+                <div class="perm-card h-100">
+                    <div class="perm-header">
+                        <h6 class="perm-title">{{ $groupName }}</h6>
+                        <input type="checkbox" class="select-group" style="width:16px; height:16px; cursor:pointer;">
+                    </div>
+                    <div class="perm-body">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Role Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control border-secondary @error('name') is-invalid @enderror" 
-                                       value="{{ old('name', $role->name) }}" placeholder="e.g. Manager">
-                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            @foreach($groupPermissions as $permission)
+                            <div class="col-12">
+                                <div class="form-check-edu">
+                                    <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" class="perm-checkbox" id="p_{{ $permission->id }}" {{ in_array($permission->name, old('permissions', $currentPermissions)) ? 'checked' : '' }}>
+                                    <label for="p_{{ $permission->id }}">{{ str_replace(['.', '-'], ' ', $permission->name) }}</label>
+                                </div>
                             </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Role Type <span class="text-danger">*</span></label>
-                                <select name="role_type" class="form-select border-secondary" id="roleTypeId">
-                                    @foreach($role_types as $type)
-                                        <option value="{{ $type }}" {{ $role->role_type == $type ? 'selected' : '' }}>
-                                            {{ ucwords(str_replace('_', ' ', $type)) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('role_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </div>
+            @endforeach
+        </div>
 
-            {{-- Permissions Card --}}
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="card-title mb-0">Update Permissions</h6>
-                            <div class="form-check form-switch">
-                                <input type="checkbox" class="form-check-input" id="checkAll">
-                                <label class="form-check-label fw-bold text-primary" for="checkAll">Select All</label>
-                            </div>
-                        </div>
-                        <hr class="mb-3">
-
-                        <div class="permission-section">
-                            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                                @php $currentPermissions = $role->permissions->pluck('name')->toArray(); @endphp
-                                
-                                @foreach($permissions->groupBy('group_name') as $group => $groupPermissions)
-                                    <div class="col">
-                                        <div class="permission-group-card shadow-sm">
-                                            <div class="permission-group-header d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0 fw-bolder text-primary text-uppercase" style="font-size: 0.8rem;">
-                                                    <i data-feather="layers" class="icon-sm me-1"></i> {{ $group }}
-                                                </h6>
-                                                <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input select-group" id="group_{{ Str::slug($group) }}">
-                                                    <label class="form-check-label small text-info fw-bold" for="group_{{ Str::slug($group) }}">Select All</label>
-                                                </div>
-                                            </div>
-                                            <div class="permission-group-body p-3">
-                                                <div class="row g-2">
-                                                    @foreach($groupPermissions as $permission)
-                                                    <div class="col-12 col-sm-6">
-                                                        <div class="custom-check">
-                                                            <input class="form-check-input permission-checkbox" 
-                                                                   type="checkbox" name="permissions[]" 
-                                                                   value="{{ $permission->name }}" 
-                                                                   id="perm_{{ $permission->id }}"
-                                                                   {{ in_array($permission->name, old('permissions', $currentPermissions)) ? 'checked' : '' }}>
-                                                            <label class="permission-label" for="perm_{{ $permission->id }}" data-perm-name="{{ $permission->name }}">
-                                                                {{ $permission->name }}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        @error('permissions') <p class="text-danger small mt-2 fw-bold text-center">{{ $message }}</p> @enderror
-
-                        <div class="mt-5 d-flex flex-wrap justify-content-center">
-                            <button type="submit" class="btn btn-success btn-lg px-5 shadow text-white mb-2">
-                                <i data-feather="refresh-cw" class="icon-md me-2"></i> Update Role Now
-                            </button>
-                            <a href="{{ route('super.roles.index') }}" class="btn btn-secondary btn-lg ms-sm-3 mb-2">Cancel</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="d-flex justify-content-end gap-2 mb-5">
+            <a href="{{ route('super.roles.index') }}" class="btn-edu btn-edu-light" style="padding:12px 30px;">Cancel</a>
+            <button type="submit" class="btn-edu btn-edu-primary" style="padding:12px 40px;">
+                <i data-feather="refresh-cw" style="width:16px; margin-right:5px;"></i> Update Role Settings
+            </button>
         </div>
     </form>
 </div>
@@ -155,48 +110,48 @@
 
 @section('customJs')
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (typeof feather !== 'undefined') { feather.replace(); }
+    const checkAll = document.getElementById('checkAll');
+    const permCheckboxes = document.querySelectorAll('.perm-checkbox');
+    const groupCheckboxes = document.querySelectorAll('.select-group');
 
-        // সুন্দর নাম দেখানোর জন্য
-        document.querySelectorAll('.permission-label').forEach(label => {
-            const rawName = label.getAttribute('data-perm-name');
-            label.textContent = rawName.replace(/[.-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        });
+    function updateMainCheckAll() {
+        checkAll.checked = Array.from(permCheckboxes).every(cb => cb.checked);
+    }
 
-        const checkAll = document.querySelector('#checkAll');
-        const checkboxes = document.querySelectorAll('.permission-checkbox');
-        const groupCheckboxes = document.querySelectorAll('.select-group');
-
-        // লোড হওয়ার সময় স্ট্যাটাস চেক
-        const updateCheckAllStatus = () => {
-            checkAll.checked = Array.from(checkboxes).every(c => c.checked);
-            groupCheckboxes.forEach(groupCb => {
-                const container = groupCb.closest('.permission-group-card');
-                const childCheckboxes = container.querySelectorAll('.permission-checkbox');
-                groupCb.checked = Array.from(childCheckboxes).every(c => c.checked);
-            });
-        };
-        updateCheckAllStatus();
-
-        // Select All Logic
-        checkAll.addEventListener('change', function() {
-            checkboxes.forEach(cb => cb.checked = checkAll.checked);
-            groupCheckboxes.forEach(gb => gb.checked = checkAll.checked);
-        });
-
-        // Group Select Logic
+    function updateGroupStates() {
         groupCheckboxes.forEach(groupCb => {
-            groupCb.addEventListener('change', function() {
-                const container = this.closest('.permission-group-card');
-                container.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = groupCb.checked);
-                updateCheckAllStatus();
-            });
+            const container = groupCb.closest('.perm-card');
+            const childCheckboxes = container.querySelectorAll('.perm-checkbox');
+            groupCb.checked = Array.from(childCheckboxes).every(c => c.checked);
         });
+    }
 
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateCheckAllStatus);
+    checkAll.addEventListener('change', function() {
+        permCheckboxes.forEach(cb => cb.checked = this.checked);
+        groupCheckboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    groupCheckboxes.forEach(groupCb => {
+        groupCb.addEventListener('change', function() {
+            const container = this.closest('.perm-card');
+            const childCheckboxes = container.querySelectorAll('.perm-checkbox');
+            childCheckboxes.forEach(cb => cb.checked = this.checked);
+            updateMainCheckAll();
         });
     });
+
+    permCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const container = this.closest('.perm-card');
+            const groupCb = container.querySelector('.select-group');
+            const childCheckboxes = container.querySelectorAll('.perm-checkbox');
+            groupCb.checked = Array.from(childCheckboxes).every(c => c.checked);
+            updateMainCheckAll();
+        });
+    });
+
+    // Initial State
+    updateGroupStates();
+    updateMainCheckAll();
 </script>
 @endsection

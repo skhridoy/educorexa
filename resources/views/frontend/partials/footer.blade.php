@@ -39,7 +39,7 @@
                     <li class="mb-2"><a href="#features" class="footer-link">Our Modules</a></li>
                     <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
                     <li class="mb-2"><a href="#" class="footer-link">Terms & Conditions</a></li>
-                    <li class="mb-2"><a href="{{ route('login') }}" class="footer-link">Admin Login</a></li>
+                    <li class="mb-2"><a href="{{ route('login.form') }}" class="footer-link">Admin Login</a></li>
                 </ul>
             </div>
 

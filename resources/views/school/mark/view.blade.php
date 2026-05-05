@@ -1,5 +1,6 @@
 @extends($layout)
 @section('customCSS')
+    @include('school.others._modern_design_styles')
 <style>
     .pagination{
     --bs-pagination-border-radius: 50% !important;

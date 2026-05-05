@@ -33,6 +33,8 @@ class AssignClass extends Model
     protected $fillable = [
         'school_id',
         'class_id',
+        'school_category_id',
+        'school_sub_category_id',
         'subject_id',
         'full_mark',
         'pass_mark'
@@ -48,5 +50,17 @@ class AssignClass extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    // এই রেকর্ডটি কোন ক্যাটাগরির?
+    public function category()
+    {
+        return $this->belongsTo(SchoolCategory::class, 'school_category_id');
+    }
+
+    // এই রেকর্ডটি কোন সাব-ক্যাটেগরির?
+    public function subcategory()
+    {
+        return $this->belongsTo(SchoolSubCategory::class, 'school_sub_category_id');
     }
 }

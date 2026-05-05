@@ -58,6 +58,16 @@ class FrontendSectionController extends Controller
         
         // ডাটা সংগ্রহ (অপ্রয়োজনীয় ইনপুট বাদে)
         $data = $request->except(['_token', '_method', 'image']);
+
+        // If items array exists (e.g., features), remove empty entries
+        if (isset($data['items']) && is_array($data['items'])) {
+            $filtered = array_values(array_filter($data['items'], function($it) {
+                $title = isset($it['title']) ? trim($it['title']) : '';
+                $desc = isset($it['desc']) ? trim($it['desc']) : '';
+                return $title !== '' || $desc !== '';
+            }));
+            $data['items'] = $filtered;
+        }
         
         // আগের কন্টেন্ট থেকে ইমেজ পাথ নিয়ে রাখা
         $oldContent = json_decode($section->content, true);

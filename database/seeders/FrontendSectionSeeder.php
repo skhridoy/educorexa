@@ -16,7 +16,7 @@ class FrontendSectionSeeder extends Seeder
     {
         $sections = [
             ['key' => 'hero', 'title' => 'Hero Section', 'order' => 1],
-            ['key' => 'category_module', 'title' => 'Category Module', 'order' => 2],
+            ['key' => 'features', 'title' => 'Features Section', 'order' => 2],
             ['key' => 'why_choose_us', 'title' => 'Why Choose Us', 'order' => 3],
             ['key' => 'setup-section', 'title' => 'Setup Section', 'order' => 4],
             ['key' => 'pricing', 'title' => 'Pricing Table', 'order' => 5],

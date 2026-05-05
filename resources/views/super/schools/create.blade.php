@@ -1,132 +1,104 @@
 @extends('layouts.main')
-
 @section('customCSS')
+@include('layouts._shared_styles')
 <style>
-    /* ফোনের আইকন পজিশন ঠিক করা */
-    .phone-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 16px;
-        display: none;
-        z-index: 5;
-    }
-    .phone-valid { color: #28a745; }
-    .phone-invalid { color: #dc3545; }
-    
-    /* স্পিন বাটন হাইড করা */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type=number] { -moz-appearance: textfield; }
+    .domain-preview { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 15px; display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+    .domain-url { font-family:monospace; color:#4f46e5; font-weight:700; font-size:0.9rem; }
+    .input-group-edu { border-radius:10px !important; overflow:hidden; border:1px solid #e2e8f0; }
+    .input-group-edu .form-control { border:none !important; }
+    .input-group-edu .input-group-text { border:none !important; background:#f1f5f9; color:#64748b; font-weight:600; font-size:0.85rem; }
 </style>
 @endsection
 
 @section('content')
 <div class="page-content">
-    <nav class="page-breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                @php 
-                    $user = auth()->user();
-                    $isSuperAdmin = ($user->role === 'super_admin');
-                @endphp
-                <a href="{{ $isSuperAdmin ? route('super.dashboard') : route('employee.dashboard') }}">Dashboard</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Add School</li>
-        </ol>
-    </nav>
+    <ul class="edu-bc">
+        <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+        <li><span>/</span></li>
+        <li><a href="{{ route('manage.schools.index') }}">Schools</a></li>
+        <li><span>/</span></li>
+        <li class="active">Add New School</li>
+    </ul>
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="edu-page-title"><i class="fa-solid fa-plus-circle me-2" style="color:#4f46e5;"></i> Register New School</h2>
+            <p class="edu-page-sub">Onboard a new school tenant and setup their custom domain.</p>
+        </div>
+    </div>
 
     <form action="{{ route('manage.schools.store') }}" method="POST">
         @csrf
-        <div class="row">
-            {{-- School Information --}}
-            <div class="col-md-6 grid-margin stretch-card">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h6 class="card-title text-primary"><i data-feather="home" class="icon-sm me-2"></i>School Information</h6>
-                        <hr>
-                        <div class="mb-3">
-                            <label class="form-label" for="schoolNameId">School Name <span class="text-danger">*</span></label>
-                            <input type="text" name="school_name" id="schoolNameId" 
-                                   class="form-control @error('school_name') is-invalid @enderror" 
-                                   placeholder="e.g. Dhaka Model High School" value="{{ old('school_name') }}">
+        <div class="row g-4">
+            {{-- School Info --}}
+            <div class="col-lg-6">
+                <div class="edu-panel h-100">
+                    <div class="edu-panel-hd">
+                        <h6 class="edu-panel-ttl">School Branding & Domain</h6>
+                    </div>
+                    <div class="edu-panel-bd">
+                        <div class="mb-4">
+                            <label class="edu-label">School Name <span class="text-danger">*</span></label>
+                            <input type="text" name="school_name" id="schoolNameId" class="form-control edu-input @error('school_name') is-invalid @enderror" placeholder="e.g. Greenhill International School" value="{{ old('school_name') }}" required>
                             @error('school_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label" for="slugId">School Domain (Subdomain) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="text" name="slug" id="slugId" 
-                                       class="form-control @error('slug') is-invalid @enderror" 
-                                       placeholder="abcschool" value="{{ old('slug') }}" required>
-                                <span class="input-group-text bg-light fw-bold text-muted">{{ $mainDomain }}</span>
+                            <label class="edu-label">Custom Subdomain <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-edu">
+                                <input type="text" name="slug" id="slugId" class="form-control @error('slug') is-invalid @enderror" placeholder="greenhill" value="{{ old('slug') }}" required>
+                                <span class="input-group-text">.{{ $mainDomain }}</span>
                             </div>
-                            <small class="text-muted">Use only lowercase letters and numbers (no spaces).</small>
-                            @error('slug') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
+                            <div class="domain-preview">
+                                <span style="font-size:0.75rem; color:#94a3b8; font-weight:600;">PREVIEW:</span>
+                                <span class="domain-url" id="domainPreview">https://domain.{{ $mainDomain }}</span>
+                            </div>
+                            @error('slug') <p class="text-danger small mt-2">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Admin Information --}}
-            <div class="col-md-6 grid-margin stretch-card">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h6 class="card-title text-primary"><i data-feather="user" class="icon-sm me-2"></i>Admin Information</h6>
-                        <hr>
+            {{-- Admin Info --}}
+            <div class="col-lg-6">
+                <div class="edu-panel h-100">
+                    <div class="edu-panel-hd">
+                        <h6 class="edu-panel-ttl">Administrator Access</h6>
+                    </div>
+                    <div class="edu-panel-bd">
                         <div class="mb-3">
-                            <label class="form-label" for="adminNameId">Admin Name <span class="text-danger">*</span></label>
-                            <input type="text" name="admin_name" id="adminNameId" 
-                                   class="form-control @error('admin_name') is-invalid @enderror" 
-                                   placeholder="Full Name" value="{{ old('admin_name') }}">
+                            <label class="edu-label">Admin Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="admin_name" class="form-control edu-input @error('admin_name') is-invalid @enderror" placeholder="Enter name" value="{{ old('admin_name') }}" required>
                             @error('admin_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label" for="adminEmailId">Admin Email <span class="text-danger">*</span></label>
-                            <input type="email" name="admin_email" id="adminEmailId" 
-                                   class="form-control @error('admin_email') is-invalid @enderror" 
-                                   placeholder="admin@school.com" value="{{ old('admin_email') }}">
+                            <label class="edu-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="admin_email" class="form-control edu-input @error('admin_email') is-invalid @enderror" placeholder="admin@school.com" value="{{ old('admin_email') }}" required>
                             @error('admin_email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <div class="position-relative">
-                                <input type="text" name="admin_mobile" id="numberId" 
-                                       class="form-control pe-5 @error('admin_mobile') is-invalid @enderror" 
-                                       placeholder="01XXXXXXXXX" maxlength="11" 
-                                       oninput="validatePhone(this)" value="{{ old('admin_mobile') }}">
-                                <span id="phoneIcon" class="phone-icon"></span>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="edu-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="text" name="admin_mobile" class="form-control edu-input @error('admin_mobile') is-invalid @enderror" placeholder="017XXXXXXXX" maxlength="11" value="{{ old('admin_mobile') }}" required>
                             </div>
-                            @error('admin_mobile') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label" for="adminPasswordId">Admin Password <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="password" name="admin_password" id="adminPasswordId" 
-                                       class="form-control @error('admin_password') is-invalid @enderror" 
-                                       placeholder="Minimum 8 characters">
-                                <button class="btn btn-outline-secondary" type="button" id="togglePass">
-                                    <i data-feather="eye" class="icon-sm"></i>
-                                </button>
+                            <div class="col-md-6 mb-3">
+                                <label class="edu-label">Initial Password <span class="text-danger">*</span></label>
+                                <div class="input-group input-group-edu">
+                                    <input type="password" name="admin_password" id="passInput" class="form-control" placeholder="••••••••" required>
+                                    <button class="input-group-text" type="button" id="togglePass" style="cursor:pointer; background:#fff; border-left:1px solid #f1f5f9;">
+                                        <i data-feather="eye" style="width:14px;"></i>
+                                    </button>
+                                </div>
                             </div>
-                            @error('admin_password') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-12 text-end">
-                <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
-                    <i data-feather="plus-circle" class="icon-sm me-1"></i> Create School & Domain
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <a href="{{ route('manage.schools.index') }}" class="btn-edu btn-edu-light" style="padding:12px 30px;">Cancel</a>
+                <button type="submit" class="btn-edu btn-edu-primary" style="padding:12px 40px;">
+                    <i data-feather="check-circle" style="width:16px; margin-right:5px;"></i> Create School Platform
                 </button>
             </div>
         </div>
@@ -135,62 +107,36 @@
 @endsection
 
 @section('customJs')
-{{-- SweetAlert Messages --}}
-@if(session('success') || session('error') || session('duplicate'))
 <script>
-    Swal.fire({
-        icon: "{{ session('success') ? 'success' : 'error' }}",
-        title: "{{ session('success') ? 'Success!' : (session('duplicate') ? 'Duplicate Entry!' : 'Error!') }}",
-        text: "{{ session('success') ?? session('error') ?? session('duplicate') }}",
-    });
-</script>
-@endif
+    const nameInput = document.getElementById('schoolNameId');
+    const slugInput = document.getElementById('slugId');
+    const domainPreview = document.getElementById('domainPreview');
+    const mainDomain = "{{ $mainDomain }}";
 
-<script>
-    // ১. অটোমেটিক স্লাগ (Domain) জেনারেশন
-    document.getElementById('schoolNameId').addEventListener('input', function() {
-        let name = this.value;
-        let slug = name.toLowerCase()
-                       .replace(/[^a-z0-9]/g, '') // স্পেস এবং স্পেশাল ক্যারেক্টার রিমুভ
-                       .substring(0, 20); // ম্যাক্স লেন্থ ২০
-        document.getElementById('slugId').value = slug;
+    function updatePreview() {
+        domainPreview.innerText = `https://${slugInput.value || 'domain'}.${mainDomain}`;
+    }
+
+    nameInput.addEventListener('input', function() {
+        let slug = this.value.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 25);
+        slugInput.value = slug;
+        updatePreview();
     });
 
-    // ২. পাসওয়ার্ড টগল
+    slugInput.addEventListener('input', updatePreview);
+    updatePreview();
+
     document.getElementById('togglePass').addEventListener('click', function() {
-        const passInput = document.getElementById('adminPasswordId');
+        const input = document.getElementById('passInput');
         const icon = this.querySelector('i');
-        if (passInput.type === 'password') {
-            passInput.type = 'text';
+        if (input.type === 'password') {
+            input.type = 'text';
             icon.setAttribute('data-feather', 'eye-off');
         } else {
-            passInput.type = 'password';
+            input.type = 'password';
             icon.setAttribute('data-feather', 'eye');
         }
         feather.replace();
-    });
-
-    // ৩. ফোন ভ্যালিডেশন
-    function validatePhone(input){
-        let icon = document.getElementById('phoneIcon');
-        input.value = input.value.replace(/[^0-9]/g,'');
-        let isValid = /^01[0-9]{9}$/.test(input.value);
-
-        if(isValid){
-            icon.style.display = 'block';
-            icon.innerHTML = '✔';
-            icon.className = 'phone-icon phone-valid';
-        } else if(input.value.length > 0){
-            icon.style.display = 'block';
-            icon.innerHTML = '✖';
-            icon.className = 'phone-icon phone-invalid';
-        } else {
-            icon.style.display = 'none';
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if(typeof feather !== 'undefined') feather.replace();
     });
 </script>
 @endsection

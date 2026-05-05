@@ -1,6 +1,6 @@
 @extends('layouts.school')
 @section('customCSS')
-
+    @include('school.others._modern_design_styles')
 @endsection
 @section('content')
     <div class="page-content">

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Outfit:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#232ec2",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "tertiary": "#41485e",
+                        "surface-tint": "#4d44e3",
+                        "secondary-fixed-dim": "#bec2ff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "tertiary-container": "#586076",
+                        "surface-container-low": "#f2f4f6",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "background": "#f7f9fb",
+                        "secondary-fixed": "#e0e0ff",
+                        "inverse-primary": "#c3c0ff",
+                        "on-primary-fixed": "#0f0069",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-fixed": "#dae2fd",
+                        "outline-variant": "#c7c4d8",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "on-secondary-fixed": "#00046a",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#e2dfff",
+                        "primary": "#3525cd",
+                        "secondary": "#3d49d8",
+                        "on-primary-container": "#dad7ff",
+                        "on-secondary-container": "#fffbff",
+                        "outline": "#777587",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "inverse-surface": "#2d3133",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-container": "#5864f2",
+                        "primary-container": "#4f46e5",
+                        "on-background": "#191c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-container": "#d4dbf5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Outfit"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Outfit"],
+                        "headline-xl": ["Outfit"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab-border {
+            position: relative;
+        }
+        .active-tab-border::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-surface-bright font-body-md text-on-surface antialiased min-h-screen">
+<!-- SideNavBar -->
+<aside class="flex flex-col fixed left-0 top-0 h-full p-4 gap-2 bg-white border-r border-slate-200 w-64 z-50">
+<div class="flex items-center gap-3 px-2 py-4 mb-4">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<h1 class="font-outfit font-bold text-indigo-600 leading-tight">EduCorexa</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Admin Portal</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-indigo-600 bg-indigo-50/50 rounded-lg font-semibold border-r-4 border-indigo-600 transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Students</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">school</span>
+<span>Courses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">grade</span>
+<span>Gradebook</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-slate-100 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 rounded-lg transition-all font-medium" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="pl-64 flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-[0px_4px_20px_rgba(15,23,42,0.05)]">
+<div class="flex justify-between items-center w-full px-8 h-16">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-body-sm focus:ring-2 focus:ring-indigo-500/20 transition-all" placeholder="Search student records, grades, or files..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+<div class="flex items-center gap-3">
+<img alt="Administrator" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-50" data-alt="A professional headshot of a school administrator in a bright, modern office setting. He is wearing a charcoal suit and a soft blue shirt, smiling confidently at the camera. The background is softly blurred with clean white lines and natural sunlight streaming in, creating a high-end corporate modern atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIkSdAfqjMzJEEkR9RAP0aomfMptbwRDs-VWtD-iofM0CQWEvN5a8jFkebwPIvA00m9twwO-4hophalHo7L1nSPvnFEr5xhLI24DtrDAg11Nku76sw2zc5tomncRpUJETD8ihyZzzJ5i54B6tMB7FQ-G8YCdWQAbf55cTc5rEwOCWZOyJQbz_ws17GyWGADpQnM_ahBSdUbRVsBP6ki6c7Yr8eQYubd7SA4XVfIDMfoGR3RK2xcEcFO_RcvQrGXG0JCqRLhBP6t8jt"/>
+<div class="hidden lg:block text-left">
+<p class="text-label-md text-on-surface">Admin User</p>
+<p class="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Lead Registrar</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Profile Content -->
+<div class="p-8 space-y-8 max-w-[1400px] mx-auto w-full">
+<!-- Header Section -->
+<section class="flex flex-col lg:flex-row gap-8 items-start lg:items-end">
+<div class="relative group">
+<img alt="Student" class="w-40 h-40 rounded-3xl object-cover shadow-xl ring-4 ring-white" data-alt="A vibrant portrait of a young college student with a friendly expression, standing against a blurred library background. Her style is modern and casual, wearing a mustard yellow knit sweater. The lighting is warm and natural, highlighting a clean, high-contrast academic environment with a premium feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIxxj_F2nT1C1LEuOVBE7aQQT-443bHLUh8ALdhZckyMoVcpvaM6zVTO9czuw_HaQcOa6af-c55PB7fJPNDuB4gMBszKcJ0vtBFUONZAqElv3EPf5uA0HJ6K1VQnNqd91XgoAagbAjtNfjt7QTLSP2TVqvI6aLT9n8sTsY_SpxNDyOhCDY7qGuomCAFgRRySUahpulAUrLDzlRlMVmAmSfCCAyO6rExvAZ_UIVNp5pXSeMMyTtqItbDghBakK-XiqnWAk2mDBJIsLQ"/>
+<button class="absolute bottom-2 right-2 bg-white p-2 rounded-xl shadow-lg border border-slate-100 text-indigo-600 hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+<div class="flex-1 space-y-2">
+<div class="flex items-center gap-3">
+<h2 class="font-headline-lg text-on-surface">Eleanor Sterling</h2>
+<span class="px-3 py-1 bg-green-100 text-green-700 text-label-sm rounded-full">Active</span>
+</div>
+<div class="flex flex-wrap gap-6 text-slate-500 font-medium">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-500">fingerprint</span>
+<span>ID: STU-882910</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-500">school</span>
+<span>Junior (Year 3)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-500">location_on</span>
+<span>Boston, MA</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3 w-full lg:w-auto">
+<button class="flex-1 lg:flex-none px-6 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">mail</span>
+                        Message
+                    </button>
+<button class="flex-1 lg:flex-none px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">edit</span>
+                        Edit Profile
+                    </button>
+</div>
+</section>
+<!-- Main Grid -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Content Tabs -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<!-- Tabs Navigation -->
+<div class="flex gap-8 border-b border-slate-200 overflow-x-auto scrollbar-hide">
+<button class="pb-4 font-bold text-indigo-600 border-b-2 border-indigo-600 flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined">library_books</span>
+                            Enrolled Courses
+                        </button>
+<button class="pb-4 font-medium text-slate-500 hover:text-indigo-600 border-b-2 border-transparent hover:border-slate-200 flex items-center gap-2 transition-all whitespace-nowrap">
+<span class="material-symbols-outlined">sports_soccer</span>
+                            Extracurriculars
+                        </button>
+<button class="pb-4 font-medium text-slate-500 hover:text-indigo-600 border-b-2 border-transparent hover:border-slate-200 flex items-center gap-2 transition-all whitespace-nowrap">
+<span class="material-symbols-outlined">description</span>
+                            Documents
+                        </button>
+</div>
+<!-- Enrolled Courses Card -->
+<div class="space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Course 1 -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-indigo-200 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">functions</span>
+</div>
+<span class="text-headline-md text-indigo-600">A-</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-1">Advanced Calculus</h3>
+<p class="text-body-sm text-slate-500 mb-6">Prof. Marcus Thorne • Room 402</p>
+<div class="space-y-2">
+<div class="flex justify-between text-label-sm">
+<span class="text-slate-500">Progress</span>
+<span class="text-indigo-600 font-bold">88%</span>
+</div>
+<div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-indigo-500 to-indigo-700 rounded-full w-[88%]"></div>
+</div>
+</div>
+</div>
+<!-- Course 2 -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-indigo-200 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<span class="text-headline-md text-purple-600">B+</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-1">Molecular Biology</h3>
+<p class="text-body-sm text-slate-500 mb-6">Dr. Elena Rodriguez • Lab 3</p>
+<div class="space-y-2">
+<div class="flex justify-between text-label-sm">
+<span class="text-slate-500">Progress</span>
+<span class="text-purple-600 font-bold">72%</span>
+</div>
+<div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-purple-500 to-purple-700 rounded-full w-[72%]"></div>
+</div>
+</div>
+</div>
+<!-- Course 3 -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-indigo-200 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<span class="text-headline-md text-blue-600">A</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-1">Modern History</h3>
+<p class="text-body-sm text-slate-500 mb-6">Dr. Sarah Jenkins • Room 210</p>
+<div class="space-y-2">
+<div class="flex justify-between text-label-sm">
+<span class="text-slate-500">Progress</span>
+<span class="text-blue-600 font-bold">95%</span>
+</div>
+<div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full w-[95%]"></div>
+</div>
+</div>
+</div>
+<!-- Course 4 -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-indigo-200 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">language</span>
+</div>
+<span class="text-headline-md text-emerald-600">A</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-1">Global Economics</h3>
+<p class="text-body-sm text-slate-500 mb-6">Prof. Wei Chen • Seminar Room B</p>
+<div class="space-y-2">
+<div class="flex justify-between text-label-sm">
+<span class="text-slate-500">Progress</span>
+<span class="text-emerald-600 font-bold">100%</span>
+</div>
+<div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full w-[100%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Sidebar Stats -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<!-- Performance Chart Card -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-indigo-600 text-[18px]">trending_up</span>
+</div>
+<h3 class="font-label-md text-on-surface">Academic Performance</h3>
+</div>
+<div class="flex items-center justify-center py-4">
+<div class="relative w-32 h-32">
+<svg class="w-full h-full" viewbox="0 0 36 36">
+<path class="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="transparent" stroke="currentColor" stroke-width="3"></path>
+<path class="text-indigo-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="transparent" stroke="currentColor" stroke-dasharray="88, 100" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-headline-md text-on-surface leading-none">3.88</span>
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">GPA</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-6">
+<div class="p-3 bg-slate-50 rounded-xl text-center">
+<p class="text-[10px] text-slate-500 font-bold uppercase tracking-tight mb-1">Rank</p>
+<p class="font-headline-md text-indigo-600">12<span class="text-body-sm text-slate-400">/240</span></p>
+</div>
+<div class="p-3 bg-slate-50 rounded-xl text-center">
+<p class="text-[10px] text-slate-500 font-bold uppercase tracking-tight mb-1">Attendance</p>
+<p class="font-headline-md text-emerald-600">96%</p>
+</div>
+</div>
+</div>
+<!-- Contact Info Card -->
+<div class="bg-white p-6 rounded-2xl shadow-[0px_4px_20px_rgba(15,23,42,0.05)] border border-slate-100">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-purple-600 text-[18px]">contact_page</span>
+</div>
+<h3 class="font-label-md text-on-surface">Personal Information</h3>
+</div>
+<div class="space-y-5">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">alternate_email</span>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Email</p>
+<p class="text-body-sm font-medium">e.sterling@university.edu</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">call</span>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Phone</p>
+<p class="text-body-sm font-medium">+1 (617) 555-0192</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">cake</span>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Birthday</p>
+<p class="text-body-sm font-medium">October 14, 2003</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400">home</span>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Address</p>
+<p class="text-body-sm font-medium leading-tight">422 Beacon Street, Apt 4C<br/>Boston, MA 02115</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Mini Card -->
+<div class="bg-indigo-600 p-6 rounded-2xl shadow-xl shadow-indigo-100 text-white relative overflow-hidden">
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-white/10 text-[120px]">verified</span>
+<h4 class="font-label-md mb-4 relative z-10">Quick Actions</h4>
+<div class="grid grid-cols-2 gap-3 relative z-10">
+<button class="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors flex flex-col items-center gap-2">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-bold uppercase">Transcript</span>
+</button>
+<button class="bg-white/10 hover:bg-white/20 p-3 rounded-xl transition-colors flex flex-col items-center gap-2">
+<span class="material-symbols-outlined">add_task</span>
+<span class="text-[10px] font-bold uppercase">Assigment</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

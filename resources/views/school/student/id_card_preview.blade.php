@@ -1,6 +1,7 @@
 @extends('layouts.school')
 
 @section('customCSS')
+    @include('school.others._modern_design_styles')
 <style>
     /* প্রিভিউ মোডে কার্ডগুলো সুন্দরভাবে দেখানোর জন্য */
     .preview-grid {

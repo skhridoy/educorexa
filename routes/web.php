@@ -12,13 +12,14 @@ use App\Http\Controllers\{
     FeeHeadController, FeeAmountController, StudentFeeController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
-    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController, ReviewController
+    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController, ReviewController,
+    RoutineController
 };
 use App\Http\Controllers\SuperAdmin\FrontendSectionController;
 use App\Http\Controllers\SuperAdmin\{
     SuperAdminController, RoleController,
     SettingController, EmployeeController, PermissionController,
-    SubscriptionPackageController, TestimonialController
+    SubscriptionPackageController, TestimonialController, EventController
 };
 
 /*
@@ -121,6 +122,7 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::resource('subscription-packages', SubscriptionPackageController::class);
         Route::patch('testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggleStatus'])->name('testimonials.toggle');
         Route::resource('testimonials', TestimonialController::class);
+        Route::resource('events', EventController::class);
     });
 
     // --- 2. Employee ONLY Group ---
@@ -208,6 +210,12 @@ Route::domain(config('app.main_domain'))->group(function () {
                         ->name('academic-year.toggleInactive');
                 });
 
+                // Routine
+                Route::middleware(['auth', 'permission:class.routine'])->group(function () {
+                    Route::get('get-subjects/{classId}', [RoutineController::class, 'getSubjects'])->name('getSubjects');
+                    Route::resource('routine', RoutineController::class);
+                });
+
                 // Categories
                 Route::middleware(['permission:category.manage'])->group(function () {
                     Route::get('/categories', [SchoolCategoryController::class, 'index'])->name('categories.index');
@@ -244,6 +252,7 @@ Route::domain(config('app.main_domain'))->group(function () {
                     Route::delete('/subjects-assign/{assignment}', [AssignClassController::class, 'destroy'])->name('subjects.assign.destroy');
                     Route::get('/subjects-assign/{assignment}', [AssignClassController::class, 'edit'])->name('subjects.assign.edit');
                     Route::put('/subjects-assign/{assignment}', [AssignClassController::class, 'update'])->name('subjects.assign.update');
+                    Route::get('/get-subjects-by-class/{classId}', [AssignClassController::class, 'getSubjectsByClass'])->name('get.subjects.by.class');
                     Route::resource('subjects', SubjectController::class);
 
                 });

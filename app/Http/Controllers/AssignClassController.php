@@ -52,28 +52,37 @@ class AssignClassController extends Controller
         $request->validate([
             'class_id' => [
                 'required',
-                'exists:classes,id',
-               
+                Rule::exists('classes', 'id')->where('school_id', $schoolId),
                 Rule::unique('assign_classes')->where(function ($query) use ($schoolId, $request) {
                     return $query->where('school_id', $schoolId)
                                 ->where('class_id', $request->class_id)
                                 ->where('subject_id', $request->subject_id);
                 }),
             ],
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => [
+                'required',
+                Rule::exists('subjects', 'id')->where('school_id', $schoolId),
+            ],
             'full_mark'  => 'required|numeric',
             'pass_mark'  => 'required|numeric'
-        ], [
-            'class_id.unique' => 'This subject is already assigned to this class.' // কাস্টম মেসেজ
         ]);
 
         AssignClass::create([
             'school_id'  => $schoolId,
+            'school_category_id' => $request->school_category_id,
+            'school_sub_category_id' => $request->school_sub_category_id,
             'class_id'   => $request->class_id,
             'subject_id' => $request->subject_id,
             'full_mark'  => $request->full_mark,
             'pass_mark'  => $request->pass_mark,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Subject assigned successfully',
+            ], 201);
+        }
 
         return back()->with('success', 'Subject assigned successfully');
     }
@@ -118,18 +127,36 @@ class AssignClassController extends Controller
         $request->validate([
             'class_id' => [
                 'required',
+                Rule::exists('classes', 'id')->where('school_id', $schoolId),
                 Rule::unique('assign_classes')->where(function ($query) use ($schoolId, $request) {
                     return $query->where('school_id', $schoolId)
                                 ->where('class_id', $request->class_id)
                                 ->where('subject_id', $request->subject_id);
                 })->ignore($assignment->id), // নিজের আইডি ইগনোর করবে
             ],
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => [
+                'required',
+                Rule::exists('subjects', 'id')->where('school_id', $schoolId),
+            ],
             'full_mark'  => 'required|numeric',
-            'pass_mark'  => 'required|numeric'
+            'pass_mark'  => 'required|numeric',
+            
+        ]);
+        $assignment->update([
+            'class_id' => $request->class_id,
+            'subject_id' => $request->subject_id,
+            'full_mark' => $request->full_mark,
+            'pass_mark' => $request->pass_mark,
+            'school_category_id' => $request->school_category_id,
+            'school_sub_category_id' => $request->school_sub_category_id,
         ]);
 
-        $assignment->update($request->only(['class_id', 'subject_id', 'full_mark', 'pass_mark']));
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Assign Subject updated successfully'
+            ]);
+        }
 
         return redirect()->back()->with(['success' => 'Assign Subject updated successfully', 'type' => 'success']);
     }

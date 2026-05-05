@@ -1,6 +1,7 @@
 @extends('layouts.school')
 
-@section('customCss')
+@section('customCSS')
+    @include('school.others._modern_design_styles')
     <style>
         input{
             min-width: 50px;

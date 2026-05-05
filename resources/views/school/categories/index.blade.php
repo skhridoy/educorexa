@@ -2,15 +2,7 @@
 @extends('layouts.school')
 
 @section('customCSS')
-    <style>
-        /* আপনার আগের সেই মোবাইল ফ্রেন্ডলি স্টাইল এখানেও কাজ করবে */
-        .bg-soft-primary { background-color: rgba(114, 124, 245, 0.1); }
-        @media (max-width: 767px) {
-            .custom-mobile-table tbody tr { display: block; border: 1px solid #eee; margin-bottom: 10px; border-radius: 8px; }
-            .custom-mobile-table td { display: flex; justify-content: space-between; padding: 10px !important; }
-            .custom-mobile-table td::before { content: attr(data-label); font-weight: bold; color: #6c757d; }
-        }
-    </style>
+    @include('school.others._modern_design_styles')
 @endsection
 @section('content')
     <div class="page-content">

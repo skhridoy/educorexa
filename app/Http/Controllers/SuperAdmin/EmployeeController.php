@@ -5,6 +5,8 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Employee;
+use App\Models\Event;
+use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +17,17 @@ use App\Mail\EmployeeRegistrationMail;
 class EmployeeController extends Controller
 {
     public function dashboard() {
-        return view('super.employee.dashboard');
+        $user = auth()->user();
+        $employee = Employee::where('user_id', $user->id)->first();
+        
+        $totalSchools = School::count();
+        $upcomingEvents = Event::where('event_date', '>=', now())
+                               ->where('is_active', true)
+                               ->orderBy('event_date', 'asc')
+                               ->take(5)
+                               ->get();
+
+        return view('super.employee.dashboard', compact('user', 'employee', 'totalSchools', 'upcomingEvents'));
     }
 
     public function index()

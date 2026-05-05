@@ -1,33 +1,7 @@
 @extends('layouts.school')
 
 @section('customCSS')
-<style>
-    /* মোবাইলের জন্য ক্লিন লুক */
-    @media (max-width: 767px) {
-        .custom-mobile-table tbody tr {
-            display: block;
-            background: #fff;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            border: 1px solid #f1f4f8 !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .custom-mobile-table td {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 15px !important;
-            border: none !important;
-            border-bottom: 1px solid #f8f9fb !important;
-        }
-        .custom-mobile-table td::before {
-            content: attr(data-label);
-            font-weight: bold;
-            font-size: 11px;
-            color: #888;
-        }
-    }
-    .bg-soft-info { background-color: rgba(0, 204, 255, 0.1); }
-</style>
+    @include('school.others._modern_design_styles')
 @endsection
 @section('content')
 <div class="page-content">

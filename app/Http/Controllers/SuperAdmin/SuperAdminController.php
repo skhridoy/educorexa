@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\School;
 use App\Models\Employee;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\SchoolApprovedMail;
@@ -24,7 +25,13 @@ class SuperAdminController extends Controller
         $pendingSchools = School::where('status', 'pending')->count();
         $totalSchools = School::count();
         $recentSchools = School::latest()->take(5)->get();
-        return view('super.dashboard', compact('pendingSchools', 'totalSchools', 'recentSchools', 'mainDomain'));
+        $upcomingEvents = Event::where('event_date', '>=', now())
+                               ->where('is_active', true)
+                               ->orderBy('event_date', 'asc')
+                               ->take(5)
+                               ->get();
+
+        return view('super.dashboard', compact('pendingSchools', 'totalSchools', 'recentSchools', 'upcomingEvents', 'mainDomain'));
     }
 
     // ২. পেন্ডিং স্কুল লিস্ট

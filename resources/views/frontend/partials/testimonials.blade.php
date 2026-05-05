@@ -20,21 +20,21 @@
                             <p class="text-muted small mb-4 fst-italic">"{{ $testimonial->message }}"</p>
                             <div class="d-flex align-items-center">
                                 @php
-                                    $imageUrl = $testimonial->user_id && $testimonial->user && $testimonial->user->photo 
-                                                ? asset('uploads/profiles/' . $testimonial->user->photo) 
-                                                : ($testimonial->image ? asset($testimonial->image) : null);
+                                    $imageUrl = null;
+                                    if ($testimonial->user_id && $testimonial->user) {
+                                        $folder = ($testimonial->user->role === 'super_admin') ? 'super_admin' : 'employees';
+                                        $imageUrl = ($testimonial->user->photo) 
+                                                    ? asset('uploads/' . $folder . '/' . $testimonial->user->photo) 
+                                                    : null;
+                                    }
+                                    
+                                    if (!$imageUrl) {
+                                        $imageUrl = ($testimonial->image) ? asset($testimonial->image) : asset('assets/images/profile.webp');
+                                    }
                                 @endphp
-                                @if($imageUrl)
-                                    <img src="{{ $imageUrl }}" alt="image" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover; flex-shrink: 0;">
-                                @else
-                                    @php 
-                                        $colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-danger', 'bg-warning'];
-                                        $bgClass = $colors[$loop->index % count($colors)];
-                                    @endphp
-                                    <div class="{{ $bgClass }} text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; flex-shrink: 0;">
-                                        {{ strtoupper(substr($testimonial->name, 0, 1)) }}
-                                    </div>
-                                @endif
+                                <img src="{{ $imageUrl }}" 
+                                     onerror="this.src='{{ asset('assets/images/profile.webp') }}'"
+                                     alt="{{ $testimonial->name }}" class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover; flex-shrink: 0;">
                                 <div>
                                     <h6 class="fw-bold mb-0 small">{{ $testimonial->name }}</h6>
                                     <small class="text-muted x-small">

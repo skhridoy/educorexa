@@ -1,181 +1,195 @@
-    
 @php
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
     $isFrontendMenuOpen = Request::is('manage/frontend*');
-    // রাউট ফাইল অনুযায়ী স্কুলের সব রাউট 'manage.' দিয়ে শুরু
-    $schoolRoutePrefix = 'manage.'; 
-    
-    // Active Class এর জন্য URL প্যাটার্ন চেক
     $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*');
     $isSystemMenuOpen = Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') || Request::is('settings*');
 @endphp
 
-<nav class="sidebar">
-  <div class="sidebar-header">
-    <a href="{{ route('main.home') }}" class="sidebar-brand">
-        @if(!empty($setting->logo_wide))
-            <img src="{{ asset($setting->logo_wide) }}" alt="logo" style="height: 30px; margin-right: 8px;">
-        @else
-            <i class="link-icon" data-feather="box" style="width: 25px; margin-right: 5px;"></i>
-            <span class="text-capitalize" style="font-weight: 700; font-size: 1.1rem;">
-                {{ $setting->site_name ?? 'EduCorexa' }}
-            </span>
-        @endif
-    </a>
-    <div class="sidebar-toggler not-active">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-  </div>
+<nav class="sidebar edu-sidebar">
 
-  <div class="sidebar-body">
-    <ul class="nav">
-      <li class="nav-item nav-category">Main</li>
-      
-      {{-- Dashboard Link (Role Based Redirect) --}}
-      <li class="nav-item {{ Request::is('super-admin/dashboard*') || Request::is('employee/dashboard*') ? 'active' : '' }}">
-        <a href="{{ $isSuperAdmin ? route('super.dashboard') : route('employee.dashboard') }}" class="nav-link">
-          <i class="link-icon" data-feather="grid"></i>
-          <span class="link-title">Dashboard</span>
+    {{-- ===== BRAND ===== --}}
+    <div class="edu-sidebar-header">
+        <a href="{{ route('main.home') }}" class="edu-brand">
+            <div class="edu-brand-icon">
+                {{ strtoupper(substr($setting->site_name ?? 'E', 0, 1)) }}
+            </div>
+            <div>
+                <div class="edu-brand-name">{{ $setting->site_name ?? 'EduCorexa' }}</div>
+                <div class="edu-brand-sub">Admin Portal</div>
+            </div>
         </a>
-      </li>
-
-      {{-- Staff & HR Section (Only for Super Admin who can manage employees) --}}
-      @if($isSuperAdmin)
-      <li class="nav-item nav-category">Staff & HR</li>
-      <li class="nav-item {{ Request::is('super-admin/employees*') ? 'active' : '' }}">
-        <a class="nav-link" data-bs-toggle="collapse" href="#employeeMenu" role="button" aria-expanded="{{ Request::is('super-admin/employees*') ? 'true' : 'false' }}">
-          <i class="link-icon" data-feather="users"></i>
-          <span class="link-title">Employee Manage</span>
-          <i class="link-arrow" data-feather="chevron-down"></i>
-        </a>
-        <div class="collapse {{ Request::is('super-admin/employees*') ? 'show' : '' }}" id="employeeMenu">
-          <ul class="nav sub-menu">
-            <li class="nav-item">
-              <a href="{{ route('super.employees.index') }}" class="nav-link {{ Request::is('super-admin/employees') ? 'active' : '' }}">View Employees</a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ route('super.employees.create') }}" class="nav-link {{ Request::is('super-admin/employees/create') ? 'active' : '' }}">Add Employee</a>
-            </li>
-          </ul>
+        {{-- Mobile Close Button --}}
+        <div class="sidebar-toggler not-active d-lg-none ms-auto" style="cursor:pointer; color:var(--text-faint);">
+            <i data-feather="x" style="width:20px;height:20px;"></i>
         </div>
-      </li>
-      @endif
+    </div>
 
-      {{-- Schools Management (Shared based on permission: school.manage) --}}
-      @can('school.manage')
-      <li class="nav-item nav-category">Management</li>
-      <li class="nav-item {{ $isSchoolMenuOpen ? 'active' : '' }}">
-        <a class="nav-link" data-bs-toggle="collapse" href="#schoolsMenu" role="button" aria-expanded="{{ $isSchoolMenuOpen ? 'true' : 'false' }}">
-          <i class="link-icon" data-feather="home"></i>
-          <span class="link-title">Manage Schools</span>
-          <i class="link-arrow" data-feather="chevron-down"></i>
-        </a>
-        <div class="collapse {{ $isSchoolMenuOpen ? 'show' : '' }}" id="schoolsMenu">
-          <ul class="nav sub-menu">
-            <li class="nav-item">
-              <a href="{{ route('manage.schools.all') }}" class="nav-link {{ Request::is('*/schools/all') ? 'active' : '' }}">All Schools</a>
+    {{-- ===== NAV BODY ===== --}}
+    <div class="edu-sidebar-body">
+        <ul class="edu-nav">
+
+            {{-- MAIN --}}
+            <li class="edu-nav-category">Main</li>
+
+            <li class="edu-nav-item">
+                <a href="{{ $isSuperAdmin ? route('super.dashboard') : route('employee.dashboard') }}"
+                   class="edu-nav-link {{ Request::is('super-admin/dashboard*') || Request::is('employee/dashboard*') ? 'active' : '' }}">
+                    <i data-feather="grid"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
-            <li class="nav-item">
-              <a href="{{ route('manage.schools.pending') }}" class="nav-link {{ Request::is('*/schools/pending') ? 'active' : '' }}">Pending Requests</a>
+
+            {{-- STAFF & HR --}}
+            @if($isSuperAdmin)
+            <li class="edu-nav-category">Staff &amp; HR</li>
+
+            <li class="edu-nav-item">
+                <a class="edu-nav-link edu-has-submenu {{ Request::is('super-admin/employees*') ? 'active' : '' }}"
+                   data-bs-toggle="collapse" href="#employeeMenu" role="button"
+                   aria-expanded="{{ Request::is('super-admin/employees*') ? 'true' : 'false' }}">
+                    <i data-feather="users"></i>
+                    <span>Employee Manage</span>
+                    <i data-feather="chevron-down" class="edu-arrow"></i>
+                </a>
+                <div class="collapse {{ Request::is('super-admin/employees*') ? 'show' : '' }}" id="employeeMenu">
+                    <ul class="edu-sub-nav">
+                        <li><a href="{{ route('super.employees.index') }}"
+                               class="edu-sub-link {{ Request::is('super-admin/employees') ? 'active' : '' }}">View Employees</a></li>
+                        <li><a href="{{ route('super.employees.create') }}"
+                               class="edu-sub-link {{ Request::is('super-admin/employees/create') ? 'active' : '' }}">Add Employee</a></li>
+                    </ul>
+                </div>
             </li>
-            
-            {{-- স্কুল তৈরি করার পারমিশন চেক --}}
-            @can('school.create')
-            <li class="nav-item">
-              <a href="{{ route('manage.schools.create') }}" class="nav-link {{ Request::is('*/schools/create') ? 'active' : '' }}">Create School</a>
+            @endif
+
+            {{-- MANAGEMENT --}}
+            @can('school.manage')
+            <li class="edu-nav-category">Management</li>
+
+            <li class="edu-nav-item">
+                <a class="edu-nav-link edu-has-submenu {{ $isSchoolMenuOpen ? 'active' : '' }}"
+                   data-bs-toggle="collapse" href="#schoolsMenu" role="button"
+                   aria-expanded="{{ $isSchoolMenuOpen ? 'true' : 'false' }}">
+                    <i data-feather="home"></i>
+                    <span>Manage Schools</span>
+                    <i data-feather="chevron-down" class="edu-arrow"></i>
+                </a>
+                <div class="collapse {{ $isSchoolMenuOpen ? 'show' : '' }}" id="schoolsMenu">
+                    <ul class="edu-sub-nav">
+                        <li><a href="{{ route('manage.schools.all') }}"
+                               class="edu-sub-link {{ Request::is('*/schools/all') ? 'active' : '' }}">All Schools</a></li>
+                        <li><a href="{{ route('manage.schools.pending') }}"
+                               class="edu-sub-link {{ Request::is('*/schools/pending') ? 'active' : '' }}">Pending Requests</a></li>
+                        @can('school.create')
+                        <li><a href="{{ route('manage.schools.create') }}"
+                               class="edu-sub-link {{ Request::is('*/schools/create') ? 'active' : '' }}">Create School</a></li>
+                        @endcan
+                    </ul>
+                </div>
             </li>
             @endcan
-          </ul>
-        </div>
-      </li>
-      @endcan
 
-      {{-- System & Settings Section --}}
-      @if($isSuperAdmin || $user->can('settings.manage'))
-          {{-- Roles & Permissions (Only Super Admin) --}}
-          @if($isSuperAdmin && $user->can('super.roles.manage'))
-          <li class="nav-item {{ Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') ? 'active' : '' }}">
-            <a class="nav-link" data-bs-toggle="collapse" href="#roleMenu" role="button">
-              <i class="link-icon" data-feather="shield"></i>
-              <span class="link-title">Roles & Permissions</span>
-              <i class="link-arrow" data-feather="chevron-down"></i>
-            </a>
-            <div class="collapse {{ Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') ? 'show' : '' }}" id="roleMenu">
-              <ul class="nav sub-menu">
-                <li class="nav-item"><a href="{{ route('super.roles.index') }}" class="nav-link {{ Request::is('*/roles*') ? 'active' : '' }}">Manage Roles</a></li>
-                <li class="nav-item"><a href="{{ route('super.permissions.index') }}" class="nav-link {{ Request::is('*/permissions*') ? 'active' : '' }}">Manage Permissions</a></li>
-              </ul>
-            </div>
-          </li>
-          @endif
+            {{-- SYSTEM --}}
+            @if($isSuperAdmin || $user->can('settings.manage'))
 
-          {{-- System Settings (Based on settings.manage permission) --}}
-          @can('settings.manage')
-          <li class="nav-item {{ Request::is('settings*') ? 'active' : '' }}">
-            <a href="{{ route('settings.edit') }}" class="nav-link">
-              <i class="link-icon" data-feather="settings"></i>
-              <span class="link-title">System Settings</span>
-            </a>
-          </li>
-          @endcan
+                @if($isSuperAdmin && $user->can('super.roles.manage'))
+                <li class="edu-nav-item">
+                    <a class="edu-nav-link edu-has-submenu {{ $isSystemMenuOpen ? 'active' : '' }}"
+                       data-bs-toggle="collapse" href="#roleMenu" role="button"
+                       aria-expanded="{{ $isSystemMenuOpen ? 'true' : 'false' }}">
+                        <i data-feather="shield"></i>
+                        <span>Roles &amp; Permissions</span>
+                        <i data-feather="chevron-down" class="edu-arrow"></i>
+                    </a>
+                    <div class="collapse {{ $isSystemMenuOpen ? 'show' : '' }}" id="roleMenu">
+                        <ul class="edu-sub-nav">
+                            <li><a href="{{ route('super.roles.index') }}"
+                                   class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">Manage Roles</a></li>
+                            <li><a href="{{ route('super.permissions.index') }}"
+                                   class="edu-sub-link {{ Request::is('*/permissions*') ? 'active' : '' }}">Manage Permissions</a></li>
+                        </ul>
+                    </div>
+                </li>
+                @endif
 
-          {{-- Subscription Packages (Only Super Admin) --}}
-          @if($isSuperAdmin)
-          <li class="nav-item {{ Request::is('super-admin/subscription-packages*') ? 'active' : '' }}">
-            <a href="{{ route('super.subscription-packages.index') }}" class="nav-link">
-              <i class="link-icon" data-feather="package"></i>
-              <span class="link-title">Subscription Packages</span>
-            </a>
-          </li>
-          <li class="nav-item {{ Request::is('super-admin/testimonials*') ? 'active' : '' }}">
-            <a href="{{ route('super.testimonials.index') }}" class="nav-link">
-              <i class="link-icon" data-feather="message-square"></i>
-              <span class="link-title">Testimonials</span>
-            </a>
-          </li>
-          @endif
-          
-          @can('contact.messages.view')
-          <li class="nav-item">
-            <a href="{{ route('manage.contact.index') }}" class="nav-link">
-              <i class="link-icon" data-feather="box"></i>
-              <span class="link-title">Call Request</span>
-            </a>
-          </li>
-          @endcan
-      @endif
-      @can('frontend.manage')
-      <li class="nav-item nav-category">Frontend</li>
-      <li class="nav-item {{ $isFrontendMenuOpen ? 'active' : '' }}">
-        <a class="nav-link" data-bs-toggle="collapse" href="#frontendMenu" role="button" aria-expanded="{{ $isFrontendMenuOpen ? 'true' : 'false' }}">
-          <i class="link-icon" data-feather="layout"></i>
-          <span class="link-title">Landing Page</span>
-          <i class="link-arrow" data-feather="chevron-down"></i>
-        </a>
-        <div class="collapse {{ $isFrontendMenuOpen ? 'show' : '' }}" id="frontendMenu">
-          <ul class="nav sub-menu">
-            <li class="nav-item">
-              <a href="{{ route('manage.frontend.index') }}" class="nav-link {{ Request::is('manage/frontend/manage-sections') ? 'active' : '' }}">
-                  Manage Sections
-              </a>
+                @can('settings.manage')
+                <li class="edu-nav-item">
+                    <a href="{{ route('settings.edit') }}"
+                       class="edu-nav-link {{ Request::is('settings*') ? 'active' : '' }}">
+                        <i data-feather="settings"></i>
+                        <span>System Settings</span>
+                    </a>
+                </li>
+                @endcan
+
+                @if($isSuperAdmin)
+                <li class="edu-nav-item">
+                    <a href="{{ route('super.subscription-packages.index') }}" class="edu-nav-link {{ Request::is('super-admin/subscription-packages*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-gem edu-nav-icon"></i>
+                        <span>Subscription Packages</span>
+                    </a>
+                </li>
+
+                {{-- Events --}}
+                <li class="edu-nav-item">
+                    <a href="{{ route('super.events.index') }}" class="edu-nav-link {{ Request::is('super-admin/events*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-calendar-check edu-nav-icon"></i>
+                        <span>Manage Events</span>
+                    </a>
+                </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('super.testimonials.index') }}"
+                       class="edu-nav-link {{ Request::is('super-admin/testimonials*') ? 'active' : '' }}">
+                        <i data-feather="message-square"></i>
+                        <span>Testimonials</span>
+                    </a>
+                </li>
+                @endif
+
+                @can('contact.messages.view')
+                <li class="edu-nav-item">
+                    <a href="{{ route('manage.contact.index') }}"
+                       class="edu-nav-link {{ Request::is('manage/contact*') ? 'active' : '' }}">
+                        <i data-feather="phone-call"></i>
+                        <span>Call Request</span>
+                    </a>
+                </li>
+                @endcan
+
+            @endif
+
+            {{-- FRONTEND --}}
+            @can('frontend.manage')
+            <li class="edu-nav-category">Frontend</li>
+            <li class="edu-nav-item">
+                <a class="edu-nav-link edu-has-submenu {{ $isFrontendMenuOpen ? 'active' : '' }}"
+                   data-bs-toggle="collapse" href="#frontendMenu" role="button"
+                   aria-expanded="{{ $isFrontendMenuOpen ? 'true' : 'false' }}">
+                    <i data-feather="layout"></i>
+                    <span>Landing Page</span>
+                    <i data-feather="chevron-down" class="edu-arrow"></i>
+                </a>
+                <div class="collapse {{ $isFrontendMenuOpen ? 'show' : '' }}" id="frontendMenu">
+                    <ul class="edu-sub-nav">
+                        <li><a href="{{ route('manage.frontend.index') }}"
+                               class="edu-sub-link {{ Request::is('manage/frontend/manage-sections') ? 'active' : '' }}">Manage Sections</a></li>
+                    </ul>
+                </div>
             </li>
-            {{-- ভবিষ্যতে এখানে Slider, Testimonials বা Gallery এর লিংক যোগ করতে পারবেন --}}
-          </ul>
-        </div>
-      </li>
-      @endcan
-      {{-- Profile (For everyone) --}}
-      <li class="nav-item nav-category">User</li>
-      <li class="nav-item {{ Request::is('profile*') ? 'active' : '' }}">
-        <a href="{{ route('profile') }}" class="nav-link">
-          <i class="link-icon" data-feather="user"></i>
-          <span class="link-title">My Profile</span>
-        </a>
-      </li>
-      
-    </ul>
-  </div>
+            @endcan
+
+            {{-- USER --}}
+            <li class="edu-nav-category">Account</li>
+            <li class="edu-nav-item">
+                <a href="{{ route('profile') }}"
+                   class="edu-nav-link {{ Request::is('profile*') ? 'active' : '' }}">
+                    <i data-feather="user"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
 </nav>
