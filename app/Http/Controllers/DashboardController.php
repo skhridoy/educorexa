@@ -7,8 +7,9 @@ use \App\Models\Attendance;
 use \App\Models\StudentFee;
 use \App\Models\Classes;
 use \App\Models\LessonPlan;
-use \App\Models\Student;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use \App\Models\Student;
 class DashboardController extends Controller
 {
 
@@ -18,64 +19,79 @@ class DashboardController extends Controller
         $schoolId = auth()->user()->school_id;
         $today = now()->toDateString();
 
-        // ১. বেসিক কাউন্টস (একক কুয়েরিতে আনার চেষ্টা)
+        // ১. বেসিক কাউন্টস
         $data['totalStudents'] = Student::where('school_id', $schoolId)->count();
         $data['totalTeachers'] = $school->teacher()->count();
         $data['classesCount'] = $school->classes()->count();
 
-        // ২. ফি সামারি (বর্তমান মাসের জন্য ডিফল্ট)
-        // ১. বর্তমান মাসের ফি সামারি
+        // ২. ফি সামারি (বর্তমান মাসের জন্য)
+        $totalExpected = StudentFee::where('school_id', $schoolId)->sum('amount');
+        $totalCollected = StudentFee::where('school_id', $schoolId)
+            ->where('status', 'paid')
+            ->sum('amount');
         $currentMonth = now()->format('F-Y');
         $currentMonthSummary = StudentFee::where('school_id', $schoolId)
             ->where('month', $currentMonth)
             ->selectRaw("SUM(amount) as total, SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as collected")
             ->first();
 
+        $data['totalExpected'] = $totalExpected;
+        $data['totalCollected'] = $totalCollected;
         $data['currentTotal'] = $currentMonthSummary->total ?? 0;
         $data['currentCollected'] = $currentMonthSummary->collected ?? 0;
-        $data['currentTotal'] = $currentMonthSummary->total ?? 0;
-        $data['currentCollected'] = $currentMonthSummary->collected ?? 0;
 
-        // ২. সর্বমোট (All Time) ফি সামারি
-        $allTimeSummary = StudentFee::where('school_id', $schoolId)
-            ->selectRaw("SUM(amount) as total, SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as collected")
+        // ৩. আজকের উপস্থিতির পরিসংখ্যান (ওভাররাইট এড়াতে ভেরিয়েবল নাম পরিবর্তন করা হয়েছে)
+        $todayAttendance = Attendance::where('school_id', $schoolId)
+            ->whereDate('date', $today)
+            ->selectRaw("COUNT(CASE WHEN status = 'present' THEN 1 END) as present, 
+                        COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent")
             ->first();
 
-        $data['allTimeTotal'] = $allTimeSummary->total ?? 0;
-        $data['allTimeCollected'] = $allTimeSummary->collected ?? 0;
-        $data['unpaidFees'] = $data['currentTotal'] - $data['currentCollected'];
+        $data['presentCount'] = $todayAttendance->present ?? 0;
+        $data['absentCount'] = $todayAttendance->absent ?? 0;
 
-        // ৩. ক্লাস-ভিত্তিক ফি চার্ট ডাটা (Optimization: Avoid Loop Queries)
-        $classFeesData = DB::table('student_fees')
-            ->join('students', 'student_fees.student_id', '=', 'students.id')
-            ->join('classes', 'students.class_id', '=', 'classes.id')
-            ->where('student_fees.school_id', $schoolId)
-            ->where('student_fees.status', 'paid')
-            ->select('classes.name', DB::raw('SUM(student_fees.amount) as total_paid'))
-            ->groupBy('classes.name')
-            ->get();
-
-        $data['classNames'] = $classFeesData->pluck('name');
-        $data['classFees'] = $classFeesData->pluck('total_paid');
-
-        // ৪. আজকের উপস্থিতি স্ট্যাটাস
-        $attendanceData = Attendance::where('school_id', $schoolId)
-            ->where('date', $today)
-            ->selectRaw("SUM(status = 'present') as present, SUM(status = 'absent') as absent")
-            ->first();
-
-        $data['presentCount'] = $attendanceData->present ?? 0;
-        $data['absentCount'] = $attendanceData->absent ?? 0;
-
-        // ৫. রিসেন্ট টিচার অ্যাটেনডেন্স লগ
+        // ৪. রিসেন্ট অ্যাটেনডেন্স লগ (টেবিলের জন্য)
         $data['attendanceLogs'] = Attendance::with(['teacher', 'class', 'section'])
             ->where('school_id', $schoolId)
-            ->whereDate('created_at', $today)
-            ->latest()
+            ->whereDate('date', today())
+            ->select('teacher_id', 'class_id', 'section_id', DB::raw('MAX(created_at) as last_marked'))
+            ->groupBy('teacher_id', 'class_id', 'section_id')
+            ->latest('last_marked')
             ->take(5)
             ->get();
 
-        return view('school.dashboard', $data);
+        // ৫. সাপ্তাহিক উপস্থিতির রিয়েল ডাটা ক্যালকুলেশন
+        $startOfWeek = now()->startOfWeek(Carbon::SATURDAY);
+        $endOfWeek = now()->endOfWeek(Carbon::FRIDAY);
+
+        // ডাটাবেস থেকে একবারে সপ্তাহের সব ডাটা আনা (পারফরম্যান্সের জন্য ভালো)
+        $weeklyAttendanceRaw = Attendance::where('school_id', $schoolId)
+            ->whereBetween('date', [$startOfWeek, $endOfWeek])
+            ->select(
+                DB::raw("DATE_FORMAT(date, '%a') as day_name"),
+                DB::raw("COUNT(*) as total_count"),
+                DB::raw("SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present_count")
+            )
+            ->groupBy('day_name', 'date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy('day_name');
+
+        // ৬. গ্রাফের জন্য ৭ দিনের অ্যারে ম্যাপ করা
+        $weekDays = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        $data['weeklyStats'] = [];
+
+        foreach ($weekDays as $day) {
+            if (isset($weeklyAttendanceRaw[$day])) {
+                $present = $weeklyAttendanceRaw[$day]->present_count;
+                $total = $weeklyAttendanceRaw[$day]->total_count;
+                $data['weeklyStats'][$day] = $total > 0 ? round(($present / $total) * 100) : 0;
+            } else {
+                $data['weeklyStats'][$day] = 0;
+            }
+        }
+
+        return view('school.admin.dashboard', $data);
     }
 
     // বকেয়া তালিকা লোড করার জন্য আলাদা মেথড (Ajax)

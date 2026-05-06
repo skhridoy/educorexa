@@ -38,12 +38,11 @@
 
         {{-- Search Bar --}}
         <form class="search-form d-none d-lg-block" style="max-width:360px;width:100%;">
-            <div class="input-group" style="background:#f8fafc;border-radius:30px;border:1px solid #e2e8f0;overflow:hidden;">
-                <div class="input-group-text" style="background:transparent;border:none;padding:0 12px;color:#94a3b8;">
+            <div class="input-group">
+                <div class="input-group-text">
                     <i data-feather="search" style="width:16px;height:16px;"></i>
                 </div>
-                <input type="text" class="form-control" id="navbarForm" placeholder="Search schools, settings..."
-                       style="background:transparent;border:none;box-shadow:none;font-size:0.875rem;padding:10px 0;">
+                <input type="text" class="form-control" id="navbarForm" placeholder="Search schools, settings...">
             </div>
         </form>
     </div>
@@ -52,7 +51,7 @@
     <div class="d-flex align-items-center gap-3">
         
         {{-- Theme Switcher (আগের হেডারের ফিচারটি রাখা হলো) --}}
-        <div class="nav-item d-none d-md-flex align-items-center">
+        <div class="nav-item d-md-flex align-items-center">
             <label class="theme-switch">
                 <input type="checkbox" id="theme-switcher" onclick="toggleTheme()">
                 <span class="slider-round">
@@ -116,8 +115,8 @@
                 <img src="{{ $userPhoto }}" alt="{{ $user->name }}"
                      style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #e0e7ff;">
                 <div class="d-none d-md-block text-start">
-                    <div style="font-size:0.82rem;font-weight:700;color:#0b132b;line-height:1.1;">{{ $user->name }}</div>
-                    <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;">
+                    <div class="edu-user-name" style="font-size:0.82rem;font-weight:700;line-height:1.1;">{{ $user->name }}</div>
+                    <div class="edu-user-role" style="font-size:10px;font-weight:700;text-transform:uppercase;">
                         {{ str_replace('_', ' ', $user->role) }}
                     </div>
                 </div>

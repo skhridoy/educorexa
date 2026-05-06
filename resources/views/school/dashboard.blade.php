@@ -2,6 +2,23 @@
 
 @section('customCSS')
     @include('school.others._modern_design_styles')
+    <style>
+        /* Responsive adjustments for the welcome card */
+        @media (max-width: 768px) {
+            .welcome-card {
+                padding: 1.5rem !important;
+                text-align: center;
+            }
+            .welcome-card .d-flex {
+                justify-content: center;
+                flex-direction: column;
+            }
+            .welcome-card h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+    </style>
 @endsection
 
 @section('content')
@@ -16,91 +33,85 @@
         @endphp
         
         {{-- ===== WELCOME HERO CARD ===== --}}
-        <div class="welcome-card mb-5 p-4 p-md-5 position-relative overflow-hidden" 
+        <div class="welcome-card mb-4 p-4 p-md-5 position-relative overflow-hidden" 
              style="border-radius:24px; background:linear-gradient(135deg, #002147 0%, #003366 100%); color:white; box-shadow: 0 10px 30px rgba(0,33,71,0.15);">
-            <!-- Abstract background shapes -->
             <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
-            <div style="position:absolute; bottom:-30px; left:10%; width:100px; height:100px; background:rgba(255,204,0,0.1); border-radius:50%; filter:blur(20px);"></div>
             
             <div class="row align-items-center position-relative" style="z-index:1;">
                 <div class="col-md-8">
                     <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="greet-icon-box" style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:14px; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+                        <div class="greet-icon-box d-none d-sm-flex" style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:14px; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
                             <i class="fa-solid {{ $faIcon }} fa-xl" style="color:{{ $greetColor == '#3b82f6' ? '#60a5fa' : $greetColor }}"></i>
                         </div>
-                        <h2 class="mb-0 fw-bold" style="font-family:'Outfit',sans-serif; letter-spacing:-0.02em;">
+                        <h2 class="mb-0 fw-bold" style="font-family:'Outfit',sans-serif;">
                             {{ $greeting }}, {{ auth()->user()->name }}!
                         </h2>
                     </div>
-                    <p class="mb-0 opacity-75 fs-5" style="max-width:600px;">
-                        EduCorexa: আপনার স্কুলের আজকের গুরুত্বপূর্ণ তথ্যসমূহ এক নজরে দেখে নিন।
+                    <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
+                        EduCorexa: আপনার স্কুলের গুরুত্বপূর্ণ তথ্যসমূহ এক নজরে দেখে নিন।
                     </p>
-                    <div class="mt-4 d-flex gap-2">
+                    <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
                         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-calendar-days me-1"></i> {{ now()->format('l, d M Y') }}
+                            <i class="fa-regular fa-calendar-days me-1"></i> {{ now()->format('d M Y') }}
                         </span>
                         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
                             <i class="fa-regular fa-clock me-1"></i> {{ now()->format('h:i A') }}
                         </span>
                     </div>
                 </div>
-                <div class="col-md-4 text-md-end mt-4 mt-md-0 d-none d-md-block">
+                <div class="col-md-4 text-md-end d-none d-md-block">
                     <i class="fa-solid fa-graduation-cap text-white opacity-10" style="font-size: 8rem;"></i>
                 </div>
             </div>
         </div>
 
         {{-- Statistics Grid --}}
-        <div class="row g-4 mb-4">
-            <div class="col-md-3 col-6">
-                <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="icon-wrap" style="background:#eff6ff; color:#3b82f6;">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <span class="badge bg-soft-success text-success" style="font-size:10px;">Expected</span>
+        <div class="row g-3 g-md-4 mb-4">
+            
+            <!-- Teachers Card -->
+            <div class="col-6 col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-2 p-md-3" style="border-radius: 10px;">
+                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f3e8ff; color: #9333ea;">
+                        <i class="fa-solid fa-chalkboard-user"></i>
                     </div>
-                    <div class="stat-label">Total Expected</div>
-                    <div class="stat-value">৳ {{ number_format($currentTotal) }}</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Teachers</div>
+                    <div class="h5 fw-bolder mb-0">{{ $totalTeachers }}</div>
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;">
-                            <i class="fa-solid fa-hand-holding-dollar"></i>
-                        </div>
-                        <span class="badge bg-soft-success text-success" style="font-size:10px;">Collected</span>
+            <!-- Students Card -->
+            <div class="col-6 col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-md-3" style="border-radius: 10px;">
+                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #fff7ed; color: #f97316;">
+                        <i class="fa-solid fa-user-graduate"></i>
                     </div>
-                    <div class="stat-label">Total Collected</div>
-                    <div class="stat-value">৳ {{ number_format($currentCollected) }}</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Students</div>
+                    <div class="h5 fw-bolder mb-0">{{ $totalStudents }}</div>
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="icon-wrap" style="background:#fef3c7; color:#d97706;">
-                            <i class="fa-solid fa-user-graduate"></i>
-                        </div>
+            <!-- Collected Card -->
+            <div class="col-6 col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-md-3" style="border-radius: 15px;">
+                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f0fdf4; color: #16a34a;">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
                     </div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-value">{{ $totalStudents }}</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Collected</div>
+                    <div class="h5 fw-bolder mb-0">৳{{ number_format($currentCollected, 0) }}</div>
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="icon-wrap" style="background:#f5f3ff; color:#7c3aed;">
-                            <i class="fa-solid fa-chalkboard-teacher"></i>
-                        </div>
+            <!-- Expected Card -->
+            <div class="col-6 col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-2 p-md-3" style="border-radius: 15px;">
+                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #eff6ff; color: #3b82f6;">
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
-                    <div class="stat-label">Total Teachers</div>
-                    <div class="stat-value">{{ $totalTeachers }}</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Expected</div>
+                    <div class="h5 fw-bolder mb-0">৳{{ number_format($currentTotal, 0) }}</div>
                 </div>
             </div>
+
         </div>
 
         {{-- Main Content Charts/Tables --}}

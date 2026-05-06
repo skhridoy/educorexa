@@ -192,7 +192,7 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::get('/get-unpaid-list', [DashboardController::class, 'getUnpaidList'])->name('school.unpaid.ajax');
 
 
-                Route::get('/logout', [AuthController::class, 'logout'])->name('school.logout');
+                Route::post('/logout', [AuthController::class, 'logout'])->name('school.logout');
                 Route::middleware(['auth', 'permission:system.settings'])->group(function () {
                     Route::get('/school-settings/school-info', [SchoolRegisterController::class, 'edit'])->name('admin.school.info-edit');
                     // আপডেট করার জন্য

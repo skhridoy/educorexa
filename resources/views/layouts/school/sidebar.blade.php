@@ -197,6 +197,7 @@
                         @if(in_array('fee.manage', $permissions))
                         <li><a href="{{ route('fee-heads.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/fee-heads*') ? 'active' : '' }}">Fee Heads</a></li>
                         <li><a href="{{ route('fee-amounts.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/fee-amounts*') ? 'active' : '' }}">Fee Amounts</a></li>
+                        <li><a href="{{ route('student-fees.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/fee/student*') ? 'active' : '' }}">Fees Generation</a></li>
                         @endif
                         @if(in_array('fee.collect', $permissions))
                         <li><a href="{{ route('payment.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/payment*') ? 'active' : '' }}">Collect Payment</a></li>

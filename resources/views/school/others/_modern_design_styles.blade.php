@@ -423,6 +423,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .dashboard-row-reverse {
+        flex-direction: column-reverse;
+    }
     .page-header-card { padding: 20px; }
     .page-title { font-size: 1.5rem; }
     .table-header { flex-direction: column; align-items: flex-start; gap: 12px; }

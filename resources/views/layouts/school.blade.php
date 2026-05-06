@@ -12,7 +12,8 @@
     @else
         <link rel="icon" type="image/png" href="{{ asset('default-favicon.png') }}">
     @endif
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>
         @hasSection('title')
             @yield('title') | {{ $currentSchool->name ?? 'EduCorexa' }}
@@ -39,40 +40,65 @@
 
     @include('layouts._css')
     <style>
+        :root {
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --table-header: #6571ff;
+            --card-border: #e0e7ff;
+            --text-muted: #64748b;
+            --text-main: #1f2937;
+        }
+
+        body.dark-mode {
+            --bg-color: #060c18;
+            --card-bg: #0c1427;
+            --text-color: #ced4da;
+            --table-header: #6571ff;
+            --card-border: #1a253b;
+            --text-muted: #8b949e;
+            --text-main: #ced4da;
+        }
+
+        /* এখন সরাসরি ভেরিয়েবল ব্যবহার করুন */
+        body {
+            background-color: var(--bg-color) !important;
+            color: var(--text-color) !important;
+        }
         /* ১. সাইডবার ক্যাটাগরি/টাইটেল কালার (যেমন: MAIN, SCHOOL MANAGEMENT) */
         body.dark-mode .sidebar .sidebar-body .nav .nav-category {
-            color: #8b949e !important; /* হালকা ধূসর রঙ যাতে ডার্ক ব্যাকগ্রাউন্ডে ফুটে ওঠে */
+            color: var(--text-muted) !important;
             margin-top: 15px;
         }
 
         /* ২. সার্চ বক্স ব্যাকগ্রাউন্ড এবং টেক্সট কালার */
         body.dark-mode .navbar .navbar-content .search-form .input-group .form-control {
-            background-color: #1a253b !important; /* সাইডবারের চেয়ে সামান্য হালকা ডার্ক */
-            color: #ffffff !important;
-            border: 1px solid #2d3a54 !important;
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
+            border: 1px solid var(--card-border) !important;
         }
 
         /* ৩. সার্চ বক্সের আইকন কন্টেইনার */
         body.dark-mode .navbar .navbar-content .search-form .input-group .input-group-text {
-            background-color: #1a253b !important;
-            border: 1px solid #2d3a54 !important;
-            color: #8b949e !important;
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            color: var(--text-muted) !important;
         }
 
         /* ৪. প্লেসহোল্ডার টেক্সট কালার (Search here...) */
         body.dark-mode .form-control::placeholder {
-            color: #8b949e !important;
+            color: var(--text-muted) !important;
             opacity: 0.8;
         }
 
         /* ৫. সাইডবার লোগো/ব্র্যান্ড এরিয়া (Demo লেখাটি) */
         body.dark-mode .sidebar .sidebar-header .sidebar-brand {
-            color: #ffffff !important;
+            color: var(--text-main) !important;
         }
         
         /* ৬. সাইডবার মেনু আইকন কালার */
         body.dark-mode .sidebar .sidebar-body .nav .nav-item .nav-link i {
-            color: #ced4da !important;
+            color: var(--text-muted) !important;
         }
         /* প্রফেশনাল থিম সুইচ */
         .theme-switch {
@@ -195,7 +221,42 @@
             color: #4f46e5 !important;
             background: #eef2ff !important;
         }
-
+        .input-group{
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            box-shadow: none !important;
+            border-radius:30px;
+            overflow:hidden;
+        }
+        .input-group:hover {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+        }
+        .input-group .form-control {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            font-size: 0.875rem !important;
+            padding: 10px 0 !important;
+        }
+        .input-group-text {
+            background: transparent !important;
+            border: none !important;
+            color: var(--text-color) !important;
+            padding: 0 12px !important;
+        }
+        .form-control:focus{
+            background: transparent !important;
+            border: none !important;
+            color: var(--text-color) !important;
+            box-shadow: none !important;
+        }
+        .edu-user-name{
+            color: var(--text-main) !important;
+        }
+        .edu-user-role{
+            color: var(--text-muted) !important;
+        }
         /* Ensure page-wrapper doesn't overlap */
         @media (min-width: 992px) {
             .page-wrapper {
@@ -249,6 +310,13 @@
 
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeSwitcher = document.getElementById('theme-switcher');
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                if(themeSwitcher) themeSwitcher.checked = true;
+            }
+        });
         // থিম টগল করার মেইন স্ক্রিপ্ট
         function toggleTheme() {
             const body = document.body;
