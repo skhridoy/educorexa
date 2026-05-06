@@ -15,7 +15,7 @@
     <ul class="edu-bc">
         <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
         <li><span>/</span></li>
-        <li><a href="{{ route('manage.schools.index') }}">Schools</a></li>
+        <li><a href="{{ route('manage.schools.all') }}">Schools</a></li>
         <li><span>/</span></li>
         <li class="active">Add New School</li>
     </ul>
