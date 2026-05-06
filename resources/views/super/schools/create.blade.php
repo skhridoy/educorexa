@@ -96,7 +96,7 @@
             </div>
 
             <div class="col-12 d-flex justify-content-end gap-2">
-                <a href="{{ route('manage.schools.index') }}" class="btn-edu btn-edu-light" style="padding:12px 30px;">Cancel</a>
+                <a href="{{ route('manage.schools.all') }}" class="btn-edu btn-edu-light" style="padding:12px 30px;">Cancel</a>
                 <button type="submit" class="btn-edu btn-edu-primary" style="padding:12px 40px;">
                     <i data-feather="check-circle" style="width:16px; margin-right:5px;"></i> Create School Platform
                 </button>
