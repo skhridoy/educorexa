@@ -105,6 +105,27 @@
                     </div>
                 </div>
 
+                <!-- Social Links -->
+                <div class="edu-section-label">Social Media Links</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="edu-label">Facebook URL</label>
+                        <input type="url" name="facebook_url" class="form-control edu-input" value="{{ $setting->facebook_url ?? '' }}" placeholder="https://www.facebook.com/yourpage">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="edu-label">Twitter URL</label>
+                        <input type="url" name="twitter_url" class="form-control edu-input" value="{{ $setting->twitter_url ?? '' }}" placeholder="https://www.twitter.com/yourprofile">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="edu-label">LinkedIn URL</label>
+                        <input type="url" name="linkedin_url" class="form-control edu-input" value="{{ $setting->linkedin_url ?? '' }}" placeholder="https://www.linkedin.com/yourprofile">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="edu-label">Instagram URL</label>
+                        <input type="url" name="instagram_url" class="form-control edu-input" value="{{ $setting->instagram_url ?? '' }}" placeholder="https://www.instagram.com/yourprofile">
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <label class="edu-label">Footer Text / Copyright Notice</label>
                     <textarea name="footer_text" class="form-control edu-input" rows="2">{{ $setting->footer_text ?? '' }}</textarea>

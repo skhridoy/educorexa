@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="google-site-verification" content="eoLqsNruvR1AE3AKJLgPKIemPNHHjhwn8OLrGHyvQyk" />
     <meta name="description" content="{{ $setting->meta_description ?? 'EduCorexa - The Most Reliable ERP Software for Schools' }}">
     <meta name="keywords" content="{{ $setting->meta_keywords ?? 'School ERP, Education Management Software, Smart School Solution' }}">
     <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">

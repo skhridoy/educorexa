@@ -23,6 +23,10 @@ class SettingController extends Controller
         $setting->phone = $request->phone;
         $setting->address = $request->address;
         $setting->footer_text = $request->footer_text;
+        $setting->facebook_url = $request->facebook_url;
+        $setting->twitter_url = $request->twitter_url;
+        $setting->linkedin_url = $request->linkedin_url;
+        $setting->instagram_url = $request->instagram_url;
 
         // --- নতুন SEO ডাটা আপডেট ---
         $setting->meta_title = $request->meta_title;

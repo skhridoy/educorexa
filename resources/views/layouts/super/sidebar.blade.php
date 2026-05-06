@@ -91,7 +91,7 @@
             @endcan
 
             {{-- SYSTEM --}}
-            @if($isSuperAdmin || $user->can('settings.manage'))
+            @if($isSuperAdmin || $user->can('contact.messages.view'))
 
                 @if($isSuperAdmin && $user->can('super.roles.manage'))
                 <li class="edu-nav-item">
@@ -112,16 +112,6 @@
                     </div>
                 </li>
                 @endif
-
-                @can('settings.manage')
-                <li class="edu-nav-item">
-                    <a href="{{ route('settings.edit') }}"
-                       class="edu-nav-link {{ Request::is('settings*') ? 'active' : '' }}">
-                        <i data-feather="settings"></i>
-                        <span>System Settings</span>
-                    </a>
-                </li>
-                @endcan
 
                 @if($isSuperAdmin)
                 <li class="edu-nav-item">
@@ -177,6 +167,17 @@
                     </ul>
                 </div>
             </li>
+
+            @endcan
+            
+            @can('settings.manage')
+                <li class="edu-nav-item">
+                    <a href="{{ route('settings.edit') }}"
+                       class="edu-nav-link {{ Request::is('settings*') ? 'active' : '' }}">
+                        <i data-feather="settings"></i>
+                        <span>System Settings</span>
+                    </a>
+                </li>
             @endcan
 
             {{-- USER --}}

@@ -1,144 +1,124 @@
-<footer class="footer-section pt-5 pb-4" style="background-color: #0b1324; color: #adb5bd;">
-    <div class="container px-lg-5">
-        <div class="row g-4 pb-5">
+<!-- Footer Start -->
+<div class="container-fluid bg-navy text-white footer wow fadeIn" data-wow-delay="0.1s">
+    <div class="container py-5 px-lg-5">
+        <div class="row g-5">
             <div class="col-md-6 col-lg-3">
-                <div class="mb-4">
-                    <h3 class="text-white fw-bolder mb-0" style="letter-spacing: -1px;">EduCorexa</h3>
+                <div class="site-logo mb-3">
+                    @if($setting && $setting->logo_wide)
+                        <img src="{{$setting->logo_wide }}" alt="Site Logo" style="max-width: 150px; max-height: 50px; object-fit: contain;">
+                    @else
+                        <div style="width:150px; height:50px; background:#f8fafc; display:flex; align-items:center; justify-content:center; border-radius:8px;">
+                            <span style="color:#cbd5e1;">No Logo</span>
+                        </div>
+                    @endif
                 </div>
-                <p class="small lh-lg mb-4" style="color: #8a94ad;">
-                    আমাদের লক্ষ্য শিক্ষা প্রতিষ্ঠানগুলোকে আধুনিক প্রযুক্তির মাধ্যমে আরও গতিশীল এবং স্মার্ট করে তোলা। একটি সমন্বিত ইআরপি সমাধান যা আপনার কাজকে করবে সহজ।
-                </p>
-                <div class="d-flex gap-2">
-                    <a href="#" class="social-icon-btn"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="social-icon-btn"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" class="social-icon-btn"><i class="bi bi-linkedin"></i></a>
+                <p class="small mb-4">{{ $setting->description ?? 'No description available.' }}</p>
+            </div>
+
+            {{-- Contact Section --}}
+            <div class="col-md-6 col-lg-3">
+                <h5 class="text-white mb-4">Contact Us</h5>
+                <p class="small mb-2"><i class="fa fa-map-marker-alt me-3 text-gold"></i>{{ $setting->address ?? 'Address not set' }}</p>
+                <p class="small mb-2"><i class="fa fa-phone-alt me-3 text-gold"></i>{{ $setting->phone ?? 'Phone not set' }}</p>
+                <p class="small mb-4"><i class="fa fa-envelope me-3 text-gold"></i>{{ $setting->email ?? 'Email not set' }}</p>
+                
+                <div class="d-flex pt-2">
+                    @if($setting->twitter_url)
+                        <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                    @endif
+                    @if($setting->facebook_url)
+                        <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    @endif
+                    @if($setting->instagram_url)
+                        <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                    @endif
+                    @if($setting->linkedin_url)
+                        <a class="btn btn-outline-light btn-sm-square rounded-circle" href="{{ $setting->linkedin_url }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    @endif
                 </div>
             </div>
 
+            {{-- Quick Links --}}
             <div class="col-md-6 col-lg-3">
-                <h6 class="footer-title mb-4">Contact Info</h6>
-                <ul class="list-unstyled">
-                    <li class="mb-3 d-flex align-items-center small">
-                        <i class="bi bi-geo-alt-fill text-primary me-3 fs-5"></i>
-                        <span>Dhaka, Bangladesh</span>
-                    </li>
-                    <li class="mb-3 d-flex align-items-center small">
-                        <i class="bi bi-telephone-fill text-primary me-3 fs-5"></i>
-                        <span>+880123456789</span>
-                    </li>
-                    <li class="mb-3 d-flex align-items-center small">
-                        <i class="bi bi-envelope-at-fill text-primary me-3 fs-5"></i>
-                        <span>support@educorexa.com</span>
-                    </li>
-                </ul>
+                <h5 class="text-white mb-4">Quick Links</h5>
+                <a class="btn btn-link text-white-50 small mb-2" href="#">About Us</a>
+                <a class="btn btn-link text-white-50 small mb-2" href="#notice">Notice Board</a>
+                <a class="btn btn-link text-white-50 small mb-2" href="#">Online Admission</a>
+                <a class="btn btn-link text-white-50 small mb-2" href="#contact">Contact Us</a>
             </div>
 
-            <div class="col-md-6 col-lg-3">
-                <h6 class="footer-title mb-4">Quick Links</h6>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#features" class="footer-link">Our Modules</a></li>
-                    <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
-                    <li class="mb-2"><a href="#" class="footer-link">Terms & Conditions</a></li>
-                    <li class="mb-2"><a href="{{ route('login.form') }}" class="footer-link">Admin Login</a></li>
-                </ul>
-            </div>
+            
 
+            {{-- Newsletter --}}
             <div class="col-md-6 col-lg-3">
-                <h6 class="footer-title mb-4">Newsletter</h6>
-                <p class="small mb-3" style="color: #8a94ad;">নতুন আপডেট পেতে সাবস্ক্রাইব করুন।</p>
-                <form class="newsletter-form">
-                    <div class="input-group">
-                        <input type="email" class="form-control" placeholder="Email Address">
-                        <button class="btn btn-primary" type="button">
-                            <i class="bi bi-send-fill"></i>
+                <h5 class="text-white mb-4">Newsletter</h5>
+                <p class="small mb-4">{{ $setting->newsletter_text ?? 'Stay updated with our latest news and events.' }}</p>
+                <form action="#" method="POST">
+                    @csrf
+                    <div class="position-relative w-100">
+                        <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" 
+                            type="email" name="email" placeholder="Your Email" 
+                            style="height: 48px;" required>
+                        <button type="submit" class="btn shadow-none position-absolute top-0 end-0 mt-1 me-2">
+                            <i class="fa fa-paper-plane text-navy fs-5"></i>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <div class="pt-4 border-top border-secondary border-opacity-25">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0 small" style="color: #8a94ad;">
-                        &copy; 2026 <span class="text-white fw-bold">EduCorexa</span>. All Rights Reserved.
-                    </p>
-                </div>
-                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
-                    <p class="mb-0 small" style="color: #8a94ad;">
-                        Developed with <span class="text-danger">❤</span> by <a href="#" class="text-primary text-decoration-none fw-bold">Kajol Ray</a>
-                    </p>
+    </div>
+    
+    {{-- Copyright Section --}}
+    <div class="container px-lg-5">
+        <div class="copyright border-top border-secondary py-4">
+            <div class="row">
+                <div class="col-md-12 text-center small">
+                    &copy; {{ date('Y') }} <a class="text-gold fw-bold" href="#">{{ $setting->site_name ?? $setting->name }}</a>. All Rights Reserved. 
+                    <span class="ms-2 opacity-50">Powered by {{ $site_setting->site_name ?? config('app.name') }}</span>
                 </div>
             </div>
         </div>
     </div>
-</footer>
+</div>
+<!-- Footer End -->
 
 <style>
-    /* টাইটেল স্টাইল */
-    .footer-title {
-        color: #ffffff;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
-        position: relative;
-        padding-left: 15px;
-    }
-    .footer-title::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 3px;
-        height: 15px;
-        background-color: #6571ff;
-        border-radius: 2px;
+    .container-fluid{
+        background: linear-gradient(135deg, #95b4ec 0%, #4f7dce 100%);
+        font-family: 'Poppins', sans-serif;
     }
 
-    /* সোশ্যাল বাটন */
-    .social-icon-btn {
-        width: 36px;
-        height: 36px;
-        background-color: rgba(255, 255, 255, 0.05);
-        color: #ffffff;
+    .site-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+    }
+    .bg-navy { background-color: #002147 !important; }
+    .text-navy { color: #002147 !important; }
+    .text-gold { color: #F9B800 !important; }
+    
+    .footer .btn.btn-link {
+        display: block;
+        margin-bottom: 5px;
+        padding: 0;
+        text-align: left;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: normal;
+        text-transform: capitalize;
+        transition: .3s;
+        text-decoration: none;
+    }
+    
+    .footer .btn.btn-link:hover {
+        color: #F9B800;
+        letter-spacing: 1px;
+        box-shadow: none;
+    }
+
+    .btn-sm-square {
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
-        transition: 0.3s ease;
-        text-decoration: none;
-    }
-    .social-icon-btn:hover {
-        background-color: #6571ff;
-        color: #ffffff;
-        transform: translateY(-3px);
-    }
-
-    /* লিংক স্টাইল */
-    .footer-link {
-        color: #8a94ad;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: 0.3s;
-    }
-    .footer-link:hover {
-        color: #6571ff;
-        padding-left: 5px;
-    }
-
-    /* নিউজলেটার ইনপুট */
-    .newsletter-form .form-control {
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-        font-size: 0.85rem;
-        padding: 10px 15px;
-    }
-    .newsletter-form .form-control:focus {
-        box-shadow: none;
-        border-color: #6571ff;
-        background-color: rgba(255, 255, 255, 0.08);
     }
 </style>
