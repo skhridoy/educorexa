@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\School;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\Tags\Url;
 use App\Http\Controllers\{
     HomeController, SchoolRegisterController, SchoolWebsiteController,
     AuthController, DashboardController, AcademicYearController,
@@ -28,24 +26,10 @@ use App\Http\Controllers\SuperAdmin\{
 // Site Map 
 Route::get('/sitemap.xml', function () {
 
-    $sitemap = Sitemap::create();
+    $schools = School::all();
 
-    $sitemap->add(
-        Url::create('/')
-    );
-
-    School::all()->each(function ($school) use ($sitemap) {
-
-        $sitemap->add(
-            Url::create("https://{$school->slug}." . config('app.main_domain'))
-        );
-    });
-
-    return response(
-        $sitemap->render(),
-        200,
-        ['Content-Type' => 'application/xml']
-    );
+    return response()->view('sitemap', compact('schools'))
+        ->header('Content-Type', 'application/xml');
 });
 /*
 |--------------------------------------------------------------------------
