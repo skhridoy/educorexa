@@ -101,6 +101,15 @@ class TeacherController extends Controller
             $attendanceStats[] = round($percentage, 2);
         }
 
+        // ৭. সাপ্তাহিক ক্লাস রুটিন (শিক্ষকের নিজের জন্য)
+        $routines = Routine::where('school_id', $schoolId)
+            ->where('teacher_id', auth()->id())
+            ->with(['class', 'section', 'subject'])
+            ->orderBy(DB::raw("FIELD(day, 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')"))
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy('day');
+
         return view('school.teacher.dashboard', compact(
             'totalStudents',
             'pendingDiaries',
@@ -110,6 +119,7 @@ class TeacherController extends Controller
             'todayCollected',
             'myTotalCollected',
             'recentCollections',
+            'routines'
         ));
     }
     public function index()

@@ -22,9 +22,10 @@ class RoutineController extends Controller
         
         $routines = Routine::where('school_id', $schoolId)
             ->with(['class', 'section', 'subject', 'teacher'])
-            ->orderBy('day')
+            ->orderBy(DB::raw("FIELD(day, 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')"))
             ->orderBy('start_time')
-            ->get();
+            ->get()
+            ->groupBy('day');
 
         return view('school.routine.index', compact('routines', 'classes', 'sections'));
     }

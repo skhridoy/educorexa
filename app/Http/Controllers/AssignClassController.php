@@ -108,14 +108,21 @@ class AssignClassController extends Controller
         $schoolId = auth()->user()->school_id;
         $classes = Classes::where('school_id', $schoolId)->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
+        
         $assignments = AssignClass::with(['class','subject'])
                     ->where('school_id', $schoolId)
-                    ->orderBy('id', 'desc')->paginate(6);
+                    ->orderBy('id', 'desc')
+                    ->paginate(5)
+                    ->withQueryString();
+                    
+        if (request()->ajax()) {
+            return view('school.subject.partials.assign-table', compact('assignments'))->render();
+        }
+
         $assignment = AssignClass::where('id', $assignment)
                             ->where('school_id', $schoolId)
                             ->firstOrFail();
 
-        
         return view('school.subject.assign-edit', compact('assignment', 'classes', 'subjects', 'assignments'));
     }
 

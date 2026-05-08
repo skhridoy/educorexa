@@ -2,13 +2,6 @@
 
 @section('customCSS')
     @include('school.others._modern_design_styles')
-    <style>
-        .pagination {
-            --bs-pagination-border-radius: 50% !important;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -235,15 +228,26 @@
             if (!url) {
                 url = "{{ route('subjects.assign', ['tenant' => auth()->user()?->school?->slug]) }}";
             }
-            const query = $('#filterClassId').serialize();
-            if (query) {
-                url += '?' + query;
+            
+            const classId = $('#filterClassId').val();
+            const newUrl = new URL(url, window.location.origin);
+            
+            if (classId) {
+                newUrl.searchParams.set('class_id', classId);
             }
+            
             $.ajax({
-                url: url,
+                url: newUrl.toString(),
                 type: 'GET',
                 success: function(data) {
                     $('#assignTable').html(data);
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Unable to load assignments.',
+                    });
                 }
             });
         }

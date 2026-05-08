@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\School;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 use App\Http\Controllers\{
     HomeController, SchoolRegisterController, SchoolWebsiteController,
     AuthController, DashboardController, AcademicYearController,
@@ -22,6 +25,24 @@ use App\Http\Controllers\SuperAdmin\{
     SubscriptionPackageController, TestimonialController, EventController
 };
 
+// Site Map 
+Route::get('/generate-sitemap', function () {
+
+    $sitemap = Sitemap::create();
+
+    $sitemap->add(Url::create('/'));
+
+    School::all()->each(function ($school) use ($sitemap) {
+
+        $sitemap->add(
+            Url::create("/school/{$school->slug}")
+        );
+    });
+
+    $sitemap->writeToFile(public_path('sitemap.xml'));
+
+    return 'done';
+});
 /*
 |--------------------------------------------------------------------------
 | Main Domain Routes

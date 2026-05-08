@@ -64,6 +64,16 @@ class StudentController extends Controller
 
         $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
 
+        // ৪. সাপ্তাহিক ক্লাস রুটিন (স্টুডেন্টের নিজ ক্লাসের জন্য)
+        $routines = \App\Models\Routine::where('school_id', $user->school_id)
+            ->where('class_id', $student->class_id)
+            ->where('section_id', $student->section_id)
+            ->with(['subject', 'teacher'])
+            ->orderBy(DB::raw("FIELD(day, 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')"))
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy('day');
+
         return view('school.student.dashboard', compact(
             'student', 
             'diaries', 
@@ -71,7 +81,8 @@ class StudentController extends Controller
             'totalDue', 
             'attendancePercentage',
             'presentDays',
-            'totalDays'
+            'totalDays',
+            'routines'
         ));
     }
     public function index(Request $request)

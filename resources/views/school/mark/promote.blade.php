@@ -1,34 +1,105 @@
 @extends($layout)
 
+@section('customCSS')
+    @include('school.others._modern_design_styles')
+    <style>
+        .promotion-warning {
+            background: linear-gradient(45deg, #fffbeb 0%, #fff7ed 100%);
+            border-left: 5px solid #ef4444;
+            border-right: 1px solid #fde68a;
+            border-top: 1px solid #fde68a;
+            border-bottom: 1px solid #fde68a;
+            color: #991b1b;
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .promotion-warning::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: #ef4444;
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .warning-icon-box {
+            width: 45px;
+            height: 45px;
+            background: #fef2f2;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 1px solid #fee2e2;
+        }
+        .warning-text strong {
+            color: #b91c1c;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 1.1rem;
+        }
+    </style>
+@endsection
+
 @section('content')
 <div class="page-content">
-    <div class="row">
-        <div class="col-md-12 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline mb-4">
-                        <h4 class="card-title mb-0">Student Promotion (শিক্ষার্থী উত্তীর্ণকরণ)</h4>
+    <div class="container-fluid">
+        {{-- Page Header --}}
+        <div class="page-header-card mb-4">
+            <div class="page-header-content">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="header-icon-box" style="background: #fefce8; color: #a16207;">
+                        <i class="fa-solid fa-graduation-cap"></i>
                     </div>
-
-                    {{-- সাকসেস বা এরর মেসেজ দেখানোর জন্য --}}
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong>অভিনন্দন!</strong> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>দুঃখিত!</strong> {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <div class="alert alert-fill-warning mb-4">
-                        <i data-feather="alert-triangle" class="icon-md me-2"></i>
-                        <strong>সাবধান:</strong> প্রমোশন বাটনে ক্লিক করলে শিক্ষার্থীদের ক্লাস, নতুন আইডি এবং মেধাক্রম অনুযায়ী রোল নম্বর নতুন সেশনের জন্য আপডেট হয়ে যাবে। এবং পূর্বের রেকর্ড <strong>Student Sessions</strong> টেবিলে সংরক্ষিত হবে।
+                    <div>
+                        <h1 class="page-title">Student Promotion</h1>
+                        <p class="page-subtitle">শিক্ষার্থী উত্তীর্ণকরণ প্রক্রিয়া</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-body p-4">
+                {{-- সাকসেস বা এরর মেসেজ দেখানোর জন্য --}}
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                        <strong><i class="fa-solid fa-circle-check me-2"></i>অভিনন্দন!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                        <strong><i class="fa-solid fa-circle-xmark me-2"></i>দুঃখিত!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <div class="promotion-warning mb-4">
+                    <div class="warning-icon-box">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="warning-text">
+                        <strong>সাবধান / Caution:</strong> 
+                        প্রমোশন বাটনে ক্লিক করলে শিক্ষার্থীদের ক্লাস, নতুন আইডি এবং মেধাক্রম অনুযায়ী রোল নম্বর নতুন সেশনের জন্য আপডেট হয়ে যাবে। এবং পূর্বের রেকর্ড <strong>Student Sessions</strong> টেবিলে সংরক্ষিত হবে।
+                    </div>
+                </div>
                     
                     <form action="{{ route('students.promote', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
@@ -100,5 +171,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

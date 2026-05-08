@@ -101,8 +101,8 @@
                                     <td data-label="Name" style="font-weight: 600;">{{ $exam->name }}</td>
                                     <td data-label="Year">{{ $exam->year?->name ?? 'N/A' }}</td>
                                     <td data-label="Category">{{ $exam->category?->name ?? 'N/A' }}</td>
-                                    <td data-label="Start Date">{{ $exam->start_date ? $exam->start_date->format('d M, Y') : 'N/A' }}</td>
-                                    <td data-label="End Date">{{ $exam->end_date ? $exam->end_date->format('d M, Y') : 'N/A' }}</td>
+                                    <td data-label="Start Date">{{ $exam->start_date ? \Carbon\Carbon::parse($exam->start_date)->format('d M, Y') : 'N/A' }}</td>
+                                    <td data-label="End Date">{{ $exam->end_date ? \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') : 'N/A' }}</td>
                                     <td data-label="Actions" class="text-center">
                                         <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="Edit" data-bs-toggle="modal" data-bs-target="#editExamModal" onclick="loadEditForm({{ $exam->id }})">
                                             <i class="fa-regular fa-pen-to-square"></i>
