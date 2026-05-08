@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="eoLqsNruvR1AE3AKJLgPKIemPNHHjhwn8OLrGHyvQyk" />
     <meta name="description" content="{{ $setting->meta_description ?? 'EduCorexa - The Most Reliable ERP Software for Schools' }}">
     <meta name="keywords" content="{{ $setting->meta_keywords ?? 'School ERP, Education Management Software, Smart School Solution' }}">
     <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">
     <link rel="icon" type="image/x-icon" href="{{ asset($setting->favicon ?? 'frontend/img/favicon.ico') }}">
-    
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     {{-- টাইটেল সেকশন, যদি $setting না থাকে তবে ডিফল্ট নাম দেখাবে --}}    
     {{-- $setting ভেরিয়েবল না থাকলে ডিফল্ট নাম দেখাবে --}}
     <title>@yield('title', $setting->site_name ?? 'EduCorexa') - @yield('subtitle', $setting->meta_title ?? 'EduCorexa')</title>
