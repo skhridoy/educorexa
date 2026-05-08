@@ -26,22 +26,26 @@ use App\Http\Controllers\SuperAdmin\{
 };
 
 // Site Map 
-Route::get('/generate-sitemap', function () {
+Route::get('/sitemap.xml', function () {
 
     $sitemap = Sitemap::create();
 
-    $sitemap->add(Url::create('/'));
+    $sitemap->add(
+        Url::create('/')
+    );
 
     School::all()->each(function ($school) use ($sitemap) {
 
         $sitemap->add(
-            Url::create("/school/{$school->slug}")
+            Url::create("https://{$school->slug}." . config('app.main_domain'))
         );
     });
 
-    $sitemap->writeToFile(public_path('sitemap.xml'));
-
-    return 'done';
+    return response(
+        $sitemap->render(),
+        200,
+        ['Content-Type' => 'application/xml']
+    );
 });
 /*
 |--------------------------------------------------------------------------
