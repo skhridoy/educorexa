@@ -1,19 +1,57 @@
 @extends('layouts.school')
 
+@section('customCSS')
+    @include('school.others._modern_design_styles')
+    <style>
+        .class-fee-input {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-weight: 600;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+        .class-fee-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+        .fee-setup-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .fee-setup-item:last-child { border-bottom: none; }
+    </style>
+@endsection
+
 @section('content')
 <div class="page-content">
-    <div class="row">
+    {{-- Modern Header --}}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">Fee Structures</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Setup Fee Amounts</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row g-4">
         {{-- Fee Setup Form --}}
         <div class="col-md-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h6 class="card-title text-primary fw-bold">Set Category-wise Fee Amount</h6>
-                    <hr>
+            <div class="schools-panel h-100">
+                <div class="panel-header">
+                    <h6 class="panel-title mb-0">Define Category-wise Fees</h6>
+                </div>
+                <div class="p-4">
                     <form action="{{ route('fee-amounts.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Select Fee Head</label>
-                            <select name="fee_head_id" class="form-select border-primary" required>
+                            <label class="form-label fw-600">Select Fee Head</label>
+                            <select name="fee_head_id" class="form-select" required>
                                 <option value="" disabled selected>Choose a Fee Head...</option>
                                 @foreach($feeHeads as $head)
                                     <option value="{{ $head->id }}">{{ $head->name }}</option>
@@ -23,8 +61,8 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Category</label>
-                                <select id="setup_category_id" name="school_category_id" class="form-select border-info" required>
+                                <label class="form-label fw-600">Category</label>
+                                <select id="setup_category_id" name="school_category_id" class="form-select" required>
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -32,31 +70,39 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Sub-Category</label>
+                                <label class="form-label fw-600">Sub-Category</label>
                                 <select id="setup_sub_category_id" name="school_sub_category_id" class="form-select">
                                     <option value="">None/All</option>
                                 </select>
                             </div>
                         </div>
 
-                        <h6 class="mb-3 text-muted fw-bold">Enter Amounts for Classes:</h6>
-                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                            <table class="table table-bordered align-middle">
-                                <thead class="bg-light sticky-top">
-                                    <tr>
-                                        <th>Class Name</th>
-                                        <th width="150">Amount (৳)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="class_amount_body">
-                                    <tr>
-                                        <td colspan="2" class="text-center text-muted">প্রথমে ক্যাটেগরি সিলেক্ট করুন</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 text-muted small fw-bold">Class-wise Amounts:</h6>
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3 w-100 shadow-sm fw-bold">
-                            <i class="fa-solid fa-save me-1"></i> Save Fee Structure
+                        <div class="border rounded bg-light overflow-hidden">
+                            <div class="table-responsive" style="max-height: 350px;">
+                                <table class="table table-sm table-borderless align-middle mb-0">
+                                    <thead class="bg-white border-bottom sticky-top">
+                                        <tr>
+                                            <th class="ps-3 py-2">Class Name</th>
+                                            <th class="pe-3 py-2 text-end" width="140">Amount (৳)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="class_amount_body" class="bg-white">
+                                        <tr>
+                                            <td colspan="2" class="text-center py-5 text-muted small italic">
+                                                <i class="fa-solid fa-layer-group d-block mb-2 opacity-50"></i>
+                                                প্রথমে ক্যাটেগরি সিলেক্ট করুন
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-4 w-100 py-2 fw-bold">
+                            <i class="fa-solid fa-save me-2"></i> Save Fee Structure
                         </button>
                     </form>
                 </div>
@@ -65,61 +111,72 @@
 
         {{-- Existing Setup List --}}
         <div class="col-md-7">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold text-secondary">Current Fee Structures</h6>
-                    <hr>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fee Head</th>
-                                    <th>Category/Class</th>
-                                    <th class="text-end">Amount</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($feeAmounts as $setup)
-                                <tr>
-                                    <td><span class="badge bg-soft-primary text-primary">{{ $setup->feeHead->name }}</span></td>
-                                    <td>
-                                        <small class="d-block fw-bold text-dark">{{ $setup->category->name ?? 'N/A' }} | {{ $setup->subCategory->name ?? '' }}</small>
-                                        <small class="text-muted">{{ $setup->class->name ?? 'N/A' }}</small>
-                                    </td>
-                                    <td class="text-end fw-bold text-primary">৳ {{ number_format($setup->amount, 2) }}</td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-1">
-                                            {{-- Edit Button --}}
-                                            <button type="button" class="btn btn-sm btn-outline-info" 
-                                                onclick="editFee('{{ $setup->id }}', '{{ $setup->amount }}', '{{ $setup->feeHead->name }}')">
-                                                <i class="fa-solid fa-pen-to-square"></i>
-                                            </button>
-
-                                            {{-- Delete Form --}}
-                                            <form action="{{ route('fee-amounts.destroy', ['tenant' => auth()->user()->school->slug, 'fee_amount' => $setup->id]) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(this)">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">No fee setup found yet.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-4 d-flex justify-content-center">
-                        {{ $feeAmounts->links() }}
+            <div class="schools-panel h-100">
+                <div class="panel-header d-flex justify-content-between align-items-center">
+                    <h6 class="panel-title mb-0">Current Fee Configurations</h6>
+                    <div class="search-box">
+                        {{-- Optional search can go here --}}
                     </div>
                 </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Fee Head</th>
+                                <th>Category / Target</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($feeAmounts as $setup)
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="badge bg-soft-primary text-primary px-2">{{ $setup->feeHead->name }}</div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark" style="font-size:0.85rem;">{{ $setup->category->name ?? 'N/A' }}</div>
+                                    @if($setup->subCategory)
+                                        <div class="text-muted small">{{ $setup->subCategory->name }}</div>
+                                    @endif
+                                    <div class="text-indigo small fw-600 mt-1">{{ $setup->class->name ?? 'All Classes' }}</div>
+                                </td>
+                                <td class="text-end fw-bold text-dark">৳ {{ number_format($setup->amount, 2) }}</td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <button type="button" class="btn btn-sm btn-icon btn-soft-info" 
+                                            onclick="editFee('{{ $setup->id }}', '{{ $setup->amount }}', '{{ $setup->feeHead->name }}')"
+                                            title="Quick Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <form action="{{ route('fee-amounts.destroy', ['tenant' => auth()->user()->school->slug, 'fee_amount' => $setup->id]) }}" 
+                                              method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-icon btn-soft-danger" onclick="confirmDelete(this)" title="Delete">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-receipt fa-2x mb-2 opacity-25"></i>
+                                    <p class="mb-0">No fee setup found yet.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($feeAmounts->hasPages())
+                <div class="p-3 border-top d-flex justify-content-center">
+                    {{ $feeAmounts->links('pagination::bootstrap-4') }}
+                </div>
+                @endif
             </div>
         </div>
     </div>

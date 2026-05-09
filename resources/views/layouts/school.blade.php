@@ -290,7 +290,7 @@
 
 	<!-- Plugin js for this page -->
 	<script src="{{ asset('../assets/vendors/flatpickr/flatpickr.min.js') }}"></script>
-	<script src="{{ asset('../assets/vendors/apexcharts/apexcharts.min.js') }}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<!-- End plugin js for this page -->
 
 	<!-- inject:js -->

@@ -4,10 +4,10 @@
         <div class="flex items-center gap-6 md:gap-12">
             <a class="text-xl md:text-2xl font-black text-indigo-600 tracking-tighter" href="{{ url('/') }}">{{ config('app.name', 'SchoolERP') }}</a>
             <div class="hidden md:flex gap-8 items-center">
-                <a class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1 transition-all duration-300" href="#features">ফিচার</a>
-                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300" href="#why-us">কেন আমরা</a>
-                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300" href="#pricing">মূল্য</a>
-                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300" href="#contact">যোগাযোগ</a>
+                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.features') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.features') }}">ফিচার</a>
+                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.why-us') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.why-us') }}">কেন আমরা</a>
+                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.pricing') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.pricing') }}">মূল্য</a>
+                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.contact') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.contact') }}">যোগাযোগ</a>
             </div>
         </div>
         <div class="flex items-center gap-2 md:gap-4">

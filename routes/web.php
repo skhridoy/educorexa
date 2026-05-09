@@ -40,6 +40,11 @@ Route::domain(config('app.main_domain'))->group(function () {
 
     // --- Public Routes ---
     Route::get('/', [HomeController::class, 'index'])->name('main.home');
+    Route::get('/features', [HomeController::class, 'features'])->name('main.features');
+    Route::get('/why-us', [HomeController::class, 'whyUs'])->name('main.why-us');
+    Route::get('/pricing', [HomeController::class, 'pricing'])->name('main.pricing');
+    Route::get('/contact', [HomeController::class, 'contact'])->name('main.contact');
+    
     Route::get('/about-details', function () {return view('frontend.page.about_details'); })->name('about.details');
     Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');

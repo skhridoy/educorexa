@@ -1,20 +1,57 @@
 @extends('layouts.school')
 
+@section('customCSS')
+    @include('school.others._modern_design_styles')
+    <style>
+        .gen-stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+        .gen-stat-card:hover { transform: translateY(-3px); }
+        .gen-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+    </style>
+@endsection
+
 @section('content')
 <div class="page-content">
-    <div class="row">
+    {{-- Modern Header --}}
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">Fee Generation</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Generate Bills</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row g-4">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 text-primary"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Generate Monthly/One-time Fees</h4>
-                    
+            <div class="schools-panel">
+                <div class="panel-header">
+                    <h6 class="panel-title mb-0">Generate Monthly / One-time Fees</h6>
+                </div>
+                <div class="p-4">
                     <form action="{{ route('student-fees.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="row g-3 align-items-end">
                             {{-- Fee Head Selection --}}
                             <div class="col-md-3">
-                                <label class="form-label font-weight-bold">Select Fee Head</label>
-                                <select name="fee_head_id" class="form-select border-primary" required>
+                                <label class="form-label fw-600">Select Fee Head</label>
+                                <select name="fee_head_id" class="form-select" required>
                                     <option value="" disabled selected>-- Choose Fee --</option>
                                     @foreach($feeHeads as $head)
                                         <option value="{{ $head->id }}">{{ $head->name }}</option>
@@ -22,10 +59,10 @@
                                 </select>
                             </div>
 
-                            {{-- School Category Filter (নতুন যুক্ত হয়েছে) --}}
+                            {{-- School Category Filter --}}
                             <div class="col-md-2">
-                                <label class="form-label font-weight-bold">Category</label>
-                                <select name="school_category_id" id="school_category_id" class="form-select border-info">
+                                <label class="form-label fw-600">Category</label>
+                                <select name="school_category_id" id="school_category_id" class="form-select">
                                     <option value="">All Categories</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -33,19 +70,18 @@
                                 </select>
                             </div>
 
-                            {{-- Sub-Category Filter (নতুন যুক্ত হয়েছে - যেমন বিজ্ঞান/মানবিক) --}}
+                            {{-- Sub-Category Filter --}}
                             <div class="col-md-2">
-                                <label class="form-label font-weight-bold">Sub-Category</label>
+                                <label class="form-label fw-600">Sub-Category</label>
                                 <select name="school_sub_category_id" id="school_sub_category_id" class="form-select">
                                     <option value="">None/All</option>
-                                    {{-- Ajax দিয়ে এখানে ডাটা আসবে --}}
                                 </select>
                             </div>
 
                             {{-- Month Selection --}}
                             <div class="col-md-2">
-                                <label class="form-label font-weight-bold">Select Month</label>
-                                <select name="month" class="form-select border-primary" required>
+                                <label class="form-label fw-600">Select Month</label>
+                                <select name="month" class="form-select" required>
                                     <option value="" disabled selected>-- Choose Month --</option>
                                     @php
                                         for ($i = -3; $i < 9; $i++) {
@@ -57,77 +93,99 @@
                             </div>
 
                             <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm">
-                                    <i class="fa-solid fa-bolt me-1"></i> Generate Bills Now
+                                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                                    <i class="fa-solid fa-bolt me-2"></i> Generate Bills Now
                                 </button>
                             </div>
                         </div>
-                        <small class="text-muted mt-2 d-block">নোট: টিউশন ফি সবার জন্য হলে ক্যাটেগরি খালি রাখুন। পরীক্ষার ফি হলে ক্যাটেগরি সিলেক্ট করুন।</small>
+                        <div class="mt-3 p-2 bg-light rounded-3 small text-muted">
+                            <i class="fa-solid fa-circle-info me-1 text-primary"></i> 
+                            নোট: টিউশন ফি সবার জন্য হলে ক্যাটেগরি খালি রাখুন। পরীক্ষার ফি হলে ক্যাটেগরি সিলেক্ট করুন।
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
         {{-- History Table --}}
-        <div class="col-md-12 mt-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Generations History</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fee Name</th>
-                                    <th>Month</th>
-                                    <th>Total Students</th>
-                                    <th>Total Expected Amount</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($recentGenerations as $gen)
-                                <tr>
-                                    <td class="fw-bold">{{ $gen->feeHead->name }}</td>
-                                    <td><span class="badge bg-soft-info text-info p-2">{{ $gen->month }}</span></td>
-                                    <td>{{ $gen->total_students }}</td>
-                                    <td class="text-success fw-bold">৳ {{ number_format($gen->total_amount, 2) }}</td>
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-primary view-students-btn" 
+        <div class="col-md-12 mt-2">
+            <div class="schools-panel">
+                <div class="panel-header d-flex justify-content-between align-items-center">
+                    <h6 class="panel-title mb-0">Recent Bill Generation History</h6>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Fee Name</th>
+                                <th>Month</th>
+                                <th>Total Students</th>
+                                <th>Expected Collection</th>
+                                <th class="text-center pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentGenerations as $gen)
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ $gen->feeHead->name }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info px-3">{{ $gen->month }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-600">{{ $gen->total_students }} <span class="text-muted fw-normal small">Students</span></div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-success">৳ {{ number_format($gen->total_amount, 2) }}</div>
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn-icon-custom btn-action-view view-students-btn"
                                             data-fee-id="{{ $gen->fee_head_id }}" 
-                                            data-month="{{ $gen->month }}">
+                                            data-month="{{ $gen->month }}" title="View List">
                                             <i class="fa-regular fa-eye"></i>
                                         </button>
                                         
-                                        <form class="m-0" action="{{ route('student-fees.destroy', ['tenant' => auth()->user()->school->slug, 'student_fee' => $gen->id]) }}" method="POST" style="display:inline;">
+                                        <form action="{{ route('student-fees.destroy', ['tenant' => auth()->user()->school->slug, 'student_fee' => $gen->id]) }}" 
+                                              method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(this)">
+                                            <button type="button" class="btn-icon-custom btn-action-delete" onclick="confirmDelete(this)" title="Delete Generation">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    No generation history found.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Ajax fee list -->
+        {{-- Modern Modal --}}
         <div class="modal fade" id="studentFeeModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">শিক্ষার্থীর ফি তালিকা (<span id="modalFeeTitle"></span>)</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                    <div class="modal-header bg-dark p-4">
+                        <h5 class="modal-title text-white fw-bold" style="font-family:'Outfit', sans-serif;">
+                            <i class="fa-solid fa-users-viewfinder me-2"></i> Bill Detail: <span id="modalFeeTitle" class="text-warning"></span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <div class="row mb-4">
+                    <div class="modal-body p-4">
+                        <div class="row mb-4 align-items-center">
                             <div class="col-md-4">
-                                <label class="form-label font-weight-bold">Filter by Class</label>
-                                <select id="modalClassFilter" class="form-select border-primary">
+                                <label class="form-label fw-bold small text-uppercase text-muted">Filter by Class</label>
+                                <select id="modalClassFilter" class="form-select">
                                     <option value="">All Classes</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}">{{ $class->name }}</option>
@@ -136,13 +194,13 @@
                             </div>
                         </div>
 
-                        <div id="modalTableLoader" class="text-center d-none">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p>ডাটা লোড হচ্ছে...</p>
+                        <div id="modalTableLoader" class="text-center py-5 d-none">
+                            <div class="spinner-grow text-primary mb-2" role="status"></div>
+                            <p class="text-muted">Loading student list...</p>
                         </div>
 
-                        <div id="studentListArea" class="table-responsive">
-                            <p class="text-muted text-center">ভিউ বাটনে ক্লিক করুন।</p>
+                        <div id="studentListArea">
+                            {{-- AJAX Content --}}
                         </div>
                     </div>
                 </div>

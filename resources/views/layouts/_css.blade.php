@@ -16,3 +16,14 @@
     <!-- Stitch Design System -->
     <link rel="stylesheet" href="{{ asset('css/stitch-design.css') }}">
 	
+	<style>
+		/* Font fallback for Bengali using SutonnyOMJ */
+		body, p, span, div, a, li, td, th, label, input, button {
+			font-family: 'Inter', 'SutonnyOMJ', sans-serif !important;
+		}
+		
+		h1, h2, h3, h4, h5, h6, 
+		.edu-page-title, .edu-panel-ttl, .page-title, .table-title {
+			font-family: 'Outfit', 'SutonnyOMJ', sans-serif !important;
+		}
+	</style>

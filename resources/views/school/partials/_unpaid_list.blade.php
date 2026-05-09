@@ -20,7 +20,7 @@
                 <td>{{ $invoice->student->class->name ?? '-' }}</td>
                 <td>
                     <span class="text-danger fw-bolder">
-                        ৳ {{ number_format($invoice->amount - $invoice->paid_amount) }}
+                        ৳ {{ number_format($invoice->amount) }}
                     </span>
                 </td>
                 <td class="text-center">

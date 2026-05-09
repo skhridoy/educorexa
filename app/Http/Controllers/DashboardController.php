@@ -50,19 +50,18 @@ class DashboardController extends Controller
         $data['presentCount'] = $todayAttendance->present ?? 0;
         $data['absentCount'] = $todayAttendance->absent ?? 0;
 
-        // ৪. রিসেন্ট অ্যাটেনডেন্স লগ (টেবিলের জন্য)
+        // ৪. রিসেন্ট অ্যাটেনডেন্স লগ (পেইজিনেটেড)
         $data['attendanceLogs'] = Attendance::with(['teacher', 'class', 'section'])
             ->where('school_id', $schoolId)
             ->whereDate('date', today())
             ->select('teacher_id', 'class_id', 'section_id', DB::raw('MAX(created_at) as last_marked'))
             ->groupBy('teacher_id', 'class_id', 'section_id')
             ->latest('last_marked')
-            ->take(5)
-            ->get();
+            ->paginate(10, ['*'], 'attendance_page');
 
-        // ৫. সাপ্তাহিক উপস্থিতির রিয়েল ডাটা ক্যালকুলেশন
-        $startOfWeek = now()->startOfWeek(Carbon::SATURDAY);
-        $endOfWeek = now()->endOfWeek(Carbon::FRIDAY);
+        // ৫. সাপ্তাহিক উপস্থিতির রিয়েল ডাটা ক্যালকুলেশন (Rolling 7 days)
+        $startOfWeek = now()->subDays(6)->startOfDay();
+        $endOfWeek = now()->endOfDay();
 
         // ডাটাবেস থেকে একবারে সপ্তাহের সব ডাটা আনা (পারফরম্যান্সের জন্য ভালো)
         $weeklyAttendanceRaw = Attendance::where('school_id', $schoolId)
@@ -78,7 +77,12 @@ class DashboardController extends Controller
             ->keyBy('day_name');
 
         // ৬. গ্রাফের জন্য ৭ দিনের অ্যারে ম্যাপ করা
-        $weekDays = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        $weekDays = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $weekDays[] = now()->subDays($i)->format('D');
+        }
+        
+        $data['weekDays'] = $weekDays;
         $data['weeklyStats'] = [];
 
         foreach ($weekDays as $day) {
@@ -89,6 +93,45 @@ class DashboardController extends Controller
             } else {
                 $data['weeklyStats'][$day] = 0;
             }
+        }
+        // ৭. রিসেন্ট পেমেন্ট লগ
+        $data['recentPayments'] = StudentFee::with(['student.class', 'feeHead'])
+            ->where('school_id', $schoolId)
+            ->where('status', 'paid')
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
+
+        // ৮. শ্রেণি ভিত্তিক কালেকশন (বর্তমান মাস)
+        $data['classWiseCollection'] = DB::table('student_fees')
+            ->join('students', 'student_fees.student_id', '=', 'students.id')
+            ->join('classes', 'students.class_id', '=', 'classes.id')
+            ->where('student_fees.school_id', $schoolId)
+            ->where('student_fees.status', 'paid')
+            ->where('student_fees.month', $currentMonth)
+            ->select('classes.name', DB::raw('SUM(student_fees.amount) as total_collected'))
+            ->groupBy('classes.name')
+            ->get();
+
+        // ৯. মাসিক কালেকশন গ্রাফ ডাটা (শেষ ৬ মাস)
+        $lastSixMonths = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $lastSixMonths[] = now()->subMonths($i)->format('F-Y');
+        }
+        
+        $data['monthlyStats'] = DB::table('student_fees')
+            ->where('school_id', $schoolId)
+            ->where('status', 'paid')
+            ->whereIn('month', $lastSixMonths)
+            ->select('month', DB::raw('SUM(amount) as total'))
+            ->groupBy('month')
+            ->get()
+            ->keyBy('month');
+            
+        $data['lastSixMonths'] = $lastSixMonths;
+        $data['monthlyChartData'] = [];
+        foreach($lastSixMonths as $m) {
+            $data['monthlyChartData'][] = isset($data['monthlyStats'][$m]) ? (float)$data['monthlyStats'][$m]->total : 0;
         }
 
         return view('school.admin.dashboard', $data);

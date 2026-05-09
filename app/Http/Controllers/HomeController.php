@@ -20,4 +20,25 @@ class HomeController extends Controller
         // ভিউ ফাইলে ডাটা পাস করা
         return view('frontend.home', compact('sections', 'packages', 'testimonials'));
     }
+
+    public function features()
+    {
+        return view('frontend.page.features');
+    }
+
+    public function whyUs()
+    {
+        return view('frontend.page.why_us');
+    }
+
+    public function pricing()
+    {
+        $packages = SubscriptionPackage::where('is_active', true)->get();
+        return view('frontend.page.pricing', compact('packages'));
+    }
+
+    public function contact()
+    {
+        return view('frontend.page.contact');
+    }
 }

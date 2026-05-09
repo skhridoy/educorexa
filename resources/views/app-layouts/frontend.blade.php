@@ -91,12 +91,13 @@
                 "unit": "8px"
             },
             "fontFamily": {
-                "label-sm": ["Inter"],
-                "headline-lg": ["Manrope"],
-                "headline-md": ["Manrope"],
-                "body-lg": ["Inter"],
-                "display-xl": ["Manrope"],
-                "body-md": ["Inter"]
+                "label-sm": ["Inter", "SutonnyOMJ", "sans-serif"],
+                "headline-lg": ["Manrope", "SutonnyOMJ", "sans-serif"],
+                "headline-md": ["Manrope", "SutonnyOMJ", "sans-serif"],
+                "body-lg": ["Inter", "SutonnyOMJ", "sans-serif"],
+                "display-xl": ["Manrope", "SutonnyOMJ", "sans-serif"],
+                "body-md": ["Inter", "SutonnyOMJ", "sans-serif"],
+                "sans": ["Inter", "SutonnyOMJ", "sans-serif"]
             },
             "fontSize": {
                 "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
@@ -111,7 +112,16 @@
       }
     </script>
 <style>
+        /* Font fallback for Bengali using SutonnyOMJ */
+        body, p, span:not(.material-symbols-outlined), div, a, li, td, th, label, input, button {
+            font-family: 'Inter', 'SutonnyOMJ', sans-serif !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Manrope', 'SutonnyOMJ', sans-serif !important;
+        }
+        
         .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
