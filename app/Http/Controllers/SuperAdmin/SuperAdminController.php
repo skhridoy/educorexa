@@ -115,7 +115,7 @@ class SuperAdminController extends Controller
         $school->save();
 
         return redirect()
-            ->route('super.schools.all')
+            ->route('manage.schools.all')
             ->with('error', 'School rejected & subdomain deactivated!');
     }
 
@@ -123,7 +123,7 @@ class SuperAdminController extends Controller
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');
         $schools = School::where('status', 'rejected')->get();
-        return view('super.schools.reject', compact('schools', 'mainDomain'));
+        return view('manage.schools.reject', compact('schools', 'mainDomain'));
     }
 
     public function destroy(School $school)
@@ -140,7 +140,7 @@ class SuperAdminController extends Controller
     public function createSchool()
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');
-        return view('super.schools.create', compact('mainDomain'));
+        return view('manage.schools.create', compact('mainDomain'));
     }
 
     public function schoolStore(Request $request)
