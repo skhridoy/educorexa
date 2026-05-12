@@ -76,7 +76,7 @@
                                     </form>
                                 @else
                                     <form action="{{ route('manage.schools.approve', $school->id) }}" method="POST">
-                                        @csrf @method('PUT')
+                                        @csrf
                                         <button type="submit" class="act-btn succ" title="Approve">
                                             <i data-feather="check-circle" style="width:15px;height:15px;"></i>
                                         </button>
