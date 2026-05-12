@@ -20,19 +20,27 @@ class ProfileController extends Controller
         $tenantSlug = $tenant;
 
         // ভ্যালিডেশন
-        $request->validate([
+        $validationRules = [
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:15',
-            'designation' => 'nullable|string|max:255', // টিচারদের জন্য
+            'designation' => 'nullable|string|max:255',
             'facebook' => 'nullable|url',
             'twitter' => 'nullable|url',
             'linkedin' => 'nullable|url',
             'instagram' => 'nullable|url',
-        ]);
+        ];
+
+        // সকল ইউজার ইমেইল পরিবর্তন করতে পারবে
+        $validationRules['email'] = 'required|email|unique:users,email,' . $user->id;
+
+        $request->validate($validationRules);
 
         // ১. ইউজার টেবিল আপডেট
         $user->name = $request->name;
         $user->phone = $request->phone;
+
+        // সকল রোলের জন্য ইমেইল আপডেট
+        $user->email = $request->email;
 
         // ২. রোল অনুযায়ী রিলেটেড টেবিল আপডেট
         if ($user->role == 'school_admin') {
@@ -42,15 +50,17 @@ class ProfileController extends Controller
             $user->insta = $request->instagram;
         } 
         elseif ($user->role == 'teacher' && $user->teacher) {
-            // ইউজার টেবিলের নাম টিচার টেবিলেও আপডেট হবে
+            // ইউজার টেবিলের নাম ও ইমেইল টিচার টেবিলেও আপডেট হবে
+            // (কারণ Teacher রিলেশন email কলাম দিয়ে যুক্ত)
             $user->teacher->update([
-                'name' => $request->name,
-                'phone' => $request->phone,
+                'name'        => $request->name,
+                'email'       => $request->email,
+                'phone'       => $request->phone,
                 'designation' => $request->designation,
-                'facebook' => $request->facebook,
-                'twitter' => $request->twitter,
-                'linkedin' => $request->linkedin,
-                'insta' => $request->instagram,
+                'facebook'    => $request->facebook,
+                'twitter'     => $request->twitter,
+                'linkedin'    => $request->linkedin,
+                'insta'       => $request->instagram,
             ]);
         } 
         elseif ($user->role == 'student' && $user->student) {
