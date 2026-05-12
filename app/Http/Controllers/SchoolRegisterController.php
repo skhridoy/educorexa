@@ -65,7 +65,7 @@ class SchoolRegisterController extends Controller
             $details = [
                 'message' => "New School Registered: {$newSchool->name}",
                 'icon'    => 'home',
-                'link'    => route('super.schools.pending'),
+                'link'    => route('manage.schools.pending'),
             ];
             $superAdmin->notify(new SuperAdminNotification($details));
         } catch (\Exception $e) {
