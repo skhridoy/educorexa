@@ -11,6 +11,27 @@
                     <p class="text-muted">স্কুল ম্যানেজমেন্ট সিস্টেম শুরু করতে নিচের তথ্যগুলো দিয়ে ফর্মটি পূরণ করুন।</p>
                 </div>
 
+                <!-- সাকসেস মেসেজ দেখানোর জন্য -->
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <!-- ভ্যালিডেশন এরর মেসেজ দেখানোর জন্য -->
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                
                 <div class="row g-0 shadow-sm border rounded-4 overflow-hidden bg-white">
                     <div class="col-lg-4 bg-light p-4 p-md-5 border-end d-none d-lg-block">
                         <h6 class="fw-bold text-primary mb-4 text-uppercase ls-1">Why EduCorexa?</h6>
