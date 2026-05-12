@@ -49,7 +49,10 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
-    Route::get('/forgot-password', fn() => "Password reset feature coming soon!")->name('password.request');
+    Route::get('/forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'resetPassword'])->name('password.update');
 
     // --- Unified Auth Routes ---
     Route::controller(AuthController::class)->group(function () {
@@ -91,7 +94,7 @@ Route::domain(config('app.main_domain'))->group(function () {
             });
 
             Route::middleware(['permission:school.approve'])->group(function () {
-                Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approveSchool'])->name('schools.approve');
+                Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approve'])->name('schools.approve');
             });
 
             Route::middleware(['permission:contact.messages.view'])->group(function () {
@@ -151,10 +154,10 @@ Route::domain(config('app.main_domain'))->group(function () {
 |--------------------------------------------------------------------------
 */
 // School Routes
-    Route::domain('{tenant}.' . config('app.main_domain'))
-        ->middleware(['identify.school'])
-        ->scopeBindings()
-        ->group(function () {
+Route::domain('{tenant}.' . config('app.main_domain'))
+    ->middleware(['identify.school'])
+    ->scopeBindings()
+    ->group(function () {
 
             Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
             Route::get('/about-us', [SchoolWebsiteController::class, 'about'])->name('school.about');
@@ -164,6 +167,14 @@ Route::domain(config('app.main_domain'))->group(function () {
                 ->name('school.login.form');
 
             Route::post('/login', [AuthController::class, 'login'])->name('school.login');
+
+            // Password Reset Routes
+            Route::get('/forgot-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'showForgotPasswordForm'])->name('school.password.request');
+            Route::post('/forgot-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'sendOtp'])->name('school.password.otp');
+            Route::get('/verify-otp', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'showVerifyOtpForm'])->name('school.password.verify.form');
+            Route::post('/verify-otp', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'verifyOtp'])->name('school.password.verify');
+            Route::get('/reset-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'showResetPasswordForm'])->name('school.password.reset');
+            Route::post('/reset-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'resetPassword'])->name('school.password.update');
 
             Route::get('/admission', [AdmissionController::class, 'create'])->name('admission.create');
 
