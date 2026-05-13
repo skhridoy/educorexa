@@ -53,7 +53,7 @@ class MailServerService
                 'quota'    => $quota,
             ]);
 
-            $responseData = $response->json();
+            $responseData = $response->json() ?? [];
 
             if ($response->successful() && isset($responseData['status']) && $responseData['status'] == 1) {
                 return [
@@ -63,7 +63,7 @@ class MailServerService
                 ];
             }
 
-            $errorMessage = $responseData['errors'][0] ?? 'Unknown error from cPanel API.';
+            $errorMessage = $responseData['errors'][0] ?? 'Unknown error from cPanel API. Check your CPANEL_HOST or API credentials.';
             Log::error("cPanel Email Creation Failed: " . $errorMessage);
 
             return [
@@ -91,12 +91,13 @@ class MailServerService
             'Authorization' => "cpanel " . $this->username . ":" . $this->apiToken,
         ])->get($this->host . "/execute/DomainInfo/list_domains");
 
-        if ($response->successful() && isset($response->json()['status']) && $response->json()['status'] == 1) {
-            $domains = $response->json()['data']['main_domain'] ?? [];
-            $addonDomains = $response->json()['data']['addon_domains'] ?? [];
-            $subDomains = $response->json()['data']['sub_domains'] ?? [];
+        $responseData = $response->json() ?? [];
+        if ($response->successful() && isset($responseData['status']) && $responseData['status'] == 1) {
+            $domains = $responseData['data']['main_domain'] ?? [];
+            $addonDomains = $responseData['data']['addon_domains'] ?? [];
+            $subDomains = $responseData['data']['sub_domains'] ?? [];
             
-            $allDomains = array_merge([$response->json()['data']['main_domain'] ?? ''], $addonDomains, $subDomains);
+            $allDomains = array_merge([$responseData['data']['main_domain'] ?? ''], $addonDomains, $subDomains);
             
             if (in_array($domain, $allDomains)) {
                 return ['success' => true];
@@ -118,11 +119,12 @@ class MailServerService
                 'disallowdot'           => 1,
             ]);
 
-            if ($addResponse->successful() && isset($addResponse->json()['status']) && $addResponse->json()['status'] == 1) {
+            $addResponseData = $addResponse->json() ?? [];
+            if ($addResponse->successful() && isset($addResponseData['status']) && $addResponseData['status'] == 1) {
                 return ['success' => true, 'message' => 'Subdomain created successfully.'];
             }
             
-            $error = $addResponse->json()['errors'][0] ?? 'Failed to create subdomain.';
+            $error = $addResponseData['errors'][0] ?? 'Failed to create subdomain. Response may not be JSON.';
             Log::error("Subdomain Creation Error: " . $error);
             return ['success' => false, 'message' => "Could not prepare domain: $error"];
         }
@@ -153,9 +155,10 @@ class MailServerService
                 'domain' => $domain,
             ]);
 
+            $responseData = $response->json() ?? [];
             if ($response->successful()) {
-                $status = $response->json()['status'] ?? 0;
-                $errors = $response->json()['errors'] ?? [];
+                $status = $responseData['status'] ?? 0;
+                $errors = $responseData['errors'] ?? [];
                 
                 if ($status == 1) {
                     return ['success' => true, 'message' => 'Email account deleted successfully.'];
