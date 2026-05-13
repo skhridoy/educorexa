@@ -44,7 +44,7 @@ class MailServerService
             }
 
             // 2. cPanel UAPI: Email::add_pop
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Authorization' => "cpanel " . $this->username . ":" . $this->apiToken,
             ])->get($this->host . "/execute/Email/add_pop", [
                 'email'    => $user,
@@ -87,7 +87,7 @@ class MailServerService
     protected function ensureDomainExists($domain)
     {
         // First, check if domain already exists
-        $response = Http::withHeaders([
+        $response = Http::withoutVerifying()->withHeaders([
             'Authorization' => "cpanel " . $this->username . ":" . $this->apiToken,
         ])->get($this->host . "/execute/DomainInfo/list_domains");
 
@@ -109,7 +109,7 @@ class MailServerService
             
             Log::info("Attempting to add subdomain: $sub for domain: $this->rootDomain");
             
-            $addResponse = Http::withHeaders([
+            $addResponse = Http::withoutVerifying()->withHeaders([
                 'Authorization' => "cpanel " . $this->username . ":" . $this->apiToken,
             ])->get($this->host . "/execute/SubDomain/addsubdomain", [
                 'domain'                => $sub,
@@ -146,7 +146,7 @@ class MailServerService
         try {
             list($user, $domain) = explode('@', $email);
 
-            $response = Http::withHeaders([
+            $response = Http::withoutVerifying()->withHeaders([
                 'Authorization' => "cpanel " . $this->username . ":" . $this->apiToken,
             ])->get($this->host . "/execute/Email/delete_pop", [
                 'email'  => $user,
