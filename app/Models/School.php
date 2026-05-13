@@ -79,7 +79,11 @@ class School extends Model
         'mail_from_name',
         'whatsapp_api_provider',
         'whatsapp_api_key',
-        'whatsapp_api_instance_id'
+        'whatsapp_api_instance_id',
+        'pro_email_status',
+        'pro_email_address',
+        'pro_email_password',
+        'pro_email_prefix'
     ];
 
     // ✅ Relation: school has many students

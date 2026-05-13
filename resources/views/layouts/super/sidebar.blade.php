@@ -2,7 +2,7 @@
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
     $isFrontendMenuOpen = Request::is('manage/frontend*');
-    $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*');
+    $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*') || Request::is('manage/professional-emails*');
     $isSystemMenuOpen = Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') || Request::is('settings*');
 @endphp
 
@@ -85,6 +85,8 @@
                         <li><a href="{{ route('manage.schools.create') }}"
                                class="edu-sub-link {{ Request::is('*/schools/create') ? 'active' : '' }}">Create School</a></li>
                         @endcan
+                        <li><a href="{{ route('manage.pro-email.index') }}"
+                               class="edu-sub-link {{ Request::is('manage/professional-emails*') ? 'active' : '' }}">Email Requests</a></li>
                     </ul>
                 </div>
             </li>

@@ -103,6 +103,11 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::delete('/contact-messages/{id}', [MainContactMsgController::class, 'destroy'])->name('contact.destroy');
 
             });
+
+            // Professional Email Requests
+            Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
+            Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
+            Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
         });
 
         Route::middleware(['permission:settings.manage'])->group(function () {
@@ -225,6 +230,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     // API Setup (Email & WhatsApp)
                     Route::get('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'apiSetup'])->name('admin.school.api-setup');
                     Route::post('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'updateApiSetup'])->name('admin.school.api-setup.update');
+                    Route::post('/school-settings/pro-email-request', [App\Http\Controllers\SchoolSettingController::class, 'requestProfessionalEmail'])->name('admin.school.pro-email.request');
                 });
                 // Academic
                 Route::middleware(['auth', 'permission:academic-year.manage'])->group(function () {
@@ -438,3 +444,12 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             });
 
         });
+
+Route::get('/run-migration', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "Migration successful: " . \Illuminate\Support\Facades\Artisan::output();
+    } catch (\Exception $e) {
+        return "Migration failed: " . $e->getMessage();
+    }
+});

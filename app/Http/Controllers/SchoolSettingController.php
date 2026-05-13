@@ -37,4 +37,25 @@ class SchoolSettingController extends Controller
 
         return back()->with('success', 'API settings updated successfully!');
     }
+
+    public function requestProfessionalEmail(Request $request)
+    {
+        $schoolId = auth()->user()->school_id;
+        $school = School::findOrFail($schoolId);
+
+        if ($school->pro_email_status !== 'none' && $school->pro_email_status !== 'rejected') {
+            return back()->with('error', 'You already have a request in progress or approved.');
+        }
+
+        $request->validate([
+            'prefix' => 'required|string|alpha_num|max:20',
+        ]);
+
+        $school->update([
+            'pro_email_status' => 'pending',
+            'pro_email_prefix' => strtolower($request->prefix)
+        ]);
+
+        return back()->with('success', 'Professional email request submitted successfully! Super Admin will review it.');
+    }
 }

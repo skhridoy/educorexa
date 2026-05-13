@@ -74,8 +74,51 @@
                                     </div>
                                 </div>
 
-                                {{-- WhatsApp Settings Section --}}
+                                {{-- Professional Email Service Section --}}
                                 <div class="col-lg-5">
+                                    <div class="p-4 bg-white border border-primary-subtle rounded-4 h-100 shadow-sm">
+                                        <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">
+                                            <i class="fa-solid fa-star me-2"></i> Professional Email Service
+                                        </h5>
+                                        
+                                        @if($school->pro_email_status == 'none' || $school->pro_email_status == 'rejected')
+                                            <div class="text-center py-4">
+                                                <div class="mb-4">
+                                                    <i class="fa-solid fa-envelope-circle-check fa-4x text-primary-gradient opacity-25"></i>
+                                                </div>
+                                                <h6>Get a Professional School Email</h6>
+                                                <p class="text-muted small">Example: info@your-school.com</p>
+                                                
+                                                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#requestEmailModal">
+                                                    Request Now
+                                                </button>
+                                            </div>
+                                        @elseif($school->pro_email_status == 'pending')
+                                            <div class="text-center py-5">
+                                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                                <h6 class="fw-bold">Request Pending</h6>
+                                                <p class="text-muted small">Super Admin is reviewing your request for <strong>{{ $school->pro_email_prefix }}@...</strong></p>
+                                            </div>
+                                        @elseif($school->pro_email_status == 'approved')
+                                            <div class="bg-success-subtle p-3 rounded-3 mb-3 border border-success-subtle">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa-solid fa-circle-check text-success fs-3 me-3"></i>
+                                                    <div>
+                                                        <h6 class="mb-0 fw-bold text-success">Account Active</h6>
+                                                        <p class="mb-0 small text-success opacity-75">{{ $school->pro_email_address }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-info small border-0 shadow-sm">
+                                                <i class="fa-solid fa-lightbulb me-2"></i>
+                                                Credential details have been sent to your primary admin email ({{ $school->email }}).
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                {{-- WhatsApp Settings Section --}}
+                                <div class="col-lg-7">
                                     <div class="p-4 bg-light rounded-4 h-100">
                                         <h5 class="fw-bold mb-4 text-dark border-bottom pb-2">
                                             <i class="fa-brands fa-whatsapp me-2 text-success"></i> WhatsApp API Setup
@@ -126,6 +169,37 @@
         </div>
     </div>
 </div>
+
+<!-- Request Email Modal -->
+<div class="modal fade" id="requestEmailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Request Professional Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.school.pro-email.request') }}" method="POST">
+                @csrf
+                <div class="modal-body py-4">
+                    <p class="text-muted small mb-4">Choose a prefix for your professional email. We will create it under your school domain.</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Prefix</label>
+                        <div class="input-group">
+                            <input type="text" name="prefix" class="form-control" placeholder="e.g. info, admin, support" required>
+                            <span class="input-group-text">@ {{ $school->slug }}.{{ parse_url(config('app.url'), PHP_URL_HOST) ?? 'educorexa.com' }}</span>
+                        </div>
+                        <div class="form-text mt-2">Example: info@{{ $school->slug }}.{{ parse_url(config('app.url'), PHP_URL_HOST) ?? 'educorexa.com' }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('customJs')
@@ -142,10 +216,19 @@
     @if(session('success'))
         Swal.fire({
             icon: 'success',
-            title: 'Updated!',
+            title: 'Success!',
             text: '{{ session('success') }}',
             confirmButtonColor: '#4f46e5',
-            timer: 2500
+            timer: 3000
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#ef4444'
         });
     @endif
 </script>

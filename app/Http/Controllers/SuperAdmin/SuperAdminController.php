@@ -15,7 +15,9 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\SchoolApprovedMail;
+use App\Mail\ProfessionalEmailDetailsMail;
 use Illuminate\Support\Facades\Mail;
+use App\Services\MailServerService;
 
 class SuperAdminController extends Controller
 {
@@ -312,5 +314,58 @@ class SuperAdminController extends Controller
         $user->syncPermissions($request->permissions); // $request->permissions একটি অ্যারে হবে
 
         return back()->with('success', 'Permissions updated for ' . $user->name);
+    }
+
+    // --- Professional Email Management ---
+    public function emailRequests()
+    {
+        $requests = School::whereIn('pro_email_status', ['pending', 'approved', 'rejected'])
+                         ->orderBy('updated_at', 'desc')
+                         ->get();
+        return view('super.schools.professional_emails', compact('requests'));
+    }
+
+    public function approveEmailRequest(School $school, MailServerService $mailService)
+    {
+        if ($school->pro_email_status !== 'pending') {
+            return back()->with('error', 'Request is not in pending state.');
+        }
+
+        // 1. Prepare email address (prefix @ schoolslug.maindomain or school domain)
+        // Usually, schools have subdomains, so email will be prefix@slug.maindomain
+        $domain = $school->slug . '.' . (parse_url(config('app.url'), PHP_URL_HOST) ?? 'educorexa.com');
+        $emailAddress = ($school->pro_email_prefix ?? 'info') . '@' . $domain;
+        
+        // 2. Generate random password
+        $password = Str::random(12);
+
+        // 3. Call MailServerService to create account
+        $result = $mailService->createEmailAccount($emailAddress, $password);
+
+        if ($result['success']) {
+            // 4. Update Database
+            $school->update([
+                'pro_email_status' => 'approved',
+                'pro_email_address' => $emailAddress,
+                'pro_email_password' => $password,
+            ]);
+
+            // 5. Send Notification Mail
+            try {
+                Mail::to($school->email)->send(new ProfessionalEmailDetailsMail($school, $emailAddress, $password));
+            } catch (\Exception $e) {
+                \Log::error("Failed to send pro email credentials: " . $e->getMessage());
+            }
+
+            return back()->with('success', 'Professional email created and credentials sent to school admin.');
+        }
+
+        return back()->with('error', 'Mail Server Error: ' . $result['message']);
+    }
+
+    public function rejectEmailRequest(School $school)
+    {
+        $school->update(['pro_email_status' => 'rejected']);
+        return back()->with('success', 'Email request rejected.');
     }
 }
