@@ -11,10 +11,13 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Traits\SchoolMailConfig;
 
 class NoticeController extends Controller
 {
+    use SchoolMailConfig;
     // নোটিশের তালিকা দেখানো
     public function index($tenant)
     {
@@ -110,6 +113,7 @@ class NoticeController extends Controller
                         Mail::to($student->user->email)->send(new NoticeMail($notice, $school));
                         $successCount++;
                     } catch (\Exception $e) {
+                        Log::error("Notice Email Failed for student {$student->user->email}: " . $e->getMessage());
                         $failCount++;
                     }
                 }
@@ -151,6 +155,11 @@ class NoticeController extends Controller
                     'to' => $number,
                     'body' => $message
                 ]);
+                
+                if (!$response->successful()) {
+                    Log::error("WhatsApp API Error ({$school->whatsapp_api_provider}): " . $response->body());
+                }
+                
                 return $response->successful();
             }
             // Add other providers here if needed
@@ -161,12 +170,22 @@ class NoticeController extends Controller
 
     private function setMailConfig($school)
     {
+        $encryption = $school->mail_encryption;
+        
+        // Port 465 usually requires SSL
+        if ($school->mail_port == 465 && (empty($encryption) || $encryption == 'none')) {
+            $encryption = 'ssl';
+        }
+
         Config::set('mail.mailers.smtp.host', $school->mail_host);
         Config::set('mail.mailers.smtp.port', $school->mail_port ?? 587);
-        Config::set('mail.mailers.smtp.encryption', $school->mail_encryption ?? 'tls');
+        Config::set('mail.mailers.smtp.encryption', $encryption ?? 'tls');
         Config::set('mail.mailers.smtp.username', $school->mail_username);
         Config::set('mail.mailers.smtp.password', $school->mail_password);
         Config::set('mail.from.address', $school->mail_from_address ?? $school->email);
         Config::set('mail.from.name', $school->mail_from_name ?? $school->name);
+
+        // Purge the mailer to apply new config
+        Mail::purge('smtp');
     }
 }

@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Traits\SchoolMailConfig;
 
 class SchoolPasswordResetController extends Controller
 {
+    use SchoolMailConfig;
     /**
      * Show the forgot password form.
      */
@@ -67,6 +69,8 @@ class SchoolPasswordResetController extends Controller
                 'created_at' => Carbon::now(),
             ]
         );
+        
+        $this->setMailConfig($currentSchool);
 
         Mail::send('emails.school_otp', ['otp' => $otp, 'school' => $currentSchool], function ($message) use ($request, $currentSchool) {
             $message->to($request->email);
@@ -158,6 +162,8 @@ class SchoolPasswordResetController extends Controller
         $user->update(['password' => Hash::make($request->password)]);
 
         DB::table('password_reset_tokens')->where(['email' => $request->email])->delete();
+
+        $this->setMailConfig($school);
 
         // পাসওয়ার্ড সফলভাবে রিসেট হলে কনফার্মেশন ইমেইল পাঠাও
         Mail::send('emails.school_password_reset_success', ['user' => $user, 'school' => $school], function($message) use($user, $school) {
