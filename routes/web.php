@@ -58,7 +58,7 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::get('/login', 'mainLoginForm')->name('login.form'); 
         Route::post('/login', 'mainLogin')->name('login');        
-        Route::post('/logout', 'mainLogout')->name('logout');     
+        Route::match(['get', 'post'], '/logout', [AuthController::class, 'mainLogout'])->name('logout');     
     });
 
     // --- Dynamic Dashboard Redirector ---
@@ -217,7 +217,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 Route::get('/get-unpaid-list', [DashboardController::class, 'getUnpaidList'])->name('school.unpaid.ajax');
 
 
-                Route::post('/logout', [AuthController::class, 'logout'])->name('school.logout');
+                Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('school.logout');
                 Route::middleware(['auth', 'permission:system.settings'])->group(function () {
                     Route::get('/school-settings/school-info', [SchoolRegisterController::class, 'edit'])->name('admin.school.info-edit');
                     // আপডেট করার জন্য

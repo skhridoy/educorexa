@@ -122,8 +122,11 @@
                                     <input type="text" name="name" class="form-control" value="{{ $user->name }}" style="border-radius: 10px;">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Email Address (Read Only)</label>
-                                    <input type="email" class="form-control bg-light" value="{{ $user->email }}" readonly style="border-radius: 10px;">
+                                    <label class="form-label fw-bold small text-muted text-uppercase">Email Address</label>
+                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ $user->email }}" style="border-radius: 10px;">
+                                    @error('email')
+                                        <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold small text-muted text-uppercase">Phone Number</label>

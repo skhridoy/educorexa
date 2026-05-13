@@ -17,6 +17,11 @@
     --card-bg: #ffffff; 
 }
 
+/* Fix: Prevent sticky elements from overlapping sidebar */
+.sticky-top {
+    z-index: 10 !important;
+}
+
 
 body {
     background-color: var(--page-bg) !important;
