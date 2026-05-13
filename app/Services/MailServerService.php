@@ -153,13 +153,30 @@ class MailServerService
                 'domain' => $domain,
             ]);
 
-            if ($response->successful() && isset($response->json()['status']) && $response->json()['status'] == 1) {
-                return ['success' => true, 'message' => 'Email account deleted successfully.'];
+            if ($response->successful()) {
+                $status = $response->json()['status'] ?? 0;
+                $errors = $response->json()['errors'] ?? [];
+                
+                if ($status == 1) {
+                    return ['success' => true, 'message' => 'Email account deleted successfully.'];
+                }
+
+                $errorMsg = $errors[0] ?? 'Unknown error from cPanel API.';
+                
+                // If the email account doesn't exist, treat the deletion as successful
+                if (str_contains($errorMsg, 'You do not have an email account named')) {
+                    return ['success' => true, 'message' => 'Email account was already deleted or did not exist.'];
+                }
+
+                return [
+                    'success' => false,
+                    'message' => $errorMsg,
+                ];
             }
 
             return [
                 'success' => false,
-                'message' => $response->json()['errors'][0] ?? 'Unknown error from cPanel API.',
+                'message' => 'Invalid response from cPanel API.',
             ];
 
         } catch (\Exception $e) {
