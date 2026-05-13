@@ -101,13 +101,13 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::get('/contact-messages', [MainContactMsgController::class, 'index'])->name('contact.index');
                 Route::get('/contact-messages/{id}', [MainContactMsgController::class, 'show'])->name('contact.show');
                 Route::delete('/contact-messages/{id}', [MainContactMsgController::class, 'destroy'])->name('contact.destroy');
-
             });
 
             // Professional Email Requests
             Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
             Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
             Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
+            Route::delete('/professional-emails/{school}/delete', [SuperAdminController::class, 'deleteEmailRequest'])->name('pro-email.delete');
         });
 
         Route::middleware(['permission:settings.manage'])->group(function () {
@@ -380,7 +380,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::delete('holidays/{id}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
                 });
                 Route::middleware('permission:attendance.manage')->group(function () {
-                    Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
+                    // Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
                     Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('student.attendance.report');
                     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendances.index');
                     Route::post('/attendance-save', [AttendanceController::class, 'store'])->name('attendances.store');
@@ -391,12 +391,12 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
 
                 Route::middleware('permission:fee.manage')->group(function () {
-                    Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories'); 
+                    // Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories'); 
                     Route::get('/get-classes-by-category', [FeeAmountController::class, 'getClassesByCategory'])->name('get-classes-by-category');
                     Route::resource('fee-amounts', FeeAmountController::class);
                 });
                 Route::middleware('permission:fee.manage')->group(function () {
-                    Route::get('/get-sub-categories/{categoryId}', [StudentFeeController::class, 'getSubCategories'])->name('get-sub-categories');
+                    // Route::get('/get-sub-categories/{categoryId}', [StudentFeeController::class, 'getSubCategories'])->name('get-sub-categories');
                     Route::get('student-fees/get-list', [StudentFeeController::class, 'getStudentList'])->name('student-fees.get-list');
                     Route::resource('student-fees', StudentFeeController::class);
                 });
@@ -447,8 +447,28 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
 Route::get('/run-migration', function () {
     try {
+        // 1. Run Standard Migrations
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "Migration successful: " . \Illuminate\Support\Facades\Artisan::output();
+        $output = \Illuminate\Support\Facades\Artisan::output();
+
+        // 2. Manually ensure professional email columns exist (Force Fix for XAMPP issues)
+        if (\Illuminate\Support\Facades\Schema::hasTable('schools')) {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('schools', 'pro_email_status')) {
+                \Illuminate\Support\Facades\Schema::table('schools', function ($table) {
+                    $table->enum('pro_email_status', ['none', 'pending', 'approved', 'rejected'])->default('none')->after('email');
+                    $table->string('pro_email_address')->nullable()->after('pro_email_status');
+                    $table->string('pro_email_password')->nullable()->after('pro_email_address');
+                    $table->string('pro_email_prefix')->nullable()->after('pro_email_password');
+                });
+                $output .= "\n[SUCCESS] Manually added professional email columns to 'schools' table.";
+            } else {
+                $output .= "\n[INFO] Professional email columns already exist.";
+            }
+        } else {
+            $output .= "\n[ERROR] 'schools' table not found. Please run full migration.";
+        }
+
+        return "<div style='padding:20px; font-family:monospace; background:#f4f4f4; border:1px solid #ddd;'><h3>Migration System Status</h3><pre>" . $output . "</pre><a href='/manage/professional-emails' style='color:blue;'>Go to Email Management</a></div>";
     } catch (\Exception $e) {
         return "Migration failed: " . $e->getMessage();
     }

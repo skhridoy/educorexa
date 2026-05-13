@@ -328,18 +328,19 @@ class SuperAdminController extends Controller
     public function approveEmailRequest(School $school, MailServerService $mailService)
     {
         if ($school->pro_email_status !== 'pending') {
-            return back()->with('error', 'Request is not in pending state.');
+            return back()->with('error', 'এই অনুরোধটি বর্তমানে পেন্ডিং অবস্থায় নেই।');
         }
 
-        // 1. Prepare email address (prefix @ schoolslug.maindomain or school domain)
-        // Usually, schools have subdomains, so email will be prefix@slug.maindomain
-        $domain = $school->slug . '.' . (parse_url(config('app.url'), PHP_URL_HOST) ?? 'educorexa.com');
+        // 1. Prepare email address
+        $rootDomain = config('services.cpanel.root_domain', 'educorexa.com');
+        $domain = $school->slug . '.' . $rootDomain;
         $emailAddress = ($school->pro_email_prefix ?? 'info') . '@' . $domain;
         
-        // 2. Generate random password
-        $password = Str::random(12);
+        // 2. Generate secure random password
+        $password = Str::random(12) . rand(10, 99) . '!'; // Added complexity
 
         // 3. Call MailServerService to create account
+        \Log::info("Attempting to create professional email for school: " . $school->name . " ($emailAddress)");
         $result = $mailService->createEmailAccount($emailAddress, $password);
 
         if ($result['success']) {
@@ -354,18 +355,43 @@ class SuperAdminController extends Controller
             try {
                 Mail::to($school->email)->send(new ProfessionalEmailDetailsMail($school, $emailAddress, $password));
             } catch (\Exception $e) {
-                \Log::error("Failed to send pro email credentials: " . $e->getMessage());
+                \Log::error("Failed to send pro email credentials to " . $school->email . ": " . $e->getMessage());
             }
 
-            return back()->with('success', 'Professional email created and credentials sent to school admin.');
+            return back()->with('success', 'প্রফেশনাল ইমেইল তৈরি হয়েছে এবং স্কুলের এডমিনকে তথ্য পাঠানো হয়েছে। Email: ' . $emailAddress);
         }
 
-        return back()->with('error', 'Mail Server Error: ' . $result['message']);
+        return back()->with('error', 'সার্ভার ত্রুটি: ' . $result['message']);
     }
 
     public function rejectEmailRequest(School $school)
     {
         $school->update(['pro_email_status' => 'rejected']);
         return back()->with('success', 'Email request rejected.');
+    }
+
+    public function deleteEmailRequest(School $school, MailServerService $mailService)
+    {
+        if ($school->pro_email_status !== 'approved') {
+            return back()->with('error', 'Only approved emails can be deleted.');
+        }
+
+        // 1. Delete from server
+        if ($school->pro_email_address) {
+            $result = $mailService->deleteEmailAccount($school->pro_email_address);
+            if (!$result['success']) {
+                return back()->with('error', 'Mail Server Error: ' . $result['message']);
+            }
+        }
+
+        // 2. Update Database
+        $school->update([
+            'pro_email_status' => 'none',
+            'pro_email_address' => null,
+            'pro_email_password' => null,
+            'pro_email_prefix' => null,
+        ]);
+
+        return back()->with('success', 'Professional email account deleted and revoked.');
     }
 }

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'cpanel' => [
+        'host' => env('CPANEL_HOST'),
+        'username' => env('CPANEL_USERNAME'),
+        'api_token' => env('CPANEL_API_TOKEN'),
+        'root_domain' => env('CPANEL_ROOT_DOMAIN', 'educorexa.com'),
+    ],
+
 ];
