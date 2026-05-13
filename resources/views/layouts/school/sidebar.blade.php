@@ -237,6 +237,12 @@
                     <span>General Settings</span>
                 </a>
             </li>
+            <li class="edu-nav-item">
+                <a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-nav-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">
+                    <i data-feather="mail"></i>
+                    <span>Professional Accounts</span>
+                </a>
+            </li>
             @endif
 
             @if($user->hasRole('school_admin'))

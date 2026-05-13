@@ -56,7 +56,8 @@
                                         <th>তারিখ</th>
                                         <th>শিরোনাম</th>
                                         <th>ফাইল</th>
-                                        <th width="120">অ্যাকশন</th>
+                                        <th>ডিস্ট্রিবিউশন</th>
+                                        <th width="100">অ্যাকশন</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,22 +75,45 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{-- এডিট বাটন --}}
-                                                <a href="{{ route('notices.edit', ['tenant' => auth()->user()->school->slug, 'notice' => $notice->id]) }}"
-                                                   class="btn btn-sm btn-warning badge">
-                                                    <i class="fa-regular fa-pen-to-square"></i>
-                                                </a>
+                                                <div class="btn-group gap-1">
+                                                    {{-- ইমেইল পাঠানোর বাটন --}}
+                                                    <form action="{{ route('notices.send', ['tenant' => auth()->user()->school->slug, 'id' => $notice->id]) }}" method="POST" class="send-form">
+                                                        @csrf
+                                                        <input type="hidden" name="method_type" value="email">
+                                                        <button type="button" onclick="confirmSend(this, 'Email')" class="btn btn-sm btn-outline-primary" style="padding: 2px 8px;" title="Send via Email">
+                                                            <i class="fa-solid fa-envelope"></i>
+                                                        </button>
+                                                    </form>
+                                                    
+                                                    {{-- হোয়াটসঅ্যাপ পাঠানোর বাটন --}}
+                                                    <form action="{{ route('notices.send', ['tenant' => auth()->user()->school->slug, 'id' => $notice->id]) }}" method="POST" class="send-form">
+                                                        @csrf
+                                                        <input type="hidden" name="method_type" value="whatsapp">
+                                                        <button type="button" onclick="confirmSend(this, 'WhatsApp')" class="btn btn-sm btn-outline-success" style="padding: 2px 8px;" title="Send via WhatsApp">
+                                                            <i class="fa-brands fa-whatsapp"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    {{-- এডিট বাটন --}}
+                                                    <a href="{{ route('notices.edit', ['tenant' => auth()->user()->school->slug, 'notice' => $notice->id]) }}"
+                                                       class="btn btn-sm btn-warning badge">
+                                                        <i class="fa-regular fa-pen-to-square"></i>
+                                                    </a>
 
-                                                {{-- ডিলিট বাটন --}}
-                                                <form action="{{ route('notices.destroy', ['tenant' => auth()->user()->school->slug, 'notice' => $notice->id]) }}"
-                                                      method="POST" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" onclick="confirmDelete(this)"
-                                                            class="btn btn-sm btn-danger badge">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                    {{-- ডিলিট বাটন --}}
+                                                    <form action="{{ route('notices.destroy', ['tenant' => auth()->user()->school->slug, 'notice' => $notice->id]) }}"
+                                                          method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" onclick="confirmDelete(this)"
+                                                                class="btn btn-sm btn-danger badge">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -118,19 +142,44 @@
 
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Submit the form
                     button.closest('form').submit();
-
                 }
             })
         }
+
+        function confirmSend(button, type) {
+            Swal.fire({
+                title: 'পিক করুন!',
+                text: "আপনি কি সকল শিক্ষার্থীর " + type + " এ এই নোটিশটি পাঠাতে চান?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: type === 'Email' ? '#4f46e5' : '#25d366',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'হ্যাঁ, পাঠান',
+                cancelButtonText: 'না, থাক'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show Loading
+                    Swal.fire({
+                        title: 'পাঠানো হচ্ছে...',
+                        html: 'অনুগ্রহ করে অপেক্ষা করুন।',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    });
+                    button.closest('form').submit();
+                }
+            })
+        }
+
         @if(session('success'))
+            Swal.close(); // Close any loading alert
             Swal.fire({
                 icon: '{{ session('type', 'success') }}',
-                title: 'Success!',
+                title: 'সফল!',
                 text: '{{ session('success') }}',
-                timer: 1500,
-                showConfirmButton: false
+                confirmButtonText: 'ঠিক আছে'
             });
         @endif
     </script>

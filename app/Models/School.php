@@ -68,7 +68,18 @@ class School extends Model
         'email',
         'phone',
         'favicon',
-        'logo'
+        'logo',
+        'mail_mailer',
+        'mail_host',
+        'mail_port',
+        'mail_username',
+        'mail_password',
+        'mail_encryption',
+        'mail_from_address',
+        'mail_from_name',
+        'whatsapp_api_provider',
+        'whatsapp_api_key',
+        'whatsapp_api_instance_id'
     ];
 
     // ✅ Relation: school has many students

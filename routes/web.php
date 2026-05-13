@@ -220,8 +220,11 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('school.logout');
                 Route::middleware(['auth', 'permission:system.settings'])->group(function () {
                     Route::get('/school-settings/school-info', [SchoolRegisterController::class, 'edit'])->name('admin.school.info-edit');
-                    // আপডেট করার জন্য
                     Route::post('/school-settings/info-update', [SchoolRegisterController::class, 'update'])->name('admin.school.info-update');
+                    
+                    // API Setup (Email & WhatsApp)
+                    Route::get('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'apiSetup'])->name('admin.school.api-setup');
+                    Route::post('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'updateApiSetup'])->name('admin.school.api-setup.update');
                 });
                 // Academic
                 Route::middleware(['auth', 'permission:academic-year.manage'])->group(function () {
@@ -261,8 +264,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
                 // Notice CRUD
                 Route::middleware('permission:notice.manage')->group(function () {
-
                     Route::resource('notices', NoticeController::class);
+                    Route::post('notices/{id}/send', [NoticeController::class, 'sendToStudents'])->name('notices.send');
                 });
 
                 // Sections
