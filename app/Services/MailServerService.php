@@ -167,7 +167,7 @@ class MailServerService
                 $errorMsg = $errors[0] ?? 'Unknown error from cPanel API.';
                 
                 // If the email account doesn't exist, treat the deletion as successful
-                if (str_contains($errorMsg, 'You do not have an email account named')) {
+                if (str_contains($errorMsg, 'You do not have an email account named') || str_contains($errorMsg, 'You do not have a user named')) {
                     return ['success' => true, 'message' => 'Email account was already deleted or did not exist.'];
                 }
 
