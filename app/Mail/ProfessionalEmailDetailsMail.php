@@ -45,6 +45,12 @@ class ProfessionalEmailDetailsMail extends Mailable
     public function build()
     {
         return $this->subject('Professional Email Account Created - ' . $this->school->name)
-                    ->view('emails.professional_email_details');
+                    ->view('emails.professional_email_details')
+                    ->with([
+                        'school' => $this->school,
+                        'emailAddress' => $this->emailAddress,
+                        'password' => $this->password,
+                        'smtpDetails' => $this->smtpDetails,
+                    ]);
     }
 }

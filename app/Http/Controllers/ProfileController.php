@@ -48,6 +48,15 @@ class ProfileController extends Controller
             $user->twitter = $request->twitter;
             $user->linkedin = $request->linkedin;
             $user->insta = $request->instagram;
+
+            // স্কুলের ইমেইল ও নাম সিঙ্ক করা (সুপার এডমিন প্যানেলের জন্য জরুরি)
+            if ($user->school) {
+                $user->school->update([
+                    'email' => $request->email,
+                    'name'  => $request->name,
+                    'phone' => $request->phone,
+                ]);
+            }
         } 
         elseif ($user->role == 'teacher' && $user->teacher) {
             // ইউজার টেবিলের নাম ও ইমেইল টিচার টেবিলেও আপডেট হবে
