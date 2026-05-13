@@ -115,7 +115,7 @@ class MailServerService
             ])->get($this->host . "/execute/SubDomain/addsubdomain", [
                 'domain'                => $sub,
                 'rootdomain'            => $this->rootDomain,
-                'dir'                   => 'public_html/' . $sub, // Standard directory
+                'dir'                   => 'public_html', // Point to main app directory for multi-tenant routing
                 'disallowdot'           => 1,
             ]);
 
