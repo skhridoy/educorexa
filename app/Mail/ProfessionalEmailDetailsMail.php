@@ -44,7 +44,8 @@ class ProfessionalEmailDetailsMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Professional Email Account Created - ' . $this->school->name)
+        return $this->from('support@educorexa.com', config('app.name', 'EduCorexa Support'))
+                    ->subject('Professional Email Account Created - ' . $this->school->name)
                     ->view('emails.professional_email_details')
                     ->with([
                         'school' => $this->school,
