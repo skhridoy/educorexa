@@ -563,7 +563,7 @@
                         @if(session('success'))
                             <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ecfdf5; color: #065f46;"><i class="fas fa-check-circle me-2"></i>{{ session('success') }}</div>
                         @endif
-                        <form action="{{ route('contact.store', ['tenant' => $school->slug]) }}" method="POST">
+                        <form action="{{ route('school.contact.store', ['tenant' => $school->slug]) }}" method="POST">
                             @csrf
                             <div class="row g-4">
                                 <div class="col-md-6">

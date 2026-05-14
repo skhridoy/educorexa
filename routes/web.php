@@ -188,7 +188,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
-            Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('contact.store');
+            Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('school.contact.store');
             // Result Route 
             Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
             Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
