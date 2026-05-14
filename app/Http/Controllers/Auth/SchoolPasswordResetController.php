@@ -42,8 +42,13 @@ class SchoolPasswordResetController extends Controller
             return back()->withErrors(['email' => 'No account found with this email address.']);
         }
 
+        // সুপ্যার এডমিন বা এমপ্লয়ি হলে
+        if (empty($user->school_id) && in_array($user->role, ['super_admin', 'employee', 'admin'])) {
+            return back()->withErrors(['email' => 'Admins must reset password from the main portal.']);
+        }
+
         // ৩. ইউজার ভিন্ন স্কুলের হলে — সেই স্কুলের লিঙ্ক দেখাও
-        if ($user->school_id !== $currentSchool->id) {
+        if ($user->school_id != $currentSchool->id) {
             $correctSchool = \App\Models\School::find($user->school_id);
             $correctUrl    = $correctSchool
                 ? url("https://{$correctSchool->slug}." . config('app.main_domain') . "/forgot-password")
