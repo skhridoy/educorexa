@@ -356,6 +356,7 @@ class SuperAdminController extends Controller
                 Mail::to($school->email)->send(new ProfessionalEmailDetailsMail($school, $emailAddress, $password));
             } catch (\Exception $e) {
                 \Log::error("Failed to send pro email credentials to " . $school->email . ": " . $e->getMessage());
+                return back()->with('error', 'প্রফেশনাল ইমেইল তৈরি হয়েছে কিন্তু এডমিনকে মেইল পাঠাতে সমস্যা হয়েছে: ' . $e->getMessage());
             }
 
             return back()->with('success', 'প্রফেশনাল ইমেইল তৈরি হয়েছে এবং স্কুলের এডমিনকে তথ্য পাঠানো হয়েছে। Email: ' . $emailAddress);
