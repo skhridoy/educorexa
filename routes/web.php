@@ -113,6 +113,8 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
             Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::get('/api-setup', [SettingController::class, 'apiSetup'])->name('settings.api');
+            Route::post('/api-setup', [SettingController::class, 'updateApiSetup'])->name('settings.api.update');
         });
         // Common Profile & Settings
         Route::get('/profile', [SuperAdminController::class, 'Profile'])->name('profile');
@@ -391,7 +393,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
 
                 Route::middleware('permission:fee.manage')->group(function () {
-                    // Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories'); 
+                    Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories');
                     Route::get('/get-classes-by-category', [FeeAmountController::class, 'getClassesByCategory'])->name('get-classes-by-category');
                     Route::resource('fee-amounts', FeeAmountController::class);
                 });
@@ -472,4 +474,13 @@ Route::get('/run-migration', function () {
     } catch (\Exception $e) {
         return "Migration failed: " . $e->getMessage();
     }
+});
+
+Route::get('/view-logs', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (!file_exists($logFile)) {
+        return 'No log file found.';
+    }
+    $lines = file($logFile);
+    return implode('<br>', array_slice($lines, -100));
 });

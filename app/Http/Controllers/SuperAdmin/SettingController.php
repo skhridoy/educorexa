@@ -113,4 +113,29 @@ class SettingController extends Controller
 
         return response()->json(['success' => 'Status updated!']);
     }
+
+    public function apiSetup() {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+        return view('super.settings.api_setup', compact('setting'));
+    }
+
+    public function updateApiSetup(Request $request) {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+        
+        // --- SMTP Data Update ---
+        $setting->mail_mailer = $request->mail_mailer ?? 'smtp';
+        $setting->mail_host = $request->mail_host;
+        $setting->mail_port = $request->mail_port;
+        $setting->mail_username = $request->mail_username;
+        if ($request->filled('mail_password')) {
+            $setting->mail_password = $request->mail_password;
+        }
+        $setting->mail_encryption = $request->mail_encryption;
+        $setting->mail_from_address = $request->mail_from_address;
+        $setting->mail_from_name = $request->mail_from_name;
+
+        $setting->save();
+
+        return back()->with('success', 'API Settings updated successfully!');
+    }
 }

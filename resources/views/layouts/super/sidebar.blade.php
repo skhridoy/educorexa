@@ -175,9 +175,16 @@
             @can('settings.manage')
                 <li class="edu-nav-item">
                     <a href="{{ route('settings.edit') }}"
-                       class="edu-nav-link {{ Request::is('settings*') ? 'active' : '' }}">
+                       class="edu-nav-link {{ Request::is('settings') ? 'active' : '' }}">
                         <i data-feather="settings"></i>
-                        <span>System Settings</span>
+                        <span>Site Settings</span>
+                    </a>
+                </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('settings.api') }}"
+                       class="edu-nav-link {{ Request::is('api-setup') ? 'active' : '' }}">
+                        <i data-feather="link"></i>
+                        <span>API Setup</span>
                     </a>
                 </li>
             @endcan

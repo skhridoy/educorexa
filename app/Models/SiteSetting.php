@@ -52,7 +52,8 @@ class SiteSetting extends Model
 {
     protected $fillable = [
         'site_name', 'address', 'phone', 'email', 'footer_text',
-        'logo_wide', 'logo_square', 'favicon', 'meta_title', 'meta_description', 'meta_keywords', 'og_image'
+        'logo_wide', 'logo_square', 'favicon', 'meta_title', 'meta_description', 'meta_keywords', 'og_image',
+        'mail_mailer', 'mail_host', 'mail_port', 'mail_username', 'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name'
     ];
 
 }

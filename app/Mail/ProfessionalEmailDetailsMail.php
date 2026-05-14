@@ -32,7 +32,7 @@ class ProfessionalEmailDetailsMail extends Mailable
         $domain = explode('@', $emailAddress)[1];
         
         $this->smtpDetails = [
-            'host' => 'mail.' . $domain,
+            'host' => $domain,
             'port' => 465,
             'encryption' => 'ssl',
             'username' => $emailAddress,

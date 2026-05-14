@@ -28,6 +28,25 @@ class AppServiceProvider extends ServiceProvider
         Route::model('school', School::class);
         Paginator::useBootstrap();
 
+        // ডাইনামিক গ্লোবাল ইমেইল কনফিগারেশন সেটআপ
+        try {
+            if (Schema::hasTable('site_settings')) {
+                $setting = SiteSetting::first();
+                if ($setting && $setting->mail_host) {
+                    \Illuminate\Support\Facades\Config::set('mail.default', $setting->mail_mailer ?? 'smtp');
+                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.host', $setting->mail_host);
+                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.port', $setting->mail_port);
+                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.username', $setting->mail_username);
+                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.password', $setting->mail_password);
+                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.encryption', $setting->mail_encryption);
+                    \Illuminate\Support\Facades\Config::set('mail.from.address', $setting->mail_from_address);
+                    \Illuminate\Support\Facades\Config::set('mail.from.name', $setting->mail_from_name);
+                }
+            }
+        } catch (\Exception $e) {
+            // ডাটাবেজ কানেকশন না থাকলে ইগনোর করবে
+        }
+
         // ভিউ কম্পোজার ব্যবহার করে সব ভিউতে ডাটা পাস করা
         View::composer('*', function ($view) {
             // ১. টেন্যান্ট বা স্কুলের ডাটা আনা
