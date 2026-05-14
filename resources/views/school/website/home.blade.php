@@ -115,6 +115,7 @@
             transition: var(--transition);
             overflow: hidden;
         }
+
         .teacher-item:hover {
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
@@ -148,6 +149,121 @@
             justify-content: center;
             margin: 0 auto;
         }
+
+        .premium-teacher-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 35px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            border: 1px solid rgba(0,0,0,0.02);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .premium-teacher-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+            z-index: -1;
+            border-radius: 24px 24px 0 0;
+            transition: all 0.5s ease;
+        }
+
+        .premium-teacher-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.08);
+            border-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .premium-teacher-card:hover::before {
+            height: 100%;
+            opacity: 0.6;
+        }
+
+        .premium-teacher-img-wrapper {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            padding: 6px;
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.4s ease;
+        }
+
+        .premium-teacher-card:hover .premium-teacher-img-wrapper {
+            transform: scale(1.05);
+        }
+
+        .premium-teacher-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(79, 70, 229, 0.05);
+        }
+
+        .premium-teacher-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-family: 'Outfit', sans-serif;
+            transition: color 0.3s ease;
+        }
+
+        .premium-teacher-designation {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4f46e5;
+            background: rgba(79, 70, 229, 0.08);
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .premium-social-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .premium-social-links a {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #64748b;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .premium-social-links a:hover {
+            background: #4f46e5;
+            color: #ffffff;
+            transform: translateY(-4px) scale(1.1);
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+        }
+ 
     </style>
 @endsection
 
@@ -340,30 +456,31 @@
     </div>
 
     {{-- Teachers Gallery --}}
-    <div class="container-xxl py-5">
-        <div class="container py-5">
+
+
+    <div class="container-xxl py-5 bg-light" style="border-radius: 40px; margin-top: 3rem; margin-bottom: 3rem;">
+        <div class="container py-4">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
-                <h2 class="fw-bold">Our Professional Educators</h2>
-                <p class="text-muted">Dedicated teachers committed to student-centered learning.</p>
+                <span class="text-uppercase fw-bold" style="color: #4f46e5; letter-spacing: 2px; font-size: 0.85rem;">Dedicated Mentors</span>
+                <h2 class="fw-bold mt-2 mb-3" style="font-family:'Outfit', sans-serif; font-size: 2.5rem; color: #0f172a;">Our Professional Educators</h2>
+                <div style="width: 60px; height: 4px; background: #4f46e5; margin: 0 auto 20px; border-radius: 2px;"></div>
+                <p class="text-muted" style="font-size: 1.05rem;">Meet our team of dedicated teachers who are committed to student-centered learning and excellence in education.</p>
             </div>
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
                 @foreach($teachers as $teacher)
-                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ 0.1 * $loop->index }}s">
-                    <div class="teacher-item text-center">
-                        <div class="position-relative overflow-hidden mb-4 mx-auto" style="width: 200px; height: 200px;">
-                            <img class="img-fluid rounded-circle w-100 h-100" 
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ 0.1 * $loop->iteration }}s">
+                    <div class="premium-teacher-card text-center">
+                        <div class="premium-teacher-img-wrapper">
+                            <img class="premium-teacher-img" 
                                  src="{{ $teacher->photo ? asset($teacher->photo) : 'https://ui-avatars.com/api/?name='.urlencode($teacher->name).'&background=002147&color=fff' }}" 
-                                 alt="{{ $teacher->name }}" 
-                                 style="object-fit: cover; border: 5px solid #f8f9fa;">
+                                 alt="{{ $teacher->name }}">
                         </div>
-                        <div class="p-4">
-                            <h5 class="fw-bold mb-1">{{ $teacher->name }}</h5>
-                            <small class="text-navy fw-bold">{{ $teacher->designation ?? 'Teacher' }}</small>
-                            <div class="d-flex justify-content-center mt-3">
-                                @if($teacher->facebook) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->facebook }}"><i class="fab fa-facebook-f"></i></a> @endif
-                                @if($teacher->twitter) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->twitter }}"><i class="fab fa-twitter"></i></a> @endif
-                                @if($teacher->linkedin) <a class="btn btn-sm-square btn-outline-primary rounded-circle mx-1" href="{{ $teacher->linkedin }}"><i class="fab fa-linkedin-in"></i></a> @endif
-                            </div>
+                        <h5 class="premium-teacher-name">{{ $teacher->name }}</h5>
+                        <div class="premium-teacher-designation">{{ $teacher->designation ?? 'Teacher' }}</div>
+                        <div class="premium-social-links">
+                            @if($teacher->facebook) <a href="{{ $teacher->facebook }}"><i class="fab fa-facebook-f"></i></a> @endif
+                            @if($teacher->twitter) <a href="{{ $teacher->twitter }}"><i class="fab fa-twitter"></i></a> @endif
+                            @if($teacher->linkedin) <a href="{{ $teacher->linkedin }}"><i class="fab fa-linkedin-in"></i></a> @endif
                         </div>
                     </div>
                 </div>
