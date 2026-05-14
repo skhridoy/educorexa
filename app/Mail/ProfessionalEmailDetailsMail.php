@@ -11,7 +11,8 @@ class ProfessionalEmailDetailsMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $school;
+    public $schoolName;
+    public $schoolSlug;
     public $emailAddress;
     public $password;
     public $smtpDetails;
@@ -19,9 +20,10 @@ class ProfessionalEmailDetailsMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(School $school, $emailAddress, $password)
+    public function __construct($school, $emailAddress, $password)
     {
-        $this->school = $school;
+        $this->schoolName = $school->name;
+        $this->schoolSlug = $school->slug;
         $this->emailAddress = $emailAddress;
         $this->password = $password;
         
@@ -45,13 +47,7 @@ class ProfessionalEmailDetailsMail extends Mailable
     public function build()
     {
         return $this->from('support@educorexa.com', config('app.name', 'EduCorexa Support'))
-                    ->subject('Professional Email Account Created - ' . $this->school->name)
-                    ->view('emails.professional_email_details')
-                    ->with([
-                        'school' => $this->school,
-                        'emailAddress' => $this->emailAddress,
-                        'password' => $this->password,
-                        'smtpDetails' => $this->smtpDetails,
-                    ]);
+                    ->subject('Professional Email Account Created - ' . $this->schoolName)
+                    ->view('emails.professional_email_details');
     }
 }

@@ -21,7 +21,7 @@
             <p>Congratulations! Your professional email account is ready.</p>
         </div>
 
-        <p>Dear {{ $school->name }} Administrator,</p>
+        <p>Dear {{ $schoolName }} Administrator,</p>
         <p>Your request for a professional email address has been approved. You can now use these credentials to configure your school's automated notifications in the API Setup menu.</p>
 
         <div class="details-box">
@@ -61,7 +61,7 @@
         <p>To apply these settings, please log in to your dashboard and navigate to <strong>Settings > API Setup</strong>.</p>
         
         <div style="text-align: center;">
-            <a href="https://{{ $school->slug }}.{{ config('app.main_domain') }}/login" class="btn">Login to Your Dashboard</a>
+            <a href="https://{{ $schoolSlug }}.{{ config('app.main_domain') }}/login" class="btn">Login to Your Dashboard</a>
         </div>
 
         <div class="footer">
