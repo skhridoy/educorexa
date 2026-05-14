@@ -13,14 +13,13 @@ use App\Http\Controllers\{
     FeeHeadController, FeeAmountController, StudentFeeController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
-    HolidayController, ContactMessageController, SchoolSubCategoryController, MainContactMsgController, ReviewController,
-    RoutineController
+    HolidayController, ContactMessageController, SchoolSubCategoryController, 
+    MainContactMsgController, ReviewController,
+    RoutineController, SchoolSupportController
 };
-use App\Http\Controllers\SuperAdmin\FrontendSectionController;
 use App\Http\Controllers\SuperAdmin\{
-    SuperAdminController, RoleController,
-    SettingController, EmployeeController, PermissionController,
-    SubscriptionPackageController, TestimonialController, EventController
+    FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
+    SubscriptionPackageController, TestimonialController, EmployeeController, EventController, SupportTicketController
 };
 
 // Site Map 
@@ -103,12 +102,21 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::delete('/contact-messages/{id}', [MainContactMsgController::class, 'destroy'])->name('contact.destroy');
             });
 
-            // Professional Email Requests
-            Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
-            Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
-            Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
-            Route::delete('/professional-emails/{school}/delete', [SuperAdminController::class, 'deleteEmailRequest'])->name('pro-email.delete');
-        });
+                // Professional Email Requests
+                Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
+                Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
+                Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
+                Route::delete('/professional-emails/{school}/delete', [SuperAdminController::class, 'deleteEmailRequest'])->name('pro-email.delete');
+
+                Route::middleware(['permission:support.manage'])->group(function () {
+                    Route::get('/support-tickets', [SupportTicketController::class, 'index'])->name('support.index');
+                    Route::get('/support-tickets/{id}', [SupportTicketController::class, 'show'])->name('support.show');
+                    Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
+                    Route::get('/support-tickets/{id}/fetch-replies', [SupportTicketController::class, 'fetchReplies'])->name('support.fetch');
+                    Route::post('/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('support.status');
+                    // Route::delete('/support-tickets/{id}', [SupportTicketController::class, 'destroy'])->name('support.destroy');
+                });
+            });
 
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
@@ -217,7 +225,15 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     
                     // Contact Messages
                     Route::get('admin/messages', [ContactMessageController::class, 'index'])->name('admin.messages.index');
+                    Route::get('admin/messages/{id}', [ContactMessageController::class, 'show'])->name('admin.messages.show');
                     Route::delete('admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
+                    // Support Tickets
+                    Route::get('admin/support', [SchoolSupportController::class, 'index'])->name('school.support.index');
+                    Route::get('admin/support/create', [SchoolSupportController::class, 'create'])->name('school.support.create');
+                    Route::post('admin/support/store', [SchoolSupportController::class, 'store'])->name('school.support.store');
+                    Route::get('admin/support/{id}', [SchoolSupportController::class, 'show'])->name('school.support.show');
+                    Route::post('admin/support/{id}/reply', [SchoolSupportController::class, 'reply'])->name('school.support.reply');
+                    Route::get('admin/support/{id}/fetch-replies', [SchoolSupportController::class, 'fetchReplies'])->name('school.support.fetch');
                 });
                 Route::get('/profile', [ProfileController::class, 'index'])->name('user.profile');
                 Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('user.profile.update');

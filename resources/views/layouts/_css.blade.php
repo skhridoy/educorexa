@@ -8,10 +8,10 @@
     <!-- End fonts -->
 
 	<!-- Plugin css -->
-	 <link rel="stylesheet" href="{{ asset('../assets/vendors/flatpickr/flatpickr.min.css') }}">
+	 <link rel="stylesheet" href="{{ asset('assets/vendors/flatpickr/flatpickr.min.css') }}">
 
 	<!-- Feather Icons -->
-	<link rel="stylesheet" href="{{ asset('../assets/fonts/feather-font/css/iconfont.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}">
 
     <!-- Stitch Design System -->
     <link rel="stylesheet" href="{{ asset('css/stitch-design.css') }}">

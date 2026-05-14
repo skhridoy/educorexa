@@ -97,6 +97,7 @@ return [
             'super.roles.manage'    => 'Manage Roles & Permissions',
             'contact.messages.view'   => 'View Contact Messages',
             'testimonial.approve'   => 'Approve/Manage Testimonials',
+            'support.manage'        => 'Manage School Support Tickets',
         ],
     ],
 ];

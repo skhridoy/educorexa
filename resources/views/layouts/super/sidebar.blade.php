@@ -149,6 +149,16 @@
                 </li>
                 @endcan
 
+                @can('support.manage')
+                <li class="edu-nav-item">
+                    <a href="{{ route('manage.support.index') }}"
+                       class="edu-nav-link {{ Request::is('manage/support-tickets*') ? 'active' : '' }}">
+                        <i data-feather="help-circle"></i>
+                        <span>Support Tickets</span>
+                    </a>
+                </li>
+                @endcan
+
             @endif
 
             {{-- FRONTEND --}}

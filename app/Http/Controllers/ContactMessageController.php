@@ -20,6 +20,18 @@ class ContactMessageController extends Controller
 
         return view('school.message.index', compact('messages', 'tenant'));
     }
+    public function show($tenant, $id)
+    {
+        $school = DB::table('schools')->where('slug', $tenant)->first();
+        if (!$school) {
+            abort(404);
+        }
+
+        $message = ContactMessage::where('school_id', $school->id)->findOrFail($id);
+        
+        return view('school.message.show', compact('message', 'tenant'));
+    }
+
     public function destroy($tenant, $id) {
         $message = ContactMessage::findOrFail($id);
         $message->delete();

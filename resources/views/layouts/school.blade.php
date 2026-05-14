@@ -12,8 +12,6 @@
     @else
         <link rel="icon" type="image/png" href="{{ asset('default-favicon.png') }}">
     @endif
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>
         @hasSection('title')
             @yield('title') | {{ $currentSchool->name ?? 'EduCorexa' }}
@@ -171,98 +169,6 @@
             border-color: #1a253b !important;
         }
 
-        /* Sidebar & Layout Premium Refinement (Matching Super Admin) */
-        .edu-sidebar {
-            background: #ffffff !important;
-            border-right: 1px solid #f1f5f9 !important;
-            box-shadow: 4px 0 24px rgba(15,23,42,0.06) !important;
-        }
-        .edu-sidebar .edu-sidebar-header {
-            border-bottom: 1px solid #f1f5f9 !important;
-            background: #ffffff !important;
-        }
-        .edu-sidebar .edu-brand-name {
-            color: #4f46e5 !important; /* Indigo like Super Admin */
-        }
-        .edu-sidebar .edu-brand-sub {
-            color: #94a3b8 !important;
-        }
-        .edu-sidebar .edu-nav-category {
-            color: #94a3b8 !important;
-            font-weight: 700 !important;
-            font-size: 10px !important;
-            letter-spacing: 0.1em !important;
-        }
-        .edu-sidebar .edu-nav-link {
-            color: #64748b !important;
-        }
-        .edu-sidebar .edu-nav-link:hover {
-            color: #4f46e5 !important;
-            background: #eef2ff !important;
-        }
-        .edu-sidebar .edu-nav-link.active {
-            color: #4f46e5 !important;
-            background: #eef2ff !important;
-            border-left: 3px solid #4f46e5 !important;
-            font-weight: 600 !important;
-        }
-        .edu-sidebar .edu-nav-link i, .edu-sidebar .edu-nav-link svg {
-            color: #94a3b8 !important;
-            width: 18px !important;
-            height: 18px !important;
-        }
-        .edu-sidebar .edu-nav-link.active i, .edu-sidebar .edu-nav-link.active svg {
-            color: #4f46e5 !important;
-        }
-        .edu-sidebar .edu-sub-link {
-            color: #64748b !important;
-        }
-        .edu-sidebar .edu-sub-link:hover, .edu-sidebar .edu-sub-link.active {
-            color: #4f46e5 !important;
-            background: #eef2ff !important;
-        }
-        .input-group{
-            background: var(--card-bg) !important;
-            border: 1px solid var(--card-border) !important;
-            box-shadow: none !important;
-            border-radius:30px;
-            overflow:hidden;
-        }
-        .input-group:hover {
-            background: var(--card-bg) !important;
-            border: 1px solid var(--card-border) !important;
-        }
-        .input-group .form-control {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            font-size: 0.875rem !important;
-            padding: 10px 0 !important;
-        }
-        .input-group-text {
-            background: transparent !important;
-            border: none !important;
-            color: var(--text-color) !important;
-            padding: 0 12px !important;
-        }
-        .form-control:focus{
-            background: transparent !important;
-            border: none !important;
-            color: var(--text-color) !important;
-            box-shadow: none !important;
-        }
-        .edu-user-name{
-            color: var(--text-main) !important;
-        }
-        .edu-user-role{
-            color: var(--text-muted) !important;
-        }
-        /* Ensure page-wrapper doesn't overlap */
-        @media (min-width: 992px) {
-            .page-wrapper {
-                margin-left: 260px !important;
-            }
-        }
     </style>
 
     <script>
@@ -285,23 +191,23 @@
     </div>
 
      <!-- core:js -->
-    <script src="{{ asset('../assets/vendors/core/core.js') }}"></script>
+    <script src="{{ asset('assets/vendors/core/core.js') }}"></script>
 	<!-- endinject -->
 
 	<!-- Plugin js for this page -->
-	<script src="{{ asset('../assets/vendors/flatpickr/flatpickr.min.js') }}"></script>
+	<script src="{{ asset('assets/vendors/flatpickr/flatpickr.min.js') }}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<!-- End plugin js for this page -->
 
 	<!-- inject:js -->
-	<script src="{{ asset('../assets/vendors/feather-icons/feather.min.js') }}"></script>
-	<script src="{{ asset('../assets/js/template.js') }}"></script>
+	<script src="{{ asset('assets/vendors/feather-icons/feather.min.js') }}"></script>
+	<script src="{{ asset('assets/js/template.js') }}"></script>
 	<!-- endinject -->
 
     <!-- Cropper Js  -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 	<!-- Custom js for this page -->
-	<script src="{{ asset('../assets/js/dashboard-dark.js') }}"></script>
+	<script src="{{ asset('assets/js/dashboard-dark.js') }}"></script>
 	<script src="https://unpkg.com/feather-icons"></script>
 	<!-- End custom js for this page -->
 	 <!-- JS Files -->
