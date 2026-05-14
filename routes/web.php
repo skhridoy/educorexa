@@ -484,3 +484,12 @@ Route::get('/view-logs', function () {
     $lines = file($logFile);
     return implode('<br>', array_slice($lines, -100));
 });
+
+Route::get('/clear-cache', function() {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    return 'All caches cleared successfully!';
+});

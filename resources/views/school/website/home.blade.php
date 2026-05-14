@@ -521,27 +521,80 @@
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="bg-light rounded p-5">
+                    <style>
+                        .premium-contact-form {
+                            background: #ffffff;
+                            border-radius: 24px;
+                            box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+                            border: 1px solid rgba(0,0,0,0.03);
+                        }
+                        .premium-input {
+                            background: #f8fafc !important;
+                            border: 1px solid transparent !important;
+                            border-radius: 12px !important;
+                            box-shadow: none !important;
+                            transition: all 0.3s ease;
+                        }
+                        .premium-input:focus {
+                            background: #ffffff !important;
+                            border-color: #4f46e5 !important;
+                            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+                        }
+                        .form-floating label {
+                            color: #64748b;
+                        }
+                        .premium-btn {
+                            background: linear-gradient(135deg, #002147 0%, #003366 100%);
+                            border: none;
+                            border-radius: 12px;
+                            color: white;
+                            transition: all 0.3s ease;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .premium-btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 10px 20px rgba(0, 33, 71, 0.2);
+                            color: #ffffff;
+                        }
+                    </style>
+                    <div class="premium-contact-form p-4 p-md-5">
+                        <h4 class="fw-bold mb-4 text-center" style="color: #1e293b; font-family: 'Outfit', sans-serif;">Send us a Message</h4>
                         @if(session('success'))
-                            <div class="alert alert-success border-0 shadow-sm mb-4">{{ session('success') }}</div>
+                            <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 12px; background: #ecfdf5; color: #065f46;"><i class="fas fa-check-circle me-2"></i>{{ session('success') }}</div>
                         @endif
                         <form action="{{ route('contact.store', ['tenant' => $school->slug]) }}" method="POST">
                             @csrf
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <div class="col-md-6">
-                                    <input type="text" name="name" class="form-control border-0 py-3" placeholder="Your Name" required>
+                                    <div class="form-floating">
+                                        <input type="text" name="name" class="form-control premium-input" id="name" placeholder="Your Name" required>
+                                        <label for="name">Your Name</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="email" name="email" class="form-control border-0 py-3" placeholder="Your Email">
+                                    <div class="form-floating">
+                                        <input type="email" name="email" class="form-control premium-input" id="email" placeholder="Your Email">
+                                        <label for="email">Your Email</label>
+                                    </div>
                                 </div>
                                 <div class="col-12">
-                                    <input type="text" name="phone" class="form-control border-0 py-3" placeholder="Phone Number" required>
+                                    <div class="form-floating">
+                                        <input type="text" name="phone" class="form-control premium-input" id="phone" placeholder="Phone Number" required>
+                                        <label for="phone">Phone Number</label>
+                                    </div>
                                 </div>
                                 <div class="col-12">
-                                    <textarea name="message" class="form-control border-0 py-3" placeholder="Message" rows="5" required></textarea>
+                                    <div class="form-floating">
+                                        <textarea name="message" class="form-control premium-input" id="message" placeholder="Message" style="height: 150px" required></textarea>
+                                        <label for="message">Message</label>
+                                    </div>
                                 </div>
-                                <div class="col-12">
-                                    <button class="btn btn-navy w-100 py-3 rounded-pill fw-bold" type="submit">Send Message</button>
+                                <div class="col-12 mt-4">
+                                    <button class="btn premium-btn w-100 py-3 fw-bold text-uppercase" style="letter-spacing: 1px;" type="submit">
+                                        <span>Send Message</span>
+                                        <i class="fas fa-paper-plane ms-2"></i>
+                                    </button>
                                 </div>
                             </div>
                         </form>
