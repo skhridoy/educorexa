@@ -445,18 +445,6 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
         });
 
-Route::get('/test-mail', function () {
-    try {
-        \Illuminate\Support\Facades\Mail::raw('Test email from EduCorexa', function ($msg) {
-            // Send to a fixed email or to request's email
-            $msg->to(request('email', 'kajolroy@gmail.com'))->subject('SMTP Test'); 
-        });
-        return "Mail sent successfully to " . request('email', 'kajolroy@gmail.com');
-    } catch (\Exception $e) {
-        return "Mail failed: " . $e->getMessage();
-    }
-});
-
 Route::get('/run-migration', function () {
     try {
         // 1. Run Standard Migrations
