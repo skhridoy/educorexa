@@ -220,6 +220,7 @@
                     <ul class="edu-sub-nav">
                         @if(in_array('notice.manage', $permissions))
                         <li><a href="{{ route('notices.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/notices*') ? 'active' : '' }}">Notice Board</a></li>
+                        <li><a href="{{ route('admin.messages.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admin/messages*') ? 'active' : '' }}">Contact Messages</a></li>
                         @endif
                         @if(in_array('slider.manage', $permissions) || in_array('system.settings', $permissions))
                         <li><a href="{{ route('sliders.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sliders*') ? 'active' : '' }}">Sliders</a></li>

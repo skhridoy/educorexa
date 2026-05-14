@@ -1,101 +1,90 @@
 @extends('layouts.school')
 
 @section('content')
-    <div class="page-content">
-        <div class="row">
-            <div class="col-md-8 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Messages</h6> 
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Id</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Message</th>
-                                        <th width="150">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($messages as $message)
-                                    <tr>
-                                        <td>{{ $message->id }}</td>
-                                        <td>{{ $message->name }}</td>
-                                        <td>{{ $message->email }}</td>
-                                        <td>{{ $message->phone }}</td>
-                                        <td>{{ $message->message }}</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <button type="button" class="btn btn-primary btn-icon btn-sm me-2" 
-                                                        data-bs-toggle="modal" data-bs-target="#viewMessage{{ $message->id }}" title="View">
-                                                    <i class="link-icon" data-feather="eye"></i>
-                                                </button>
+<div class="page-content">
+    <div class="d-flex justify-content-between align-items-center grid-margin">
+        <div>
+            <h4 class="mb-3 mb-md-0">Contact Messages</h4>
+            <p class="text-muted">Messages received from the school website contact form.</p>
+        </div>
+    </div>
 
-                                                <form action="{{ route('admin.message.destroy', ['tenant' => auth()->user()->school->slug, 'id' => $message->id]) }}" 
-                                                    method="POST" 
-                                                    id="delete-form-{{ $message->id }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" class="btn btn-danger btn-icon btn-sm" title="Delete" onclick="confirmDelete({{ $message->id }})">
-                                                        <i class="link-icon" data-feather="trash-2"></i>
-                                                    </button>
-                                                </form>
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background: #f8fafc;">
+                                <tr>
+                                    <th class="pt-3 pb-3 border-0">Date</th>
+                                    <th class="pt-3 pb-3 border-0">Name</th>
+                                    <th class="pt-3 pb-3 border-0">Email/Phone</th>
+                                    <th class="pt-3 pb-3 border-0">Message</th>
+                                    <th class="pt-3 pb-3 border-0 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($messages as $message)
+                                <tr>
+                                    <td class="py-3">
+                                        <div class="fw-bold">{{ $message->created_at->format('d M, Y') }}</div>
+                                        <small class="text-muted">{{ $message->created_at->format('h:i A') }}</small>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; color: #6366f1;">
+                                                <i data-feather="user" style="width: 16px;"></i>
                                             </div>
-
-                                            <div class="modal fade" id="viewMessage{{ $message->id }}" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Message from {{ $message->name }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p><strong>Phone:</strong> {{ $message->phone }}</p>
-                                                            <p><strong>Email:</strong> {{ $message->email }}</p>
-                                                            <hr>
-                                                            <p><strong>Message:</strong></p>
-                                                            <p class="text-muted">{{ $message->message }}</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                            <span class="fw-semibold">{{ $message->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div><i data-feather="mail" class="me-1" style="width: 14px;"></i> {{ $message->email ?? 'N/A' }}</div>
+                                        <div><i data-feather="phone" class="me-1" style="width: 14px;"></i> {{ $message->phone ?? 'N/A' }}</div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div style="max-width: 300px; white-space: normal; line-height: 1.5;">
+                                            {{ $message->message }}
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-end">
+                                        <form action="{{ route('admin.messages.destroy', ['tenant' => $tenant, 'id' => $message->id]) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই মেসেজটি ডিলিট করতে চান?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 8px;">
+                                                <i data-feather="trash-2" style="width: 14px;"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="text-muted mb-3">
+                                            <i data-feather="inbox" style="width: 48px; height: 48px; opacity: 0.2;"></i>
+                                        </div>
+                                        <h5>No messages found yet.</h5>
+                                        <p class="small text-muted">When someone submits the contact form on your website, it will appear here.</p>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('customJs')
 <script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'আপনি কি নিশ্চিত?',
-            text: "এটি ডিলিট করলে আর ফিরে পাওয়া যাবে না!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'হ্যাঁ, ডিলিট করুন!',
-            cancelButtonText: 'বাতিল'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // নির্দিষ্ট আইডি অনুযায়ী ফর্ম সাবমিট
-                document.getElementById('delete-form-' + id).submit();
-            }
-        })
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
 </script>
 @endsection

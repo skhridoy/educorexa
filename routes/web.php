@@ -214,6 +214,10 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                         ->name('school.dashboard');
                     Route::get('admin/review/create', [ReviewController::class, 'create'])->name('school.review.create');
                     Route::post('admin/review/store', [ReviewController::class, 'store'])->name('school.review.store');
+                    
+                    // Contact Messages
+                    Route::get('admin/messages', [ContactMessageController::class, 'index'])->name('admin.messages.index');
+                    Route::delete('admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
                 });
                 Route::get('/profile', [ProfileController::class, 'index'])->name('user.profile');
                 Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('user.profile.update');
