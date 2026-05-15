@@ -1,54 +1,77 @@
-<nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm font-manrope transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between h-16 md:h-20 transition-all duration-300 nav-container">
+@php
+    $topBarSection = \App\Models\FrontendSection::where('key', 'top_bar')->first();
+    $topBarContent = $topBarSection ? json_decode($topBarSection->content, true) : [];
+    
+    $support_phone = $topBarContent['phone'] ?? ($setting->phone ?? '+01844054129');
+    $support_email = $topBarContent['email'] ?? ($setting->email ?? 'bizpoint@arenaphonebd.com');
+    $brochure_text = $topBarContent['brochure_text'] ?? 'Download Brochure';
+    $brochure_link = $topBarContent['brochure_link'] ?? '#';
+    $demo_text = $topBarContent['demo_text'] ?? 'Request Demo';
+    $demo_link = $topBarContent['demo_link'] ?? '#';
+@endphp
+
+<div class="hidden lg:block bg-[#0061A8] text-white py-2.5 px-8">
+    <div class="max-w-7xl mx-auto flex justify-between items-center text-[13px] font-medium leading-none">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[17px]">call</span>
+                <span class="pt-0.5">Support: {{ $support_phone }}</span>
+            </div>
+            <div class="flex items-center gap-2 border-l border-white/30 pl-8 h-4">
+                <span class="material-symbols-outlined text-[17px]">mail</span>
+                <span class="pt-0.5">Email: {{ $support_email }}</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="{{ $brochure_link }}" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-md flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined text-[17px]">download</span>
+                {{ $brochure_text }}
+            </a>
+            <a href="{{ $demo_link }}" class="border border-white/80 hover:bg-white hover:text-[#0061A8] px-4 py-2 rounded-md transition-all">
+                {{ $demo_text }}
+            </a>
+        </div>
+    </div>
+</div>
+
+<nav class="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200/50 shadow-sm font-manrope transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between h-16 transition-all duration-300 nav-container">
         
-        <div class="flex items-center gap-12">
-            <a href="{{ url('/') }}" class="flex items-center group">
+        <div class="flex items-center gap-6 xl:gap-10 h-full">
+            <a href="{{ url('/') }}" class="flex items-center shrink-0">
                 @if(isset($setting) && $setting->logo_wide)
-                    {{-- লোগো সাইজ এখানে কন্ট্রোল করা হয়েছে --}}
-                    <img src="{{ asset($setting->logo_wide) }}" alt="EduCorexa" class="h-8 md:h-11 w-auto object-contain transition-transform group-hover:scale-105">
+                    <img src="{{ asset($setting->logo_wide) }}" alt="EduCorexa" class="h-8 md:h-10 w-auto object-contain">
                 @else
                     <div class="flex items-center gap-2">
-                        <span class="bg-indigo-600 p-1.5 rounded-lg shadow-indigo-200 shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="bg-[#0061A8] p-1.5 rounded-lg shadow-lg flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                             </svg>
                         </span>
-                        <span class="text-2xl font-black text-slate-900 tracking-tighter italic">edu<span class="text-indigo-600">corexa</span></span>
+                        <span class="text-xl font-black text-slate-900 tracking-tighter italic leading-none">edu<span class="text-[#0061A8]">corexa</span></span>
                     </div>
                 @endif
             </a>
 
-            <div class="hidden lg:flex items-center gap-8">
-                <a href="{{ url('/') }}" class="nav-link {{ Request::is('/') ? 'nav-active' : '' }}">Home</a>
-                
-                {{-- Dropdown Example for Solutions --}}
-                <div class="relative group">
-                    <button class="nav-link flex items-center gap-1">
-                        Solutions <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div class="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 shadow-xl rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 p-2">
-                        <a href="#features" class="block px-4 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">School Management</a>
-                        <a href="#features" class="block px-4 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">Online Admission</a>
-                        <a href="#features" class="block px-4 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">Exam & Results</a>
-                    </div>
-                </div>
-
-                <a href="#pricing" class="nav-link">Pricing</a>
-                <a href="#about" class="nav-link">About Us</a>
-                <a href="#contact" class="nav-link">Contact</a>
+            <div class="hidden lg:flex items-center gap-4 xl:gap-7 h-full">
+                <a href="{{ url('/') }}" class="nav-link whitespace-nowrap {{ Request::is('/') ? 'nav-active' : '' }} flex items-center h-full">Feature</a>
+                <a href="#about" class="nav-link whitespace-nowrap flex items-center h-full">About Us</a>
+                <a href="#client" class="nav-link whitespace-nowrap flex items-center h-full">Our Client</a>
+                <a href="#partners" class="nav-link whitespace-nowrap flex items-center h-full">Our Partners</a>
+                <a href="#blog" class="nav-link whitespace-nowrap flex items-center h-full">Blog</a>
+                <a href="#contact" class="nav-link whitespace-nowrap flex items-center h-full">Contact Us</a>
             </div>
         </div>
 
-        <div class="hidden md:flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 xl:gap-4 shrink-0 h-full">
             @auth
-                <a href="{{ route('common.dashboard') }}" class="flex items-center gap-2 px-5 py-2.5 text-sm bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <a href="{{ route('common.dashboard') }}" class="flex items-center gap-2 px-4 py-2 text-sm bg-[#0061A8] text-white rounded-lg font-bold hover:bg-[#004d85] transition-all shadow-md">
                     Dashboard
                 </a>
             @else
-                <a href="{{ route('login.form') }}" class="px-5 py-2.5 text-sm text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-all">Login</a>
-                <a href="{{ route('school.register.form') }}" class="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 hover:-translate-y-0.5 transition-all shadow-md">
+                <a href="{{ route('login.form') }}" class="flex items-center px-3 py-2 text-sm text-slate-600 font-semibold hover:bg-slate-100 rounded-lg transition-all h-fit">Login</a>
+                <a href="{{ route('school.register.form') }}" class="flex items-center justify-center px-4 py-2 bg-[#0061A8] text-white text-[10px] font-extrabold rounded-lg hover:bg-[#004d85] hover:-translate-y-0.5 transition-all shadow-md uppercase tracking-widest whitespace-nowrap h-fit">
                     Register School
                 </a>
             @endauth
@@ -64,10 +87,10 @@
 
     <div id="mobile-menu" class="lg:hidden hidden bg-white border-b border-slate-100 px-6 py-6 animate-fade-in">
         <div class="flex flex-col gap-4">
-            <a href="{{ url('/') }}" class="text-indigo-600 font-bold text-lg">Home</a>
-            <a href="#features" class="text-slate-600 font-medium">Solutions</a>
-            <a href="#pricing" class="text-slate-600 font-medium">Pricing</a>
-            <a href="#contact" class="text-slate-600 font-medium">Contact</a>
+            <a href="{{ url('/') }}" class="text-indigo-600 font-bold text-lg">Feature</a>
+            <a href="#about" class="text-slate-600 font-medium">About Us</a>
+            <a href="#client" class="text-slate-600 font-medium">Our Client</a>
+            <a href="#contact" class="text-slate-600 font-medium">Contact Us</a>
             <hr class="border-slate-100">
             @auth
                 <a href="{{ route('common.dashboard') }}" class="w-full py-3 bg-indigo-600 text-white text-center rounded-xl font-bold">Dashboard</a>
