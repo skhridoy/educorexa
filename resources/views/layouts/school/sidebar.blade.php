@@ -58,6 +58,10 @@
                 <div class="edu-brand-sub">School Portal</div>
             </div>
         </a>
+        {{-- Mobile Close Button --}}
+        <div class="edu-mobile-close d-lg-none" style="cursor:pointer; color:#94a3b8; z-index: 9999; display: flex !important; align-items: center; justify-content: center; margin-left: auto;">
+            <i data-feather="x" style="width:22px;height:22px;"></i>
+        </div>
     </div>
 
     <div class="edu-sidebar-body">
@@ -149,15 +153,20 @@
             @endphp
             @if($hasGroupAccess($staffPerms))
             <li class="edu-nav-item">
-                <a class="edu-nav-link edu-has-submenu {{ Request::is('*/teachers*') || Request::is('*/teacher-assign*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#staffMenu">
+                <a class="edu-nav-link edu-has-submenu {{ Request::is('*/teachers*') || Request::is('*/staff*') || Request::is('*/teacher-assign*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#staffMenu">
                     <i data-feather="user-check"></i> <span>Staff & HR</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
-                <div class="collapse {{ Request::is('*/teachers*') || Request::is('*/teacher-assign*') ? 'show' : '' }}" id="staffMenu">
+                <div class="collapse {{ Request::is('*/teachers*') || Request::is('*/staff*') || Request::is('*/teacher-assign*') ? 'show' : '' }}" id="staffMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('teacher.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('teachers.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers*') ? 'active' : '' }}">Teachers</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('teachers.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers') ? 'active' : '' }}">Teachers List</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('teachers.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers/create*') ? 'active' : '' }}">Add Teacher</a></li>
                             <li class="edu-sub-item"><a href="{{ route('teacher.assign', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teacher-assign*') ? 'active' : '' }}">Assign Teachers</a></li>
+                        @endif
+                        @if($hasFeature('employee.manage'))
+                            <li class="edu-sub-item"><a href="{{ route('staff.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff') ? 'active' : '' }}">Staff List</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('staff.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff/create*') ? 'active' : '' }}">Add Staff</a></li>
                         @endif
                     </ul>
                 </div>
@@ -277,12 +286,26 @@
             </li>
             @endif
 
-            <li class="edu-nav-item mt-3">
-                <a href="#" class="edu-nav-link text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i data-feather="log-out"></i> <span>Logout</span>
-                </a>
-            </li>
         </ul>
+
+        {{-- Upgrade Plan Card --}}
+        @if($user->hasRole('school_admin'))
+        <div class="edu-sidebar-footer mx-3 my-4">
+            {{-- Upgrade Card --}}
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
+                <div class="card-body p-3 text-white text-center">
+                    <div class="upgrade-icon mb-2">
+                        <i class="fa-solid fa-rocket fa-2x opacity-50"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">Upgrade Your Plan</h6>
+                    <p class="small opacity-75 mb-3">Get access to premium features & higher limits.</p>
+                    <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" class="btn btn-upgrade-premium w-100 rounded-pill py-2 mt-2">
+                        Upgrade Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </nav>
 

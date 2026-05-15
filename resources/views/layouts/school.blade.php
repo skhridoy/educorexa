@@ -36,6 +36,7 @@
    
 
     @include('layouts._css')
+    @include('school.others._modern_design_styles')
     <style>
         :root {
             --bg-color: #f9fafb;
@@ -251,6 +252,16 @@
                 $('#theme-switcher').prop('checked', true);
                 $('body').addClass('dark-mode');
             }
+            
+            // Render feather icons
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+
+            // Sidebar close for mobile
+            $('.edu-mobile-close').on('click', function() {
+                $('body').removeClass('sidebar-open');
+            });
         });
     </script>
     @yield('customJs')

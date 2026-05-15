@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\School;
 use Illuminate\Support\Facades\DB;
@@ -49,16 +49,26 @@ class SchoolRoleController extends Controller
         $packagePermissions = optional($school->subscriptionPackage)->permissions ?? [];
 
         $request->validate([
-            'name' => 'required|unique:roles,name',
+            'name' => 'required|string|max:255',
+            'role_type' => 'required|in:school_staff,teacher,student',
             'permissions' => 'required|array'
         ]);
+
+        // মাল্টি-টেন্যান্ট ইউনিক চেক: একই স্কুলে একই নামের রোল থাকা যাবে না
+        $roleExists = Role::where('school_id', $school->id)
+                          ->where('display_name', $request->name)
+                          ->exists();
+        
+        if ($roleExists) {
+            return back()->withInput()->with('error', 'A role with this name already exists in your school.');
+        }
 
         // সিকিউরিটি চেক: ইউজার যেন প্যাকেজের বাইরের কোনো পারমিশন হ্যাক করে না দেয়
         $filteredPermissions = array_intersect($request->permissions, $packagePermissions);
 
         DB::transaction(function () use ($request, $school, $filteredPermissions) {
             $role = Role::create([
-                'name' => $request->name . ' - ' . $school->id, // ইউনিক রাখার জন্য স্কুল আইডি যোগ
+                'name' => $request->name . '-' . $school->id . '-' . uniqid(), // গ্লোবাল ইউনিক নাম
                 'display_name' => $request->name,
                 'guard_name' => 'web',
                 'school_id' => $school->id,

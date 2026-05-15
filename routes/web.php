@@ -15,7 +15,7 @@ use App\Http\Controllers\{
     FooterSettingController, SchoolOverviewController, LessonPlanController,
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
     MainContactMsgController, ReviewController,
-    RoutineController, SchoolSupportController, SchoolRoleController
+    RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -269,7 +269,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     });
                 });
                 // Academic
-                Route::middleware(['auth', 'permission:academic-year.manage'])->group(function () {
+                Route::middleware(['auth', 'permission:academic-year.manage', 'school_package:academic-year.manage'])->group(function () {
 
                     Route::resource('academic-year', AcademicYearController::class)->parameters([
                         'academic-year' => 'academic_year'
@@ -281,7 +281,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
 
                 // Routine
-                Route::middleware(['auth', 'permission:class.routine'])->group(function () {
+                Route::middleware(['auth', 'permission:class.routine', 'school_package:class.routine'])->group(function () {
                     Route::get('get-subjects/{classId}', [RoutineController::class, 'getSubjects'])->name('getSubjects');
                     Route::resource('routine', RoutineController::class);
                 });
@@ -299,24 +299,24 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 // Newsletter 
     
                 // Classes
-                Route::middleware('permission:class.manage')->group(function () {
+                Route::middleware(['auth', 'permission:class.manage', 'school_package:class.manage'])->group(function () {
 
                     Route::resource('classes', ClassesController::class);
                 });
 
                 // Notice CRUD
-                Route::middleware('permission:notice.manage')->group(function () {
+                Route::middleware(['auth', 'permission:notice.manage', 'school_package:notice.manage'])->group(function () {
                     Route::resource('notices', NoticeController::class);
                     Route::post('notices/{id}/send', [NoticeController::class, 'sendToStudents'])->name('notices.send');
                 });
 
                 // Sections
-                Route::middleware('permission:section.manage')->group(function () {
+                Route::middleware(['auth', 'permission:section.manage', 'school_package:section.manage'])->group(function () {
                     Route::resource('sections', SectionController::class);
                 });
 
                 // Subjects
-                Route::middleware('permission:subject.manage')->group(function () {
+                Route::middleware(['auth', 'permission:subject.manage', 'school_package:subject.manage'])->group(function () {
                     Route::get('/subjects-assign', [AssignClassController::class, 'index'])->name('subjects.assign');
                     Route::post('/subjects-assign', [AssignClassController::class, 'store'])->name('subjects.assign.store');
                     Route::delete('/subjects-assign/{assignment}', [AssignClassController::class, 'destroy'])->name('subjects.assign.destroy');
@@ -328,7 +328,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
 
                 // Students
-                Route::middleware('permission:student.manage')->group(function () {
+                Route::middleware(['auth', 'permission:student.manage', 'school_package:student.manage'])->group(function () {
                     Route::get('get-subcategories/{categoryId}', [StudentController::class, 'getSubCategories'])->name('get.subcategories');
                     Route::get('students/import', [StudentController::class, 'importForm'])->name('students.importForm');
                     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
@@ -369,7 +369,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
                 // Teacher Routes (to be implemented)
     
-                Route::middleware('permission:teacher.manage')->group(function () {
+                Route::middleware(['auth', 'permission:teacher.manage', 'school_package:teacher.manage'])->group(function () {
                     // Define teacher management routes here
                     Route::get('/teacher-assign', [TeacherAssignSubjectController::class, 'index'])->name('teacher.assign');
 
@@ -379,7 +379,11 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::resource('teachers', TeacherController::class);
                 });
 
-                Route::middleware('permission:exam.manage')->group(function () {
+                Route::middleware(['auth', 'permission:employee.manage', 'school_package:employee.manage'])->group(function () {
+                    Route::resource('staff', SchoolStaffController::class);
+                });
+
+                Route::middleware(['auth', 'permission:exam.manage', 'school_package:exam.manage'])->group(function () {
                     Route::post('exams/{exam}/status', [ExamController::class, 'toggleStatus'])->name('exams.status');
                     Route::get('exams/admit-card', [ExamController::class, 'generateAdmitIndex'])->name('exams.admit-card');
                     Route::get('exams/bulk-admit-card', [ExamController::class, 'bulkAdmitCard'])->name('exam.bulk_admit_card');
@@ -387,7 +391,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::resource('exams', ExamController::class);
                 });
 
-                Route::middleware('permission:mark.manage')->group(function () {
+                Route::middleware(['auth', 'permission:mark.manage', 'school_package:mark.manage'])->group(function () {
                     Route::post('find-subject', [MarkController::class, 'findSubject'])->name('marks.findSubject');
                     Route::post('marks-autosave', [MarkController::class, 'autoSave'])->name('marks.autosave');
                     Route::post('marks-status', [MarkController::class, 'statusUpdate'])->name('marks.statusUpdate');
@@ -415,29 +419,23 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
                     Route::delete('holidays/{id}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
                 });
-                Route::middleware('permission:attendance.manage')->group(function () {
+                Route::middleware(['auth', 'permission:attendance.manage', 'school_package:attendance.manage'])->group(function () {
                     // Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
                     Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('student.attendance.report');
                     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendances.index');
                     Route::post('/attendance-save', [AttendanceController::class, 'store'])->name('attendances.store');
                 });
 
-                Route::middleware('permission:fee.manage')->group(function () {
+                Route::middleware(['auth', 'permission:fee.manage', 'school_package:fee.manage'])->group(function () {
                     Route::resource('fee-heads', FeeHeadController::class);
-                });
-
-                Route::middleware('permission:fee.manage')->group(function () {
                     Route::get('/get-sub-categories/{categoryId}', [FeeAmountController::class, 'getSubCategories'])->name('get-sub-categories');
                     Route::get('/get-classes-by-category', [FeeAmountController::class, 'getClassesByCategory'])->name('get-classes-by-category');
                     Route::resource('fee-amounts', FeeAmountController::class);
-                });
-                Route::middleware('permission:fee.manage')->group(function () {
-                    // Route::get('/get-sub-categories/{categoryId}', [StudentFeeController::class, 'getSubCategories'])->name('get-sub-categories');
                     Route::get('student-fees/get-list', [StudentFeeController::class, 'getStudentList'])->name('student-fees.get-list');
                     Route::resource('student-fees', StudentFeeController::class);
                 });
 
-                Route::middleware(['auth', 'permission:fee.collect'])->group(function () {
+                Route::middleware(['auth', 'permission:fee.collect', 'school_package:fee.collect'])->group(function () {
                     Route::get('collect-payment', [PaymentController::class, 'index'])->name('payment.index');
                     Route::post('collect-payment/{id}', [PaymentController::class, 'collect'])->name('payment.collect');
                     Route::get('payment-receipt/{id}', [PaymentController::class, 'downloadReceipt'])->name('payment.receipt');

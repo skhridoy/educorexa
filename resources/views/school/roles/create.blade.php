@@ -110,9 +110,6 @@
             @csrf
             
             <div class="row g-4">
-
-        <form action="{{ route('school.roles.store', ['tenant' => $tenant]) }}" method="POST">
-            @csrf
             
             <div class="row g-4">
                 {{-- Left: Role Information --}}

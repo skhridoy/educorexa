@@ -110,9 +110,6 @@
             @csrf @method('PUT')
             
             <div class="row g-4">
-
-        <form action="{{ route('school.roles.update', ['tenant' => $tenant, 'role' => $role->id]) }}" method="POST">
-            @csrf @method('PUT')
             
             <div class="row g-4">
                 {{-- Left: Role Information --}}
