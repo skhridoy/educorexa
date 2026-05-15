@@ -63,8 +63,39 @@
 
                         <div class="mb-4">
                             <label class="edu-label">Key Features (One per line)</label>
-                            <textarea name="features_list" class="form-control edu-input" rows="6" placeholder="Live Classes&#10;Exam Management&#10;Auto Attendance">{{ old('features_list') }}</textarea>
+                            <textarea name="features_list" class="form-control edu-input" rows="4" placeholder="Live Classes&#10;Exam Management&#10;Auto Attendance">{{ old('features_list') }}</textarea>
                             <small class="text-muted mt-2 d-block"><i class="fa-solid fa-circle-info me-1"></i> These will appear as bullet points on the pricing page.</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="edu-label mb-3">Module Permissions</label>
+                            <div class="row g-3">
+                                @foreach(config('permissions.permissions') as $group => $perms)
+                                    @if($group != 'SaaS Management (Super Admin/Employee Only)')
+                                    <div class="col-12">
+                                        <h6 class="text-indigo-600 font-bold mb-2 small text-uppercase">{{ $group }}</h6>
+                                        <div class="d-flex flex-wrap gap-3 p-3 bg-slate-50 rounded-3">
+                                            @foreach($perms as $slug => $label)
+                                            @php 
+                                                $isDefault = in_array($slug, ['system.settings', 'notice.manage', 'academic-year.manage', 'profile.manage']);
+                                            @endphp
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $slug }}" id="perm_{{ Str::slug($slug) }}" 
+                                                    {{ ($isDefault || (is_array(old('permissions')) && in_array($slug, old('permissions')))) ? 'checked' : '' }}
+                                                    {{ $isDefault ? 'disabled' : '' }}>
+                                                <label class="form-check-label small {{ $isDefault ? 'text-primary fw-bold' : '' }}" for="perm_{{ Str::slug($slug) }}">
+                                                    {{ $label }} {!! $isDefault ? '<i class="fa-solid fa-lock ms-1 small"></i>' : '' !!}
+                                                </label>
+                                                @if($isDefault)
+                                                    <input type="hidden" name="permissions[]" value="{{ $slug }}">
+                                                @endif
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
+                                @endforeach
+                            </div>
                         </div>
 
                         <div class="edu-divider"></div>

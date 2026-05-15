@@ -29,6 +29,7 @@ class SubscriptionPackageController extends Controller
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
+            'permissions' => 'nullable|array',
         ]);
 
         $validated['is_popular'] = $request->has('is_popular');
@@ -40,7 +41,21 @@ class SubscriptionPackageController extends Controller
             $lines = explode("\n", str_replace("\r", "", $validated['features_list']));
             $features = array_values(array_filter(array_map('trim', $lines)));
         }
+        // Define default basic permissions that every school should have
+        $defaultPermissions = [
+            'system.settings',
+            'notice.manage',
+            'academic-year.manage',
+            'profile.manage',
+            'student.index',
+            'student.create',
+            'student.edit',
+            'student.delete',
+            'student.manage',
+        ];
+
         $validated['features'] = $features;
+        $validated['permissions'] = array_unique(array_merge($request->permissions ?? [], $defaultPermissions));
         unset($validated['features_list']);
 
         SubscriptionPackage::create($validated);
@@ -64,6 +79,7 @@ class SubscriptionPackageController extends Controller
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
+            'permissions' => 'nullable|array',
         ]);
 
         $validated['is_popular'] = $request->has('is_popular');
@@ -75,7 +91,21 @@ class SubscriptionPackageController extends Controller
             $lines = explode("\n", str_replace("\r", "", $validated['features_list']));
             $features = array_values(array_filter(array_map('trim', $lines)));
         }
+        // Define default basic permissions that every school should have
+        $defaultPermissions = [
+            'system.settings',
+            'notice.manage',
+            'academic-year.manage',
+            'profile.manage',
+            'student.index',
+            'student.create',
+            'student.edit',
+            'student.delete',
+            'student.manage',
+        ];
+
         $validated['features'] = $features;
+        $validated['permissions'] = array_unique(array_merge($request->permissions ?? [], $defaultPermissions));
         unset($validated['features_list']);
 
         $subscriptionPackage->update($validated);

@@ -142,7 +142,7 @@ class SuperAdminController extends Controller
     public function createSchool()
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');
-        return view('manage.schools.create', compact('mainDomain'));
+        return view('super.schools.create', compact('mainDomain'));
     }
 
     public function schoolStore(Request $request)
@@ -162,6 +162,8 @@ class SuperAdminController extends Controller
         DB::transaction(function () use ($request, &$newSchool) {
 
             // 1️⃣ Create School (সরাসরি approved স্ট্যাটাসে)
+            $defaultPackage = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->first();
+
             $newSchool = School::create([
                 'name'      => $request->school_name,
                 'slug'      => strtolower($request->slug),
@@ -169,6 +171,7 @@ class SuperAdminController extends Controller
                 'phone'     => $request->admin_mobile,
                 'status'    => 'approved',
                 'is_active' => true,
+                'subscription_package_id' => $defaultPackage ? $defaultPackage->id : null,
             ]);
 
             // 2️⃣ Create School Admin User
@@ -394,5 +397,26 @@ class SuperAdminController extends Controller
         ]);
 
         return back()->with('success', 'Professional email account deleted and revoked.');
+    }
+
+    public function changePackage(Request $request, School $school)
+    {
+        $request->validate([
+            'package_id' => 'required|exists:subscription_packages,id'
+        ]);
+
+        $package = \App\Models\SubscriptionPackage::findOrFail($request->package_id);
+
+        $school->update([
+            'subscription_package_id' => $package->id
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($school->email)->send(new \App\Mail\PackageUpgraded($school, $package));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send package upgrade mail: " . $e->getMessage());
+        }
+
+        return back()->with('success', "School package updated to {$package->name} successfully.");
     }
 }

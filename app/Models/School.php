@@ -83,8 +83,27 @@ class School extends Model
         'pro_email_status',
         'pro_email_address',
         'pro_email_password',
-        'pro_email_prefix'
+        'pro_email_prefix',
+        'subscription_package_id'
     ];
+
+    public function subscriptionPackage()
+    {
+        return $this->belongsTo(SubscriptionPackage::class);
+    }
+
+    /**
+     * Check if the school's current package allows a specific permission.
+     */
+    public function hasPackagePermission($permission)
+    {
+        if (!$this->subscriptionPackage) {
+            return false;
+        }
+
+        $packagePermissions = $this->subscriptionPackage->permissions ?? [];
+        return in_array($permission, $packagePermissions);
+    }
 
     // ✅ Relation: school has many students
     public function student()

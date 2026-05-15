@@ -32,11 +32,14 @@ class SchoolRegisterController extends Controller
         DB::transaction(function () use ($request, &$newSchool) {
 
             // 1️⃣ Create School
+            $defaultPackage = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->first();
+
             $newSchool = School::create([
                 'name'   => $request->school_name,
                 'slug'   => strtolower($request->slug),
                 'email'  => $request->admin_email,
                 'status' => 'pending',
+                'subscription_package_id' => $defaultPackage ? $defaultPackage->id : null,
             ]);
 
             // 2️⃣ Create School Admin User

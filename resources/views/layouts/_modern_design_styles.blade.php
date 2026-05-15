@@ -1,7 +1,27 @@
 {{-- =====================================================
      Modern Design Shared Styles
-     ===================================================== --}} 
+     ===================================================== --}}
 <style>
+
+/* =====================================================
+   SCHOOL SIDEBAR — Arrow & active state CSS
+   (Bootstrap .collapse is handled natively)
+   ===================================================== */
+
+/* Arrow rotates when menu is open */
+.edu-sidebar a.edu-has-submenu[aria-expanded="true"] .edu-arrow {
+    transform: rotate(180deg) !important;
+}
+.edu-sidebar .edu-has-submenu .edu-arrow {
+    transition: transform 0.22s ease !important;
+}
+
+/* Active parent highlight when open */
+.edu-sidebar a.edu-has-submenu[aria-expanded="true"] {
+    color: #4f46e5 !important;
+    background: #eef2ff !important;
+}
+
 /* Page Header */
 .page-header-card {
     background: linear-gradient(135deg, #1e293b, #334155);

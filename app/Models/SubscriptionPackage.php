@@ -17,12 +17,14 @@ class SubscriptionPackage extends Model
         'student_limit',
         'teacher_limit',
         'features',
+        'permissions',
         'is_popular',
         'is_active',
     ];
 
     protected $casts = [
         'features' => 'array',
+        'permissions' => 'array',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',
     ];

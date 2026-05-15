@@ -29,7 +29,11 @@ return [
 
         'Students & Admissions' => [
             'admission.manage'      => 'Manage Admissions',
-            'student.manage'        => 'Manage Students',
+            'student.index'         => 'View Student List',
+            'student.create'        => 'Add New Student',
+            'student.edit'          => 'Edit Student Info',
+            'student.delete'        => 'Delete Student Record',
+            'student.manage'        => 'Manage All Student Operations',
             'student.idcard'        => 'Generate Student ID',
             'student.promotion'     => 'Handle Student Promotion',
 
@@ -98,6 +102,7 @@ return [
             'contact.messages.view'   => 'View Contact Messages',
             'testimonial.approve'   => 'Approve/Manage Testimonials',
             'support.manage'        => 'Manage School Support Tickets',
+            'support.bot.manage'    => 'Manage Help Support Chat Bot',
         ],
     ],
 ];

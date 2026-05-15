@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,6 +47,13 @@
             --text-main: #1f2937;
         }
 
+        a{
+            text-decoration: none;
+            color: inherit;
+        }
+        li{
+            list-style: none;
+        }
         body.dark-mode {
             --bg-color: #060c18;
             --card-bg: #0c1427;

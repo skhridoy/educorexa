@@ -32,6 +32,7 @@
                     <tr>
                         <th>#</th>
                         <th>School</th>
+                        <th>Package</th>
                         <th>Admin Email</th>
                         <th>Domain</th>
                         <th>Status</th>
@@ -39,6 +40,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php $packages = \App\Models\SubscriptionPackage::where('is_active', true)->get(); @endphp
                     @forelse($schools as $school)
                     <tr>
                         <td><span class="badge-id">{{ $school->id }}</span></td>
@@ -48,6 +50,27 @@
                                     {{ strtoupper(substr($school->name, 0, 1)) }}
                                 </div>
                                 <span style="font-weight:700;color:#1e293b;">{{ $school->name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-indigo dropdown-toggle py-1 px-2 rounded-3" type="button" data-bs-toggle="dropdown" style="font-size: 0.75rem;">
+                                    {{ $school->subscriptionPackage->name ?? 'No Package' }}
+                                </button>
+                                <ul class="dropdown-menu shadow border-0 rounded-4 p-2">
+                                    <li class="px-2 py-1 small fw-bold text-muted border-bottom mb-1">Change Plan</li>
+                                    @foreach($packages as $pkg)
+                                    <li>
+                                        <form action="{{ route('manage.schools.change-package', $school->id) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="package_id" value="{{ $pkg->id }}">
+                                            <button type="submit" class="dropdown-item rounded-3 {{ $school->subscription_package_id == $pkg->id ? 'active' : '' }}">
+                                                {{ $pkg->name }} (৳{{ number_format($pkg->price) }})
+                                            </button>
+                                        </form>
+                                    </li>
+                                    @endforeach
+                                </ul>
                             </div>
                         </td>
                         <td>{{ $school->email ?? '—' }}</td>

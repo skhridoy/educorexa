@@ -54,13 +54,13 @@
                         </td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
-                                <form action="{{ route('super.schools.approve', $school->id) }}" method="POST">
+                                <form action="{{ route('manage.schools.approve', $school->id) }}" method="POST">
                                     @csrf @method('PUT')
                                     <button type="submit" class="btn-edu btn-edu-primary" style="padding:7px 16px;font-size:0.8rem;">
                                         <i data-feather="check" style="width:14px;height:14px;"></i> Approve
-                                    </button>
+                                    </button> 
                                 </form>
-                                <form action="{{ route('super.schools.reject', $school->id) }}" method="POST">
+                                <form action="{{ route('manage.schools.reject', $school->id) }}" method="POST">
                                     @csrf @method('DELETE')
                                     <button type="button" class="btn-edu btn-edu-danger" style="padding:7px 16px;font-size:0.8rem;" onclick="confirmReject(this)">
                                         <i data-feather="x" style="width:14px;height:14px;"></i> Reject

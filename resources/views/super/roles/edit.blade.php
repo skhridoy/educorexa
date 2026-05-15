@@ -74,7 +74,40 @@
         </div>
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-5">
-            @foreach($permissions->groupBy('group_name') as $groupName => $groupPermissions)
+            @php
+                $groupedPermissions = $permissions->groupBy('group_name');
+                $configGroups = ['SaaS Management (Super Admin/Employee Only)'];
+            @endphp
+
+            @foreach($configGroups as $groupName)
+                @if(isset($groupedPermissions[$groupName]))
+                    @php $groupPermissions = $groupedPermissions[$groupName]; @endphp
+                    <div class="col">
+                        <div class="perm-card h-100">
+                            <div class="perm-header">
+                                <h6 class="perm-title">{{ $groupName }}</h6>
+                                <input type="checkbox" class="select-group" style="width:16px; height:16px; cursor:pointer;">
+                            </div>
+                            <div class="perm-body">
+                                <div class="row">
+                                    @foreach($groupPermissions as $permission)
+                                    <div class="col-12">
+                                        <div class="form-check-edu">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" class="perm-checkbox" id="p_{{ $permission->id }}" {{ in_array($permission->name, old('permissions', $currentPermissions)) ? 'checked' : '' }}>
+                                            <label for="p_{{ $permission->id }}">{{ config("permissions.permissions.$groupName.".$permission->name) ?? str_replace(['.', '-'], ' ', $permission->name) }}</label>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php unset($groupedPermissions[$groupName]); @endphp
+                @endif
+            @endforeach
+
+            {{-- বাকি গ্রুপগুলো --}}
+            @foreach($groupedPermissions as $groupName => $groupPermissions)
             <div class="col">
                 <div class="perm-card h-100">
                     <div class="perm-header">

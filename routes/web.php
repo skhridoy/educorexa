@@ -15,7 +15,7 @@ use App\Http\Controllers\{
     FooterSettingController, SchoolOverviewController, LessonPlanController,
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
     MainContactMsgController, ReviewController,
-    RoutineController, SchoolSupportController
+    RoutineController, SchoolSupportController, SchoolRoleController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -73,50 +73,57 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::middleware(['auth'])->group(function () {
 
         
-        // Schools Management: ইউআরএল হবে /manage/schools/...
-        Route::middleware(['permission:school.manage'])->prefix('manage')->name('manage.')->group(function () {
-            Route::get('/schools/all', [SuperAdminController::class, 'allSchools'])->name('schools.all');
-            Route::get('/schools/pending', [SuperAdminController::class, 'pending'])->name('schools.pending');
+        // --- Management Group (Prefix: manage, Name: manage.) ---
+        Route::prefix('manage')->name('manage.')->group(function () {
             
-            // শুধু নির্দিষ্ট পারমিশন থাকলে স্কুল ক্রিয়েট বা ডিলিট করতে পারবে
-            Route::middleware(['permission:school.create'])->group(function () {
-                Route::get('/schools/create', [SuperAdminController::class, 'createSchool'])->name('schools.create');
-                Route::post('/schools/create', [SuperAdminController::class, 'schoolStore'])->name('schools.store');
+            // Schools Management
+            Route::middleware(['permission:school.manage'])->group(function () {
+                Route::get('/schools/all', [SuperAdminController::class, 'allSchools'])->name('schools.all');
+                Route::get('/schools/pending', [SuperAdminController::class, 'pending'])->name('schools.pending');
+                
+                Route::middleware(['permission:school.create'])->group(function () {
+                    Route::get('/schools/create', [SuperAdminController::class, 'createSchool'])->name('schools.create');
+                    Route::post('/schools/create', [SuperAdminController::class, 'schoolStore'])->name('schools.store');
+                });
+
+                Route::middleware(['permission:school.delete'])->group(function () {
+                    Route::delete('/schools/{school}', [SuperAdminController::class, 'destroy'])->name('schools.destroy');
+                });
+                Route::middleware(['permission:school.reject'])->group(function () {
+                    Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
+                    Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
+                });
+
+                Route::middleware(['permission:school.approve'])->group(function () {
+                    Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approve'])->name('schools.approve');
+                });
+
+                Route::post('/schools/{school}/change-package', [SuperAdminController::class, 'changePackage'])->name('schools.change-package');
             });
 
-            Route::middleware(['permission:school.delete'])->group(function () {
-                Route::delete('/schools/{school}', [SuperAdminController::class, 'destroy'])->name('schools.destroy');
-            });
-            Route::middleware(['permission:school.reject'])->group(function () {
-                Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
-                Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
-            });
-
-            Route::middleware(['permission:school.approve'])->group(function () {
-                Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approve'])->name('schools.approve');
-            });
-
+            // Contact Messages
             Route::middleware(['permission:contact.messages.view'])->group(function () {
                 Route::get('/contact-messages', [MainContactMsgController::class, 'index'])->name('contact.index');
                 Route::get('/contact-messages/{id}', [MainContactMsgController::class, 'show'])->name('contact.show');
                 Route::delete('/contact-messages/{id}', [MainContactMsgController::class, 'destroy'])->name('contact.destroy');
             });
 
-                // Professional Email Requests
-                Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
-                Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
-                Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
-                Route::delete('/professional-emails/{school}/delete', [SuperAdminController::class, 'deleteEmailRequest'])->name('pro-email.delete');
+            // Professional Email Requests
+            Route::get('/professional-emails', [SuperAdminController::class, 'emailRequests'])->name('pro-email.index');
+            Route::post('/professional-emails/{school}/approve', [SuperAdminController::class, 'approveEmailRequest'])->name('pro-email.approve');
+            Route::post('/professional-emails/{school}/reject', [SuperAdminController::class, 'rejectEmailRequest'])->name('pro-email.reject');
+            Route::delete('/professional-emails/{school}/delete', [SuperAdminController::class, 'deleteEmailRequest'])->name('pro-email.delete');
 
-                Route::middleware(['permission:support.manage'])->group(function () {
-                    Route::get('/support-tickets', [SupportTicketController::class, 'index'])->name('support.index');
-                    Route::get('/support-tickets/{id}', [SupportTicketController::class, 'show'])->name('support.show');
-                    Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
-                    Route::get('/support-tickets/{id}/fetch-replies', [SupportTicketController::class, 'fetchReplies'])->name('support.fetch');
-                    Route::post('/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('support.status');
-                    // Route::delete('/support-tickets/{id}', [SupportTicketController::class, 'destroy'])->name('support.destroy');
-                });
+            // Support Tickets
+            Route::middleware(['permission:support.manage'])->group(function () {
+                Route::get('/support-tickets', [SupportTicketController::class, 'index'])->name('support.index');
+                Route::get('/support-tickets/{id}', [SupportTicketController::class, 'show'])->name('support.show');
+                Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
+                Route::get('/support-tickets/{id}/fetch-replies', [SupportTicketController::class, 'fetchReplies'])->name('support.fetch');
+                Route::post('/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('support.status');
             });
+
+        });
 
         Route::middleware(['permission:settings.manage'])->group(function () {
             Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
@@ -220,6 +227,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 Route::middleware(['is_admin'])->group(function () {
                     Route::get('admin/dashboard', [DashboardController::class, 'index'])
                         ->name('school.dashboard');
+                    Route::get('admin/pricing', [DashboardController::class, 'pricing'])->name('school.pricing');
+                    Route::post('admin/upgrade', [DashboardController::class, 'upgradeRequest'])->name('school.upgrade.request');
                     Route::get('admin/review/create', [ReviewController::class, 'create'])->name('school.review.create');
                     Route::post('admin/review/store', [ReviewController::class, 'store'])->name('school.review.store');
                     
@@ -253,6 +262,11 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'apiSetup'])->name('admin.school.api-setup');
                     Route::post('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'updateApiSetup'])->name('admin.school.api-setup.update');
                     Route::post('/school-settings/pro-email-request', [App\Http\Controllers\SchoolSettingController::class, 'requestProfessionalEmail'])->name('admin.school.pro-email.request');
+
+                    // School Roles Management
+                    Route::middleware(['permission:system.settings'])->group(function () {
+                        Route::resource('roles', SchoolRoleController::class)->names('school.roles');
+                    });
                 });
                 // Academic
                 Route::middleware(['auth', 'permission:academic-year.manage'])->group(function () {
@@ -464,6 +478,12 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     
                 });
             });
+
+        // Upgrade Plan
+        Route::get('/upgrade', function(School $currentSchool) {
+            $packages = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
+            return view('school.upgrade', compact('packages', 'currentSchool'));
+        })->name('school.upgrade');
 
         });
 

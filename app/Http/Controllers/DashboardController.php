@@ -9,7 +9,10 @@ use \App\Models\Classes;
 use \App\Models\LessonPlan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PackageUpgraded;
 use \App\Models\Student;
+use \App\Models\SubscriptionPackage;
 class DashboardController extends Controller
 {
 
@@ -153,6 +156,37 @@ class DashboardController extends Controller
         return response()->json([
             'html' => view('school.partials._unpaid_list', compact('unpaidList'))->render()
         ]);
+    }
+
+    public function pricing()
+    {
+        $packages = SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
+        $currentSchool = app('currentSchool');
+        return view('school.admin.pricing', compact('packages', 'currentSchool'));
+    }
+
+    public function upgradeRequest(Request $request)
+    {
+        $request->validate([
+            'package_id' => 'required|exists:subscription_packages,id'
+        ]);
+
+        $school = app('currentSchool');
+        $package = SubscriptionPackage::findOrFail($request->package_id);
+
+        // Update school package
+        $school->subscription_package_id = $package->id;
+        $school->save();
+
+        // Send Email
+        try {
+            Mail::to($school->email)->send(new PackageUpgraded($school, $package));
+        } catch (\Exception $e) {
+            // Log error but don't stop the flow
+            \Log::error("Failed to send upgrade email: " . $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Your subscription has been successfully upgraded to ' . $package->name . '. Enjoy the new features!');
     }
 
     // অ্যাটেনডেন্স চার্ট ডাটা (API)
