@@ -48,6 +48,67 @@
             loadUnpaidFees($(this).attr('href'));
         });
 
+        $(document).on('click', '.btn-send-reminder', function() {
+            let btn = $(this);
+            let id = btn.data('id');
+            let originalIcon = btn.html();
+            
+            btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>').prop('disabled', true);
+            
+            let url = '{{ route("school.unpaid.remind", ["tenant" => app("currentSchool")->slug, "id" => ":id"]) }}';
+            url = url.replace(':id', id);
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(res) {
+                    btn.html(originalIcon).prop('disabled', false);
+                    if(res.success) {
+                        if(typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: res.message,
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            alert(res.message);
+                        }
+                    } else {
+                        if(typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: res.message
+                            });
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    btn.html(originalIcon).prop('disabled', false);
+                    let errorMsg = 'Failed to send reminder. Please try again.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if(typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMsg
+                        });
+                    } else {
+                        alert(errorMsg);
+                    }
+                }
+            });
+        });
+
         // Monthly Collection Chart (Using Chart.js for stability)
         if ($('#monthlyCollectionChart').length > 0 && typeof Chart !== 'undefined') {
             const ctx = document.getElementById('monthlyCollectionChart').getContext('2d');

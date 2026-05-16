@@ -251,6 +251,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 Route::get('/get-attendance-chart-data', [DashboardController::class, 'getAttendanceChartData'])->name('get.attendance.chart.data');
                 Route::get('/fee-filter', [DashboardController::class, 'filterFee'])->name('school.fee.filter');
                 Route::get('/get-unpaid-list', [DashboardController::class, 'getUnpaidList'])->name('school.unpaid.ajax');
+                Route::post('/send-unpaid-reminder/{id}', [DashboardController::class, 'sendFeeReminder'])->name('school.unpaid.remind');
 
 
                 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('school.logout');
@@ -262,6 +263,10 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'apiSetup'])->name('admin.school.api-setup');
                     Route::post('/school-settings/api-setup', [App\Http\Controllers\SchoolSettingController::class, 'updateApiSetup'])->name('admin.school.api-setup.update');
                     Route::post('/school-settings/pro-email-request', [App\Http\Controllers\SchoolSettingController::class, 'requestProfessionalEmail'])->name('admin.school.pro-email.request');
+                    
+                    // Communication Settings
+                    Route::get('/school-settings/communication', [App\Http\Controllers\SchoolSettingController::class, 'communicationSetup'])->name('admin.school.communication');
+                    Route::post('/school-settings/communication', [App\Http\Controllers\SchoolSettingController::class, 'updateCommunicationSetup'])->name('admin.school.communication.update');
 
                     // School Roles Management
                     Route::middleware(['permission:system.settings'])->group(function () {

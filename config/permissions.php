@@ -81,6 +81,7 @@ return [
             'message.manage'        => 'Manage Contact Messages',
             'sms.send'              => 'Send SMS Alerts',
             'email.send'            => 'Send Email Notifications',
+            'whatsapp.send'         => 'Send WhatsApp Messages',
         ],
 
         'Settings' => [

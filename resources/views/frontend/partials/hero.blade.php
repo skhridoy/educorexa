@@ -21,33 +21,33 @@
 @endphp
 
 <!-- Reference-Matched Hero Section -->
-<section class="relative min-h-[85vh] flex items-center overflow-hidden px-6 lg:px-20 bg-gradient-to-br from-[#FFFBEB] to-[#FFF1F2]">
+<section class="relative min-h-[85vh] flex items-center overflow-hidden px-4 lg:px-20 bg-gradient-to-br from-[#FFFBEB] to-[#FFF1F2]">
     
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10 py-12 md:py-20">
         
         <!-- Left Content -->
-        <div class="space-y-8 animate-fade-in-left">
-            <div class="space-y-5">
-                <h1 class="font-display-xl text-[40px] md:text-[50px] lg:text-[60px] text-[#2D2D2D] font-extrabold leading-[1.1] tracking-tight">
+        <div class="space-y-6 md:space-y-8 animate-fade-in-left">
+            <div class="space-y-4 md:space-y-5">
+                <h1 class="font-display-xl text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] text-[#2D2D2D] font-extrabold leading-[1.2] md:leading-[1.1] tracking-tight">
                     {!! $title !!}
                 </h1>
-                <p class="font-body-lg text-base md:text-lg text-slate-600 max-w-lg leading-relaxed">
+                <p class="font-body-lg text-sm sm:text-base md:text-lg text-slate-600 max-w-lg leading-relaxed">
                     {{ $description }}
                 </p>
             </div>
 
-            <div class="flex flex-row items-center flex-wrap gap-4">
+            <div class="flex flex-row items-center flex-nowrap sm:flex-wrap gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
                 <!-- Action Button -->
-                <a href="{{ $btn1_link }}" class="flex items-center gap-2 bg-[#0061A8] text-white px-6 py-3 rounded-lg shadow-md hover:bg-[#004d85] transition-all transform hover:-translate-y-1">
-                    <span class="font-bold text-sm">{{ $btn1_text }}</span>
+                <a href="{{ $btn1_link }}" class="flex items-center justify-center gap-1 sm:gap-2 bg-[#0061A8] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-md hover:bg-[#004d85] transition-all transform hover:-translate-y-1 whitespace-nowrap">
+                    <span class="font-bold text-xs sm:text-sm">{{ $btn1_text }}</span>
                 </a>
                 
                 <!-- View Demo Button -->
-                <a href="{{ $btn2_link }}" class="flex items-center gap-2 bg-white border border-slate-200 text-[#2D2D2D] px-6 py-3 rounded-lg hover:border-red-500 hover:text-red-500 transition-all transform hover:-translate-y-1">
-                    <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white">
-                        <span class="material-symbols-outlined text-[14px]">language</span>
+                <a href="{{ $btn2_link }}" class="flex items-center justify-center gap-1 sm:gap-2 bg-white border border-slate-200 text-[#2D2D2D] px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:border-red-500 hover:text-red-500 transition-all transform hover:-translate-y-1 whitespace-nowrap">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 bg-red-500 rounded-full flex items-center justify-center text-white shrink-0">
+                        <span class="material-symbols-outlined text-[12px] sm:text-[14px]">language</span>
                     </div>
-                    <span class="font-bold text-sm">{{ $btn2_text }}</span>
+                    <span class="font-bold text-xs sm:text-sm">{{ $btn2_text }}</span>
                 </a>
             </div>
         </div>
@@ -58,40 +58,40 @@
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border-2 border-dashed border-red-300 rounded-full opacity-40 animate-[spin_20s_linear_infinite]"></div>
             
             <!-- Main Image Container with Red/Pink Circle -->
-            <div class="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden border-[15px] border-white shadow-2xl z-20">
+            <div class="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden border-[10px] sm:border-[15px] border-white shadow-2xl z-20">
                 <div class="absolute inset-0 bg-[#FF5A79]"></div>
                 <img src="{{ $image }}" alt="Education Potential" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[110%] object-cover object-top scale-110">
             </div>
 
             <!-- Floating Info Cards -->
             <!-- 15+ Districts -->
-            <div class="absolute -left-4 top-[20%] bg-white p-4 rounded-2xl shadow-xl z-30 border border-slate-50 flex items-center gap-3 animate-float" style="animation-delay: 0.2s;">
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-[#FF5A79]">
-                    <span class="material-symbols-outlined">map</span>
+            <div class="absolute -left-2 sm:-left-4 top-[20%] bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl z-30 border border-slate-50 flex items-center gap-2 sm:gap-3 animate-float" style="animation-delay: 0.2s;">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center text-[#FF5A79]">
+                    <span class="material-symbols-outlined text-[18px] sm:text-[24px]">map</span>
                 </div>
                 <div>
-                    <p class="text-xl font-black text-[#2D2D2D]">15+</p>
-                    <p class="text-[10px] uppercase font-bold text-slate-400">Districts</p>
+                    <p class="text-base sm:text-xl font-black text-[#2D2D2D]">15+</p>
+                    <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">Districts</p>
                 </div>
             </div>
 
             <!-- 25K Students -->
-            <div class="absolute -right-4 top-[10%] bg-white p-4 rounded-2xl shadow-xl z-30 border border-slate-50 flex flex-col items-center gap-1 animate-float" style="animation-delay: 1s;">
-                <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-[#FF5A79]">
-                    <span class="material-symbols-outlined">school</span>
+            <div class="absolute -right-2 sm:-right-4 top-[10%] bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl z-30 border border-slate-50 flex flex-col items-center gap-1 animate-float" style="animation-delay: 1s;">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-50 rounded-full flex items-center justify-center text-[#FF5A79]">
+                    <span class="material-symbols-outlined text-[18px] sm:text-[24px]">school</span>
                 </div>
-                <p class="text-xl font-black text-[#2D2D2D]">25K</p>
-                <p class="text-[10px] uppercase font-bold text-slate-400">Students</p>
+                <p class="text-base sm:text-xl font-black text-[#2D2D2D]">25K</p>
+                <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">Students</p>
             </div>
 
             <!-- 20+ School -->
-            <div class="absolute right-4 bottom-[5%] bg-white p-4 rounded-2xl shadow-xl z-30 border border-slate-50 flex items-center gap-3 animate-float" style="animation-delay: 1.8s;">
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-[#FF5A79]">
-                    <span class="material-symbols-outlined">apartment</span>
+            <div class="absolute right-0 sm:right-4 bottom-[5%] bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl z-30 border border-slate-50 flex items-center gap-2 sm:gap-3 animate-float" style="animation-delay: 1.8s;">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center text-[#FF5A79]">
+                    <span class="material-symbols-outlined text-[18px] sm:text-[24px]">apartment</span>
                 </div>
                 <div>
-                    <p class="text-xl font-black text-[#2D2D2D]">20+</p>
-                    <p class="text-[10px] uppercase font-bold text-slate-400">School</p>
+                    <p class="text-base sm:text-xl font-black text-[#2D2D2D]">20+</p>
+                    <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">School</p>
                 </div>
             </div>
         </div>
@@ -99,6 +99,13 @@
 </section>
 
 <style>
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
     @keyframes float {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-15px); }

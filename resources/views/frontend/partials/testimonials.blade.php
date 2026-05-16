@@ -1,8 +1,8 @@
 <section id="testimonials" class="py-5 bg-white overflow-hidden">
     <div class="container py-lg-5">
         <div class="text-center mb-5">
-            <h6 class="text-primary fw-bold text-uppercase mb-2 small" style="letter-spacing: 2px;">Testimonials</h6>
-            <h2 class="fw-bold text-dark">What School Leaders Say</h2>
+            <h6 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-3 text-primary">Testimonials</h6>
+            <h2 class="">What School Leaders Say</h2>
             <p class="text-muted small mx-auto" style="max-width: 500px;">আমাদের ওপর আস্থা রেখেছেন দেশের অসংখ্য শিক্ষা প্রতিষ্ঠান।</p>
         </div>
 
@@ -21,15 +21,12 @@
                             <div class="d-flex align-items-center">
                                 @php
                                     $imageUrl = null;
-                                    if ($testimonial->user_id && $testimonial->user) {
-                                        $folder = ($testimonial->user->role === 'super_admin') ? 'super_admin' : 'employees';
-                                        $imageUrl = ($testimonial->user->photo) 
-                                                    ? asset('uploads/' . $folder . '/' . $testimonial->user->photo) 
-                                                    : null;
-                                    }
-                                    
-                                    if (!$imageUrl) {
-                                        $imageUrl = ($testimonial->image) ? asset($testimonial->image) : asset('assets/images/profile.webp');
+                                    if ($testimonial->user_id && $testimonial->user && $testimonial->user->photo) {
+                                        $imageUrl = asset($testimonial->user->photo);
+                                    } elseif ($testimonial->image) {
+                                        $imageUrl = asset($testimonial->image);
+                                    } else {
+                                        $imageUrl = asset('assets/images/profile.webp');
                                     }
                                 @endphp
                                 <img src="{{ $imageUrl }}" 

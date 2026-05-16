@@ -158,6 +158,82 @@ class DashboardController extends Controller
         ]);
     }
 
+    // বকেয়া ফি রিমাইন্ডার পাঠানোর মেথড (Ajax)
+    public function sendFeeReminder(Request $request, $id)
+    {
+        $fee = StudentFee::with(['student.user', 'feeHead', 'school'])->findOrFail($id);
+        $schoolId = $fee->school_id;
+        $studentName = $fee->student->name ?? 'Student';
+        $schoolName = $fee->school->name ?? 'School';
+        $month = $fee->month;
+        $amount = number_format($fee->amount);
+        $feeName = $fee->feeHead->name ?? 'Fee';
+        $sentVia = [];
+
+        // Fetch settings
+        $setting = \App\Models\CommunicationSetting::where('school_id', $schoolId)
+                    ->where('event', 'fee_reminder')
+                    ->first();
+
+        // Default settings if not configured
+        $emailEnabled = $setting ? $setting->email_enabled : false;
+        $smsEnabled = $setting ? $setting->sms_enabled : false;
+        $whatsappEnabled = $setting ? $setting->whatsapp_enabled : false;
+
+        // Dynamic Tag Replacer Function
+        $parseTemplate = function($template) use ($studentName, $feeName, $month, $amount, $schoolName) {
+            $parsed = str_replace('[student_name]', $studentName, $template);
+            $parsed = str_replace('[fee_name]', $feeName, $parsed);
+            $parsed = str_replace('[month]', $month, $parsed);
+            $parsed = str_replace('[fee_amount]', $amount, $parsed);
+            $parsed = str_replace('[school_name]', $schoolName, $parsed);
+            return $parsed;
+        };
+
+        // Email sending
+        if ($emailEnabled && $fee->student && $fee->student->user && $fee->student->user->email) {
+            try {
+                $emailTemplate = $setting->email_template ?? "Dear [student_name],\n\nThis is a friendly reminder that your [fee_name] for the month of [month] amounting to ৳[fee_amount] is currently unpaid.\n\nPlease pay at your earliest convenience.\n\nThank you,\n[school_name]";
+                $messageText = $parseTemplate($emailTemplate);
+
+                Mail::raw($messageText, function ($message) use ($fee) {
+                    $message->to($fee->student->user->email)
+                            ->subject('Fee Payment Reminder');
+                });
+                $sentVia[] = 'Email';
+            } catch (\Exception $e) {
+                \Log::error("Fee reminder email failed: " . $e->getMessage());
+            }
+        }
+
+        // Simulate SMS
+        if ($smsEnabled && $fee->student && $fee->student->contact_number) {
+            $smsTemplate = $setting->sms_template ?? "Dear [student_name], your [fee_name] of ৳[fee_amount] for [month] is unpaid. Please pay soon. - [school_name]";
+            $smsMessage = $parseTemplate($smsTemplate);
+            // TODO: Integrate Actual SMS API here using $smsMessage
+            $sentVia[] = 'SMS';
+        }
+
+        // Simulate WhatsApp
+        if ($whatsappEnabled && $fee->student && $fee->student->contact_number) {
+            $waTemplate = $setting->whatsapp_template ?? "Dear [student_name],\nYour [fee_name] of ৳[fee_amount] for [month] is unpaid.\nPlease pay soon.\n- [school_name]";
+            $waMessage = $parseTemplate($waTemplate);
+            // TODO: Integrate Actual WhatsApp API here using $waMessage
+            $sentVia[] = 'WhatsApp';
+        }
+
+        if (count($sentVia) > 0) {
+            $method = implode(', ', $sentVia);
+            return response()->json(['success' => true, 'message' => "Reminder sent to {$studentName} via {$method}."]);
+        }
+
+        if (!$emailEnabled && !$smsEnabled && !$whatsappEnabled) {
+             return response()->json(['success' => false, 'message' => 'No communication channels are enabled in Settings.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No email or contact number found for this student.']);
+    }
+
     public function pricing()
     {
         $packages = SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();

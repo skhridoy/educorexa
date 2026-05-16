@@ -261,6 +261,14 @@
                 </a>
             </li>
 
+            @if($user->hasRole('school_admin') || $user->role === 'school_admin' || $user->hasRole('super_admin') || $user->role === 'super_admin')
+            <li class="edu-nav-item">
+                <a href="{{ route('school.review.create', ['tenant' => $tenant]) }}" class="edu-nav-link {{ Request::is('*/review*') ? 'active' : '' }}">
+                    <i data-feather="star"></i> <span>Review</span>
+                </a>
+            </li>
+            @endif
+
             <li class="edu-nav-category">Settings</li>
             
             @if($user->hasRole('school_admin') || $user->role === 'school_admin' || $hasFeature('system.settings'))
@@ -273,6 +281,7 @@
                     <ul class="edu-sub-nav">
                         <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">General Settings</a></li>
                         <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">API Setup</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">Communication Settings</a></li>
                         @if($user->hasRole('school_admin'))
                             <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">Role & Permissions</a></li>
                         @endif

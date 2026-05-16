@@ -24,7 +24,7 @@
                     </span>
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-sm btn-icon btn-outline-primary" title="Send SMS/Notice">
+                    <button class="btn btn-sm btn-icon btn-outline-primary btn-send-reminder" data-id="{{ $invoice->id }}" title="Send SMS/Notice">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </td>
