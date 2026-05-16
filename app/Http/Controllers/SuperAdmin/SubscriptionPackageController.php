@@ -51,7 +51,7 @@ class SubscriptionPackageController extends Controller
             'student.create',
             'student.edit',
             'student.delete',
-            'student.manage',
+            'student.manage', 
         ];
 
         $validated['features'] = $features;
