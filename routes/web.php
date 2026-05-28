@@ -53,6 +53,9 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset');
     Route::post('/reset-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'resetPassword'])->name('password.update');
 
+    Route::post('/main-newsletter-subscribe', [NewsletterController::class, 'mainSubscribe'])->name('main.newsletter.subscribe');   
+
+
     // --- Unified Auth Routes ---
     Route::controller(AuthController::class)->group(function () {
         Route::get('/login', 'mainLoginForm')->name('login.form'); 

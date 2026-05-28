@@ -65,6 +65,18 @@ h6,
     min-height: 100vh;
 }
 
+.card {
+    background-color: var(--surface-card) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md) !important;
+    transform: translateY(-2px);
+}
+
 @media (max-width: 768px) {
     .page-content {
         padding: 16px !important;
@@ -494,13 +506,13 @@ h6,
 }
 
 /* =====================================================
-   CARDS (global override)
+   CARDS (global override
    ===================================================== */
 .card {
     background-color: var(--surface-card) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-sm) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {

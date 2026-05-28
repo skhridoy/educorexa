@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>OTP for Password Reset - {{ $school->name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -50,6 +51,20 @@
             color: #888;
             font-size: 12px;
         }
+        
+@media (max-width: 480px) {
+    .container {
+        width: 100%;
+        padding: 20px;
+    }
+    .otp-container {
+        padding: 10px;
+    }
+    .otp-code {
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+}
     </style>
 </head>
 <body>

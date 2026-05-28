@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Newsletter;
+use App\Models\MainNewsletter;
 use App\Models\School;
 use Illuminate\Http\Request;
 use App\Mail\NewsletterMail;
@@ -81,5 +82,24 @@ class NewsletterController extends Controller
         }
 
         return back()->with('success', 'Emails have been added to the queue and will be sent shortly!');
+    }
+
+    public function mainSubscribe(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $exists =   MainNewsletter::where('email', $request->email)->exists();
+
+        if ($exists) {
+            return back()->with('info', 'You are already subscribed!');
+        }
+
+        MainNewsletter::create([
+            'email' => $request->email
+        ]);
+
+        return back()->with('success', 'Thanks for subscribing!');
     }
 }

@@ -49,11 +49,23 @@
 
             
 
-            {{-- Newsletter --}}
             <div class="col-md-6 col-lg-3">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                        <strong>ধন্যবাদ!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                @if(session('exi    sts'))
+                    <div class="alert alert-warning alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                        <strong>দুঃখিত!</strong> {{ session('exists') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 <h5 class="text-white mb-4">Newsletter</h5>
                 <p class="small mb-4">{{ $setting->newsletter_text ?? 'Stay updated with our latest news and events.' }}</p>
-                <form action="#" method="POST">
+                <form action="{{ route('main.newsletter.subscribe') }}" method="POST">
                     @csrf
                     <div class="position-relative w-100">
                         <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" 

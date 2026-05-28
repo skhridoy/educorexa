@@ -185,4 +185,20 @@
         color: #dc2626;
     }
 </style>
+<style>
+@media (max-width: 480px) {
+    .otp-grid {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .otp-box {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    .otp-timer {
+        font-size: 0.9rem;
+    }
+}
+</style>
 @endsection
