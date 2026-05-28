@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AdmissionController extends Controller
 {
@@ -123,7 +125,22 @@ class AdmissionController extends Controller
 
         });
 
-        return back()->with('success', 'Admission Submitted Successfully. Your ID: ' . $admissionNumber);
+        // After creating admission, store the ID in session and return to the form with success message
+        $admission = Admission::where('admission_number', $admissionNumber)->first();
+        return back()->with(['success' => 'Admission submitted successfully.', 'admission_id' => $admission->id]);
+    }
+
+    /**
+     * Download Admission PDF
+     */
+    public function downloadPdf($tenant, $id)
+    {
+        $admission = Admission::findOrFail($id);
+        $school = app('currentSchool');
+        $qrData = "Admission No: {$admission->admission_number}\nName: {$admission->name}";
+        $qrCode = base64_encode(QrCode::format('svg')->size(150)->generate($qrData));
+        $pdf = Pdf::loadView('admission.pdf', compact('admission', 'school', 'qrCode'));
+        return $pdf->download('admission_' . $admission->admission_number . '.pdf');
     }
 
     public function approve($tenant, Admission $admission)
@@ -257,14 +274,17 @@ class AdmissionController extends Controller
     /**
      * Reject Admission
      */
-    public function reject(Request $request, Admission $admission)
+    public function reject(Request $request, $tenant, Admission $admission)
     {
-        abort_if($admission->school_id !== Auth::user()->school_id, 403);
 
+        abort_if($admission->school_id !== auth()->user()->school_id, 403);
+
+ 
         $request->validate([
             'admin_note' => 'required|string'
         ]);
 
+        // ৩. আপডেট
         $admission->update([
             'status' => 'rejected',
             'admin_note' => $request->admin_note

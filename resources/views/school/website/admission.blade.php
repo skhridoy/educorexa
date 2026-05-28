@@ -95,9 +95,8 @@
 
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                            <i class="me-2 icon-md" data-feather="check-circle"></i>
                             <strong>Success!</strong> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <a href="{{ route('admission.pdf', ['tenant' => app('currentSchool')->slug, 'id' => session('admission_id')]) }}" class="btn btn-sm btn-outline-primary ms-2" target="_blank">Download PDF</a>
                         </div>
                     @endif
 

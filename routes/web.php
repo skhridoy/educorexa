@@ -204,6 +204,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::get('/admission', [AdmissionController::class, 'create'])->name('admission.create');
 
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
+Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admission.pdf');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
             Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('school.contact.store');
@@ -375,6 +376,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     [AdmissionController::class, 'destroy']
                 )->name('admissions.destroy');
 
+                Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admissions.pdf');
                 // Teacher Routes (to be implemented)
     
                 Route::middleware(['auth', 'permission:teacher.manage', 'school_package:teacher.manage'])->group(function () {
