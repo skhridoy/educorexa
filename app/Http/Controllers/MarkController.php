@@ -561,6 +561,9 @@ class MarkController extends Controller
         // ৬. স্কুল ও PDF ডাটা তৈরি
         $school = DB::table('schools')->find($schoolId);
 
+        $instituteLogo = public_path($school->logo ?? 'no-logo.png');
+        $studentPhoto = public_path($student->photo ?? 'no-image.png');
+
         $data = [
             'student'         => $student,
             'displayRoll'     => $displayRoll,
@@ -575,13 +578,63 @@ class MarkController extends Controller
             'address'         => $school->address ?? 'Address',
             'emis'            => $school->emis_code ?? 'N/A',
             'academic_year'   => $academicYearName,
-            'instituteLogo'   => public_path($school->logo ?? 'no-logo.png'),
-            'studentPhoto'    => public_path($student->photo ?? 'no-image.png'),
+            'instituteLogo'   => $this->compressImageToBase64($instituteLogo, 250),
+            'studentPhoto'    => $this->compressImageToBase64($studentPhoto, 150),
             'formattedDOB'    => $student->dob ? date('d-m-Y', strtotime($student->dob)) : 'N/A'
         ];
 
         $pdf = Pdf::loadView('school.mark.marksheet-pdf', $data);
         return $pdf->download('marksheet-'.$displayCustomId.'.pdf');
+    }
+
+    private function compressImageToBase64($path, $maxWidth = 150)
+    {
+        if (!file_exists($path) || !is_file($path)) return '';
+        try {
+            $info = getimagesize($path);
+            if (!$info) return '';
+            
+            $width = $info[0];
+            $height = $info[1];
+            $mime = $info['mime'];
+            
+            if ($width > $maxWidth) {
+                $newWidth = $maxWidth;
+                $newHeight = floor($height * ($maxWidth / $width));
+                
+                $image = null;
+                if ($mime == 'image/jpeg') $image = @imagecreatefromjpeg($path);
+                elseif ($mime == 'image/png') $image = @imagecreatefrompng($path);
+                elseif ($mime == 'image/webp') $image = @imagecreatefromwebp($path);
+                
+                if ($image) {
+                    $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                    
+                    if ($mime == 'image/png' || $mime == 'image/webp') {
+                        imagealphablending($newImage, false);
+                        imagesavealpha($newImage, true);
+                        $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
+                        imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
+                    }
+                    
+                    imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                    
+                    ob_start();
+                    if ($mime == 'image/jpeg') imagejpeg($newImage, null, 75);
+                    elseif ($mime == 'image/png') imagepng($newImage, null, 6);
+                    elseif ($mime == 'image/webp') imagewebp($newImage, null, 75);
+                    $imageData = ob_get_clean();
+                    
+                    imagedestroy($image);
+                    imagedestroy($newImage);
+                    
+                    return 'data:' . $mime . ';base64,' . base64_encode($imageData);
+                }
+            }
+            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     public function downloadResultSheet(Request $request, $tenant)

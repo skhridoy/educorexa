@@ -65,6 +65,12 @@ class SchoolWebsiteController extends Controller
         return view('school.website.about-us', compact('school'));
     }
 
+    public function resultPage($tenant)
+    {
+        $school = School::where('slug', $tenant)->firstOrFail();
+        return view('school.website.result', compact('school'));
+    }
+
     
     public function storeMessage($tenant, Request $request) {
         $school = DB::table('schools')->where('slug', $tenant)->first();

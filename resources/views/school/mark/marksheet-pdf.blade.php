@@ -8,8 +8,9 @@
     <meta charset="UTF-8">
     <title>Academic Transcript - {{ $student->name }}</title>
     <style>
+        @page { margin: 20px; }
         /* ফন্ট সাইজ ১১.৫ এ সেট করা হয়েছে যা স্ট্যান্ডার্ড */
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 11.5px; margin: 0; padding: 0; color: #000; line-height: 1.4; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11.5px; margin: 0; padding: 0; color: #000; line-height: 1.4; }
         
         .watermark {
             position: fixed;
@@ -22,7 +23,14 @@
         .watermark img { width: 420px; }
 
         /* wrapper এর মার্জিন ও প্যাডিং ঠিক করা হয়েছে */
-        .wrapper { border: 2px solid #000; padding: 15px; margin: 5px; min-height: 920px; position: relative;}
+        .wrapper { 
+
+            padding: 15px; 
+            margin: 5px; 
+            min-height: 1000px; 
+            position: relative;
+            box-sizing: border-box;
+        }
         
         /* Header Section - স্পেসিং একটু বাড়ানো হয়েছে */
         .header-top { text-align: center; margin-bottom: 12px; }
@@ -51,7 +59,8 @@
         .bg-gray { background-color: #f2f2f2; }
 
         /* Footer Signatures - পজিশন ফিক্সড করা হয়েছে যাতে পেজের নিচে থাকে */
-        .footer-sig { margin-top: 60px; width: 100%; }
+        .footer-sig-container { position: absolute; bottom: 30px; left: 15px; right: 15px; }
+        .footer-sig { width: 100%; }
         .footer-sig td { text-align: center; vertical-align: bottom; }
         .sig-line { border-top: 1px solid #000; display: inline-block; width: 150px; padding-top: 5px; font-size: 11px; font-weight: bold;}
     </style>
@@ -182,13 +191,15 @@
     </table>
 
     {{-- Footer Signatures --}}
-    <table class="footer-sig">
-        <tr>
-            <td><span class="sig-line">Class Teacher</span></td>
-            <td><span class="sig-line">Guardian</span></td>
-            <td><span class="sig-line">Principal</span></td>
-        </tr>
-    </table>
+    <div class="footer-sig-container">
+        <table class="footer-sig">
+            <tr>
+                <td><span class="sig-line">Class Teacher</span></td>
+                <td><span class="sig-line">Guardian</span></td>
+                <td><span class="sig-line">Principal</span></td>
+            </tr>
+        </table>
+    </div>
 </div>
 
 </body>

@@ -33,12 +33,17 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
+            @php
+                $isHome = request()->routeIs('school.home');
+                $homeUrl = route('school.home', ['tenant' => $school->slug]);
+            @endphp
             <div class="navbar-nav ms-auto py-4 py-lg-0">
-                <a href="#home" class="nav-item nav-link active">Home</a>
-                <a href="{{ $school ? route('school.about', ['tenant' => $school->slug]) : '#' }}" class="nav-item nav-link">About</a>
-                <a href="#notice" class="nav-item nav-link">Notice</a>
-                <a href="#overview" class="nav-item nav-link">Academic</a>
-                <a href="#contact" class="nav-item nav-link">Contact</a>
+                <a href="{{ $isHome ? '#home' : $homeUrl }}" class="nav-item nav-link {{ $isHome ? 'active' : '' }}">Home</a>
+                <a href="{{ $isHome ? '#about' : $homeUrl . '#about' }}" class="nav-item nav-link">About</a>
+                <a href="{{ route('frontend.result_page', ['tenant' => $school->slug]) }}" class="nav-item nav-link {{ request()->routeIs('frontend.result_page') ? 'active' : '' }}">Result</a>
+                <a href="{{ $isHome ? '#notice' : $homeUrl . '#notice' }}" class="nav-item nav-link">Notice</a>
+                <a href="{{ $isHome ? '#overview' : $homeUrl . '#overview' }}" class="nav-item nav-link">Academic</a>
+                <a href="{{ $isHome ? '#contact' : $homeUrl . '#contact' }}" class="nav-item nav-link">Contact</a>
             </div>
             @auth
                 @php

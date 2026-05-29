@@ -296,7 +296,7 @@
                         <i class="fa fa-file-invoice"></i>
                         <h4 class="fw-bold mb-3">Public Results</h4>
                         <p class="text-muted mb-4">Easily check examination results online. Stay updated with your child's academic progress.</p>
-                        <a href="#home" class="btn btn-navy rounded-pill py-2 px-4">Check Result</a>
+                        <a href="{{ route('frontend.result_page', ['tenant' => $school->slug]) }}" class="btn btn-navy rounded-pill py-2 px-4">Check Result</a>
                     </div>
                 </div>
             </div>
