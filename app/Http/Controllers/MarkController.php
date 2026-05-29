@@ -558,6 +558,15 @@ class MarkController extends Controller
         
         $targetData = collect($meritList)->where('id', $studentId)->first();
 
+        // Attendance Report
+        $attendances = \App\Models\Attendance::where('student_id', $studentId)
+                        ->where('class_id', $classId)
+                        ->get();
+        $totalWorkingDays = $attendances->count();
+        $presentDays = $attendances->where('status', 'present')->count();
+        $absentDays = $attendances->where('status', 'absent')->count();
+        $attendancePercentage = $totalWorkingDays > 0 ? round(($presentDays / $totalWorkingDays) * 100) : 0;
+
         // ৬. স্কুল ও PDF ডাটা তৈরি
         $school = DB::table('schools')->find($schoolId);
 
@@ -580,7 +589,11 @@ class MarkController extends Controller
             'academic_year'   => $academicYearName,
             'instituteLogo'   => $this->compressImageToBase64($instituteLogo, 250),
             'studentPhoto'    => $this->compressImageToBase64($studentPhoto, 150),
-            'formattedDOB'    => $student->dob ? date('d-m-Y', strtotime($student->dob)) : 'N/A'
+            'formattedDOB'    => $student->dob ? date('d-m-Y', strtotime($student->dob)) : 'N/A',
+            'totalWorkingDays'=> $totalWorkingDays,
+            'presentDays'     => $presentDays,
+            'absentDays'      => $absentDays,
+            'attendancePercentage' => $attendancePercentage
         ];
 
         $pdf = Pdf::loadView('school.mark.marksheet-pdf', $data);

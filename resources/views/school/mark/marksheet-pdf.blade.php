@@ -190,6 +190,31 @@
         </tbody>
     </table>
 
+    {{-- Attendance Table --}}
+    <div style="margin-top: 20px;">
+        <table class="marks-table" style="width: 70%; margin: 0 auto; text-align: center;">
+            <thead>
+                <tr class="bg-gray">
+                    <th colspan="4" style="font-size: 12px; padding: 4px;">ATTENDANCE REPORT</th>
+                </tr>
+                <tr>
+                    <th width="25%">Total Working Days</th>
+                    <th width="25%">Present</th>
+                    <th width="25%">Absent</th>
+                    <th width="25%">Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: bold;">{{ $totalWorkingDays }}</td>
+                    <td style="font-weight: bold; color: #10b981;">{{ $presentDays }}</td>
+                    <td style="font-weight: bold; color: #ef4444;">{{ $absentDays }}</td>
+                    <td style="font-weight: bold;">{{ $attendancePercentage }}%</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     {{-- Footer Signatures --}}
     <div class="footer-sig-container">
         <table class="footer-sig">
