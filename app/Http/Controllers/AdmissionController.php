@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Classes;
 use App\Models\AcademicYear;
 use App\Models\Section;
+use App\Models\SchoolCategory;
+use App\Models\SchoolSubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,11 +24,14 @@ class AdmissionController extends Controller
      */
     public function index()
     {
-        $schoolId = app('currentSchool')->id; 
+        $schoolId = app('currentSchool')->id;
         $admissions = Admission::where('school_id', Auth::user()->school_id)
             ->latest()
             ->get();
-        return view('school.admission.index', compact('admissions'));
+        $sections   = Section::where('school_id', $schoolId)->get();
+        $categories = SchoolCategory::where('school_id', $schoolId)->get();
+        $subCategories = SchoolSubCategory::where('school_id', $schoolId)->get();
+        return view('school.admission.index', compact('admissions', 'sections', 'categories', 'subCategories'));
     }
 
     /**
@@ -143,26 +148,37 @@ class AdmissionController extends Controller
         return $pdf->download('admission_' . $admission->admission_number . '.pdf');
     }
 
-    public function approve($tenant, Admission $admission)
+    public function approve(Request $request, $tenant, Admission $admission)
     {
         // ১. সিকিউরিটি চেক
         abort_if($admission->school_id !== auth()->user()->school_id, 403);
+
+        // ২. ভ্যালিডেশন
+        $request->validate([
+            'section_id'           => 'required|exists:sections,id',
+            'school_category_id'   => 'nullable|exists:school_categories,id',
+            'school_sub_category_id' => 'nullable|exists:school_sub_categories,id',
+        ]);
 
         $currentSchool = app('currentSchool');
         $schoolId = $currentSchool->id;
         $tenantSlug = $currentSchool->slug;
 
-        // ২. ডাইনামিকভাবে ডিফল্ট সেকশন খুঁজে বের করা (ওই স্কুল ও ক্লাসের জন্য)
-        $defaultSection = Section::where('school_id', $schoolId)->first();
+        // ৩. ফর্ম থেকে নির্বাচিত Section
+        $selectedSection = Section::where('id', $request->section_id)
+            ->where('school_id', $schoolId)
+            ->first();
 
-        if (!$defaultSection) {
+        if (!$selectedSection) {
             return back()->with([
-                'success' => 'এই ক্লাসের জন্য কোনো সেকশন খুঁজে পাওয়া যায়নি। আগে সেকশন তৈরি করুন।',
+                'success' => 'নির্বাচিত সেকশন পাওয়া যায়নি। আবার চেষ্টা করুন।',
                 'type'    => 'danger'
             ]);
         }
 
-        $sectionId = $defaultSection->id;
+        $sectionId          = $selectedSection->id;
+        $categoryId         = $request->school_category_id;
+        $subCategoryId      = $request->school_sub_category_id;
 
         // ৩. একটিভ একাডেমিক ইয়ার খুঁজে বের করা
         $academicYear = AcademicYear::where('school_id', $schoolId)
@@ -207,7 +223,7 @@ class AdmissionController extends Controller
 
         $nextRoll = $lastRoll ? $lastRoll + 1 : 1;
         // ৬. ডাটাবেজ ট্রানজ্যাকশন (নিরাপদ ইনসার্ট নিশ্চিত করতে)
-        DB::transaction(function () use ($admission, $studentId, $schoolId, $admissionDate, $finalPhotoPath, $sectionId, $nextRoll) {
+        DB::transaction(function () use ($admission, $studentId, $schoolId, $admissionDate, $finalPhotoPath, $sectionId, $categoryId, $subCategoryId, $nextRoll) {
            // ১. ইউজার খুঁজে বের করা অথবা আপডেট করা
             $user = User::where('email', $admission->email)
                         ->where('school_id', $schoolId)
@@ -237,7 +253,9 @@ class AdmissionController extends Controller
                 'school_id'         => $schoolId,
                 'academic_year_id'  => $admission->academic_year_id,
                 'class_id'          => $admission->class_id,
-                'section_id'        => $sectionId,
+                'section_id'             => $sectionId,
+                'school_category_id'     => $categoryId,
+                'school_sub_category_id' => $subCategoryId,
                 'student_id'        => $studentId,
                 'roll'              => $nextRoll,
                 'name'              => $admission->name,
@@ -265,8 +283,177 @@ class AdmissionController extends Controller
             $admission->delete();
         });
 
+    }
+
+    public function bulkApprove(Request $request, $tenant)
+    {
+        // 1. Validation
+        $request->validate([
+            'admission_ids'        => 'required|array',
+            'admission_ids.*'      => 'exists:admissions,id',
+            'section_id'           => 'required|exists:sections,id',
+            'school_category_id'   => 'nullable|exists:school_categories,id',
+            'school_sub_category_id' => 'nullable|exists:school_sub_categories,id',
+        ]);
+
+        $currentSchool = app('currentSchool');
+        $schoolId = $currentSchool->id;
+        $tenantSlug = $currentSchool->slug;
+
+        // 2. Fetch pending admissions for this school
+        $admissions = Admission::whereIn('id', $request->admission_ids)
+            ->where('school_id', $schoolId)
+            ->where('status', 'pending')
+            ->get();
+
+        if ($admissions->isEmpty()) {
+            return back()->with([
+                'success' => 'কোনো পেন্ডিং আবেদন পাওয়া যায়নি।',
+                'type'    => 'danger'
+            ]);
+        }
+
+        // 3. Find selected section
+        $selectedSection = Section::where('id', $request->section_id)
+            ->where('school_id', $schoolId)
+            ->first();
+
+        if (!$selectedSection) {
+            return back()->with([
+                'success' => 'নির্বাচিত সেকশন পাওয়া যায়নি। আবার চেষ্টা করুন।',
+                'type'    => 'danger'
+            ]);
+        }
+
+        $sectionId          = $selectedSection->id;
+        $categoryId         = $request->school_category_id;
+        $subCategoryId      = $request->school_sub_category_id;
+
+        // 4. Find active academic year
+        $academicYear = AcademicYear::where('school_id', $schoolId)
+            ->where('is_active', 1)
+            ->first();
+
+        if (!$academicYear) {
+            return back()->with([
+                'success' => 'কোনো সক্রিয় শিক্ষাবর্ষ পাওয়া যায়নি।',
+                'type'    => 'danger'
+            ]);
+        }
+
+        // 5. Setup Unique Student ID generation
+        $yearPart = substr($academicYear->name, -2);
+        $prefix = 'STD-' . $yearPart;
+
+        $lastSerial = Student::where('school_id', $schoolId)
+            ->where('student_id', 'like', $prefix . '%')
+            ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
+            ->value('max_serial');
+
+        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
+        $admissionDate = now()->format('Y-m-d');
+
+        // Track rolls per class to prevent duplicate rolls in the batch
+        $classRolls = [];
+        $approvedCount = 0;
+
+        // 6. DB Transaction to ensure everything succeeds or fails together
+        DB::transaction(function () use ($admissions, $schoolId, $tenantSlug, $academicYear, $prefix, &$nextNumber, $admissionDate, $sectionId, $categoryId, $subCategoryId, &$classRolls, &$approvedCount) {
+            foreach ($admissions as $admission) {
+                // Generate Student ID
+                $studentId = $prefix . str_pad($nextNumber++, 4, '0', STR_PAD_LEFT);
+
+                // Handle Roll Number
+                $classId = $admission->class_id;
+                if (!isset($classRolls[$classId])) {
+                    $lastRoll = Student::where('school_id', $schoolId)
+                        ->where('class_id', $classId)
+                        ->where('academic_year_id', $academicYear->id)
+                        ->max('roll');
+                    $classRolls[$classId] = $lastRoll ? $lastRoll : 0;
+                }
+                $classRolls[$classId]++;
+                $nextRoll = $classRolls[$classId];
+
+                // Handle Photo Move
+                $finalPhotoPath = $admission->photo;
+                if ($admission->photo && file_exists(public_path($admission->photo))) {
+                    $oldPath = public_path($admission->photo);
+                    $newFolder = "uploads/schools/{$tenantSlug}/students";
+                    
+                    if (!file_exists(public_path($newFolder))) {
+                        mkdir(public_path($newFolder), 0755, true);
+                    }
+
+                    $fileName = basename($oldPath);
+                    $newPath = $newFolder . '/' . $fileName;
+                    
+                    if (rename($oldPath, public_path($newPath))) {
+                        $finalPhotoPath = $newPath;
+                    }
+                }
+
+                // Handle User
+                $user = User::where('email', $admission->email)
+                            ->where('school_id', $schoolId)
+                            ->first();
+
+                if ($user) {
+                    $user->update(['role' => 'student']);
+                } else {
+                    $user = User::create([
+                        'school_id' => $schoolId,
+                        'name'      => $admission->name,
+                        'email'     => $admission->email,
+                        'password'  => $admission->password,
+                        'role'      => 'student',
+                    ]);
+                }
+
+                if (method_exists($user, 'syncRoles')) {
+                    $user->syncRoles(['student']);
+                }
+
+                // Create Student
+                Student::create([
+                    'user_id'                => $user->id,
+                    'school_id'              => $schoolId,
+                    'academic_year_id'       => $academicYear->id,
+                    'class_id'               => $admission->class_id,
+                    'section_id'             => $sectionId,
+                    'school_category_id'     => $categoryId,
+                    'school_sub_category_id' => $subCategoryId,
+                    'student_id'             => $studentId,
+                    'roll'                   => $nextRoll,
+                    'name'                   => $admission->name,
+                    'email'                  => $admission->email,
+                    'contact_number'         => $admission->contact_number,
+                    'fathers_name'           => $admission->fathers_name,
+                    'mothers_name'           => $admission->mothers_name,
+                    'father_nid'             => $admission->father_nid,
+                    'mother_nid'             => $admission->mother_nid,
+                    'student_birth_nid'      => $admission->student_birth_nid,
+                    'gender'                 => $admission->gender,
+                    'religion'               => $admission->religion,
+                    'blood_group'            => $admission->blood_group,
+                    'date_of_birth'          => $admission->date_of_birth,
+                    'admission_date'         => $admissionDate,
+                    'address'                => $admission->address,
+                    'previous_school'        => $admission->previous_school,
+                    'previous_class'         => $admission->previous_class,
+                    'photo'                  => $finalPhotoPath,
+                    'status'                 => 'active',
+                    'password'               => $admission->password,
+                ]);
+
+                // Delete Admission
+                $admission->delete();
+                $approvedCount++;
+            }
+        });
+
         return back()->with([
-            'success' => 'শিক্ষার্থী সফলভাবে ভর্তি করা হয়েছে। আইডি: ' . $studentId,
+            'success' => $approvedCount . ' জন শিক্ষার্থী সফলভাবে ভর্তি করা হয়েছে।',
             'type'    => 'success'
         ]);
     }
@@ -276,18 +463,15 @@ class AdmissionController extends Controller
      */
     public function reject(Request $request, $tenant, Admission $admission)
     {
-
         abort_if($admission->school_id !== auth()->user()->school_id, 403);
 
- 
         $request->validate([
-            'admin_note' => 'required|string'
+            'admin_note' => 'nullable|string'
         ]);
 
-        // ৩. আপডেট
         $admission->update([
-            'status' => 'rejected',
-            'admin_note' => $request->admin_note
+            'status'     => 'rejected',
+            'admin_note' => $request->admin_note,
         ]);
 
         return back()->with('success', 'Admission rejected successfully.');
@@ -296,4 +480,17 @@ class AdmissionController extends Controller
     /**
      * Delete Admission
      */
+    public function destroy($tenant, Admission $admission)
+    {
+        abort_if($admission->school_id !== auth()->user()->school_id, 403);
+
+        // ফটো থাকলে মুছে ফেলা
+        if ($admission->photo && file_exists(public_path($admission->photo))) {
+            @unlink(public_path($admission->photo));
+        }
+
+        $admission->delete();
+
+        return back()->with('success', 'Admission deleted successfully.');
+    }
 }

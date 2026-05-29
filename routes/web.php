@@ -202,9 +202,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::post('/reset-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'resetPassword'])->name('school.password.update');
 
             Route::get('/admission', [AdmissionController::class, 'create'])->name('admission.create');
-
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
-Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admission.pdf');
+            Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admissions.pdf');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
             Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('school.contact.store');
@@ -365,6 +364,7 @@ Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->
                 Route::get('/admissions', [AdmissionController::class, 'index'])
                     ->name('admissions.index');
 
+                Route::post('/admissions/bulk-approve', [AdmissionController::class, 'bulkApprove'])->name('admissions.bulk-approve');
                 Route::post('/admissions/{admission}/approve', [AdmissionController::class, 'approve'])->name('admissions.approve');
                 Route::post(
                     '/admissions/{admission}/reject',
@@ -376,7 +376,6 @@ Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->
                     [AdmissionController::class, 'destroy']
                 )->name('admissions.destroy');
 
-                Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admissions.pdf');
                 // Teacher Routes (to be implemented)
     
                 Route::middleware(['auth', 'permission:teacher.manage', 'school_package:teacher.manage'])->group(function () {

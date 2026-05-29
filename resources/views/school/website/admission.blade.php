@@ -96,7 +96,7 @@
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
                             <strong>Success!</strong> {{ session('success') }}
-                            <a href="{{ route('admission.pdf', ['tenant' => app('currentSchool')->slug, 'id' => session('admission_id')]) }}" class="btn btn-sm btn-outline-primary ms-2" target="_blank">Download PDF</a>
+                            <a href="{{ route('admissions.pdf', ['tenant' => app('currentSchool')->slug, 'id' => session('admission_id')]) }}" class="btn btn-sm btn-outline-primary ms-2" target="_blank">Download PDF</a>
                         </div>
                     @endif
 
