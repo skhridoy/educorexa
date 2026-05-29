@@ -209,6 +209,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('school.contact.store');
             // Result Route 
             Route::get('/result', [SchoolWebsiteController::class, 'resultPage'])->name('frontend.result_page');
+            Route::get('/notice', [\App\Http\Controllers\NoticeController::class, 'publicIndex'])->name('frontend.notice');
             Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
             Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
             // Protected Routes

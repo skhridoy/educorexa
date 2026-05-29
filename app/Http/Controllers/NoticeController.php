@@ -19,15 +19,17 @@ class NoticeController extends Controller
 {
     use SchoolMailConfig;
     // নোটিশের তালিকা দেখানো
-    public function index($tenant)
+
+    // Front-end public notices list
+    public function publicIndex($tenant)
     {
         $school = School::where('slug', $tenant)->firstOrFail();
         $notices = Notice::where('school_id', $school->id)
                         ->orderBy('notice_date', 'desc')
                         ->get();
-
-        return view('school.admin.notice.index', compact('notices'));
+        return view('school.website.notice', compact('school', 'notices'));
     }
+
 
     // নতুন নোটিশ সেভ করা
     public function store(Request $request, $tenant)

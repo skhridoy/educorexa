@@ -41,7 +41,7 @@
                 <a href="{{ $isHome ? '#home' : $homeUrl }}" class="nav-item nav-link {{ $isHome ? 'active' : '' }}">Home</a>
                 <a href="{{ $isHome ? '#about' : $homeUrl . '#about' }}" class="nav-item nav-link">About</a>
                 <a href="{{ route('frontend.result_page', ['tenant' => $school->slug]) }}" class="nav-item nav-link {{ request()->routeIs('frontend.result_page') ? 'active' : '' }}">Result</a>
-                <a href="{{ $isHome ? '#notice' : $homeUrl . '#notice' }}" class="nav-item nav-link">Notice</a>
+                <a href="{{ route('frontend.notice', ['tenant' => $school->slug]) }}" class="nav-item nav-link">Notice</a>
                 <a href="{{ $isHome ? '#overview' : $homeUrl . '#overview' }}" class="nav-item nav-link">Academic</a>
                 <a href="{{ $isHome ? '#contact' : $homeUrl . '#contact' }}" class="nav-item nav-link">Contact</a>
             </div>
