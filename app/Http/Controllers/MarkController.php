@@ -589,7 +589,7 @@ class MarkController extends Controller
             'academic_year'   => $academicYearName,
             'instituteLogo'   => $this->compressImageToBase64($instituteLogo, 250),
             'studentPhoto'    => $this->compressImageToBase64($studentPhoto, 150),
-            'formattedDOB'    => $student->dob ? date('d-m-Y', strtotime($student->dob)) : 'N/A',
+            'formattedDOB'    => $student->date_of_birth ? date('d-m-Y', strtotime($student->date_of_birth)) : 'N/A',
             'totalWorkingDays'=> $totalWorkingDays,
             'presentDays'     => $presentDays,
             'absentDays'      => $absentDays,
