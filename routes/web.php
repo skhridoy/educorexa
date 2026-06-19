@@ -448,7 +448,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
                 Route::middleware(['auth', 'permission:fee.collect', 'school_package:fee.collect'])->group(function () {
                     Route::get('collect-payment', [PaymentController::class, 'index'])->name('payment.index');
+                    Route::post('collect-payment-multiple', [PaymentController::class, 'collectMultiple'])->name('payment.collectMultiple');
                     Route::post('collect-payment/{id}', [PaymentController::class, 'collect'])->name('payment.collect');
+                    Route::get('payment-receipt-multiple/{receipt_no}', [PaymentController::class, 'downloadReceiptMultiple'])->name('payment.receiptMultiple');
                     Route::get('payment-receipt/{id}', [PaymentController::class, 'downloadReceipt'])->name('payment.receipt');
                 });
 

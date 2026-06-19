@@ -3,167 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* PDF সেটিংস: মার্জিন কমানো হয়েছে ব্ল্যাঙ্ক পেজ রোধ করতে */
-        @page { size: A4 landscape; margin: 0; }
-        body { font-family: 'Helvetica', sans-serif; margin: 0; padding: 10px; background-color: white; color: #333; line-height: 1.2; }
-        
-        .master-container { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .receipt-column { width: 50%; padding: 8px; vertical-align: top; }
-        
-        /* বর্ডার এবং জলছাপ কন্টেইনার */
-        .receipt-border { 
-            border: 1px dashed #ccc; 
-            border-radius: 8px; 
-            overflow: hidden; 
+        @page { size: A4 landscape; margin: 5px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Helvetica', sans-serif; margin: 0; padding: 5px; background: white; color: #333; font-size: 10px; line-height: 1.3; }
+
+        .master-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .receipt-col { width: 50%; padding: 5px; vertical-align: top; }
+
+        .receipt-box {
+            border: 1px solid #ccc;
+            overflow: hidden;
             position: relative;
-            height: 730px; /* ফিক্সড হাইট যাতে ব্ল্যাঙ্ক পেজ না আসে */
+            background: #fff;
+            height: 540px;
         }
 
+        /* WATERMARK */
         .watermark {
             position: absolute;
-            top: 55%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            z-index: -1;
-            opacity: 15%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-40deg);
+            z-index: 0;
+            opacity: 0.08;
+        }
+        .watermark img { width: 220px; height: auto; }
+
+        .body-wrap { position: relative; z-index: 1; }
+
+        /* ======= FIXED COMPACT HEADER DESIGN ======= */
+        .hdr-container {
             width: 100%;
-            text-align: center;
-        }
-        .watermark img{
-            width: 250px;
-            height: auto;
-
+            height: 80px;
+            background: #f37920; /* Base background orange */
+            position: relative;
         }
 
-        /* হেডার */
-        .header-table { width: 100%; background-color: #1a2a4e; color: white; padding: 15px; border-collapse: collapse; }
-        .school-logo-cell { width: 60px; vertical-align: middle; }
-        .logo-box img { width: 50px; height: 50px; border-radius: 5px; }
-        
-        .school-info-cell { vertical-align: middle; padding-left: 10px; }
-        .school-name { margin: 0; font-size: 16px; text-transform: uppercase; font-weight: bold; }
-        .school-addr { margin: 2px 0 0; font-size: 12px; color: #ccc; }
-        
-        .rec-meta-cell { text-align: right; vertical-align: middle; }
-        .copy-tag { background: #e2a03f; color: #1a2a4e; font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 4px; display: inline-block; text-transform: uppercase; }
-        .rec-no { font-size: 16px; font-weight: bold; margin: 5px 0 0; }
-        .date { font-size: 14px; color: #bbb; }
+        .hdr-left-navy {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60%; /* Controls where the slope starts */
+            height: 80px;
+            background: #2B3547;
+            z-index: 2;
+        }
 
-        .banner { background-color: #00a65a; color: white; text-align: center; padding: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        /* The master triangle connector */
+        .hdr-slope-svg {
+            position: absolute;
+            top: 0;
+            left: 60%;
+            width: 40px;
+            height: 80px;
+            z-index: 2;
+        }
 
-        .content { padding: 10px; line-height: 20px;}
-        .section-title { color: #888; font-size: 13px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 10px; }
+        /* Text positioning inside the navy container */
+        .hdr-content-table {
+            width: 100%;
+            height: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        .hdr-orange-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin-top: -10px;
+            width: 40%;
+            height: 80px;
+            text-align: right;
+            z-index: 1;
+            margin-right: 10px;
+        }
+
+        .school-name { color: #f37920; font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 2px 0; }
+        .copy-badge { color: #a8c8e8; font-size: 9px; text-transform: uppercase; margin: 0; }
+        .invoice-title { 
+            color: #2B3547; font-size: 20px; font-weight: 700; letter-spacing: 2px; display: inline-block; vertical-align: end; line-height: 70px; text-align:right; margin-top: -15px }
+
+        /* ======= ADDRESS BAR WITH GOLD SHADOW ======= */
+        .addr-container {
+            position: relative;
+            margin-top: -17px;
+            width: 100%;
+
+            z-index: 1;
+            vertical-align: end;
+        }
+
+        /* নতুন টেবিল স্টাইল: অ্যাড্রেসকে INVOICE এর নিচে সমানভাবে এলাইন করার জন্য */
         
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
-        .info-table td { width: 33.33%; padding-bottom: 8px; vertical-align: top; }
-        .info-label { display: block; font-size: 12px; color: #888; text-transform: uppercase; }
-        .info-value { display: block; font-size: 13px; font-weight: bold; color: #1a2a4e; margin-top: 1px; }
+        .addr-text-box-right {
+            padding: 6px 0;
+            font-size: 9px;
+            color: #444;
+            line-height: 1.2;
+            text-align: right; /* বামে এলাইন থাকবে কিন্তু কলামটি থাকবে ইনভয়েসের নিচে */
+        }
+        .addr-text-box-right b { color: #2B3547; }
 
-        .payment-table { width: 100%; border-collapse: collapse; }
-        .payment-table thead th { background-color: #1a2a4e; color: white; font-size: 12px; padding: 6px; text-align: left; }
-        .payment-table tbody td { padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 13px; }
-        
-        .total-row td { background-color: #1a2a4e; color: white; font-weight: bold; font-size: 14px; }
-        .tk-symbol { color: #e2a03f; }
+        /* ======= INFO SECTION ======= */
+        .info-section { padding: 8px 10px; }
+        .label-tag {
+            background: #f37920;
+            color: #fff;
+            padding: 3px 7px;
+            font-size: 10px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+            width: fit-content;
+            
+        }
+        .student-name { color: #f37920; font-size: 13px; font-weight: bold; margin: 0 0 4px 0; }
+        .info-text { font-size: 10px; line-height: 1.5; color: #333; }
 
-        .in-words-box { border: 1px solid #00a65a; border-left: 4px solid #00a65a; padding: 6px; margin-top: 10px; border-radius: 4px; font-style: italic; font-size: 12px; color: #555; }
+        /* ======= FEE TABLE ======= */
+        .fee-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10px; }
+        .fee-table th { background: #2B3547; color: #fff; padding: 5px 7px; text-align: left; border: 1px solid #2B3547; }
+        .fee-table td { padding: 4px 7px; border: 1px solid #ddd; }
+        .fee-table .c { text-align: center; }
+        .fee-table .r { text-align: right; }
 
-        .footer-sigs-table { width: 100%; border-collapse: collapse; margin-top: 40px; }
-        .sig-cell { width: 50%; text-align: center; vertical-align: top; padding: 0 20px; }
-        .sig-line { border-top: 1px solid #ccc; font-size: 12px; color: #777; padding-top: 3px; }
-        
-        .comp-gen { text-align: center; font-size: 10px; color: #a7a3a3; padding-top: 25px; }
+        /* ======= IN WORDS ======= */
+        .inwords { padding: 6px 10px 0; }
+        .inwords-text { font-style: italic; font-size: 10px; color: #555; margin-top: 3px; }
+
+        /* ======= FOOTER ======= */
+        .footer-row { width: 100%; border-collapse: collapse; margin-top: 18px; padding: 0 10px; }
+        .sig-line { border-top: 1px solid #555; display: inline-block; padding-top: 3px; font-size: 10px; font-weight: bold; width: 120px; text-align: center; }
+
+        /* ======= BOTTOM BAR ======= */
+        .bottom-bar {
+            background: #2B3547; color: #fff; text-align: center;
+            padding: 5px; font-size: 9px;
+            position: absolute; bottom: 0; left: 0; width: 100%;
+        }
     </style>
 </head>
 <body>
+@php
+    $firstFee = $fees->first();
+@endphp
 
-<table class="master-container">
+<table class="master-table">
     <tr>
         @foreach(['OFFICE COPY', 'STUDENT COPY'] as $copyType)
-        <td class="receipt-column">
-            <div class="receipt-border">
+        <td class="receipt-col">
+            <div class="receipt-box">
+
                 <div class="watermark">
-                    <img src="{{ $schoolLogo }}" alt=""></div>
-                
-                <table class="header-table">
-                    <tr>
-                        <td class="school-logo-cell">
-                            <div class="logo-box">
-                                <img src="{{ $schoolLogo }}" alt="Logo">
-                            </div> 
-                        </td>
-                        <td class="school-info-cell">
-                            <h2 class="school-name">{{ $school->name }}</h2>
-                            <p class="school-addr">{{ $school->address ?? 'Address' }} , {{ $school->phone ?? '01700000000'}}</p>
-                        </td>
-                        <td class="rec-meta-cell">
-                            <div class="copy-tag" style="{{ $copyType == 'STUDENT COPY' ? 'background: #00a65a; color: #fff;' : '' }}">
-                                {{ $copyType }}
+                    <img src="{{ asset($schoolLogo) }}" alt="Logo"> 
+                </div>
+
+                <div class="body-wrap">
+
+                    <div class="hdr-container">
+                        <div class="hdr-left-navy">
+                            <table class="hdr-content-table">
+                                <tr>
+                                    <td style="width:52px; vertical-align:middle; padding-left:12px;">
+                                        <img src="{{ asset($schoolLogo) }}" alt="Logo" style="width:46px; height:46px; border-radius:50%; padding:2px;">
+                                    </td>
+                                    <td style="vertical-align:middle; padding-left:8px;">
+                                        <div class="school-name">{{ $school->name }}</div>
+                                        <div class="copy-badge">{{ $copyType }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <svg class="hdr-slope-svg" viewBox="0 0 40 75" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="0,0 40,0 0,75" fill="#2B3547"/>
+                        </svg>
+
+                        <div class="hdr-orange-right">
+                            <div class="invoice-title">INVOICE</div>
+                            <div class="addr-container">
+                                <div class="addr-text-box-right">
+                                    <b>Address:</b> {{ $school->address ?? '' }} <br>
+                                    <b>Phone:</b> {{ $school->phone ?? '' }} <br>
+                                    <b>Email:</b> {{ $school->email ?? '' }}
+                                </div>
+                                        
                             </div>
-                            <p class="rec-no">#REC-{{ $fee->id }}</p>
-                            <p class="date">{{ date('d M, Y') }}</p>
-                        </td>
-                    </tr>
-                </table>
-
-                <div class="banner">Official Payment Receipt</div>
-
-                <div class="content">
-                    <div class="section-title">Student Information</div>
-                    <table class="info-table">
-                        <tr>
-                            <td><span class="info-label">Full name</span><span class="info-value">{{ $student->name }}</span></td>
-                            <td><span class="info-label">Student ID</span><span class="info-value">{{ $student->student_id }}</span></td>
-                            <td><span class="info-label">Class Roll</span><span class="info-value">{{ $student->roll }}</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="info-label">Collected By</span><span class="info-value">{{ $fee->collector->name ?? 'Admin' }}</span></td>
-                            <td><span class="info-label">Class Name</span><span class="info-value">{{ $student->class->name }}</span></td>
-                            <td><span class="info-label">Method</span><span class="info-value">{{ ucfirst($fee->payment_method) }}</span></td>
-                        </tr>
-                        <tr>
-                            <td><span class="info-label">Month</span><span class="info-value">{{ $fee->month }}</span></td>
-                            <td><span class="info-label">Mobile</span><span class="info-value">{{ $student->contact_number }}</span></td>
-                        </tr>
-                    </table>
-
-                    <div class="section-title">Payment Details</div>
-                    <table class="payment-table">
-                        <thead>
-                            <tr>
-                                <th width="10%">#</th>
-                                <th width="65%">DESCRIPTION</th>
-                                <th width="25%" style="text-align: right;">AMOUNT</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>{{ $fee->feeHead->name }}</td>
-                                <td style="text-align: right;">Tk {{ number_format($fee->amount, 2) }}</td>
-                            </tr>
-                            <tr class="total-row">
-                                <td colspan="2">TOTAL PAID</td>
-                                <td style="text-align: right;"><span class="tk-symbol">Tk</span> {{ number_format($fee->amount, 2) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="in-words-box">
-                        <strong>"</strong> In words: {{ ucfirst($amountInWords) }} Only <strong>"</strong>
+                        </div>
                     </div>
+
+
+                    <div class="info-section">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <tr>
+                                <td style="width:50%; vertical-align:top; padding-right:8px;">
+                                    <div class="label-tag">Receipt To</div>
+                                    <div class="student-name">{{ $student->name }}</div>
+                                    <div class="info-text">
+                                        <b>Phone :</b> {{ $student->contact_number }}<br>
+                                        <b>Student ID :</b> {{ $student->student_id }}<br>
+                                        <b>Class :</b> {{ $student->class->name }}&nbsp;|&nbsp;<b>Roll :</b> {{ $student->roll }}
+                                    </div>
+                                </td>
+                                <td style="width:50%; vertical-align:top; padding-left:8px;">
+                                    <div class="label-tag" >Receipt No : {{ $receiptNo }}</div>
+                                    <div class="info-text" style="margin-bottom:8px; padding-left:2px;">
+                                        <b>Receipt Date :</b> {{ date('d/m/Y') }}
+                                    </div>
+                                    <div class="label-tag">Payment Method</div>
+                                    <div class="info-text">
+                                        <b>Method:</b> {{ ucfirst($firstFee->payment_method ?? 'Cash') }}<br>
+                                        <b>Collected By:</b> {{ $firstFee->collector->name ?? 'Admin' }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="fee-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="c" style="width:22%;">Month</th>
+                                    <th class="r" style="width:25%;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $totalAmount = 0; @endphp
+                                @foreach($fees as $f)
+                                <tr>
+                                    <td>{{ $f->feeHead->name }}</td>
+                                    <td class="c">{{ $f->month }}</td>
+                                    <td class="r">Tk {{ number_format($f->amount, 2) }}</td>
+                                </tr>
+                                @php $totalAmount += $f->amount; @endphp
+                                @endforeach
+                                <tr>
+                                    <td colspan="2" class="r" style="font-weight:bold;">Sub Total :</td>
+                                    <td class="r">Tk {{ number_format($totalAmount, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="r" style="font-weight:bold; font-size:11px;">Grand Total :</td>
+                                    <td class="r" style="font-weight:bold; font-size:11px; color:#2B3547;">Tk {{ number_format($totalAmount, 2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="inwords">
+                        <span class="label-tag" style="display:inline-block; width:auto;">In Words</span>
+                        <div class="inwords-text">{{ ucfirst($amountInWords) }} Only</div>
+                    </div>
+
+                    <table class="footer-row">
+                        <tr>
+                            <td style="font-size:10px; font-weight:bold; color:#444; vertical-align:bottom;">Thanks For Your Payment</td>
+                            <td style="text-align:right; vertical-align:bottom;">
+                                <div class="sig-line">Authorize Signature</div>
+                            </td>
+                        </tr>
+                    </table>
+
                 </div>
 
-                <table class="footer-sigs-table">
-                    <tr>
-                        <td class="sig-cell"><div class="sig-line">Accounts Signature</div></td>
-                        <td class="sig-cell"><div class="sig-line">Authorized Signature</div></td>
-                    </tr>
-                </table>
-                
-                <div class="comp-gen">
-                    <strong>{{ $school->name }}</strong><br>
-                    This recipt Software generated by <strong>EduCorexa</strong>
+                <div class="bottom-bar">
+                    {{ $school->name }} &nbsp;|&nbsp; This Receipt is generated by Educorexa 1.0.0
                 </div>
+
             </div>
         </td>
         @endforeach

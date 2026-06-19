@@ -4,7 +4,7 @@
         <div class="row g-5">
             <div class="col-md-6 col-lg-3">
                 <div class="site-logo mb-3">
-                    @if($setting && $setting->logo_wide)
+                    @if(isset($setting) && isset($setting->logo_wide) && $setting->logo_wide)
                         <img src="{{$setting->logo_wide }}" alt="Site Logo" style="max-width: 150px; max-height: 50px; object-fit: contain;">
                     @else
                         <div style="width:150px; height:50px; background:#f8fafc; display:flex; align-items:center; justify-content:center; border-radius:8px;">
@@ -23,16 +23,16 @@
                 <p class="small mb-4"><i class="fa fa-envelope me-3 text-gold"></i>{{ $setting->email ?? 'Email not set' }}</p>
                 
                 <div class="d-flex pt-2">
-                    @if($setting->twitter_url)
+                    @if(isset($setting->twitter_url) && $setting->twitter_url)
                         <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->twitter_url }}" target="_blank"><i class="fab fa-twitter"></i></a>
                     @endif
-                    @if($setting->facebook_url)
+                    @if(isset($setting->facebook_url) && $setting->facebook_url)
                         <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->facebook_url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     @endif
-                    @if($setting->instagram_url)
+                    @if(isset($setting->instagram_url) && $setting->instagram_url)
                         <a class="btn btn-outline-light btn-sm-square rounded-circle me-2" href="{{ $setting->instagram_url }}" target="_blank"><i class="fab fa-instagram"></i></a>
                     @endif
-                    @if($setting->linkedin_url)
+                    @if(isset($setting->linkedin_url) && $setting->linkedin_url)
                         <a class="btn btn-outline-light btn-sm-square rounded-circle" href="{{ $setting->linkedin_url }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
                     @endif
                 </div>
@@ -85,7 +85,7 @@
         <div class="copyright border-top border-secondary py-4">
             <div class="row">
                 <div class="col-md-12 text-center small">
-                    &copy; {{ date('Y') }} <a class="text-gold fw-bold" href="#">{{ $setting->site_name ?? $setting->name }}</a>. All Rights Reserved. 
+                    &copy; {{ date('Y') }} <a class="text-gold fw-bold" href="#">{{ $setting->site_name ?? ($setting->name ?? '') }}</a>. All Rights Reserved. 
                     <span class="ms-2 opacity-50">Powered by {{ $site_setting->site_name ?? config('app.name') }}</span>
                 </div>
             </div>

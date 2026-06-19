@@ -14,7 +14,8 @@ class SchoolRegisterController extends Controller
 {
     public function create()
     {
-        return view('auth.school-register');
+        $packages = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
+        return view('auth.school-register', compact('packages'));
     }
     public function store(Request $request)
     {
@@ -24,6 +25,7 @@ class SchoolRegisterController extends Controller
             'admin_name'      => 'required|string|max:255',
             'admin_email'     => 'required|email|unique:users,email',
             'admin_password'  => 'required|min:8',
+            'package_id'      => 'required|exists:subscription_packages,id',
         ]);
 
         // আমরা ডাটাগুলো ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবলে রাখছি
@@ -31,15 +33,12 @@ class SchoolRegisterController extends Controller
 
         DB::transaction(function () use ($request, &$newSchool) {
 
-            // 1️⃣ Create School
-            $defaultPackage = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->first();
-
             $newSchool = School::create([
                 'name'   => $request->school_name,
                 'slug'   => strtolower($request->slug),
                 'email'  => $request->admin_email,
                 'status' => 'pending',
-                'subscription_package_id' => $defaultPackage ? $defaultPackage->id : null,
+                'subscription_package_id' => $request->package_id,
             ]);
 
             // 2️⃣ Create School Admin User

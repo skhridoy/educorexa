@@ -106,6 +106,8 @@ class StudentFeeController extends Controller
                     StudentFee::create([
                         'school_id'   => $schoolId,
                         'student_id'  => $student->id,
+                        'school_category_id' => $student->school_category_id,
+                        'school_sub_category_id' => $student->school_sub_category_id,
                         'fee_head_id' => $request->fee_head_id,
                         'amount'      => $setup->amount,
                         'month'       => $request->month,

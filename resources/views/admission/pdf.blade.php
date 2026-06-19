@@ -146,7 +146,7 @@
     <table class="field-table">
         <tr>
             <td class="label-td">7. Date of Birth:&nbsp;&nbsp;</td>
-            <td class="value-td" style="width: 45%;"></td>
+            <td class="value-td" style="width: 45%;">{{ \Carbon\Carbon::parse($admission->date_of_birth)->format('d/m/Y') }}</td>
             <td class="label-td" style="padding-left: 15px;">8. Religion:&nbsp;&nbsp;</td>
             <td class="value-td"></td>
         </tr>

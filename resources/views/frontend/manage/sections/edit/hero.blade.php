@@ -58,11 +58,11 @@
                             <h5>Buttons & Stats</h5>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Primary Btn Text</label>
-                                <input type="text" name="btn1_text" class="form-control" value="{{ $content['btn1_text'] ?? 'Get Started Free' }}">
+                                <input type="text" name="btn1_text" class="form-control" value="{{ $content['btn1_text'] ?? 'Get Started' }}">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Primary Btn Link</label>
-                                <input type="text" name="btn1_link" class="form-control" value="{{ $content['btn1_link'] ?? '#' }}">
+                                <input type="text" name="btn1_link" class="form-control" value="{{ $content['btn1_link'] ?? 'http://schoolerp.test/register-school' }}">
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label">Secondary Btn Text</label>

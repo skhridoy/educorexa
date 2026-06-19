@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->call([
             RolePermissionSeeder::class,
-            SupportPermissionSeeder::class,
+            SiteSettingSeeder::class,
+            FrontendSectionSeeder::class,
         ]);
     }
 }

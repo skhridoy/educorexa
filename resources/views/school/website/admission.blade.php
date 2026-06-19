@@ -100,7 +100,17 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admission.store', ['tenant' => app('currentSchool')->slug]) }}" method="POST" enctype="multipart/form-data">
+<div class="mb-4">
+    <h5 class="mb-2">ডাউনলোড পূর্বের অ্যাডমিশন PDF</h5>
+    <div class="input-group">
+        <input type="number" id="searchAdmissionId" class="form-control" placeholder="Admission ID" />
+        <button type="button" class="btn btn-outline-primary" id="downloadAdmissionBtn">ডাউনলোড</button>
+    </div>
+</div>
+
+<form action="{{ route('admission.store', ['tenant' => app('currentSchool')->slug]) }}" method="POST" enctype="multipart/form-data">
+
+                    
                         @csrf
                         
                         <div class="row">
@@ -244,6 +254,18 @@
             }
             reader.readAsDataURL(file);
         }
+    });
+    // পূর্বের অ্যাডমিশন PDF ডাউনলোড হ্যান্ডলার
+    document.getElementById('downloadAdmissionBtn').addEventListener('click', function () {
+        const admissionId = document.getElementById('searchAdmissionId').value.trim();
+        if (!admissionId) {
+            alert('অনুগ্রহ করে অ্যাডমিশন আইডি দিন');
+            return;
+        }
+        // Build URL using Laravel route helper with placeholder
+        const baseUrl = "{{ route('admissions.pdf', ['tenant' => app('currentSchool')->slug, 'id' => ':id']) }}";
+        const url = baseUrl.replace(':id', admissionId);
+        window.open(url, '_blank');
     });
 </script>
 @endsection

@@ -39,7 +39,7 @@
         
         <div class="flex items-center gap-6 xl:gap-10 h-full">
             <a href="{{ url('/') }}" class="flex items-center shrink-0">
-                @if(isset($setting) && $setting->logo_wide)
+                @if(isset($setting) && isset($setting->logo_wide) && $setting->logo_wide)
                     <img src="{{ asset($setting->logo_wide) }}" alt="EduCorexa" class="h-8 md:h-10 w-auto object-contain">
                 @else
                     <div class="flex items-center gap-2">

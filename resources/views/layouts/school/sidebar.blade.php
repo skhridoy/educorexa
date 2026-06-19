@@ -74,7 +74,7 @@
             </li>
 
             @php
-                $anyModule = $hasGroupAccess(['academic-year.manage', 'class.manage', 'section.manage', 'subject.manage', 'admission.manage', 'student.manage', 'teacher.manage', 'employee.manage', 'attendance.manage', 'exam.manage', 'fee.manage', 'notice.manage']);
+                $anyModule = $hasGroupAccess(['academic-year.manage', 'class.manage', 'section.manage', 'subject.manage', 'admission.manage', 'student.manage', 'teacher.manage', 'employee.manage', 'attendance.manage', 'exam.manage', 'fee.manage', 'notice.manage', 'category.manage', 'sub-category.manage']);
             @endphp
 
             @if($anyModule)
@@ -83,19 +83,25 @@
 
             {{-- 1. Academic Section --}}
             @php
-                $academicPerms = ['academic-year.manage', 'class.manage', 'section.manage', 'subject.manage', 'class.routine', 'syllabus.manage'];
+                $academicPerms = ['academic-year.manage', 'class.manage', 'section.manage', 'subject.manage', 'class.routine', 'syllabus.manage', 'category.manage', 'sub-category.manage'];
             @endphp
             @if($hasGroupAccess($academicPerms))
             <li class="edu-nav-item">
-                <a class="edu-nav-link edu-has-submenu {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') ? 'active' : '' }}" 
+                <a class="edu-nav-link edu-has-submenu {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') || Request::is('*/categories*') || Request::is('*/sub-categories*') ? 'active' : '' }}" 
                    data-bs-toggle="collapse" href="#academicMenu">
                     <i data-feather="layers"></i> <span>Academic</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
-                <div class="collapse {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') ? 'show' : '' }}" id="academicMenu">
+                <div class="collapse {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') || Request::is('*/categories*') || Request::is('*/sub-categories*') ? 'show' : '' }}" id="academicMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('academic-year.manage'))
                             <li class="edu-sub-item"><a href="{{ route('academic-year.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/academic-year*') ? 'active' : '' }}">Academic Years</a></li>
+                        @endif
+                        @if($hasFeature('category.manage'))
+                            <li class="edu-sub-item"><a href="{{ route('categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/categories*') ? 'active' : '' }}">Categories</a></li>
+                        @endif
+                        @if($hasFeature('sub-category.manage'))
+                            <li class="edu-sub-item"><a href="{{ route('sub-categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sub-categories*') ? 'active' : '' }}">Sub Categories</a></li>
                         @endif
                         @if($hasFeature('class.manage'))
                             <li class="edu-sub-item"><a href="{{ route('classes.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/classes*') ? 'active' : '' }}">Classes</a></li>

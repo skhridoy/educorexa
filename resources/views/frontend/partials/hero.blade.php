@@ -11,8 +11,8 @@
     // Defaults matching the reference image
     $title = $heroContent['title'] ?? 'The Most Reliable ERP <br><span class="text-slate-800">Software</span>';
     $description = $heroContent['description'] ?? 'We make learning engaging & effective, so that you are ready to achieve your goals';
-    $btn1_text = $heroContent['btn1_text'] ?? 'Get Started Free';
-    $btn1_link = $heroContent['btn1_link'] ?? '#';
+    $btn1_text = $heroContent['btn1_text'] ?? 'Get Started';
+    $btn1_link = $heroContent['btn1_link'] ?? 'http://schoolerp.test/register-school';
     $btn2_text = $heroContent['btn2_text'] ?? 'View Demo';
     $btn2_link = $heroContent['btn2_link'] ?? '#';
     

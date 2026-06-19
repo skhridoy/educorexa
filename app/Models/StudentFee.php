@@ -55,13 +55,16 @@ class StudentFee extends Model
     protected $fillable = [
         'school_id',
         'student_id',
+        'school_category_id',
+        'school_sub_category_id',
         'fee_head_id',
         'amount',
         'month',
         'status',
         'collected_by',
         'payment_method',
-        'due_date'
+        'due_date',
+        'receipt_no'
     ];
 
     /**
@@ -103,7 +106,7 @@ class StudentFee extends Model
 
     public function collector()
     {
-        return $this->belongsTo(Teacher::class, 'collected_by');
+        return $this->belongsTo(User::class, 'collected_by');
     }
 
     public function getCollectorNameAttribute()

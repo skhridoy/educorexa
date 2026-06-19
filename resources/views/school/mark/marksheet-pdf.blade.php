@@ -23,13 +23,13 @@
         .watermark img { width: 420px; }
 
         /* wrapper এর মার্জিন ও প্যাডিং ঠিক করা হয়েছে */
-        .wrapper { 
-
-            padding: 15px; 
-            margin: 5px; 
-            min-height: 1000px; 
+        .wrapper {
+            padding: 15px;
+            margin: 5px;
             position: relative;
             box-sizing: border-box;
+            /* Removed min-height to prevent extra blank pages */
+            /* Ensure content fits naturally */
         }
         
         /* Header Section - স্পেসিং একটু বাড়ানো হয়েছে */
