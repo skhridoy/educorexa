@@ -15,7 +15,7 @@
     <title>@yield('title', $setting->site_name ?? 'EduCorexa') - @yield('subtitle', $setting->meta_title ?? 'EduCorexa')</title>
     
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;family=Noto+Sans+Bengali:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -91,13 +91,13 @@
                 "unit": "8px"
             },
             "fontFamily": {
-                "label-sm": ["Inter", "SutonnyOMJ", "sans-serif"],
-                "headline-lg": ["Manrope", "SutonnyOMJ", "sans-serif"],
-                "headline-md": ["Manrope", "SutonnyOMJ", "sans-serif"],
-                "body-lg": ["Inter", "SutonnyOMJ", "sans-serif"],
-                "display-xl": ["Manrope", "SutonnyOMJ", "sans-serif"],
-                "body-md": ["Inter", "SutonnyOMJ", "sans-serif"],
-                "sans": ["Inter", "SutonnyOMJ", "sans-serif"]
+                "label-sm": ["Inter", "Noto Sans Bengali", "sans-serif"],
+                "headline-lg": ["Manrope", "Noto Sans Bengali", "sans-serif"],
+                "headline-md": ["Manrope", "Noto Sans Bengali", "sans-serif"],
+                "body-lg": ["Inter", "Noto Sans Bengali", "sans-serif"],
+                "display-xl": ["Manrope", "Noto Sans Bengali", "sans-serif"],
+                "body-md": ["Inter", "Noto Sans Bengali", "sans-serif"],
+                "sans": ["Inter", "Noto Sans Bengali", "sans-serif"]
             },
             "fontSize": {
                 "label-sm": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
@@ -112,12 +112,12 @@
       }
     </script>
 <style>
-        /* Font fallback for Bengali using SutonnyOMJ */
+        /* Font fallback for Bengali using Noto Sans Bengali (web font) */
         body, p, span:not(.material-symbols-outlined), div, a, li, td, th, label, input, button {
-            font-family: 'Inter', 'SutonnyOMJ', sans-serif !important;
+            font-family: 'Inter', 'Noto Sans Bengali', sans-serif !important;
         }
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Manrope', 'SutonnyOMJ', sans-serif !important;
+            font-family: 'Manrope', 'Noto Sans Bengali', sans-serif !important;
         }
         
         .material-symbols-outlined {

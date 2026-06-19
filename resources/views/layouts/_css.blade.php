@@ -4,7 +4,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;900&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- End fonts -->
 
 	<!-- Plugin css -->
@@ -17,13 +17,13 @@
     <link rel="stylesheet" href="{{ asset('css/stitch-design.css') }}">
 	
 	<style>
-		/* Font fallback for Bengali using SutonnyOMJ */
+		/* Font fallback for Bengali using Noto Sans Bengali (web font) */
 		body, p, span, div, a, li, td, th, label, input, button {
-			font-family: 'Inter', 'SutonnyOMJ', sans-serif !important;
+			font-family: 'Inter', 'Noto Sans Bengali', sans-serif !important;
 		}
 		
 		h1, h2, h3, h4, h5, h6, 
 		.edu-page-title, .edu-panel-ttl, .page-title, .table-title {
-			font-family: 'Outfit', 'SutonnyOMJ', sans-serif !important;
+			font-family: 'Outfit', 'Noto Sans Bengali', sans-serif !important;
 		}
 	</style>
