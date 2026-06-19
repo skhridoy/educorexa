@@ -304,21 +304,51 @@
         </ul>
 
         {{-- Upgrade Plan Card --}}
-        @if($user->hasRole('school_admin'))
+        @if($user->hasRole('school_admin') || $user->role === 'school_admin')
+        @php
+            $currentPackage = optional($school->subscriptionPackage);
+            $isPremium = $currentPackage->is_popular ?? false;
+            $packageName = $currentPackage->name ?? 'Basic';
+        @endphp
+
         <div class="edu-sidebar-footer mx-3 my-4">
-            {{-- Upgrade Card --}}
-            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
-                <div class="card-body p-3 text-white text-center">
-                    <div class="upgrade-icon mb-2">
-                        <i class="fa-solid fa-rocket fa-2x opacity-50"></i>
+            @if(!$isPremium)
+                {{-- Basic Package: Upgrade Card --}}
+                <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
+                    <div class="card-body p-3 text-white text-center">
+                        <div class="mb-2">
+                            <i class="fa-solid fa-rocket fa-2x opacity-75"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size:13px;">Upgrade to Premium</h6>
+                        <p class="mb-2" style="font-size:11px; opacity:0.8;">আনলক করুন সকল প্রিমিয়াম ফিচার ও আনলিমিটেড সুবিধা।</p>
+                        <div class="mb-2" style="font-size:10px; opacity:0.7;">
+                            <span class="badge" style="background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:20px;">
+                                বর্তমান: {{ $packageName }}
+                            </span>
+                        </div>
+                        <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" 
+                           class="btn w-100 rounded-pill py-2 fw-bold" 
+                           style="background:#fff; color:#4f46e5; font-size:12px; margin-top:4px;">
+                            <i class="fa-solid fa-arrow-up me-1"></i> Upgrade Now
+                        </a>
                     </div>
-                    <h6 class="fw-bold mb-1">Upgrade Your Plan</h6>
-                    <p class="small opacity-75 mb-3">Get access to premium features & higher limits.</p>
-                    <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" class="btn btn-upgrade-premium w-100 rounded-pill py-2 mt-2">
-                        Upgrade Now
-                    </a>
                 </div>
-            </div>
+            @else
+                {{-- Premium Package: Active Badge --}}
+                <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #059669, #10b981);">
+                    <div class="card-body p-3 text-white text-center">
+                        <div class="mb-2">
+                            <i class="fa-solid fa-crown fa-2x" style="opacity:0.85; color:#fcd34d;"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" style="font-size:13px; color:#fcd34d;">Premium Active</h6>
+                        <p class="mb-2" style="font-size:11px; opacity:0.85;">আপনি {{ $packageName }} প্যাকেজে আছেন।</p>
+                        <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:6px 10px; font-size:10px;">
+                            <i class="fa-solid fa-check-circle me-1" style="color:#fcd34d;"></i>
+                            সকল প্রিমিয়াম ফিচার সক্রিয়
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
         @endif
     </div>
