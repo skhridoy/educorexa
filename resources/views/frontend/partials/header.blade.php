@@ -7,6 +7,7 @@
                 <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.features') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.features') }}">ফিচার</a>
                 <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.why-us') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.why-us') }}">কেন আমরা</a>
                 <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.pricing') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.pricing') }}">মূল্য</a>
+                <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.blogs') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.blogs') }}">ব্লগ</a>
                 <a class="text-slate-600 font-medium hover:text-indigo-500 transition-all duration-300 {{ request()->routeIs('main.contact') ? 'text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1' : '' }}" href="{{ route('main.contact') }}">যোগাযোগ</a>
             </div>
         </div>

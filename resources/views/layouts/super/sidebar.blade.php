@@ -1,7 +1,7 @@
 @php
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
-    $isFrontendMenuOpen = Request::is('manage/frontend*');
+    $isFrontendMenuOpen = Request::is('manage/frontend*') || Request::is('super-admin/blogs*') || Request::is('super-admin/blog-categories*');
     $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*') || Request::is('manage/professional-emails*');
     $isSystemMenuOpen = Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') || Request::is('settings*');
 @endphp
@@ -176,6 +176,10 @@
                     <ul class="edu-sub-nav">
                         <li><a href="{{ route('manage.frontend.index') }}"
                                class="edu-sub-link {{ Request::is('manage/frontend/manage-sections') ? 'active' : '' }}">Manage Sections</a></li>
+                        <li><a href="{{ route('super.blogs.index') }}"
+                               class="edu-sub-link {{ Request::is('super-admin/blogs*') ? 'active' : '' }}">Manage Blogs</a></li>
+                        <li><a href="{{ route('super.blog-categories.index') }}"
+                               class="edu-sub-link {{ Request::is('super-admin/blog-categories*') ? 'active' : '' }}">Blog Categories</a></li>
                     </ul>
                 </div>
             </li>

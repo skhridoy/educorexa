@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\FrontendSection;
 use App\Models\SubscriptionPackage;
 use App\Models\Testimonial; 
+use App\Models\Blog;
 
 class HomeController extends Controller
 {
@@ -19,6 +20,18 @@ class HomeController extends Controller
 
         // ভিউ ফাইলে ডাটা পাস করা
         return view('frontend.home', compact('sections', 'packages', 'testimonials'));
+    }
+
+    public function blogs()
+    {
+        $blogs = Blog::where('status', 1)->latest()->paginate(9);
+        return view('frontend.page.blogs', compact('blogs'));
+    }
+
+    public function blogDetails($slug)
+    {
+        $blog = Blog::where('slug', $slug)->where('status', 1)->firstOrFail();
+        return view('frontend.page.blog_details', compact('blog'));
     }
 
     public function features()

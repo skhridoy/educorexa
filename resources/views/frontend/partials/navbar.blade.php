@@ -58,8 +58,8 @@
                 <a href="{{ url('/') }}" class="nav-link whitespace-nowrap {{ Request::is('/') ? 'nav-active' : '' }} flex items-center h-full">Feature</a>
                 <a href="#about" class="nav-link whitespace-nowrap flex items-center h-full">About Us</a>
                 <a href="#client" class="nav-link whitespace-nowrap flex items-center h-full">Our Client</a>
-                <a href="#partners" class="nav-link whitespace-nowrap flex items-center h-full">Our Partners</a>
-                <a href="#blog" class="nav-link whitespace-nowrap flex items-center h-full">Blog</a>
+                <a href="#partners" class="nav-link whitespace-nowrap flex items-center h-full">Our Partners</a> 
+                <a href="{{ route('main.blogs') }}" class="nav-link whitespace-nowrap {{ request()->routeIs('main.blogs') ? 'nav-active' : '' }} flex items-center h-full">Blog</a>
                 <a href="#contact" class="nav-link whitespace-nowrap flex items-center h-full">Contact Us</a>
             </div>
         </div>
@@ -90,6 +90,7 @@
             <a href="{{ url('/') }}" class="text-indigo-600 font-bold text-lg">Feature</a>
             <a href="#about" class="text-slate-600 font-medium">About Us</a>
             <a href="#client" class="text-slate-600 font-medium">Our Client</a>
+            <a href="{{ route('main.blogs') }}" class="text-slate-600 font-medium {{ request()->routeIs('main.blogs') ? 'text-indigo-600 font-bold' : '' }}">Blog</a>
             <a href="#contact" class="text-slate-600 font-medium">Contact Us</a>
             <hr class="border-slate-100">
             @auth

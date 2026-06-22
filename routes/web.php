@@ -19,7 +19,8 @@ use App\Http\Controllers\{
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
-    SubscriptionPackageController, TestimonialController, EmployeeController, EventController, SupportTicketController
+    SubscriptionPackageController, TestimonialController, EmployeeController, EventController, SupportTicketController,
+    BlogController, BlogCategoryController
 };
 
 // Site Map 
@@ -45,6 +46,8 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::get('/contact', [HomeController::class, 'contact'])->name('main.contact');
     
     Route::get('/about-details', function () {return view('frontend.page.about_details'); })->name('about.details');
+    Route::get('/blogs', [HomeController::class, 'blogs'])->name('main.blogs');
+    Route::get('/blog/{slug}', [HomeController::class, 'blogDetails'])->name('main.blog.details');
     Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
@@ -165,6 +168,10 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::patch('testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggleStatus'])->name('testimonials.toggle');
         Route::resource('testimonials', TestimonialController::class);
         Route::resource('events', EventController::class);
+        Route::patch('blogs/{blog}/toggle', [BlogController::class, 'toggleStatus'])->name('blogs.toggle');
+        Route::resource('blogs', BlogController::class);
+        Route::patch('blog-categories/{category}/toggle', [BlogCategoryController::class, 'toggleStatus'])->name('blog-categories.toggle');
+        Route::resource('blog-categories', BlogCategoryController::class);
     });
 
     // --- 2. Employee ONLY Group ---
