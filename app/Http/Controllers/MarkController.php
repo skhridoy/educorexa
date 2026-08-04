@@ -280,158 +280,165 @@ class MarkController extends Controller
         $examTypes = Exam::where('school_id', $schoolId)->where('is_published', 1)->get();
         $academicYears = AcademicYear::where('school_id', $schoolId)->orderBy('name', 'desc')->get();
 
-        $selectedClassId = $request->class_id;
-        $selectedExamId = $request->exam_id;
-        // ডিফল্টভাবে সক্রিয় বছর নেওয়া
-        $selectedYearId = $request->academic_year_id ?? AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
+        $selectedClassId   = $request->class_id;
+        $selectedExamId    = $request->exam_id;
+        $selectedSubjectId = $request->subject_id; // ← নতুন
+        $selectedYearId    = $request->academic_year_id
+                                ?? AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
 
-        $students = collect();
-        $subjects = collect();
-        $marksData = [];
+        $students      = collect();
+        $subjects      = collect();
+        $marksData     = [];
         $meritPosition = [];
-        $meritList = [];
+        $meritList     = [];
         $paginatedResults = null;
 
-        if ($selectedClassId && $selectedExamId && $selectedYearId) {
-            
-            // ১. সাবজেক্ট লোড করার সময় অবশ্যই বছরের ফিল্টার থাকতে হবে (যদি AssignClass এ বছর থাকে)
-            // অন্যথায় সরাসরি ওই ক্লাসের জন্য অ্যাসাইন করা সাবজেক্টগুলো নিন
+        // সিঙ্গেল সাবজেক্ট মোডের জন্য
+        $selectedSubject  = null;
+        $subjectMarks     = collect(); // student_id => mark record
+        $fullMark         = null;
+
+        // ক্লাস সিলেক্ট হলে সাবজেক্ট লোড করি
+        if ($selectedClassId) {
             $subjectIds = AssignClass::where('class_id', $selectedClassId)
                             ->where('school_id', $schoolId)
-                            // যদি আপনার AssignClass টেবিলে academic_year_id থাকে তবে নিচের লাইনটি আনকমেন্ট করুন
-                            // ->where('academic_year_id', $selectedYearId) 
                             ->pluck('subject_id');
-            
             $subjects = Subject::whereIn('id', $subjectIds)->get();
+        }
 
-            // ২. স্টুডেন্ট রিট্রিভ লজিক
+        if ($selectedClassId && $selectedExamId && $selectedYearId) {
+
             $currentYearId = AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
 
+            // স্টুডেন্ট লোড
             if ($selectedYearId == $currentYearId) {
-                // বর্তমান বছরের স্টুডেন্ট
                 $students = Student::where([
-                    'class_id' => $selectedClassId,
+                    'class_id'         => $selectedClassId,
                     'academic_year_id' => $selectedYearId,
-                    'school_id' => $schoolId
-                ])->get();
+                    'school_id'        => $schoolId,
+                ])->orderBy('roll')->get();
             } else {
-                // পুরনো বছরের স্টুডেন্ট (সেশন টেবিল থেকে)
                 $studentIdsInSession = DB::table('student_sessions')
                     ->where('class_id', $selectedClassId)
                     ->where('academic_year_id', $selectedYearId)
                     ->pluck('student_id');
-
-                $students = Student::whereIn('id', $studentIdsInSession)->get();
+                $students = Student::whereIn('id', $studentIdsInSession)->orderBy('roll')->get();
             }
 
-            // ৩. মার্কস কুয়েরি
-            $allMarks = Mark::where([
-                'class_id' => $selectedClassId,
-                'exam_id' => $selectedExamId,
-                'academic_year_id' => $selectedYearId, 
-                'school_id' => $schoolId
-            ])->get();
+            // ══════════════════════════════════════════════
+            // মোড ১: সিঙ্গেল সাবজেক্ট ভিউ + এডিট
+            // ══════════════════════════════════════════
+            if ($selectedSubjectId) {
+                $selectedSubject = Subject::find($selectedSubjectId);
 
-            // যদি স্টুডেন্ট বা মার্কস না থাকে, তবে লুপ চালানোর প্রয়োজন নেই
-            if ($students->isNotEmpty()) {
-                foreach ($students as $student) {
-                    $currentStudentTotal = 0;
-                    $failCount = 0;
-                    $totalPoints = 0;
-                    $applicableSubjectCount = 0;
+                $fullMark = AssignClass::where([
+                    'class_id'   => $selectedClassId,
+                    'subject_id' => $selectedSubjectId,
+                ])->value('full_mark') ?? 100;
 
-                    foreach ($subjects as $subject) {
-                        // ধর্মীয় ফিল্টার লজিক এখানে থাকবে (আপনার আগের কোড অনুযায়ী)
-                        $subjectName = strtolower($subject->name);
-                        $studentReligion = strtolower($student->religion ?? '');
-                        $religions = ['islam', 'hindu', 'christian', 'buddhist', 'religion', 'studies'];
-                        $isReligionSubject = false;
+                $subjectMarks = Mark::where([
+                    'school_id'        => $schoolId,
+                    'class_id'         => $selectedClassId,
+                    'exam_id'          => $selectedExamId,
+                    'subject_id'       => $selectedSubjectId,
+                    'academic_year_id' => $selectedYearId,
+                ])->get()->keyBy('student_id');
 
-                        foreach ($religions as $rel) {
-                            if (str_contains($subjectName, $rel)) {
-                                $isReligionSubject = true;
-                                break;
+            } else {
+                // ══════════════════════════════════════════
+                // মোড ২: সব সাবজেক্ট রিপোর্ট (আগের লজিক)
+                // ══════════════════════════════════════════
+                $allMarks = Mark::where([
+                    'class_id'         => $selectedClassId,
+                    'exam_id'          => $selectedExamId,
+                    'academic_year_id' => $selectedYearId,
+                    'school_id'        => $schoolId,
+                ])->get();
+
+                if ($students->isNotEmpty()) {
+                    foreach ($students as $student) {
+                        $currentStudentTotal    = 0;
+                        $failCount              = 0;
+                        $totalPoints            = 0;
+                        $applicableSubjectCount = 0;
+
+                        foreach ($subjects as $subject) {
+                            $subjectName    = strtolower($subject->name);
+                            $studentReligion = strtolower($student->religion ?? '');
+                            $isReligionSubject = false;
+
+                            foreach (['islam', 'hindu', 'christian', 'buddhist', 'religion', 'studies'] as $rel) {
+                                if (str_contains($subjectName, $rel)) { $isReligionSubject = true; break; }
+                            }
+
+                            if ($isReligionSubject && !empty($studentReligion)) {
+                                $matchFound = false;
+                                if (str_contains($subjectName, 'islam') && $studentReligion == 'islam') $matchFound = true;
+                                if (str_contains($subjectName, 'hindu') && str_contains($studentReligion, 'hindu')) $matchFound = true;
+                                if (!$matchFound && (str_contains($subjectName, 'islam') || str_contains($subjectName, 'hindu'))) {
+                                    $marksData[$student->id][$subject->id] = ['marks' => null, 'grade' => 'N/A'];
+                                    continue;
+                                }
+                            }
+
+                            $markRecord = $allMarks->where('student_id', $student->id)->where('subject_id', $subject->id)->first();
+                            $fm         = AssignClass::where(['class_id' => $selectedClassId, 'subject_id' => $subject->id])->value('full_mark') ?? 100;
+                            $rawMark    = $markRecord ? $markRecord->marks : null;
+                            $gradeInfo  = $this->getGradeWithPoint($rawMark, $fm);
+
+                            $marksData[$student->id][$subject->id] = ['marks' => $rawMark, 'grade' => $gradeInfo['grade']];
+                            $applicableSubjectCount++;
+
+                            if ($rawMark !== null) {
+                                $currentStudentTotal += $rawMark;
+                                if ($gradeInfo['grade'] == 'F') $failCount++;
+                                else $totalPoints += $gradeInfo['point'];
+                            } else {
+                                $failCount++;
                             }
                         }
 
-                        if ($isReligionSubject && !empty($studentReligion)) {
-                            $matchFound = false;
-                            if (str_contains($subjectName, 'islam') && $studentReligion == 'islam') $matchFound = true;
-                            if (str_contains($subjectName, 'hindu') && str_contains($studentReligion, 'hindu')) $matchFound = true;
+                        $currentGpa = ($failCount > 0) ? 0.00 : (($applicableSubjectCount > 0) ? (float) number_format($totalPoints / $applicableSubjectCount, 2) : 0);
+                        $marksData[$student->id]['GPA'] = ($failCount > 0) ? "0.00 (F-$failCount)" : number_format($currentGpa, 2);
 
-                            if (!$matchFound && (str_contains($subjectName, 'islam') || str_contains($subjectName, 'hindu'))) {
-                                $marksData[$student->id][$subject->id] = ['marks' => null, 'grade' => 'N/A'];
-                                continue;
-                            }
-                        }
-
-                        $markRecord = $allMarks->where('student_id', $student->id)
-                                            ->where('subject_id', $subject->id)
-                                            ->first();
-                        
-                        // AssignClass থেকে ফুল মার্ক নেওয়া (এখানেও বছরের বিষয় থাকতে পারে)
-                        $fullMark = AssignClass::where([
-                            'class_id' => $selectedClassId, 
-                            'subject_id' => $subject->id
-                        ])->value('full_mark') ?? 100;
-                        
-                        $rawMark = $markRecord ? $markRecord->marks : null;
-                        $gradeInfo = $this->getGradeWithPoint($rawMark, $fullMark);
-
-                        $marksData[$student->id][$subject->id] = [
-                            'marks' => $rawMark, 
-                            'grade' => $gradeInfo['grade']
+                        $meritList[] = [
+                            'student_id'  => $student->id,
+                            'fail_count'  => $failCount,
+                            'total_marks' => $currentStudentTotal,
+                            'gpa'         => $currentGpa,
                         ];
-                        
-                        $applicableSubjectCount++;
+                    } // end foreach($students)
 
-                        if ($rawMark !== null) {
-                            $currentStudentTotal += $rawMark;
-                            if ($gradeInfo['grade'] == 'F') $failCount++;
-                            else $totalPoints += $gradeInfo['point'];
-                        } else {
-                            $failCount++;
-                        }
+                    // মেধাক্রম সর্টিং
+                    usort($meritList, function ($a, $b) {
+                        if ($b['gpa'] != $a['gpa']) return $b['gpa'] <=> $a['gpa'];
+                        if ($b['total_marks'] != $a['total_marks']) return $b['total_marks'] <=> $a['total_marks'];
+                        return $a['fail_count'] <=> $b['fail_count'];
+                    });
+
+                    foreach ($meritList as $index => $item) {
+                        $meritPosition[$item['student_id']] = $index + 1;
                     }
 
-                    // GPA ক্যালকুলেশন
-                    $currentGpa = ($failCount > 0) ? 0.00 : (($applicableSubjectCount > 0) ? (float)number_format($totalPoints / $applicableSubjectCount, 2) : 0);
-                    $marksData[$student->id]['GPA'] = ($failCount > 0) ? "0.00 (F-$failCount)" : number_format($currentGpa, 2);
+                    // পেজিনেশন
+                    $currentPage      = LengthAwarePaginator::resolveCurrentPage();
+                    $itemCollection   = collect($meritList);
+                    $perPage          = 10;
+                    $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
 
-                    $meritList[] = [
-                        'student_id' => $student->id,
-                        'fail_count' => $failCount,
-                        'total_marks' => $currentStudentTotal,
-                        'gpa' => $currentGpa
-                    ];
-                }
+                    $paginatedResults = new LengthAwarePaginator($currentPageItems, count($itemCollection), $perPage);
+                    $paginatedResults->setPath($request->url());
+                    $paginatedResults->appends($request->all());
 
-                // ৪. মেধাক্রম সর্টিং
-                usort($meritList, function($a, $b) {
-                    if ($b['gpa'] != $a['gpa']) return $b['gpa'] <=> $a['gpa'];
-                    if ($b['total_marks'] != $a['total_marks']) return $b['total_marks'] <=> $a['total_marks'];
-                    return $a['fail_count'] <=> $b['fail_count'];
-                });
-
-                foreach ($meritList as $index => $item) {
-                    $meritPosition[$item['student_id']] = $index + 1;
-                }
-
-                // ৫. পেজিনেশন
-                $currentPage = LengthAwarePaginator::resolveCurrentPage();
-                $itemCollection = collect($meritList);
-                $perPage = 10;
-                $currentPageItems = $itemCollection->slice(($currentPage * $perPage) - $perPage, $perPage)->all();
-                
-                $paginatedResults = new LengthAwarePaginator($currentPageItems, count($itemCollection), $perPage);
-                $paginatedResults->setPath($request->url());
-                $paginatedResults->appends($request->all());
-            }
-        }
+                } // end if($students->isNotEmpty())
+            } // end else (mode 2)
+        } // end if($selectedClassId && $selectedExamId && $selectedYearId)
 
         return view('school.mark.view', compact(
-            'layout', 'classes', 'examTypes', 'academicYears', 'selectedClassId', 'selectedYearId',
-            'selectedExamId', 'students', 'subjects', 'marksData', 'meritPosition', 'paginatedResults'
+            'layout', 'classes', 'examTypes', 'academicYears',
+            'selectedClassId', 'selectedYearId', 'selectedExamId', 'selectedSubjectId',
+            'students', 'subjects', 'marksData', 'meritPosition', 'paginatedResults',
+            'selectedSubject', 'subjectMarks', 'fullMark'
         ));
     }
 
