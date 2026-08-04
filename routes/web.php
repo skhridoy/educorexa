@@ -97,11 +97,11 @@ Route::domain(config('app.main_domain'))->group(function () {
                 });
                 Route::middleware(['permission:school.reject'])->group(function () {
                     Route::get('/schools/rejected', [SuperAdminController::class, 'rejected'])->name('schools.rejected');
-                    Route::post('/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
+                    Route::match(['post', 'delete'], '/schools/{school}/reject', [SuperAdminController::class, 'rejectSchool'])->name('schools.reject');
                 });
 
                 Route::middleware(['permission:school.approve'])->group(function () {
-                    Route::post('/schools/{school}/approve', [SuperAdminController::class, 'approve'])->name('schools.approve');
+                    Route::match(['post', 'put'], '/schools/{school}/approve', [SuperAdminController::class, 'approve'])->name('schools.approve');
                 });
 
                 Route::post('/schools/{school}/change-package', [SuperAdminController::class, 'changePackage'])->name('schools.change-package');
