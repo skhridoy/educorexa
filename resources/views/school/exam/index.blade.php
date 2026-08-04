@@ -28,7 +28,7 @@
                         <div class="mb-3">
                             <label for="name" class="form-label">Exam Name</label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                id="name" name="name" placeholder="e.g., 1st Semester Exam" value="{{ old('name') }}" required>
+                                id="name" name="name" placeholder="e.g., 1st Term Exam" value="{{ old('name') }}" required>
                             @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
@@ -84,14 +84,15 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table data-table mb-0">
+                        <table class="table data-table mb-0 align-middle">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Year</th>
-                                    <th>Category</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
+                                    <th>Start - End Date</th>
+                                    <th class="text-center">State</th>
+                                    <th class="text-center">Active</th>
+                                    <th class="text-center">Published</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -99,26 +100,64 @@
                                 @forelse($exams as $exam)
                                 <tr>
                                     <td data-label="Name" style="font-weight: 600;">{{ $exam->name }}</td>
-                                    <td data-label="Year">{{ $exam->year?->name ?? 'N/A' }}</td>
-                                    <td data-label="Category">{{ $exam->category?->name ?? 'N/A' }}</td>
-                                    <td data-label="Start Date">{{ $exam->start_date ? \Carbon\Carbon::parse($exam->start_date)->format('d M, Y') : 'N/A' }}</td>
-                                    <td data-label="End Date">{{ $exam->end_date ? \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') : 'N/A' }}</td>
+                                    <td data-label="Year">{{ $exam->academicYear->name ?? $exam->year?->name ?? 'N/A' }}</td>
+                                    <td data-label="Dates">
+                                        {{ \Carbon\Carbon::parse($exam->start_date)->format('d M, Y') }} 
+                                        <br>
+                                        <small class="text-muted">to {{ \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') }}</small>
+                                    </td>
+                                    <td data-label="State" class="text-center">
+                                        @php $state = $exam->exam_state; @endphp
+                                        @if($state == 'ongoing')
+                                            <span class="badge bg-success statusBadge" data-id="{{ $exam->id }}" data-year="{{ $exam->year_id }}">Ongoing</span>
+                                        @elseif($state == 'upcoming')
+                                            <span class="badge bg-warning text-dark statusBadge" data-id="{{ $exam->id }}" data-year="{{ $exam->year_id }}">Upcoming</span>
+                                        @elseif($state == 'finished')
+                                            <span class="badge bg-danger statusBadge" data-id="{{ $exam->id }}" data-year="{{ $exam->year_id }}">Finished</span>
+                                        @else
+                                            <span class="badge bg-secondary statusBadge" data-id="{{ $exam->id }}" data-year="{{ $exam->year_id }}">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td data-label="Active" class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input statusToggle"
+                                                type="checkbox"
+                                                data-id="{{ $exam->id }}"
+                                                data-year="{{ $exam->year_id }}"
+                                                {{ $exam->status ? 'checked' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td data-label="Published" class="text-center">
+                                        @if ($exam->status == 1)
+                                            <div class="form-check form-switch d-inline-block">
+                                                <input class="form-check-input resultToggle" 
+                                                    type="checkbox" 
+                                                    role="switch"
+                                                    data-id="{{ $exam->id }}" 
+                                                    {{ $exam->is_published ? 'checked' : '' }}>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small">—</span>
+                                        @endif
+                                    </td>
                                     <td data-label="Actions" class="text-center">
-                                        <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="Edit" data-bs-toggle="modal" data-bs-target="#editExamModal" onclick="loadEditForm({{ $exam->id }})">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </button>
-                                        <form action="{{ route('exams.destroy', ['tenant' => auth()->user()?->school?->slug, 'exam' => $exam->id]) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
-                                                <i class="fa-solid fa-trash"></i>
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <button type="button" class="btn btn-action btn-sm btn-outline-warning editBtn" data-id="{{ $exam->id }}" title="Edit">
+                                                <i class="fa-regular fa-pen-to-square"></i>
                                             </button>
-                                        </form>
+                                            <form action="{{ route('exams.destroy', ['tenant' => auth()->user()?->school?->slug, 'exam' => $exam->id]) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-5">
+                                    <td colspan="7" class="text-center py-5">
                                         <i class="fa-solid fa-inbox fa-3x mb-3" style="color:#e2e8f0;"></i>
                                         <p class="text-muted">No exams found.</p>
                                     </td>
@@ -133,119 +172,28 @@
     </div>
 </div>
 
-<!-- Edit exam modal -->
-                        </div>
-                    </form>
-                </div>
+<!-- Edit Exam Modal -->
+<div class="modal fade" id="editExamModal" tabindex="-1" aria-labelledby="editExamModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="editExamModalLabel"><i class="fa-regular fa-pen-to-square me-2"></i> Edit Exam</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-md-8 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Exams</h6>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Exam Name</th>
-                                        <th>Year</th>
-                                        <th>Start - End Date</th>
-                                        <th>Status</th>
-                                        <th>Published</th>
-                                        <th width="150">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($exams as $exam)
-                                        <tr>
-                                            <td>{{ $exam->name }}</td>
-                                            <td>{{ $exam->academicYear->name ?? '' }}</td>
-                                            <td>
-                                                {{ \Carbon\Carbon::parse($exam->start_date)->format('d M') }} 
-                                                - 
-                                                {{ \Carbon\Carbon::parse($exam->end_date)->format('d M') }}
-                                            </td>
-                                            
-                                            <td>
-                                                @php
-                                                $state = $exam->exam_state;
-                                                @endphp
-
-                                                @if($state == 'ongoing')
-                                                    <span class="badge bg-success statusBadge"
-                                                        data-id="{{ $exam->id }}"
-                                                        data-year="{{ $exam->year_id }}">
-                                                        Ongoing
-                                                    </span>
-
-                                                @elseif($state == 'upcoming')
-                                                    <span class="badge bg-warning text-dark statusBadge"
-                                                        data-id="{{ $exam->id }}"
-                                                        data-year="{{ $exam->year_id }}">
-                                                        Upcoming
-                                                    </span>
-
-                                                @elseif($state == 'finished')
-                                                    <span class="badge bg-danger statusBadge"
-                                                        data-id="{{ $exam->id }}"
-                                                        data-year="{{ $exam->year_id }}">
-                                                        Finished
-                                                    </span>
-
-                                                @else
-                                                    <span class="badge bg-secondary statusBadge"
-                                                        data-id="{{ $exam->id }}"
-                                                        data-year="{{ $exam->year_id }}">
-                                                        Inactive
-                                                    </span>
-                                                @endif
-
-                                            </td>
-                                            <td>
-                                                @if ($exam->status == 1)
-                                                    
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input resultToggle" 
-                                                        type="checkbox" 
-                                                        role="switch"
-                                                        data-id="{{ $exam->id }}" 
-                                                        {{ $exam->is_published ? 'checked' : '' }}>
-                                                </div>
-                                                @endif
-                                            </td>
-                                            <td class="d-flex px-3">
-                                                <button class="  btn btn-sm btn-info badge editBtn" data-id="{{ $exam->id }}">
-                                                    <i class="fa-regular fa-pen-to-square"></i>
-                                                </button>
-
-
-                                                <form
-                                                    action="{{ route('exams.destroy', ['tenant' => auth()->user()?->school?->slug, 'exam' => $exam->id]) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" onclick="confirmDelete(this)"
-                                                        class="mx-2 btn btn-sm btn-danger badge">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input statusToggle"
-                                                        type="checkbox"
-                                                        data-id="{{ $exam->id }}"
-                                                        data-year="{{ $exam->year_id }}"
-                                                        {{ $exam->status ? 'checked' : '' }}>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body" id="editBody">
+                    <!-- Dynamic fields loaded by AJAX -->
                 </div>
-            </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary-gradient px-4" style="border-radius: 8px;">Update Exam</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 @endsection
 
 @section('customJs')
@@ -253,19 +201,16 @@
         function confirmDelete(button) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you want to delete this subject?",
+                text: "Do you want to delete this exam?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'Cancel',
-
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Submit the form
                     button.closest('form').submit();
-
                 }
             })
         }
@@ -280,7 +225,6 @@
         @endif
 
         $(document).on('change', '.statusToggle', function () {
-
             let examId = $(this).data('id');
             let yearId = $(this).data('year');
             let toggle = $(this);
@@ -293,15 +237,9 @@
                     _token: "{{ csrf_token() }}"
                 },
                 success: function (response) {
-
                     if (response.success) {
-
-
-                        // 🔥 Same year সব badge inactive
                         $('.statusBadge').each(function () {
-
                             if ($(this).data('year') == yearId) {
-
                                 $(this)
                                     .removeClass('bg-success')
                                     .addClass('bg-secondary')
@@ -309,17 +247,13 @@
                             }
                         });
 
-                        // 🔥 Same year সব toggle off
                         $('.statusToggle').each(function () {
-
                             if ($(this).data('year') == yearId) {
                                 $(this).prop('checked', false);
                             }
                         });
 
-                        // 🔥 Current exam active
                         if (response.new_status == 1) {
-
                             $('.statusBadge[data-id="' + examId + '"]')
                                 .removeClass('bg-secondary')
                                 .addClass('bg-success')
@@ -328,28 +262,22 @@
                             toggle.prop('checked', true);
                         }
 
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Status Updated',
-                                timer: 1000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload(); // Swal শেষ হওয়ার পর রিলোড হবে
-                            });
-                        }
-
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Status Updated',
+                            timer: 1000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
                     }
                 }
             });
-
         });
 
         // Result publish toggle
         $(document).on('change', '.resultToggle', function () {
-
             let examId = $(this).data('id');
-            let toggle = $(this);
 
             $.ajax({
                 url: "{{ route('exams.publish', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
@@ -359,7 +287,6 @@
                     _token: "{{ csrf_token() }}"
                 },
                 success: function (response) {
-
                     if (response.success) {
                         Swal.fire({
                             icon: 'success',
@@ -370,21 +297,18 @@
                     }
                 }
             });
-
         });
-        $(document).on('click','.editBtn',function(){
 
+        $(document).on('click', '.editBtn', function(){
             let id = $(this).data('id');
 
             $.get("{{ route('exams.edit', ['tenant' => auth()->user()?->school?->slug, 'exam' => ':id']) }}"
                 .replace(':id', id),
-
                 function(data){
-
                     let html = `
                         <div class="mb-3">
-                            <label>Academic Year</label>
-                            <select name="year_id" class="form-control" required>
+                            <label class="form-label fw-bold">Academic Year</label>
+                            <select name="year_id" class="form-select" required>
                                 @foreach($years as $year)
                                     <option value="{{ $year->id }}"
                                         ${data.year_id == {{ $year->id }} ? 'selected' : ''}>
@@ -395,20 +319,20 @@
                         </div>
 
                         <div class="mb-3">
-                            <label>Exam Name</label>
+                            <label class="form-label fw-bold">Exam Name</label>
                             <input type="text" name="name" class="form-control"
                                 value="${data.name}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label>Start Date</label>
+                            <label class="form-label fw-bold">Start Date</label>
                             <input type="date" name="start_date"
                                 class="form-control"
                                 value="${data.start_date}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label>End Date</label>
+                            <label class="form-label fw-bold">End Date</label>
                             <input type="date" name="end_date"
                                 class="form-control"
                                 value="${data.end_date}" required>
