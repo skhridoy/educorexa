@@ -3,7 +3,6 @@
 @section('title', 'Login')
 
 @section('content')
-<div class="container">
 <!-- Header Section -->
 <div class="text-center mb-4">
     <div class="auth-icon-box">
@@ -25,7 +24,19 @@
     </div>
 @endif
 
-<form action="{{ route('school.login', ['tenant' => $currentSchool->slug]) }}" method="POST" class="mt-2">
+@if(session('status'))
+    <div class="alert-auth success animate-fade-in">
+        <div class="alert-icon-title">
+            <i class="fas fa-circle-check"></i>
+            <strong>Success</strong>
+        </div>
+        <div class="alert-message mt-1">
+            {{ session('status') }}
+        </div>
+    </div>
+@endif
+
+<form action="{{ route('school.login', ['tenant' => $currentSchool->slug]) }}" method="POST">
     @csrf
     
     <div class="f-group">
@@ -41,16 +52,19 @@
     </div>
 
     <div class="f-group">
-    <label class="f-label mb-0">Password</label>
-    <div class="f-input-wrap position-relative">
-        <span class="f-icon"><i class="fas fa-lock"></i></span>
-        <input type="password" name="password" class="f-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
-        <a href="{{ route('school.password.request', ['tenant' => $currentSchool->slug]) }}" class="f-link forgot-link">Forgot?</a>
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="f-label mb-0">Password</label>
+            <a href="{{ route('school.password.request', ['tenant' => $currentSchool->slug]) }}" class="f-link" style="font-size: 0.8rem; font-weight: 500;">Forgot?</a>
+        </div>
+        <div class="f-input-wrap position-relative">
+            <span class="f-icon"><i class="fas fa-lock"></i></span>
+            <input type="password" id="passwordInput" name="password" class="f-control @error('password') is-invalid @enderror" placeholder="••••••••" required>
+            <button type="button" class="f-btn-toggle" onclick="togglePassword()"><i class="far fa-eye" id="toggleIcon"></i></button>
+        </div>
+        @error('password')
+            <small class="f-error">{{ $message }}</small>
+        @enderror
     </div>
-    @error('password')
-        <small class="f-error">{{ $message }}</small>
-    @enderror
-</div>
 
     <div class="f-check mb-4">
         <input type="checkbox" id="remember" name="remember">
@@ -64,14 +78,13 @@
 </form>
 
 <div class="f-divider">
-    <span>new to the portal?</span>
+    <span>OR</span>
 </div>
 
 <div class="text-center">
-    <p class="text-muted small">
-        Need an account? <a href="{{ route('school.register.form') }}" class="f-link">Request Enrollment</a>
+    <p class="text-muted small mb-0">
+        Return to <a href="{{ route('school.home', ['tenant' => $currentSchool->slug]) }}" class="f-link">School Homepage</a>
     </p>
-</div>
 </div>
 @endsection
 
@@ -82,7 +95,7 @@
     }
     @keyframes float {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+        50% { transform: translateY(-8px); }
     }
     .animate-shake {
         animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -93,53 +106,23 @@
         30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
         40%, 60% { transform: translate3d(4px, 0, 0); }
     }
-    .container {
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    padding: 30px;
-    max-width: 500px;
-    margin: 40px auto;
-}
-    .f-group {
-        margin-bottom: 1rem;
-    }
-    .f-label {
-        font-weight: 600;
-        color: #002147;
-        margin-bottom: 0.25rem;
-        display: block;
-    }
-    .f-control {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 4rem; /* extra space for link */
-        border: 2px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .f-control:focus {
-        outline: none;
-        border-color: #1e3a8a;
-        box-shadow: 0 0 8px rgba(30,58,138,0.3);
-    }
-    .btn-submit {
-        background: linear-gradient(90deg, #1e3a8a, #2563eb);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem;
-        font-weight: 600;
-        transition: opacity 0.2s;
-    }
-    .btn-submit:hover {
-        opacity: 0.9;
-    }
-    .f-link {
-        color: #2563eb;
-        text-decoration: underline;
-    }
-    .f-link:hover {
-        color: #1e40af;
-    }
 </style>
+@endsection
+
+@section('customJs')
+<script>
+function togglePassword() {
+    const input = document.getElementById('passwordInput');
+    const icon = document.getElementById('toggleIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
 @endsection
