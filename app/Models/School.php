@@ -16,6 +16,7 @@ use App\Models\User;
  * @property string|null $phone
  * @property string|null $ein_number
  * @property string|null $emis_code
+ * @property string|null $app_code
  * @property string|null $address
  * @property string $status
  * @property int $is_active
@@ -63,10 +64,12 @@ class School extends Model
     protected $fillable = [
         'name',
         'slug',
+        'school_code',
         'status',
         'is_active',
         'email',
         'phone',
+        'app_code',
         'favicon',
         'logo',
         'mail_mailer',
@@ -86,6 +89,34 @@ class School extends Model
         'pro_email_prefix',
         'subscription_package_id'
     ];
+
+    public static function generateAppCode(): string
+    {
+        $prefix = 'SCH';
+
+        $lastSchool = self::query()
+            ->where('app_code', 'like', $prefix . '%')
+            ->orderByDesc('id')
+            ->first();
+
+        $lastNumber = 1;
+
+        if ($lastSchool && $lastSchool->app_code) {
+            $matches = [];
+            preg_match('/^' . preg_quote($prefix, '/') . '(\d{4})$/', $lastSchool->app_code, $matches);
+
+            if (!empty($matches[1])) {
+                $lastNumber = (int) $matches[1] + 1;
+            }
+        }
+
+        return $prefix . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    public function getDisplayAppCodeAttribute(): string
+    {
+        return !empty($this->app_code) ? $this->app_code : 'N/A';
+    }
 
     public function subscriptionPackage()
     {

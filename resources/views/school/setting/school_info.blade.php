@@ -36,6 +36,10 @@
                                 <input type="text" name="emis_code" class="form-control" value="{{ $school->emis_code }}" placeholder="Institution EMIS Code">
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label"><i class="fa-solid fa-qrcode me-2 text-primary opacity-50"></i> App Code (Auto Generated)</label>
+                                <input type="text" class="form-control bg-light" value="{{ $school->app_code ?? 'N/A' }}" readonly>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label"><i class="fa-solid fa-envelope me-2 text-primary opacity-50"></i> Official Email</label>
                                 <input type="email" name="email" class="form-control" value="{{ $school->email }}" placeholder="contact@school.edu">
                             </div>

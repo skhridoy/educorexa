@@ -164,9 +164,12 @@ class SuperAdminController extends Controller
             // 1️⃣ Create School (সরাসরি approved স্ট্যাটাসে)
             $defaultPackage = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->first();
 
+            $appCode = School::generateAppCode();
+
             $newSchool = School::create([
                 'name'      => $request->school_name,
                 'slug'      => strtolower($request->slug),
+                'app_code' => $appCode,
                 'email'     => $request->admin_email,
                 'phone'     => $request->admin_mobile,
                 'status'    => 'approved',

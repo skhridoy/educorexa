@@ -16,10 +16,10 @@ class TeacherAssignSubjectController extends Controller
     {
         $schoolId = auth()->user()->school_id;
 
-        $teachers = Teacher::where('school_id',$schoolId)->get();
-        $classes = Classes::where('school_id',$schoolId)->get();
-        $subjects = Subject::where('school_id',$schoolId)->get();
-        $sections = Section::where('school_id',$schoolId)->get();
+        $teachers = Teacher::where('school_id',$schoolId)->orderBy('name','asc')->get();
+        $classes = Classes::where('school_id',$schoolId)->orderBy('name','asc')->get();
+        $subjects = Subject::where('school_id',$schoolId)->orderBy('name','asc')->get();
+        $sections = Section::where('school_id',$schoolId)->orderBy('name','asc')->get();
 
         $assignments = TeacherAssignSubject::with([
             'teacher','class','subject','section'
@@ -36,9 +36,28 @@ class TeacherAssignSubjectController extends Controller
             $assignments->where('section_id',$request->section_id);
         }
 
+        // Teacher filter
+        if($request->filled('teacher_id')){
+            $assignments->where('teacher_id',$request->teacher_id);
+        }
+
+        // Search text
+        if($request->filled('search')){
+            $search = $request->search;
+            $assignments->where(function($q) use ($search) {
+                $q->whereHas('teacher', function($tQuery) use ($search) {
+                    $tQuery->where('name', 'like', "%{$search}%");
+                })->orWhereHas('subject', function($sQuery) use ($search) {
+                    $sQuery->where('name', 'like', "%{$search}%");
+                })->orWhereHas('class', function($cQuery) use ($search) {
+                    $cQuery->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
         $assignments = $assignments
             ->orderBy('id','desc')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         if ($request->ajax()) {
@@ -48,12 +67,17 @@ class TeacherAssignSubjectController extends Controller
             )->render();
         }
 
+        $totalAssignments = TeacherAssignSubject::where('school_id', $schoolId)->count();
+        $assignedTeachersCount = TeacherAssignSubject::where('school_id', $schoolId)->distinct('teacher_id')->count('teacher_id');
+
         return view('school.teacher.assign',compact(
             'teachers',
             'classes',
             'subjects',
             'sections',
-            'assignments'
+            'assignments',
+            'totalAssignments',
+            'assignedTeachersCount'
         ));
     }
 

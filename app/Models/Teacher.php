@@ -65,6 +65,40 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Teacher extends Model
 {
+    public static function generateTeacherId($schoolId): string
+    {
+        $yearPart = date('y');
+        $prefix = 'TCH-' . $yearPart;
+
+        $lastSerial = self::where('school_id', $schoolId)
+            ->where('teacher_id', 'like', $prefix . '%')
+            ->selectRaw("MAX(CAST(SUBSTRING(teacher_id, -4) AS UNSIGNED)) as max_serial")
+            ->value('max_serial');
+
+        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
+
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    public function getDisplayTeacherIdAttribute(): string
+    {
+        if (empty($this->teacher_id)) {
+            return 'N/A';
+        }
+
+        $teacherId = (string) $this->teacher_id;
+
+        if (preg_match('/^\d{4}-\d{3}$/', $teacherId)) {
+            return $teacherId;
+        }
+
+        if (preg_match('/^\d{7}$/', $teacherId)) {
+            return substr($teacherId, 0, 4) . '-' . substr($teacherId, 4, 3);
+        }
+
+        return $teacherId;
+    }
+
     protected $fillable = [
         'school_id',
         'teacher_id',

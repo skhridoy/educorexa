@@ -184,4 +184,4 @@
         background-color: var(--bg-light) !important;
     }
 </style>
-@endsection
+@endsection

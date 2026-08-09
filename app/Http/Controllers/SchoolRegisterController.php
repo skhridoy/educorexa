@@ -33,9 +33,12 @@ class SchoolRegisterController extends Controller
 
         DB::transaction(function () use ($request, &$newSchool) {
 
+            $appCode = School::generateAppCode();
+
             $newSchool = School::create([
                 'name'   => $request->school_name,
                 'slug'   => strtolower($request->slug),
+                'app_code' => $appCode,
                 'email'  => $request->admin_email,
                 'status' => 'pending',
                 'subscription_package_id' => $request->package_id,
@@ -113,6 +116,9 @@ class SchoolRegisterController extends Controller
         $school->phone = $request->phone;
         $school->ein_number = $request->ein_number;
         $school->emis_code = $request->emis_code;
+        if ($request->filled('app_code')) {
+            $school->app_code = $request->app_code;
+        }
         $school->address = $request->address;
 
         $tenantSlug = $school->slug;

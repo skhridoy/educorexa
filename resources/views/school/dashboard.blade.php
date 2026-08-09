@@ -114,19 +114,130 @@
 
         </div>
 
+        {{-- ══════ QUICK ACTIONS ══════ --}}
+        <div class="mb-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-bolt text-white" style="font-size:13px;"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-0" style="font-size:13px;text-transform:uppercase;letter-spacing:.6px;">Quick Actions</h6>
+            </div>
+            <div class="row g-3">
+
+                {{-- Collect Payment (Highlighted) --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('payment.index', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100 position-relative overflow-hidden"
+                       style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border-radius:16px;box-shadow:0 4px 18px rgba(16,185,129,0.35);transition:all .25s cubic-bezier(.4,0,.2,1);"
+                       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(16,185,129,0.5)'"
+                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 18px rgba(16,185,129,0.35)'">
+                        <div style="position:absolute;top:-15px;right:-15px;width:60px;height:60px;background:rgba(255,255,255,0.12);border-radius:50%;"></div>
+                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;backdrop-filter:blur(4px);">
+                            <i class="fa-solid fa-hand-holding-dollar text-white" style="font-size:18px;"></i>
+                        </div>
+                        <div class="text-white fw-bold" style="font-size:12px;line-height:1.3;">Collect<br>Payment</div>
+                        <div style="background:rgba(255,255,255,0.2);border-radius:50px;padding:2px 10px;margin-top:8px;display:inline-block;">
+                            <span class="text-white" style="font-size:10px;font-weight:600;">Fee Collection</span>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Add Student --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('students.create', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100"
+                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
+                       onmouseover="this.style.borderColor='#4f46e5';this.style.boxShadow='0 4px 18px rgba(79,70,229,0.15)';this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+                        <div style="width:44px;height:44px;border-radius:12px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                            <i class="fa-solid fa-user-plus" style="color:#4f46e5;font-size:17px;"></i>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Add<br>Student</div>
+                    </a>
+                </div>
+
+                {{-- Add Teacher --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('teachers.create', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100"
+                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
+                       onmouseover="this.style.borderColor='#7c3aed';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.15)';this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+                        <div style="width:44px;height:44px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                            <i class="fa-solid fa-chalkboard-user" style="color:#7c3aed;font-size:17px;"></i>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Add<br>Teacher</div>
+                    </a>
+                </div>
+
+                {{-- Student List --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('students.index', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100"
+                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
+                       onmouseover="this.style.borderColor='#f59e0b';this.style.boxShadow='0 4px 18px rgba(245,158,11,0.15)';this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+                        <div style="width:44px;height:44px;border-radius:12px;background:#fffbeb;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                            <i class="fa-solid fa-users" style="color:#f59e0b;font-size:17px;"></i>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Student<br>List</div>
+                    </a>
+                </div>
+
+                {{-- Attendance --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('attendance.index', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100"
+                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
+                       onmouseover="this.style.borderColor='#ec4899';this.style.boxShadow='0 4px 18px rgba(236,72,153,0.15)';this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+                        <div style="width:44px;height:44px;border-radius:12px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                            <i class="fa-solid fa-clipboard-check" style="color:#ec4899;font-size:17px;"></i>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Take<br>Attendance</div>
+                    </a>
+                </div>
+
+                {{-- School Settings --}}
+                <div class="col-6 col-md-3 col-lg-2">
+                    <a href="{{ route('school.settings', ['tenant' => auth()->user()->school->slug]) }}"
+                       class="d-block text-decoration-none text-center p-3 h-100"
+                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
+                       onmouseover="this.style.borderColor='#64748b';this.style.boxShadow='0 4px 18px rgba(100,116,139,0.15)';this.style.transform='translateY(-2px)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
+                        <div style="width:44px;height:44px;border-radius:12px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                            <i class="fa-solid fa-gear" style="color:#64748b;font-size:17px;"></i>
+                        </div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">School<br>Settings</div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
         {{-- Main Content Charts/Tables --}}
+
         <div class="row g-4 mb-4">
             {{-- Unpaid Student List --}}
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; box-shadow: 0 8px 28px rgba(15,23,42,0.06) !important; overflow: hidden;">
                     <div class="card-body p-4">
-                        <div class="d-md-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h5 class="card-title mb-1">Unpaid Students</h5>
-                                <p class="text-muted small">তালিকাটি ফিল্টার করে বকেয়া ফি চেক করুন।</p>
+                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1.5px solid #f1f5f9;">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(239,68,68,0.3);">
+                                    <i class="fa-solid fa-file-invoice-dollar text-white" style="font-size: 16px;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 16px; font-family: 'Outfit', sans-serif;">Unpaid Student Fees</h5>
+                                    <p class="text-muted mb-0" style="font-size: 12px;">তালিকা ফিল্টার করে বকেয়া ফি চেক করুন</p>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <select id="unpaidMonthFilter" class="form-select form-select-sm border-0 bg-light rounded-pill px-3" style="width: auto;">
+                                <select id="unpaidMonthFilter"
+                                        class="form-select form-select-sm"
+                                        style="width: 155px; min-width: 155px; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 7px 30px 7px 12px; font-size: 12.5px; font-weight: 600; color: #475569; background-color: #f8fafc; cursor: pointer; transition: all .2s;"
+                                        onmouseover="this.style.borderColor='#4f46e5'"
+                                        onmouseout="this.style.borderColor='#e2e8f0'">
                                     @for ($i = -3; $i < 5; $i++)
                                         @php $m = now()->addMonths($i)->format('F-Y'); @endphp
                                         <option value="{{ $m }}" {{ $m == now()->format('F-Y') ? 'selected' : '' }}>{{ $m }}</option>
@@ -138,7 +249,7 @@
                         <div id="unpaidListContainer">
                             <div class="text-center py-5">
                                 <div class="spinner-grow text-primary" role="status"></div>
-                                <p class="mt-2 text-muted">তালিকা লোড হচ্ছে...</p>
+                                <p class="mt-2 text-muted small">তালিকা লোড হচ্ছে...</p>
                             </div>
                         </div>
                     </div>

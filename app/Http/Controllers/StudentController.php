@@ -89,36 +89,72 @@ class StudentController extends Controller
     {
         $schoolId = auth()->user()->school_id;
 
-        // ১. কোয়েরি বিল্ডার শুরু করা (এখনই গেট বা পেজিনেট করা যাবে না)
         $query = Student::where('school_id', $schoolId)
-            ->with(['class', 'section', 'category', 'group']);
+            ->with(['class', 'section', 'category', 'group', 'user']);
 
-        // ২. সার্চ ফিল্টারসমূহ যোগ করা
+        // Search Filter (Combined search or field specific)
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('student_id', 'like', "%{$search}%")
+                  ->orWhere('contact_number', 'like', "%{$search}%")
+                  ->orWhere('fathers_name', 'like', "%{$search}%")
+                  ->orWhere('mothers_name', 'like', "%{$search}%")
+                  ->orWhere('student_birth_nid', 'like', "%{$search}%");
+            });
+        }
+
         if ($request->filled('student_id')) {
-            $query->where('student_id', 'like', '%' . $request->student_id . '%');
+            $query->where('student_id', 'like', '%' . trim($request->student_id) . '%');
         }
 
         if ($request->filled('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+            $query->where('name', 'like', '%' . trim($request->name) . '%');
         }
 
         if ($request->filled('contact')) {
-            // ডাটাবেজ কলামের নাম contact_number কি না নিশ্চিত হয়ে নিন
-            $query->where('contact_number', 'like', '%' . $request->contact . '%');
+            $query->where('contact_number', 'like', '%' . trim($request->contact) . '%');
         }
 
-        // ৩. সর্টিং এবং পেজিনেশন (সবশেষে)
-        $students = $query->orderBy('roll', 'asc')->paginate(10);
+        // Class & Section Filter
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
 
-        // ৪. একটিভ স্টুডেন্ট কাউন্ট (এটি আগের মতোই থাকবে)
+        if ($request->filled('section_id')) {
+            $query->where('section_id', $request->section_id);
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'newest');
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('id', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'roll_asc':
+                $query->orderBy('roll', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('id', 'desc');
+                break;
+        }
+
+        $students = $query->paginate(15)->withQueryString();
         $activeStudents = Student::where('school_id', $schoolId)->where('status', 'active')->count();
 
-        // ৫. AJAX রেসপন্স হ্যান্ডেলিং
+        $classes = Classes::where('school_id', $schoolId)->orderBy('name')->get();
+        $sections = Section::where('school_id', $schoolId)->orderBy('name')->get();
+
         if ($request->ajax()) {
-            return view('school.student.partials.table', compact('students', 'activeStudents'))->render();
+            return view('school.student.partials.table', compact('students', 'activeStudents', 'classes', 'sections'))->render();
         }
 
-        return view('school.student.index', compact('students', 'activeStudents'));
+        return view('school.student.index', compact('students', 'activeStudents', 'classes', 'sections'));
     }
     public function getSubCategories($tenant, $categoryId)
     {
@@ -145,23 +181,49 @@ class StudentController extends Controller
             $request->merge(['date_of_birth' => $dob]);
         }
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'class_id' => 'required|exists:classes,id',
-            'school_category_id' => 'required',
+            'name'                   => 'required|string|max:255',
+            'email'                  => 'required|email|unique:users,email',
+            'password'               => 'nullable|string|min:6',
+            'class_id'               => 'required|exists:classes,id',
+            'school_category_id'     => 'required',
             'school_sub_category_id' => 'nullable',
-            'section_id' => 'required|exists:sections,id',
-            'father_nid' => 'nullable|string|max:255',
-            'student_birth_nid' => 'nullable|string|max:255',
-            'date_of_birth' => 'nullable|date|before:today',
-            'gender' => 'nullable|in:male,female,other',
-            'phone' => 'nullable|string|max:11',
-            'admission_date' => 'required|date',
-            'address' => 'nullable|string|max:500',
-            'religion' => 'required|string|max:50',
-            'blood_group' => 'nullable|string|max:10',
-            'photo' => 'nullable|image|max:2048',
+            'section_id'             => 'required|exists:sections,id',
+            'father_nid'             => [
+                'nullable',
+                'string',
+                'regex:/^(\d{10}|\d{17})$/'
+            ],
+            'mother_nid'             => [
+                'nullable',
+                'string',
+                'regex:/^(\d{10}|\d{17})$/'
+            ],
+            'student_birth_nid'      => [
+                'required',
+                'string',
+                'regex:/^\d{17}$/',
+                'unique:students,student_birth_nid'
+            ],
+            'date_of_birth'          => 'nullable|date|before:today',
+            'gender'                 => 'nullable|in:male,female,other',
+            'phone'                  => [
+                'nullable',
+                'string',
+                'regex:/^01[3-9]\d{8}$/'
+            ],
+            'admission_date'         => 'required|date',
+            'address'                => 'nullable|string|max:500',
+            'religion'               => 'required|string|max:50',
+            'blood_group'            => 'nullable|string|max:10',
+            'photo'                  => 'nullable|image|max:2048',
+        ], [
+            'email.unique'               => 'এই ইমেইল ঠিকানাটি ইতিমধ্যে ব্যবহার করা হয়েছে। অন্য ইমেইল প্রদান করুন।',
+            'phone.regex'                => 'ফোন নম্বরটি সঠিক নয় (১১ ডিজিট হতে হবে এবং 01 দিয়ে শুরু হতে হবে)।',
+            'father_nid.regex'           => 'পিতার এনআইডি (NID) নম্বরটি অবশ্যই ১০ ডিজিট অথবা ১৭ ডিজিট হতে হবে।',
+            'mother_nid.regex'           => 'মাতার এনআইডি (NID) নম্বরটি অবশ্যই ১০ ডিজিট অথবা ১৭ ডিজিট হতে হবে।',
+            'student_birth_nid.required' => 'শিক্ষার্থীর জন্ম নিবন্ধন নম্বর প্রদান করা আবশ্যক।',
+            'student_birth_nid.regex'    => 'শিক্ষার্থীর জন্ম নিবন্ধন নম্বরটি অবশ্যই ১৭ ডিজিটের হতে হবে।',
+            'student_birth_nid.unique'   => 'এই জন্ম নিবন্ধন নম্বরটি ইতিমধ্যে ব্যবহার করা হয়েছে।',
         ]);
 
         $schoolId = auth()->user()->school_id;
@@ -171,6 +233,7 @@ class StudentController extends Controller
 
         $tenantSlug = auth()->user()->school->slug;
         $photoPath = null;
+        $password = $request->filled('password') ? $request->password : '12345678';
 
         // ১. ফটো হ্যান্ডেলিং
         if ($request->hasFile('photo')) {
@@ -185,14 +248,14 @@ class StudentController extends Controller
         }
 
         // ট্রানজ্যাকশন শুরু
-        DB::transaction(function () use ($schoolId, $request, $validated, $academicYear, $photoPath, $tenantSlug) {
+        DB::transaction(function () use ($schoolId, $request, $validated, $academicYear, $photoPath, $tenantSlug, $password) {
             
             // ১. ইউজার তৈরি
             $user = User::create([
                 'school_id' => $schoolId,
                 'name'      => $validated['name'],
                 'email'     => $validated['email'],
-                'password'  => Hash::make($request->password),
+                'password'  => Hash::make($password),
                 'role'      => 'student',
             ]);
 
@@ -221,7 +284,7 @@ class StudentController extends Controller
                 'religion'               => $request->religion,
                 'photo'                  => $photoPath,
                 'status'                 => 'active',
-                'password'               => Hash::make($request->password),
+                'password'               => Hash::make($password),
                 'created_by'             => auth()->id(),
             ]);
 

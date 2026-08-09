@@ -394,6 +394,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::post('/teacher-assign', [TeacherAssignSubjectController::class, 'store'])->name('teacher.assign.store');
 
                     Route::delete('/teacher-assign/{assignment}', [TeacherAssignSubjectController::class, 'destroy'])->name('teacher.assign.destroy');
+                    Route::get('/teachers/demo-download', [TeacherController::class, 'downloadDemo'])->name('teachers.demo');
+                    Route::post('/teachers/import-excel', [TeacherController::class, 'importExcel'])->name('teachers.import');
                     Route::resource('teachers', TeacherController::class);
                 });
 

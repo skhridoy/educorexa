@@ -1,44 +1,223 @@
 @extends('layouts.school')
 
+@section('customCSS')
+    @include('school.others._modern_design_styles')
+    <style>
+        .modal-dropzone {
+            border: 2px dashed #818cf8;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .modal-dropzone:hover, .modal-dropzone.dz-over {
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+            box-shadow: 0 8px 25px rgba(79,70,229,0.15);
+        }
+        .modal-dropzone.dz-selected {
+            border-color: #4f46e5;
+            border-style: solid;
+            background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%);
+        }
+        .modal-dz-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg,#4f46e5,#7c3aed);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: #fff;
+            margin: 0 auto 12px;
+            box-shadow: 0 6px 16px rgba(79,70,229,0.3);
+            transition: transform 0.2s ease;
+        }
+        .modal-dropzone:hover .modal-dz-icon { transform: translateY(-4px); }
+        .modal-dz-title { font-weight: 700; font-size: 16px; color: #3730a3; margin-bottom: 4px; }
+        .modal-dz-sub   { font-size: 12.5px; color: #64748b; margin: 0; }
+        /* Premium Header Action Buttons Alignment & Design */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-header-outline {
+            background: rgba(255, 255, 255, 0.12) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(8px);
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            height: 38px !important;
+            padding: 0 18px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.25s ease !important;
+            text-decoration: none !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        }
+        .btn-header-outline:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-color: rgba(255, 255, 255, 0.6) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2) !important;
+            transform: translateY(-1px);
+        }
+        .btn-header-solid {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            height: 38px !important;
+            padding: 0 18px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.25s ease !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4) !important;
+            text-decoration: none !important;
+        }
+        .btn-header-solid:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55) !important;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 576px) {
+            .header-actions {
+                width: 100%;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px !important;
+            }
+            .btn-header-outline, .btn-header-solid {
+                width: 100%;
+            }
+        }
+    </style>
+@endsection
+
 @section('content')
-    <div class="page-content">
-        <div class="row">
-            <nav class="col-md-6 page-breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()?->school?->slug]) }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Student Import</li>
-                </ol>
-            </nav>
-            <div class="my-2 col-md-6 text-end">
-                <a href="{{ route('students.create', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-primary btn-sm">Add Student</a>
-            </div>
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Import Students</h6>
-                        <p class="card-description">Upload an Excel file to import multiple students at once.</p>
-                            <form action="{{ route('students.import', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="file" name="file" class="form-control mb-3" required>
-                            <button type="submit" class="btn btn-primary">Upload Excel</button>
-                        </form>
-                    </div>
+<div class="page-content">
+    <div class="container-fluid">
+        {{-- Page Header --}}
+        <div class="page-header-card mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="page-header-content d-flex align-items-center gap-3">
+                <div class="header-icon-box">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+                <div>
+                    <h1 class="page-title fs-4 mb-1">Student Bulk Import</h1>
+                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">Upload an Excel or CSV file to import students into your school records</p>
                 </div>
             </div>
+            <div class="header-actions">
+                <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()?->school?->slug]) }}"
+                   class="btn-header-outline">
+                    <i class="fa-solid fa-download me-1.5"></i> Download Template
+                </a>
+                <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}"
+                   class="btn-header-solid">
+                    <i class="fa-solid fa-user-graduate me-1.5"></i> Student List
+                </a>
+            </div>
+        </div>
+
+        {{-- Import Form Card --}}
+        <div class="form-card mb-4">
+            <form action="{{ route('students.import', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST" enctype="multipart/form-data" id="student_import_form">
+                @csrf
+
+                <div id="stu_standalone_dropzone"
+                     class="modal-dropzone"
+                     onclick="document.getElementById('stu_standalone_file').click();"
+                     ondragover="event.preventDefault(); this.classList.add('dz-over');"
+                     ondragleave="this.classList.remove('dz-over');">
+                    <div id="stu_standalone_dz_icon" class="modal-dz-icon">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <p class="modal-dz-title" id="stu_standalone_label">Click or drag Excel/CSV file here to upload</p>
+                    <p class="modal-dz-sub">Supports .xlsx, .xls, .csv files up to 5 MB</p>
+                    <input type="file" name="file" id="stu_standalone_file"
+                           accept=".xlsx,.xls,.csv" class="d-none" required
+                           onchange="previewStandaloneStuFile(this);">
+                </div>
+
+                <div class="mt-4 p-3.5 rounded-3 small" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <p class="fw-bold mb-2 text-dark"><i class="fa-solid fa-circle-info me-1.5 text-primary"></i>Required Columns Guide:</p>
+                    <div class="d-flex flex-wrap gap-1.5 mb-2">
+                        @foreach(['name *','email *','class_name *','section_name *','roll','fathers_name','mothers_name','student_birth_nid','contact_number','gender','date_of_birth','address'] as $col)
+                            <span class="badge rounded-pill fw-normal px-2.5 py-1"
+                                  style="background:{{ str_contains($col,'*') ? '#4f46e5' : '#64748b' }};color:#fff;font-size:11px;">
+                                {{ $col }}
+                            </span>
+                        @endforeach
+                    </div>
+                    <p class="text-muted mb-0" style="font-size:11.5px;">
+                        <span class="text-primary fw-bold">*</span> Mandatory columns &nbsp;|&nbsp;
+                        Default Password: <span class="badge bg-primary">12345678</span>
+                    </p>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end gap-2">
+                    <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    <button type="submit" id="stu_import_submit_btn" class="btn btn-primary-modern rounded-pill px-5">
+                        <i class="fa-solid fa-file-import me-1"></i> Start Import
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 @endsection
+
 @section('customJs')
 <script>
-    // Add any custom JavaScript for the teacher creation page here
+    function previewStandaloneStuFile(input) {
+        const file = input.files[0];
+        const label = document.getElementById('stu_standalone_label');
+        const icon = document.getElementById('stu_standalone_dz_icon');
+
+        if (!file) return;
+
+        const allowed = ['xlsx', 'xls', 'csv'];
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (!allowed.includes(ext)) {
+            label.textContent = '❌ Invalid file format! Please select .xlsx, .xls or .csv';
+            label.style.color = '#ef4444';
+            return;
+        }
+
+        const size = file.size < 1024 * 1024
+            ? (file.size / 1024).toFixed(1) + ' KB'
+            : (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+        label.innerHTML = `<i class="fa-solid fa-file-excel me-2" style="color:#4f46e5;"></i><strong>${file.name}</strong> <span style="color:#64748b;font-weight:400;">(${size})</span>`;
+        label.style.color = '#3730a3';
+        icon.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#fff;font-size:1.6rem;"></i>';
+    }
+
     @if(session('success'))
-    Swal.fire({
-        icon: '{{ session('type', 'success') }}',
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        timer: 1500,
-        showConfirmButton: false
-    });
+        Swal.fire({
+            icon: '{{ session('type', 'success') }}',
+            title: 'Success!',
+            text: '{{ session('success') }}',
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}',
+        });
     @endif
 </script>
 @endsection
