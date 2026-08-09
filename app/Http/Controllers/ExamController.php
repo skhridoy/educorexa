@@ -24,15 +24,30 @@ class ExamController extends Controller
     {
         $schoolId = auth()->user()->school_id;
 
-        $years = AcademicYear::where('school_id', $schoolId)->get();
-        $categories = SchoolCategory::where('school_id', $schoolId)->get();
+        $years = AcademicYear::where('school_id', $schoolId)->orderBy('name', 'desc')->get();
+        $categories = SchoolCategory::where('school_id', $schoolId)->orderBy('name')->get();
 
-        $exams = Exam::with('academicYear')
-            ->where('school_id', $schoolId)
-            ->orderBy('id', 'desc')
-            ->paginate(5);
+        $query = Exam::with(['academicYear', 'category'])
+            ->where('school_id', $schoolId);
 
-        return view('school.exam.index', compact('exams', 'years', 'categories'));
+        if ($request->filled('year_id')) {
+            $query->where('year_id', $request->year_id);
+        }
+        if ($request->filled('category_id')) {
+            $query->where('school_category_id', $request->category_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $exams = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
+
+        // Calculate summary stats
+        $allExamsCount    = Exam::where('school_id', $schoolId)->count();
+        $activeExamsCount = Exam::where('school_id', $schoolId)->where('status', 1)->count();
+        $publishedCount   = Exam::where('school_id', $schoolId)->where('is_published', 1)->count();
+
+        return view('school.exam.index', compact('exams', 'years', 'categories', 'allExamsCount', 'activeExamsCount', 'publishedCount'));
     }
 
 

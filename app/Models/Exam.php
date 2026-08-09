@@ -84,6 +84,11 @@ class Exam extends Model
     {
         return $this->hasMany(Mark::class);
     }
+    public function category()
+    {
+        return $this->belongsTo(SchoolCategory::class, 'school_category_id');
+    }
+
     public function categories()
     {
         return $this->hasMany(SchoolCategory::class, 'school_category_id');
