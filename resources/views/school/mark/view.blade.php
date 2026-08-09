@@ -3,69 +3,145 @@
 @section('customCSS')
     @include('school.others._modern_design_styles')
     <style>
-        /* Disable number input spin buttons */
+        /* ══════════════════════════════════════════════
+           MARK INPUT STATES
+        ══════════════════════════════════════════════ */
         input.mark-input::-webkit-outer-spin-button,
         input.mark-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        input.mark-input[type=number] {
-            -moz-appearance: textfield;
-        }
-
+        input.mark-input[type=number] { -moz-appearance: textfield; }
         .mark-input.saving { border-color: #f59e0b; background: #fffbeb; }
         .mark-input.saved  { border-color: #22c55e; background: #f0fdf4; }
         .mark-input.error  { border-color: #ef4444; background: #fef2f2; }
 
-        .save-indicator {
-            font-size: 0.68rem;
-            font-weight: 700;
-            min-height: 14px;
-            margin-top: 2px;
-            text-align: center;
-        }
-        .save-indicator.saving { color: #f59e0b; }
-        .save-indicator.saved  { color: #22c55e; }
-        .save-indicator.error  { color: #ef4444; }
-
-        .grade-pill {
-            display: inline-block;
-            padding: 2px 8px;
+        /* ══════════════════════════════════════════════
+           PAGE HERO BANNER
+        ══════════════════════════════════════════════ */
+        .mark-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
             border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(15,23,42,0.18);
+        }
+        .mark-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: rgba(79,70,229,0.12);
+            border-radius: 50%;
+        }
+        .mark-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -40px;
+            width: 160px; height: 160px;
+            background: rgba(99,102,241,0.08);
+            border-radius: 50%;
+        }
+        .mark-hero-content { position: relative; z-index: 2; }
+        .mark-hero-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.5px;
+        }
+        .mark-hero-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            margin: 0;
+        }
+        .mark-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #a5b4fc;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            margin-top: 12px;
+        }
+
+        /* ══════════════════════════════════════════════
+           FILTER SECTION
+        ══════════════════════════════════════════════ */
+        .mark-filter-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(15,23,42,0.05);
+        }
+        .mark-filter-card .filter-label {
             font-size: 0.72rem;
             font-weight: 700;
-            background: #e0f2fe;
-            color: #0369a1;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
         }
-        .grade-pill.F  { background: #fee2e2; color: #dc2626; }
-        .grade-pill.Ap { background: #dcfce7; color: #16a34a; }
+        .mark-filter-card .form-select,
+        .mark-filter-card .form-control {
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            padding: 9px 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+        .mark-filter-card .form-select:focus,
+        .mark-filter-card .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+            background: #fff;
+        }
 
+        /* ══════════════════════════════════════════════
+           TAB TOGGLE
+        ══════════════════════════════════════════════ */
         .tab-toggle {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             background: #f1f5f9;
             border-radius: 12px;
             padding: 4px;
         }
         .tab-btn {
             flex: 1;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border: none;
             border-radius: 9px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.83rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             background: transparent;
             color: #64748b;
             text-decoration: none;
             text-align: center;
+            white-space: nowrap;
         }
         .tab-btn.active {
             background: #fff;
-            color: #002147;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            color: #4f46e5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
+        /* ══════════════════════════════════════════════
+           STATS BAR
+        ══════════════════════════════════════════════ */
         .stats-bar {
             display: flex;
             gap: 10px;
@@ -73,27 +149,28 @@
             overflow-x: auto;
             padding-bottom: 4px;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
-        .stats-bar::-webkit-scrollbar {
-            height: 3px;
-        }
-        .stats-bar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
+        .stats-bar::-webkit-scrollbar { height: 3px; }
+        .stats-bar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .stat-card {
             background: #fff;
-            border-radius: 12px;
-            padding: 10px 14px;
+            border-radius: 14px;
+            padding: 12px 16px;
             border: 1.5px solid #f1f5f9;
             flex: 1 0 auto;
-            min-width: 75px;
+            min-width: 80px;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+            transition: all 0.2s;
         }
-        .stat-card .num { font-size: 1.2rem; font-weight: 800; color: #002147; line-height: 1.2; }
-        .stat-card .lbl { font-size: 0.62rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .stat-card:hover { border-color: #c7d2fe; transform: translateY(-2px); }
+        .stat-card .num { font-size: 1.3rem; font-weight: 800; color: #0f172a; line-height: 1.2; }
+        .stat-card .lbl { font-size: 0.6rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
 
-        /* ── Status Toggle ── */
+        /* ══════════════════════════════════════════════
+           STATUS TOGGLE
+        ══════════════════════════════════════════════ */
         .status-toggle {
             display: inline-flex;
             border-radius: 10px;
@@ -111,7 +188,7 @@
             background: transparent;
             color: #64748b;
             cursor: pointer;
-            transition: all 0.18s ease-in-out;
+            transition: all 0.18s;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
@@ -119,20 +196,13 @@
             height: 100%;
         }
         .status-toggle .st-btn:first-child { border-right: 1.5px solid #cbd5e1; }
-        .status-toggle .st-btn.active-present {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-        .status-toggle .st-btn.active-absent {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        .status-toggle .st-btn:hover:not(.active-present):not(.active-absent) {
-            background: #f1f5f9;
-            color: #475569;
-        }
+        .status-toggle .st-btn.active-present { background: #dcfce7; color: #16a34a; }
+        .status-toggle .st-btn.active-absent  { background: #fee2e2; color: #dc2626; }
+        .status-toggle .st-btn:hover:not(.active-present):not(.active-absent) { background: #f1f5f9; color: #475569; }
 
-        /* ── Student Mark Card Grid ── */
+        /* ══════════════════════════════════════════════
+           STUDENT MARK CARD (EDIT MODE)
+        ══════════════════════════════════════════════ */
         .student-card-grid {
             display: flex;
             flex-direction: column;
@@ -144,23 +214,24 @@
             align-items: center;
             justify-content: space-between;
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 13px 18px;
             gap: 14px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: all 0.22s ease;
         }
         .student-mark-card:hover {
-            box-shadow: 0 6px 20px rgba(0, 33, 71, 0.07);
-            border-color: #cbd5e1;
+            box-shadow: 0 8px 24px rgba(15,23,42,0.08);
+            border-color: #c7d2fe;
+            transform: translateY(-1px);
         }
         .student-mark-card.card-absent {
             background: #fff8f8;
             border-color: #fecaca;
         }
 
-        /* Left: Avatar + Info */
+        /* LEFT: Avatar + Info */
         .smc-left {
             display: flex;
             align-items: center;
@@ -169,10 +240,10 @@
             flex: 1;
         }
         .smc-avatar {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: #ffffff;
             font-size: 1.1rem;
             font-weight: 800;
@@ -180,17 +251,17 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
+            box-shadow: 0 4px 10px rgba(79,70,229,0.25);
         }
-        .smc-info {
-            min-width: 0;
-            flex: 1;
-        }
+        .smc-info { min-width: 0; flex: 1; }
         .smc-name {
             font-size: 0.88rem;
             font-weight: 700;
             color: #0f172a;
             line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .smc-meta {
             display: flex;
@@ -202,21 +273,18 @@
         .smc-badge {
             display: inline-flex;
             align-items: center;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             font-weight: 600;
-            padding: 2px 6px;
+            padding: 2px 7px;
             border-radius: 5px;
             border: 1px solid #e2e8f0;
             background: #f8fafc;
             color: #475569;
         }
-        .smc-roll-badge {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border-color: #bfdbfe;
-        }
+        .smc-roll-badge { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+        .smc-id-badge   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
 
-        /* Right: Controls */
+        /* RIGHT: Controls */
         .smc-right {
             display: flex;
             align-items: center;
@@ -229,12 +297,7 @@
             gap: 10px;
         }
 
-        /* ── Unified Mark Box ── */
-        .smc-mark-box-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        /* Mark Box */
         .smc-mark-box {
             display: inline-flex;
             align-items: center;
@@ -242,16 +305,15 @@
             border-radius: 10px;
             background: #ffffff;
             overflow: hidden;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s;
             height: 38px;
-            box-sizing: border-box;
         }
         .smc-mark-box:focus-within {
-            border-color: #0284c7;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
         .mark-input {
-            width: 44px;
+            width: 46px;
             height: 100%;
             text-align: center;
             border: none;
@@ -285,6 +347,7 @@
             white-space: nowrap;
         }
 
+        /* Grade Pill */
         .smc-grade-wrap {
             display: flex;
             flex-direction: column;
@@ -313,132 +376,513 @@
         .grade-pill-lg.gp-d  { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
         .grade-pill-lg.gp-f  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
 
-        /* ── Responsive / Mobile Breakdown ── */
+        /* ══════════════════════════════════════════════
+           FULL REPORT TABLE ENHANCEMENTS
+        ══════════════════════════════════════════════ */
+        .report-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .report-table-wrap::-webkit-scrollbar { height: 5px; }
+        .report-table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
+        .report-table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .data-table.report-tbl thead th {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 13px 14px;
+            border: none;
+            white-space: nowrap;
+        }
+        .data-table.report-tbl thead th:first-child { border-radius: 0; }
+        .data-table.report-tbl tbody td {
+            padding: 12px 14px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .data-table.report-tbl tbody tr:hover { background: #fafbff; }
+        .mark-cell { font-weight: 600; color: #374151; }
+        .grade-text { font-size: 0.72rem; color: #94a3b8; font-weight: 400; }
+        .total-badge {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1d4ed8;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            border: 1px solid #bfdbfe;
+        }
+        .gpa-badge {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: #15803d;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            border: 1px solid #bbf7d0;
+        }
+        .merit-badge {
+            background: linear-gradient(135deg, #fef9c3, #fef08a);
+            color: #a16207;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid #fde68a;
+        }
+
+        /* ══════════════════════════════════════════════
+           MOBILE CARD VIEW (Full Report Mobile)
+        ══════════════════════════════════════════════ */
+        .mobile-result-card {
+            background: #fff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(15,23,42,0.04);
+            transition: all 0.2s;
+            display: none;
+        }
+        .mobile-result-card:hover { border-color: #c7d2fe; }
+        .mrc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .mrc-student {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mrc-avatar {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .mrc-name { font-size: 0.85rem; font-weight: 700; color: #0f172a; }
+        .mrc-roll { font-size: 0.68rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+        .mrc-badges { display: flex; gap: 6px; flex-shrink: 0; }
+        .mrc-subjects {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .mrc-subject-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+        .mrc-sub-name { font-size: 0.67rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px; }
+        .mrc-sub-mark { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
+        .mrc-sub-grade { font-size: 0.7rem; color: #64748b; font-weight: 600; }
+        .mrc-sub-na { font-size: 0.78rem; color: #ef4444; font-weight: 600; }
+        .mrc-footer {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            flex-wrap: wrap;
+        }
+
+        /* ══════════════════════════════════════════════
+           SHOW/HIDE: TABLE vs CARDS
+        ══════════════════════════════════════════════ */
+        .desktop-report-table { display: block; }
+        .mobile-report-cards  { display: none; }
+
+        /* ══════════════════════════════════════════════
+           EDITING MODE BADGE
+        ══════════════════════════════════════════════ */
+        .editing-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1d4ed8;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* ══════════════════════════════════════════════
+           SECTION HEADER
+        ══════════════════════════════════════════════ */
+        .section-header-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section-header-bar .sec-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .autosave-note {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ══════════════════════════════════════════════
+           EMPTY STATE
+        ══════════════════════════════════════════════ */
+        .empty-state-card {
+            background: #fff;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 18px;
+            padding: 48px 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(15,23,42,0.05);
+        }
+        .empty-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #fef9c3, #fde68a);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 16px;
+            color: #d97706;
+        }
+
+        /* ══════════════════════════════════════════════
+           DOWNLOAD BUTTON
+        ══════════════════════════════════════════════ */
+        .btn-download-csv {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            color: #047857;
+            border: 1.5px solid #a7f3d0;
+            border-radius: 9px;
+            height: 38px;
+            padding: 0 14px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-download-csv:hover {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(16,185,129,0.2);
+        }
+
+        .btn-show-results {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff !important;
+            border: none;
+            border-radius: 9px;
+            padding: 0 16px;
+            height: 38px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+        .btn-show-results:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(79,70,229,0.32);
+        }
+
+        /* ══════════════════════════════════════════════
+           MARKSHEET DOWNLOAD ICON BUTTON
+        ══════════════════════════════════════════════ */
+        .btn-marksheet {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #4f46e5;
+            border: 1px solid #bfdbfe;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-marksheet:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(79,70,229,0.25);
+        }
+
+        /* ══════════════════════════════════════════════
+           DARK MODE SUPPORT
+        ══════════════════════════════════════════════ */
+        body.dark-mode .mark-filter-card,
+        [data-bs-theme="dark"] .mark-filter-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .student-mark-card,
+        [data-bs-theme="dark"] .student-mark-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .stat-card,
+        [data-bs-theme="dark"] .stat-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .stat-card .num,
+        [data-bs-theme="dark"] .stat-card .num { color: #f8fafc !important; }
+        body.dark-mode .smc-name,
+        [data-bs-theme="dark"] .smc-name { color: #f8fafc !important; }
+        body.dark-mode .smc-mark-box,
+        [data-bs-theme="dark"] .smc-mark-box {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .mark-input,
+        [data-bs-theme="dark"] .mark-input { color: #f8fafc !important; }
+        body.dark-mode .smc-mark-denom,
+        [data-bs-theme="dark"] .smc-mark-denom {
+            background: #060c18 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .mobile-result-card,
+        [data-bs-theme="dark"] .mobile-result-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .mrc-subject-item,
+        [data-bs-theme="dark"] .mrc-subject-item {
+            background: #060c18 !important;
+            border-color: #1a253b !important;
+        }
+        body.dark-mode .mrc-name,
+        [data-bs-theme="dark"] .mrc-name { color: #f8fafc !important; }
+        body.dark-mode .mrc-sub-mark,
+        [data-bs-theme="dark"] .mrc-sub-mark { color: #f8fafc !important; }
+        body.dark-mode .tab-toggle,
+        [data-bs-theme="dark"] .tab-toggle { background: #1a253b; }
+        body.dark-mode .tab-btn.active,
+        [data-bs-theme="dark"] .tab-btn.active {
+            background: #0c1427;
+            color: #a5b4fc;
+        }
+        body.dark-mode .tab-btn,
+        [data-bs-theme="dark"] .tab-btn { color: #94a3b8; }
+        body.dark-mode .mark-filter-card .form-select,
+        body.dark-mode .mark-filter-card .form-control,
+        [data-bs-theme="dark"] .mark-filter-card .form-select,
+        [data-bs-theme="dark"] .mark-filter-card .form-control {
+            background: #060c18 !important;
+            border-color: #1a253b !important;
+            color: #f8fafc !important;
+        }
+        body.dark-mode .section-header-bar .sec-title,
+        [data-bs-theme="dark"] .section-header-bar .sec-title { color: #f8fafc !important; }
+        body.dark-mode .empty-state-card,
+        [data-bs-theme="dark"] .empty-state-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+
+        /* ══════════════════════════════════════════════
+           RESPONSIVE BREAKPOINTS
+        ══════════════════════════════════════════════ */
         .st-text { display: inline; }
+
+        /* ── Tablet (≤ 991px) ── */
+        @media (max-width: 991.98px) {
+            .mark-hero { padding: 22px 20px; }
+            .mark-hero-title { font-size: 1.4rem; }
+            .mark-filter-card { padding: 16px 18px; }
+            .desktop-report-table { display: none !important; }
+            .mobile-report-cards  { display: block !important; }
+            .mobile-result-card   { display: block !important; }
+        }
+
+        /* ── Mobile (≤ 767px) ── */
         @media (max-width: 767.98px) {
-            .st-text {
-                display: none;
-            }
-            .st-icon {
-                margin-right: 0 !important;
-                font-size: 0.9rem;
-            }
+            .mark-hero { padding: 18px 16px; border-radius: 14px; margin-bottom: 16px; }
+            .mark-hero-title { font-size: 1.2rem; }
+            .mark-hero-subtitle { font-size: 0.8rem; }
+            .mark-hero-badge { font-size: 0.72rem; margin-top: 8px; }
+            .mark-filter-card { padding: 14px; border-radius: 14px; }
+            .tab-toggle { width: 100%; }
+            .tab-btn { font-size: 0.78rem; padding: 7px 10px; }
+
+            .st-text { display: none; }
+            .st-icon { margin-right: 0 !important; }
+
+            /* Student mark card stacks vertically on mobile */
             .student-mark-card {
                 flex-direction: column;
                 align-items: stretch;
                 padding: 12px 14px;
                 gap: 10px;
             }
-            .smc-left {
-                width: 100%;
-            }
-            .smc-avatar {
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
-                border-radius: 10px;
-            }
-            .smc-name {
-                font-size: 0.85rem;
-                white-space: normal;
-                word-break: break-word;
-            }
+            .smc-left { width: 100%; }
+            .smc-avatar { width: 38px; height: 38px; font-size: 1rem; border-radius: 10px; }
+            .smc-name   { font-size: 0.83rem; white-space: normal; }
             .smc-right {
                 width: 100%;
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
                 border-top: 1px solid #f1f5f9;
-                padding-top: 8px;
+                padding-top: 9px;
                 margin-top: 2px;
                 gap: 8px;
             }
-            .smc-mark-row {
-                gap: 6px;
-            }
-            .status-toggle {
-                height: 34px;
-            }
-            .status-toggle .st-btn {
-                padding: 0 10px;
-                font-size: 0.75rem;
-            }
-            .smc-mark-box {
-                height: 34px;
-            }
-            .mark-input {
-                width: 40px;
-                font-size: 0.88rem;
-            }
-            .smc-mark-denom {
-                font-size: 0.68rem;
-                padding-right: 6px;
-                padding-left: 4px;
-            }
-            .grade-pill-lg {
-                width: 34px;
-                height: 34px;
-                font-size: 0.8rem;
-                border-radius: 8px;
-            }
+            .smc-mark-row { gap: 6px; }
+            .status-toggle { height: 34px; }
+            .status-toggle .st-btn { padding: 0 10px; font-size: 0.75rem; }
+            .smc-mark-box { height: 34px; }
+            .mark-input   { width: 40px; font-size: 0.88rem; }
+            .smc-mark-denom { font-size: 0.66rem; padding: 0 6px; }
+            .grade-pill-lg { width: 34px; height: 34px; font-size: 0.78rem; border-radius: 8px; }
+
+            /* Stats bar on mobile */
+            .stat-card { min-width: 68px; padding: 10px 12px; }
+            .stat-card .num { font-size: 1.1rem; }
+
+            /* Section header */
+            .section-header-bar { padding: 12px 14px; flex-direction: column; align-items: flex-start; }
+
+            /* Mobile result cards */
+            .mrc-subjects { grid-template-columns: repeat(2, 1fr); }
+
+            /* Filter grid: 2 cols on small mobile */
+            .filter-grid-row .col-md-2,
+            .filter-grid-row .col-md-3 { width: 50%; }
+
+            /* Buttons stay compact on mobile too */
+            .btn-show-results { font-size: 0.8rem; padding: 0 12px; }
+            .btn-download-csv { padding: 0 10px; }
+        }
+
+        /* ── Very small (≤ 400px) ── */
+        @media (max-width: 399.98px) {
+            .mrc-subjects { grid-template-columns: repeat(2, 1fr); }
+            .smc-right { flex-wrap: wrap; }
+            .mark-hero-title { font-size: 1.1rem; }
         }
     </style>
 @endsection
 
 @section('content')
 <div class="page-content">
-    <div class="container-fluid">
+    <div class="container-fluid px-3 px-md-4">
 
-        {{-- Page Header --}}
-        <div class="page-header-card mb-4">
-            <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-list-check me-2"></i> Marks Report</h1>
-                <p style="margin: 0; opacity: 0.85;">View and analyze academic results — or filter by subject to edit marks</p>
+        {{-- ══ HERO BANNER ══ --}}
+        <div class="mark-hero mb-4">
+            <div class="mark-hero-content">
+                <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+                    <div>
+                        <h1 class="mark-hero-title">
+                            <i class="fa-solid fa-list-check me-2"></i>Marks Report
+                        </h1>
+                        <p class="mark-hero-subtitle">View & analyze academic results — filter by subject to edit marks</p>
+                        <div class="mark-hero-badge">
+                            <i class="fa-solid fa-bolt"></i>
+                            Auto-saves on input change
+                        </div>
+                    </div>
+                    @if($selectedSubjectId)
+                        <div class="editing-badge">
+                            <i class="fa-solid fa-pencil"></i>
+                            Editing: {{ $selectedSubject?->name ?? 'Subject' }}
+                            &nbsp;·&nbsp; Full Mark: <strong>{{ $fullMark }}</strong>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 
-        {{-- Tab Toggle --}}
-        <div class="mb-3 d-flex align-items-center gap-3 flex-wrap">
-            <div class="tab-toggle">
-                <a href="{{ request()->fullUrlWithQuery(['subject_id' => '']) }}" 
-                   class="tab-btn {{ !$selectedSubjectId ? 'active' : '' }}">
-                    <i class="fa-solid fa-table me-1"></i> Full Report
-                </a>
-                <span class="tab-btn {{ $selectedSubjectId ? 'active' : '' }}" style="cursor:default;">
-                    <i class="fa-solid fa-pencil me-1"></i> Subject Edit Mode
-                </span>
+        {{-- ══ TAB TOGGLE ══ --}}
+        <div class="mb-3">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="tab-toggle">
+                    <a href="{{ request()->fullUrlWithQuery(['subject_id' => '']) }}"
+                       class="tab-btn {{ !$selectedSubjectId ? 'active' : '' }}">
+                        <i class="fa-solid fa-table me-1"></i>
+                        <span>Full Report</span>
+                    </a>
+                    <span class="tab-btn {{ $selectedSubjectId ? 'active' : '' }}" style="cursor:default;">
+                        <i class="fa-solid fa-pencil me-1"></i>
+                        <span>Edit Mode</span>
+                    </span>
+                </div>
             </div>
-            @if($selectedSubjectId)
-                <span class="badge bg-primary" style="font-size:0.82rem; padding: 7px 14px; border-radius:8px;">
-                    Editing: {{ $selectedSubject?->name ?? 'Subject' }} | Full Mark: {{ $fullMark }}
-                </span>
-            @endif
         </div>
 
-        {{-- Filter Section --}}
-        <div class="filter-section mb-4">
+        {{-- ══ FILTER SECTION ══ --}}
+        <div class="mark-filter-card mb-4">
             <form method="GET" action="{{ route('marks.view-marks', ['tenant' => auth()->user()->school->slug]) }}" id="filterForm">
-                <div class="row align-items-end g-3">
-                    <div class="col-md-2">
-                        <label class="filter-label">Academic Year</label>
-                        <select name="academic_year_id" class="form-select border-0 bg-light" style="border-radius:10px;padding:10px;">
+                <div class="row align-items-end g-2 filter-grid-row">
+                    <div class="col-6 col-md-2">
+                        <label class="filter-label">
+                            <i class="fa-solid fa-calendar-days me-1 text-indigo-500"></i>
+                            Academic Year
+                        </label>
+                        <select name="academic_year_id" class="form-select">
                             @foreach($academicYears as $year)
-                                <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>{{ $year->name }}</option>
+                                <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>
+                                    {{ $year->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="filter-label">Class</label>
-                        <select name="class_id" id="classSelect" class="form-select border-0 bg-light" required style="border-radius:10px;padding:10px;">
+                    <div class="col-6 col-md-2">
+                        <label class="filter-label">
+                            <i class="fa-solid fa-chalkboard me-1"></i> Class
+                        </label>
+                        <select name="class_id" id="classSelect" class="form-select" required>
                             <option value="">Select Class</option>
                             @foreach($classes as $class)
-                                <option value="{{ $class->id }}" {{ $selectedClassId == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                                <option value="{{ $class->id }}" {{ $selectedClassId == $class->id ? 'selected' : '' }}>
+                                    {{ $class->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="filter-label">Exam</label>
-                        <select name="exam_id" class="form-select border-0 bg-light" required style="border-radius:10px;padding:10px;">
+                    <div class="col-6 col-md-2">
+                        <label class="filter-label">
+                            <i class="fa-solid fa-file-pen me-1"></i> Exam
+                        </label>
+                        <select name="exam_id" class="form-select" required>
                             <option value="">Select Exam</option>
                             @foreach($examTypes as $exam)
                                 <option value="{{ $exam->id }}" {{ $selectedExamId == $exam->id ? 'selected' : '' }}>
@@ -447,24 +891,30 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="filter-label">Subject <small class="text-muted">(optional — for edit mode)</small></label>
-                        <select name="subject_id" id="subjectSelect" class="form-select border-0 bg-light" style="border-radius:10px;padding:10px;">
+                    <div class="col-6 col-md-3">
+                        <label class="filter-label">
+                            <i class="fa-solid fa-book-open me-1"></i>
+                            Subject <small class="text-muted fw-normal" style="text-transform:none;letter-spacing:0">(optional — for edit)</small>
+                        </label>
+                        <select name="subject_id" id="subjectSelect" class="form-select">
                             <option value="">All Subjects (Full Report)</option>
                             @foreach($subjects as $subject)
-                                <option value="{{ $subject->id }}" {{ $selectedSubjectId == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
+                                <option value="{{ $subject->id }}" {{ $selectedSubjectId == $subject->id ? 'selected' : '' }}>
+                                    {{ $subject->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3">
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-2" style="border-radius:10px;">
-                                <i class="fa-solid fa-magnifying-glass me-1"></i> Show
+                            <button type="submit" class="btn-show-results flex-grow-1">
+                                <i class="fa-solid fa-magnifying-glass"></i> Show Results
                             </button>
                             @if($selectedClassId && $selectedExamId && !$selectedSubjectId)
                                 <a href="{{ route('marks.download-sheet', array_merge(['tenant' => auth()->user()->school->slug], request()->all())) }}"
-                                   class="btn btn-outline-success py-2" style="border-radius:10px;" title="Download CSV">
+                                   class="btn-download-csv dl-btn-wrap" title="Download CSV">
                                     <i class="fa-solid fa-download"></i>
+                                    <span class="d-none d-sm-inline">CSV</span>
                                 </a>
                             @endif
                         </div>
@@ -483,24 +933,43 @@
                 $enteredCount  = $subjectMarks->count();
                 $absentCount   = $subjectMarks->where('status', 'absent')->count();
                 $avgMark       = $enteredCount > 0 ? round($subjectMarks->avg('marks'), 1) : 0;
+                $pendingCount  = $totalStudents - $enteredCount;
             @endphp
 
             {{-- Stats Bar --}}
             <div class="stats-bar mb-3">
-                <div class="stat-card"><div class="num">{{ $totalStudents }}</div><div class="lbl">Total</div></div>
-                <div class="stat-card"><div class="num text-success">{{ $enteredCount }}</div><div class="lbl">Entered</div></div>
-                <div class="stat-card"><div class="num text-warning">{{ $totalStudents - $enteredCount }}</div><div class="lbl">Pending</div></div>
-                <div class="stat-card"><div class="num text-danger">{{ $absentCount }}</div><div class="lbl">Absent</div></div>
-                <div class="stat-card"><div class="num text-primary">{{ $avgMark }}</div><div class="lbl">Avg Mark</div></div>
+                <div class="stat-card">
+                    <div class="num">{{ $totalStudents }}</div>
+                    <div class="lbl">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num text-success">{{ $enteredCount }}</div>
+                    <div class="lbl">Entered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num text-warning">{{ $pendingCount }}</div>
+                    <div class="lbl">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num text-danger">{{ $absentCount }}</div>
+                    <div class="lbl">Absent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num" style="color:#6366f1;">{{ $avgMark }}</div>
+                    <div class="lbl">Avg Mark</div>
+                </div>
             </div>
 
             <div class="data-table-card">
-                <div class="table-header">
-                    <h5 class="table-title">
-                        <i class="fa-solid fa-pencil me-2"></i>
-                        {{ $selectedSubject?->name }} — Marks Entry & Edit
+                <div class="section-header-bar">
+                    <h5 class="sec-title">
+                        <i class="fa-solid fa-pencil" style="color:#6366f1;"></i>
+                        {{ $selectedSubject?->name }} — Marks Entry &amp; Edit
                     </h5>
-                    <div class="text-muted small">Auto-saves on change</div>
+                    <div class="autosave-note">
+                        <i class="fa-solid fa-cloud-arrow-up" style="color:#22c55e;"></i>
+                        Auto-saves on change
+                    </div>
                 </div>
 
                 {{-- Card Grid --}}
@@ -525,7 +994,9 @@
                             $initials = strtoupper(substr($student->name, 0, 1));
                         @endphp
 
-                        <div class="student-mark-card {{ $status === 'absent' ? 'card-absent' : '' }}" id="row-{{ $student->id }}" data-student="{{ $student->id }}">
+                        <div class="student-mark-card {{ $status === 'absent' ? 'card-absent' : '' }}"
+                             id="row-{{ $student->id }}"
+                             data-student="{{ $student->id }}">
 
                             {{-- LEFT: Profile + Info --}}
                             <div class="smc-left">
@@ -533,8 +1004,12 @@
                                 <div class="smc-info">
                                     <div class="smc-name">{{ strtoupper($student->name) }}</div>
                                     <div class="smc-meta">
-                                        <span class="smc-badge smc-id-badge"><i class="fa-solid fa-id-badge me-1"></i>{{ $student->student_id ?? 'N/A' }}</span>
-                                        <span class="smc-badge smc-roll-badge"><i class="fa-solid fa-hashtag me-1"></i>Roll {{ $student->roll }}</span>
+                                        <span class="smc-badge smc-id-badge">
+                                            <i class="fa-solid fa-id-badge me-1"></i>{{ $student->student_id ?? 'N/A' }}
+                                        </span>
+                                        <span class="smc-badge smc-roll-badge">
+                                            <i class="fa-solid fa-hashtag me-1"></i>Roll {{ $student->roll }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -549,14 +1024,16 @@
                                             data-value="present"
                                             data-student="{{ $student->id }}"
                                             onclick="setStatus({{ $student->id }}, 'present', this)">
-                                        <i class="fa-solid fa-check me-1 st-icon"></i><span class="st-text">Present</span>
+                                        <i class="fa-solid fa-check me-1 st-icon"></i>
+                                        <span class="st-text">Present</span>
                                     </button>
                                     <button type="button"
                                             class="st-btn {{ $status == 'absent' ? 'active-absent' : '' }}"
                                             data-value="absent"
                                             data-student="{{ $student->id }}"
                                             onclick="setStatus({{ $student->id }}, 'absent', this)">
-                                        <i class="fa-solid fa-xmark me-1 st-icon"></i><span class="st-text">Absent</span>
+                                        <i class="fa-solid fa-xmark me-1 st-icon"></i>
+                                        <span class="st-text">Absent</span>
                                     </button>
                                 </div>
                                 <input type="hidden" class="status-hidden" id="status-{{ $student->id }}" value="{{ $status }}">
@@ -573,7 +1050,9 @@
                                                data-student="{{ $student->id }}"
                                                {{ $status == 'absent' ? 'disabled' : '' }}>
                                         <span class="save-icon-indicator" id="ind-{{ $student->id }}">
-                                            @if($markValue !== null)<i class="fa-solid fa-check text-success" title="Saved"></i>@endif
+                                            @if($markValue !== null)
+                                                <i class="fa-solid fa-check text-success" title="Saved"></i>
+                                            @endif
                                         </span>
                                         <span class="smc-mark-denom">/ {{ $fullMark }}</span>
                                     </div>
@@ -601,23 +1080,30 @@
         {{-- ════════════════════════════════════════════════════ --}}
         @elseif(isset($paginatedResults) && count($paginatedResults) > 0)
             <div class="data-table-card">
-                <div class="table-header">
-                    <h5 class="table-title"><i class="fa-solid fa-table me-2"></i> Result Sheet</h5>
-                    <div class="text-muted small">Total Records: {{ $paginatedResults->total() }}</div>
+                <div class="section-header-bar">
+                    <h5 class="sec-title">
+                        <i class="fa-solid fa-table" style="color:#6366f1;"></i>
+                        Result Sheet
+                    </h5>
+                    <span class="badge bg-light text-muted border" style="font-size:0.75rem; padding:5px 10px; border-radius:8px;">
+                        {{ $paginatedResults->total() }} Records
+                    </span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table data-table mb-0 text-center">
+
+                {{-- ── DESKTOP TABLE ── --}}
+                <div class="desktop-report-table report-table-wrap">
+                    <table class="table data-table report-tbl mb-0 text-center">
                         <thead>
                             <tr>
                                 <th>Student ID</th>
                                 <th>Roll</th>
                                 <th class="text-start">Student Name</th>
                                 @foreach($subjects as $subject)
-                                    <th>{{ $subject->name }} <br><small class="opacity-50">(M | G)</small></th>
+                                    <th>{{ $subject->name }}<br><small class="opacity-50" style="font-size:0.6rem;">(M | G)</small></th>
                                 @endforeach
-                                <th class="bg-light">Total</th>
-                                <th class="bg-light">GPA</th>
-                                <th class="bg-light">Merit</th>
+                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">Total</th>
+                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">GPA</th>
+                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">Merit</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -634,9 +1120,9 @@
                                 @endphp
                                 @if($student)
                                 <tr class="align-middle">
-                                    <td class="fw-bold text-muted">{{ $displayId }}</td>
+                                    <td class="fw-bold text-muted" style="font-size:0.8rem;">{{ $displayId }}</td>
                                     <td class="fw-bold">{{ $student->roll }}</td>
-                                    <td class="text-start fw-bold text-dark">{{ strtoupper($student->name) }}</td>
+                                    <td class="text-start fw-bold" style="color:#0f172a;">{{ strtoupper($student->name) }}</td>
                                     @foreach($subjects as $subject)
                                         @php
                                             $m = $marksData[$student->id][$subject->id]['marks'] ?? null;
@@ -646,18 +1132,16 @@
                                             @if($m !== null)
                                                 {{ $m }} <span class="grade-text">| {{ $g }}</span>
                                             @else
-                                                <span class="text-danger small">N/A</span>
+                                                <span class="text-danger" style="font-size:0.75rem;">N/A</span>
                                             @endif
                                         </td>
                                     @endforeach
-                                    <td class="bg-light"><span class="total-badge">{{ $item['total_marks'] }}</span></td>
-                                    <td class="bg-light"><span class="gpa-badge">{{ $marksData[$student->id]['GPA'] ?? '0.00' }}</span></td>
-                                    <td class="bg-light">
-                                        <span class="merit-badge">{{ $meritPosition[$student->id] ?? '-' }}</span>
-                                    </td>
-                                    <td class="text-center">
+                                    <td><span class="total-badge">{{ $item['total_marks'] }}</span></td>
+                                    <td><span class="gpa-badge">{{ $marksData[$student->id]['GPA'] ?? '0.00' }}</span></td>
+                                    <td><span class="merit-badge">{{ $meritPosition[$student->id] ?? '-' }}</span></td>
+                                    <td>
                                         <a href="{{ route('marks.marksheet', ['tenant' => auth()->user()->school->slug, 'student' => $student->id, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'year' => $selectedYearId]) }}"
-                                           class="btn btn-action btn-sm btn-outline-primary" title="Download Marksheet">
+                                           class="btn-marksheet" title="Download Marksheet">
                                             <i class="fa-solid fa-file-arrow-down"></i>
                                         </a>
                                     </td>
@@ -667,15 +1151,90 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- ── MOBILE CARDS ── --}}
+                <div class="mobile-report-cards p-3">
+                    @foreach($paginatedResults as $item)
+                        @php
+                            $studentId = $item['student_id'];
+                            $student   = $students->where('id', $studentId)->first();
+                            $history   = DB::table('student_sessions')
+                                            ->where('student_id', $studentId)
+                                            ->where('academic_year_id', $selectedYearId)
+                                            ->first();
+                            $displayId = $history ? $history->old_student_id : ($student ? $student->student_id : 'N/A');
+                        @endphp
+                        @if($student)
+                        <div class="mobile-result-card">
+                            {{-- Header --}}
+                            <div class="mrc-header">
+                                <div class="mrc-student">
+                                    <div class="mrc-avatar">{{ strtoupper(substr($student->name, 0, 1)) }}</div>
+                                    <div>
+                                        <div class="mrc-name">{{ strtoupper($student->name) }}</div>
+                                        <div class="mrc-roll">
+                                            <i class="fa-solid fa-hashtag" style="font-size:0.6rem;"></i>
+                                            Roll {{ $student->roll }} &nbsp;·&nbsp;
+                                            <i class="fa-solid fa-id-badge" style="font-size:0.6rem;"></i>
+                                            {{ $displayId }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ route('marks.marksheet', ['tenant' => auth()->user()->school->slug, 'student' => $student->id, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'year' => $selectedYearId]) }}"
+                                   class="btn-marksheet" title="Download Marksheet">
+                                    <i class="fa-solid fa-file-arrow-down"></i>
+                                </a>
+                            </div>
+
+                            {{-- Subject Marks Grid --}}
+                            <div class="mrc-subjects">
+                                @foreach($subjects as $subject)
+                                    @php
+                                        $m = $marksData[$student->id][$subject->id]['marks'] ?? null;
+                                        $g = $marksData[$student->id][$subject->id]['grade'] ?? '-';
+                                    @endphp
+                                    <div class="mrc-subject-item">
+                                        <div class="mrc-sub-name">{{ $subject->name }}</div>
+                                        @if($m !== null)
+                                            <div class="mrc-sub-mark">{{ $m }}</div>
+                                            <div class="mrc-sub-grade">Grade: {{ $g }}</div>
+                                        @else
+                                            <div class="mrc-sub-na">N/A</div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Footer: Total / GPA / Merit --}}
+                            <div class="mrc-footer">
+                                <span class="total-badge">
+                                    <i class="fa-solid fa-sigma me-1" style="font-size:0.7rem;"></i>
+                                    Total: {{ $item['total_marks'] }}
+                                </span>
+                                <span class="gpa-badge">GPA: {{ $marksData[$student->id]['GPA'] ?? '0.00' }}</span>
+                                <span class="merit-badge">
+                                    <i class="fa-solid fa-trophy me-1" style="font-size:0.68rem;"></i>
+                                    Merit: {{ $meritPosition[$student->id] ?? '-' }}
+                                </span>
+                            </div>
+                        </div>
+                        @endif
+                    @endforeach
+                </div>
             </div>
+
+            {{-- Pagination --}}
             <div class="mt-4">{{ $paginatedResults->links() }}</div>
 
         @elseif($selectedClassId && $selectedExamId)
-            <div class="card border-0 shadow-sm" style="border-radius:16px;">
-                <div class="card-body text-center py-5">
-                    <i class="fa-solid fa-circle-exclamation fa-3x text-warning mb-3"></i>
-                    <h5 class="text-muted">No marks found for the selected criteria.</h5>
+            <div class="empty-state-card">
+                <div class="empty-icon-wrap">
+                    <i class="fa-solid fa-circle-exclamation"></i>
                 </div>
+                <h5 class="fw-700" style="color:#1e293b; margin-bottom:8px;">No Marks Found</h5>
+                <p class="text-muted" style="font-size:0.9rem; margin:0;">
+                    No marks found for the selected criteria. Please try a different filter.
+                </p>
             </div>
         @endif
 
@@ -700,7 +1259,7 @@ document.querySelectorAll('.mark-input').forEach(input => {
     input.addEventListener('input', function () {
         const sid = this.dataset.student;
         clearTimeout(saveTimers[sid]);
-        setIndicator(sid, 'saving', '⏳ Saving...');
+        setIndicator(sid, 'saving');
         this.classList.add('saving');
         saveTimers[sid] = setTimeout(() => doSave(sid), 800);
     });
@@ -716,30 +1275,24 @@ function setStatus(sid, value, clickedBtn) {
     const markInput   = document.getElementById('mark-' + sid);
     const hiddenInput = document.getElementById('status-' + sid);
     const container   = clickedBtn.closest('.status-toggle');
+    const card        = document.getElementById('row-' + sid);
 
-    // Update hidden input
     hiddenInput.value = value;
 
-    // Update button styles
     container.querySelectorAll('.st-btn').forEach(btn => {
         btn.classList.remove('active-present', 'active-absent');
     });
     clickedBtn.classList.add(value === 'absent' ? 'active-absent' : 'active-present');
 
-    // Disable/enable mark input
     if (value === 'absent') {
         markInput.value    = 0;
         markInput.disabled = true;
+        card?.classList.add('card-absent');
     } else {
         markInput.disabled = false;
+        card?.classList.remove('card-absent');
     }
 
-    doSave(sid);
-}
-
-// ── Manual save button ──
-function saveMark(sid) {
-    clearTimeout(saveTimers[sid]);
     doSave(sid);
 }
 
@@ -760,7 +1313,8 @@ function doSave(sid) {
     }
 
     setIndicator(sid, 'saving');
-    input?.classList.remove('saved','error'); input?.classList.add('saving');
+    input?.classList.remove('saved','error');
+    input?.classList.add('saving');
 
     fetch(AUTOSAVE_URL, {
         method: 'POST',
@@ -779,16 +1333,19 @@ function doSave(sid) {
     .then(data => {
         if (data.status) {
             setIndicator(sid, 'saved');
-            input?.classList.remove('saving','error'); input?.classList.add('saved');
+            input?.classList.remove('saving','error');
+            input?.classList.add('saved');
             updateGrade(sid, parseFloat(marks));
         } else {
             setIndicator(sid, 'error');
-            input?.classList.remove('saving','saved'); input?.classList.add('error');
+            input?.classList.remove('saving','saved');
+            input?.classList.add('error');
         }
     })
     .catch(() => {
-        setIndicator(sid, 'error', '✗ Failed');
-        input?.classList.remove('saving','saved'); input?.classList.add('error');
+        setIndicator(sid, 'error');
+        input?.classList.remove('saving','saved');
+        input?.classList.add('error');
     });
 }
 
@@ -809,7 +1366,6 @@ function setIndicator(sid, type) {
 function updateGrade(sid, marks) {
     if (FULL_MARK <= 0 || isNaN(marks)) return;
     const pct = (marks / FULL_MARK) * 100;
-
     let grade = 'F', cls = 'gp-f';
     if      (pct >= 80) { grade = 'A+'; cls = 'gp-ap'; }
     else if (pct >= 70) { grade = 'A';  cls = 'gp-a';  }
@@ -817,7 +1373,6 @@ function updateGrade(sid, marks) {
     else if (pct >= 50) { grade = 'B';  cls = 'gp-b';  }
     else if (pct >= 40) { grade = 'C';  cls = 'gp-c';  }
     else if (pct >= 33) { grade = 'D';  cls = 'gp-d';  }
-
     const cell = document.getElementById('grade-' + sid);
     if (cell) {
         cell.className = `grade-pill-lg ${cls}`;

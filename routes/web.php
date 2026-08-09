@@ -468,6 +468,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
                     Route::get('/sliders', [SliderController::class, 'index'])->name('sliders.index');
                     Route::post('/sliders', [SliderController::class, 'store'])->name('sliders.store');
+                    Route::get('/sliders/{id}/edit', [SliderController::class, 'edit'])->name('sliders.edit');
+                    Route::put('/sliders/{id}', [SliderController::class, 'update'])->name('sliders.update');
                     Route::delete('/sliders/{id}', [SliderController::class, 'destroy'])->name('sliders.destroy');
                     Route::get('/about-settings', [AboutSectionController::class, 'index'])->name('about.index');
                     Route::post('/about-settings', [AboutSectionController::class, 'update'])->name('about.update');
