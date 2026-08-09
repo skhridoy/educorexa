@@ -87,8 +87,17 @@ class School extends Model
         'pro_email_address',
         'pro_email_password',
         'pro_email_prefix',
-        'subscription_package_id'
+        'subscription_package_id',
+        'is_admission_open',
+        'admission_closed_message',
+        'admission_close_date',
+        'admission_academic_year_id',
     ];
+
+    public function admissionAcademicYear()
+    {
+        return $this->belongsTo(AcademicYear::class, 'admission_academic_year_id');
+    }
 
     public static function generateAppCode(): string
     {

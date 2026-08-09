@@ -812,12 +812,39 @@
                 <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
                     <div>
                         <h1 class="mark-hero-title">
-                            <i class="fa-solid fa-list-check me-2"></i>Marks Report
+                            <i class="fa-solid fa-list-check me-2"></i>Result Management Panel
                         </h1>
-                        <p class="mark-hero-subtitle">View & analyze academic results — filter by subject to edit marks</p>
-                        <div class="mark-hero-badge">
-                            <i class="fa-solid fa-bolt"></i>
-                            Auto-saves on input change
+                        <p class="mark-hero-subtitle">View & analyze academic results by session, exam & class — select subject to edit marks</p>
+                        @php
+                            $activeYearId     = \App\Models\AcademicYear::where('school_id', auth()->user()->school_id)->where('is_active', 1)->value('id');
+                            $isHistorical     = $selectedYearId && $selectedYearId != $activeYearId;
+                            $selectedYearName = $academicYears->where('id', $selectedYearId)->first()?->name ?? 'N/A';
+                            $selectedExamObj  = $examTypes->where('id', $selectedExamId)->first();
+                            $selectedClassObj = $classes->where('id', $selectedClassId)->first();
+                        @endphp
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <div class="mark-hero-badge">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                {{ $selectedYearName }}
+                                @if($isHistorical)
+                                    <span style="margin-left:4px; background:rgba(251,191,36,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">Past Session</span>
+                                @else
+                                    <span style="margin-left:4px; background:rgba(52,211,153,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">Current</span>
+                                @endif
+                            </div>
+                            @if($selectedExamObj)
+                                <div class="mark-hero-badge" style="color:#fcd34d;">
+                                    <i class="fa-solid fa-file-pen"></i> {{ $selectedExamObj->name }}
+                                </div>
+                            @endif
+                            @if($selectedClassObj)
+                                <div class="mark-hero-badge" style="color:#86efac;">
+                                    <i class="fa-solid fa-chalkboard"></i> Class: {{ $selectedClassObj->name }}
+                                </div>
+                            @endif
+                            <div class="mark-hero-badge">
+                                <i class="fa-solid fa-bolt"></i> Auto-saves on input
+                            </div>
                         </div>
                     </div>
                     @if($selectedSubjectId)
@@ -830,6 +857,7 @@
                 </div>
             </div>
         </div>
+
 
         {{-- ══ TAB TOGGLE ══ --}}
         <div class="mb-3">
@@ -1079,11 +1107,62 @@
         {{-- MODE 2: FULL REPORT (all subjects)                   --}}
         {{-- ════════════════════════════════════════════════════ --}}
         @elseif(isset($paginatedResults) && count($paginatedResults) > 0)
+
+            @php
+                // Summary stats for the full result sheet
+                $allItems = $paginatedResults->getCollection() ?? collect();
+                // We need all items from meritList for stats, build from marksData
+                $passCount  = 0; $failCount = 0; $totalGpaSum = 0; $gpaCount = 0;
+                foreach ($students as $st) {
+                    $gpaStr = $marksData[$st->id]['GPA'] ?? null;
+                    if ($gpaStr !== null) {
+                        $isFailed = str_contains($gpaStr, 'F-');
+                        if ($isFailed) $failCount++;
+                        else { $passCount++; $totalGpaSum += (float)$gpaStr; $gpaCount++; }
+                    }
+                }
+                $avgGpa   = $gpaCount > 0 ? number_format($totalGpaSum / $gpaCount, 2) : '0.00';
+                $totalRec = $students->count();
+                $passRate = $totalRec > 0 ? round(($passCount / $totalRec) * 100) : 0;
+            @endphp
+
+            {{-- Summary Stats Bar --}}
+            <div class="stats-bar mb-3">
+                <div class="stat-card">
+                    <div class="num">{{ $totalRec }}</div>
+                    <div class="lbl">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num text-success">{{ $passCount }}</div>
+                    <div class="lbl">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num text-danger">{{ $failCount }}</div>
+                    <div class="lbl">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num" style="color:#6366f1;">{{ $passRate }}%</div>
+                    <div class="lbl">Pass Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num" style="color:#f59e0b;">{{ $avgGpa }}</div>
+                    <div class="lbl">Avg GPA</div>
+                </div>
+            </div>
+
             <div class="data-table-card">
                 <div class="section-header-bar">
                     <h5 class="sec-title">
                         <i class="fa-solid fa-table" style="color:#6366f1;"></i>
                         Result Sheet
+                        @if($selectedExamObj ?? false)
+                            <span class="badge ms-2" style="background:#eff6ff; color:#3b82f6; font-size:0.72rem; padding:4px 10px; border-radius:8px; font-weight:700;">{{ $selectedExamObj->name }}</span>
+                        @endif
+                        @if($isHistorical ?? false)
+                            <span class="badge ms-1" style="background:#fef9c3; color:#a16207; font-size:0.7rem; padding:4px 9px; border-radius:8px; font-weight:700;">
+                                <i class="fa-solid fa-clock-rotate-left me-1"></i>{{ $selectedYearName }}
+                            </span>
+                        @endif
                     </h5>
                     <span class="badge bg-light text-muted border" style="font-size:0.75rem; padding:5px 10px; border-radius:8px;">
                         {{ $paginatedResults->total() }} Records

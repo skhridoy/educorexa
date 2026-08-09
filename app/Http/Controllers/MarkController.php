@@ -856,56 +856,115 @@ class MarkController extends Controller
         }
     }
 
-public function publicResult(Request $request, $tenant)
-{
-    // 1. School/Tenant Validation
-    $school = DB::table('schools')->where('slug', $tenant)->first();
-    if (!$school) {
-        return response()->json(['status' => false, 'message' => 'School not found.'], 404);
-    }
+    public function publicResult(Request $request, $tenant)
+    {
+        $school = DB::table('schools')->where('slug', $tenant)->first();
+        if (!$school) {
+            return response()->json(['status' => false, 'message' => 'School not found.'], 404);
+        }
 
-    $schoolId = $school->id;
-    $customId = $request->student_id; // e.g., STD-261001
+        $schoolId = $school->id;
+        $customId = trim($request->student_id ?? '');
+        $selectedYearId  = $request->academic_year_id;
+        $selectedClassId = $request->class_id;
+        $selectedExamId  = $request->exam_id;
 
-    // 2. Find Student (Check current table and session history)
-    $student = Student::where('student_id', $customId)
-                      ->where('school_id', $schoolId)
-                      ->first();
+        if (!$customId) {
+            return response()->json(['status' => false, 'message' => 'অনুগ্রহ করে স্টুডেন্ট আইডি অথবা রোল প্রদান করুন।'], 422);
+        }
 
-    if (!$student) {
-        return response()->json(['status' => false, 'message' => 'Student ID not found.'], 404);
-    }
+        // 1. Find Student by Student ID or Roll number
+        $student = Student::where('school_id', $schoolId)
+            ->where(function ($q) use ($customId) {
+                $q->where('student_id', $customId)
+                  ->orWhere('roll', $customId);
+            })->first();
 
-    // 3. Get the published exam for this student's current or previous year
-    // We fetch the latest published marks for this student
-    $latestMark = Mark::where('student_id', $student->id)
-                      ->where('school_id', $schoolId)
-                      ->latest()
-                      ->first();
+        // If not found in current table, check student_sessions for past years
+        if (!$student) {
+            $sessionQuery = DB::table('student_sessions')
+                ->where('old_student_id', $customId)
+                ->orWhere('old_roll', $customId);
+            if ($selectedYearId) {
+                $sessionQuery->where('academic_year_id', $selectedYearId);
+            }
+            if ($selectedClassId) {
+                $sessionQuery->where('class_id', $selectedClassId);
+            }
+            $history = $sessionQuery->first();
 
-    if (!$latestMark) {
-        return response()->json(['status' => false, 'message' => 'No published results found for this Student ID.'], 404);
-    }
+            if ($history) {
+                $student = Student::where('id', $history->student_id)->where('school_id', $schoolId)->first();
+            }
+        }
 
-    $examId = $latestMark->exam_id;
-    $classId = $latestMark->class_id;
-    $yearId = $latestMark->academic_year_id;
+        if (!$student) {
+            return response()->json(['status' => false, 'message' => 'প্রদত্ত আইডি বা রোল দিয়ে কোনো শিক্ষার্থী খুঁজে পাওয়া যায়নি।'], 404);
+        }
 
-    // 4. Load Data for Calculation (Similar to your PDF logic)
-    $exam = Exam::find($examId);
-    $allStudentsInClass = Student::where('class_id', $classId)
-                                 ->where('school_id', $schoolId)
-                                 ->where('academic_year_id', $yearId)
-                                 ->get();
+        // 2. Resolve target exam, class, year
+        if ($selectedExamId) {
+            $exam = Exam::where('id', $selectedExamId)
+                ->where('school_id', $schoolId)
+                ->where('is_published', 1)
+                ->first();
 
-    $subjects = Subject::whereIn('id', AssignClass::where('class_id', $classId)->pluck('subject_id'))->get();
-    
-    $allMarks = Mark::where([
-        'class_id' => $classId,
-        'exam_id' => $examId,
-        'academic_year_id' => $yearId,
-        'school_id' => $schoolId
-    ])->get();
+            if (!$exam) {
+                return response()->json(['status' => false, 'message' => 'নির্বাচিত পরীক্ষার রেজাল্ট এখনো প্রকাশিত হয়নি।'], 404);
+            }
+
+            $examId  = $exam->id;
+            $yearId  = $selectedYearId ?: $exam->year_id;
+            $classId = $selectedClassId ?: $student->class_id;
+        } else {
+            // Find published mark matching student, year, class
+            $markQuery = Mark::where('student_id', $student->id)->where('school_id', $schoolId);
+            if ($selectedYearId) {
+                $markQuery->where('academic_year_id', $selectedYearId);
+            }
+            if ($selectedClassId) {
+                $markQuery->where('class_id', $selectedClassId);
+            }
+
+            $latestMark = $markQuery->latest()->first();
+
+            if (!$latestMark) {
+                return response()->json(['status' => false, 'message' => 'এই শিক্ষার্থীর জন্য কোনো প্রকাশিত ফলাফল পাওয়া যায়নি।'], 404);
+            }
+
+            $examId  = $latestMark->exam_id;
+            $classId = $latestMark->class_id;
+            $yearId  = $latestMark->academic_year_id;
+            $exam    = Exam::find($examId);
+        }
+
+        // 3. Load students for class & year (to calculate merit position)
+        $currentActiveYearId = AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
+
+        if ($yearId == $currentActiveYearId) {
+            $allStudentsInClass = Student::where('class_id', $classId)
+                ->where('school_id', $schoolId)
+                ->where('academic_year_id', $yearId)
+                ->get();
+        } else {
+            $studentIdsInSession = DB::table('student_sessions')
+                ->where('class_id', $classId)
+                ->where('academic_year_id', $yearId)
+                ->pluck('student_id');
+            $allStudentsInClass = Student::whereIn('id', $studentIdsInSession)->get();
+            if ($allStudentsInClass->isEmpty()) {
+                $allStudentsInClass = collect([$student]);
+            }
+        }
+
+        $subjects = Subject::whereIn('id', AssignClass::where('class_id', $classId)->pluck('subject_id'))->get();
+        
+        $allMarks = Mark::where([
+            'class_id'         => $classId,
+            'exam_id'          => $examId,
+            'academic_year_id' => $yearId,
+            'school_id'        => $schoolId
+        ])->get();
 
     // 5. Calculate Merit Position and GPA
     $meritList = [];
@@ -960,17 +1019,46 @@ public function publicResult(Request $request, $tenant)
     }
 
     // 6. Return Partial View
+    $yearName = \App\Models\AcademicYear::where('id', $yearId)->value('name');
+
+    // Build per-subject marks data for this specific student
+    $studentSubjectMarks = [];
+    foreach ($subjects as $subject) {
+        $subName = strtolower($subject->name);
+        $stRel   = strtolower($student->religion ?? '');
+        // Skip religion mismatch
+        if ((str_contains($subName, 'islam') && $stRel !== 'islam') ||
+            (str_contains($subName, 'hindu') && !str_contains($stRel, 'hindu'))) {
+            continue;
+        }
+        $mRecord  = $allMarks->where('student_id', $student->id)->where('subject_id', $subject->id)->first();
+        $rawMark  = $mRecord ? $mRecord->marks : null;
+        $fullMark = AssignClass::where(['class_id' => $classId, 'subject_id' => $subject->id])->value('full_mark') ?? 100;
+        $gradeInfo = $this->getGradeWithPoint($rawMark, $fullMark);
+        $studentSubjectMarks[] = [
+            'subject'   => $subject->name,
+            'marks'     => $rawMark,
+            'full_mark' => $fullMark,
+            'grade'     => $gradeInfo['grade'],
+            'point'     => $gradeInfo['point'],
+            'status'    => $mRecord?->status ?? 'present',
+        ];
+    }
+
     $html = view('school.website.partials.result_view', [
-        'student' => $student,
-        'exam' => $exam,
-        'studentSummary' => $targetStudentSummary, // Renamed from 'summary'
-        'meritPosition' => $meritRank,             // Renamed from 'merit'
-        'tenant' => $tenant
+        'student'             => $student,
+        'exam'                => $exam,
+        'studentSummary'      => $targetStudentSummary,
+        'meritPosition'       => $meritRank,
+        'tenant'              => $tenant,
+        'yearName'            => $yearName,
+        'studentSubjectMarks' => $studentSubjectMarks,
+        'classId'             => $classId,
     ])->render();
 
     return response()->json([
         'status' => true,
-        'data' => $html
+        'data'   => $html
     ]);
 }
 }

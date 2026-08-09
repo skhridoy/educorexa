@@ -211,6 +211,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::get('/admission', [AdmissionController::class, 'create'])->name('admission.create');
             Route::post('/admission', [AdmissionController::class, 'store'])->name('admission.store');
             Route::get('/admission/pdf/{id}', [AdmissionController::class, 'downloadPdf'])->name('admissions.pdf');
+            Route::get('/admission/search-by-phone', [AdmissionController::class, 'searchByPhone'])->name('admissions.searchByPhone');
             Route::post('/newsletter-subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
             Route::post('/contact/send', [SchoolWebsiteController::class, 'storeMessage'])->name('school.contact.store');
@@ -219,6 +220,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::get('/notice', [\App\Http\Controllers\NoticeController::class, 'publicIndex'])->name('frontend.notice');
             Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
             Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
+            Route::get('/exams-by-category', [SchoolWebsiteController::class, 'examsByCategory'])->name('frontend.exams_by_category');
+
             // Protected Routes
             Route::middleware(['auth'])->group(function () {
                 // শিক্ষার্থীর জন্য নির্দিষ্ট রাউট
@@ -372,7 +375,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
     
                 Route::get('/admissions', [AdmissionController::class, 'index'])
                     ->name('admissions.index');
-
+                Route::post('/admissions/update-settings', [AdmissionController::class, 'updateSettings'])->name('admissions.updateSettings');
                 Route::post('/admissions/bulk-approve', [AdmissionController::class, 'bulkApprove'])->name('admissions.bulk-approve');
                 Route::post('/admissions/{admission}/approve', [AdmissionController::class, 'approve'])->name('admissions.approve');
                 Route::post(

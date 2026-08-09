@@ -121,7 +121,8 @@ class Student extends Model
         'address',
         'admin_note',
         'created_by',
-        'school_sub_category_id' // যুক্ত করা হয়েছে
+        'school_sub_category_id',
+        'admission_id'
     ];
 
     // 🔹 স্টুডেন্ট কোন ক্যাটেগরির (Primary/High School) আন্ডারে
@@ -134,6 +135,12 @@ class Student extends Model
     public function group()
     {
         return $this->belongsTo(SchoolSubCategory::class, 'school_sub_category_id');
+    }
+
+    // 🔹 Student belongs to Admission (Reference)
+    public function admission()
+    {
+        return $this->belongsTo(Admission::class, 'admission_id');
     }
 
     // 🔹 Admission belongs to School
