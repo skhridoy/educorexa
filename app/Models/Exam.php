@@ -62,19 +62,24 @@ class Exam extends Model
 
     public function getExamStateAttribute()
     {
+        $today = Carbon::today();
+        $start = $this->start_date ? Carbon::parse($this->start_date) : null;
+        $end   = $this->end_date ? Carbon::parse($this->end_date) : null;
+
+        // পরীক্ষার সময় শেষ হয়ে গেলে সেটি অটোমেটিক finished হবে
+        if ($end && $today->gt($end)) {
+            return 'finished';
+        }
+
         if ($this->status == 0) {
             return 'inactive';
         }
 
-        $today = Carbon::today();
-        $start = Carbon::parse($this->start_date);
-        $end   = Carbon::parse($this->end_date);
-
-        if ($today->between($start, $end)) {
+        if ($start && $end && $today->between($start, $end)) {
             return 'ongoing';
         }
 
-        if ($today->lt($start)) {
+        if ($start && $today->lt($start)) {
             return 'upcoming';
         }
 

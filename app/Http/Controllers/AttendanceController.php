@@ -171,4 +171,170 @@ class AttendanceController extends Controller
 
         return $specialHoliday;
     }
+
+    public function analytics(Request $request, $tenant)
+    {
+        $schoolId = auth()->user()->school_id;
+        $selectedDate = $request->get('date', now()->toDateString());
+        $classId = $request->get('class_id');
+        $sectionId = $request->get('section_id');
+        $statusFilter = $request->get('status');
+        $search = $request->get('search');
+
+        // 1. Classes & Sections for filters
+        $classes = \App\Models\Classes::where('school_id', $schoolId)->get();
+        $sections = collect();
+        if ($classId) {
+            $sections = \App\Models\Section::where('school_id', $schoolId)->where('class_id', $classId)->get();
+        }
+
+        // 2. Total active students count in school (or filtered class/section)
+        $totalStudentsQuery = Student::where('school_id', $schoolId);
+        if ($classId) {
+            $totalStudentsQuery->where('class_id', $classId);
+        }
+        if ($sectionId) {
+            $totalStudentsQuery->where('section_id', $sectionId);
+        }
+        $totalStudents = $totalStudentsQuery->count();
+
+        // 3. Attendance records for selected date
+        $attendancesQuery = Attendance::with(['student', 'class', 'section', 'teacher'])
+            ->where('school_id', $schoolId)
+            ->where('date', $selectedDate);
+
+        if ($classId) {
+            $attendancesQuery->where('class_id', $classId);
+        }
+        if ($sectionId) {
+            $attendancesQuery->where('section_id', $sectionId);
+        }
+
+        $allAttendancesForDate = (clone $attendancesQuery)->get();
+
+        $presentCount = $allAttendancesForDate->where('status', 'present')->count();
+        $absentCount  = $allAttendancesForDate->where('status', 'absent')->count();
+
+        $presentPercentage = $totalStudents > 0 ? round(($presentCount / $totalStudents) * 100, 1) : 0;
+        $absentPercentage  = $totalStudents > 0 ? round(($absentCount / $totalStudents) * 100, 1) : 0;
+
+        // 4. Class-wise Breakdown
+        $classBreakdown = [];
+        $allSectionsList = \App\Models\Section::with('class')
+            ->where('school_id', $schoolId)
+            ->when($classId, function($q) use ($classId) {
+                $q->where('class_id', $classId);
+            })
+            ->get();
+
+        foreach ($allSectionsList as $sec) {
+            $secTotalStudents = Student::where('school_id', $schoolId)
+                ->where('class_id', $sec->class_id)
+                ->where('section_id', $sec->id)
+                ->count();
+
+            if ($secTotalStudents == 0) continue;
+
+            $secAttendances = Attendance::with('teacher')
+                ->where('school_id', $schoolId)
+                ->where('class_id', $sec->class_id)
+                ->where('section_id', $sec->id)
+                ->where('date', $selectedDate)
+                ->get();
+
+            $secPresent = $secAttendances->where('status', 'present')->count();
+            $secAbsent  = $secAttendances->where('status', 'absent')->count();
+            $secMarked  = $secPresent + $secAbsent;
+            $secRate    = $secTotalStudents > 0 ? round(($secPresent / $secTotalStudents) * 100, 1) : 0;
+
+            $firstLog = $secAttendances->first();
+            $takenBy = $firstLog && $firstLog->teacher ? $firstLog->teacher->name : 'N/A';
+            $takenAt = $firstLog ? $firstLog->created_at->format('h:i A') : null;
+
+            $classBreakdown[] = [
+                'class_name'    => $sec->class ? $sec->class->name : 'N/A',
+                'section_name'  => $sec->name,
+                'class_id'      => $sec->class_id,
+                'section_id'    => $sec->id,
+                'total'         => $secTotalStudents,
+                'present'       => $secPresent,
+                'absent'        => $secAbsent,
+                'rate'          => $secRate,
+                'is_completed'  => $secMarked > 0,
+                'taken_by'      => $takenBy,
+                'taken_at'      => $takenAt,
+            ];
+        }
+
+        $completedClassesCount = collect($classBreakdown)->where('is_completed', true)->count();
+        $totalClassesCount     = count($classBreakdown);
+
+        // 5. Last 7 Days Trend Data for Chart.js
+        $trendData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = \Carbon\Carbon::parse($selectedDate)->subDays($i)->toDateString();
+            $dayTotalPresent = Attendance::where('school_id', $schoolId)
+                ->where('date', $date)
+                ->where('status', 'present')
+                ->count();
+            $dayTotalAbsent = Attendance::where('school_id', $schoolId)
+                ->where('date', $date)
+                ->where('status', 'absent')
+                ->count();
+
+            $totalDayMarked = $dayTotalPresent + $dayTotalAbsent;
+            $rate = $totalDayMarked > 0 ? round(($dayTotalPresent / $totalDayMarked) * 100, 1) : 0;
+
+            $trendData[] = [
+                'date'    => \Carbon\Carbon::parse($date)->format('d M'),
+                'present' => $dayTotalPresent,
+                'absent'  => $dayTotalAbsent,
+                'rate'    => $rate
+            ];
+        }
+
+        // 6. Detailed Student Attendance Logs Table with Search & Pagination
+        $logsQuery = Attendance::with(['student', 'class', 'section', 'teacher'])
+            ->where('school_id', $schoolId)
+            ->where('date', $selectedDate);
+
+        if ($classId) {
+            $logsQuery->where('class_id', $classId);
+        }
+        if ($sectionId) {
+            $logsQuery->where('section_id', $sectionId);
+        }
+        if ($statusFilter) {
+            $logsQuery->where('status', $statusFilter);
+        }
+        if ($search) {
+            $logsQuery->whereHas('student', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('student_id', 'like', "%{$search}%")
+                  ->orWhere('roll', 'like', "%{$search}%");
+            });
+        }
+
+        $studentLogs = $logsQuery->orderBy('id', 'desc')->paginate(20)->withQueryString();
+
+        return view('school.attendance.analytics', compact(
+            'classes',
+            'sections',
+            'selectedDate',
+            'classId',
+            'sectionId',
+            'statusFilter',
+            'search',
+            'totalStudents',
+            'presentCount',
+            'absentCount',
+            'presentPercentage',
+            'absentPercentage',
+            'completedClassesCount',
+            'totalClassesCount',
+            'classBreakdown',
+            'trendData',
+            'studentLogs'
+        ));
+    }
 }

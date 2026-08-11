@@ -3,222 +3,397 @@
 @section('customCSS')
     @include('school.others._modern_design_styles')
     <style>
-        .preview { overflow: hidden; width: 160px; height: 160px; border: 2px solid #D4AF37; border-radius: 50%; }
-        .profile-cover {
-            height: 180px;
-            background: linear-gradient(135deg, #002147 0%, #003366 100%);
-            border-radius: 16px 16px 0 0;
+        /* ════ Profile Cover & Header ════ */
+        .profile-cover-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #06b6d4 100%);
+            border-radius: 16px;
+            padding: 20px 24px;
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
             position: relative;
             overflow: hidden;
         }
-        .profile-cover::before {
+        .profile-cover-card::before {
             content: '';
             position: absolute;
-            top: -50px;
-            right: -50px;
+            top: -60px;
+            right: -60px;
             width: 200px;
             height: 200px;
-            background: rgba(212, 175, 55, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 50%;
         }
-        .profile-pic-wrapper {
-            margin-top: -60px;
-            padding-left: 30px;
+        .profile-cover-card::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: 80px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        .profile-header-wrap {
             position: relative;
             z-index: 2;
         }
+        .profile-avatar-outer {
+            position: relative;
+            display: inline-block;
+        }
         .main-profile-pic {
-            width: 120px;
-            height: 120px;
+            width: 84px;
+            height: 84px;
             border-radius: 50%;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
             object-fit: cover;
-            background: #fff;
+            background: #ffffff;
         }
-        .profile-info {
-            padding-top: 15px;
-            padding-left: 30px;
-            margin-bottom: 30px;
-        }
-        .profile-name {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 2px;
-        }
-        .profile-role {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #D4AF37;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Outfit', sans-serif;
-        }
-        .section-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            color: #002147;
+        .avatar-upload-icon {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            justify-content: center;
+            font-size: 0.72rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: 2px solid #ffffff;
+            transition: transform 0.2s ease;
         }
-        .section-title i {
-            color: #D4AF37;
+        .avatar-upload-icon:hover {
+            transform: scale(1.1);
         }
-        .btn-gold {
-            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+        .profile-display-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            letter-spacing: -0.3px;
+        }
+        .profile-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .profile-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* ════ Form Sizing & Compact Typography ════ */
+        .form-card {
+            padding: 18px 20px !important;
+        }
+        .form-card .form-label {
+            font-size: 0.76rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 4px !important;
+        }
+        .form-card .form-control,
+        .form-card .form-select {
+            font-size: 0.78rem !important;
+            padding: 6px 10px !important;
+            height: 36px !important;
+            border-radius: 8px !important;
+        }
+
+        /* ════ Cropper & Preview ════ */
+        .preview {
+            overflow: hidden;
+            width: 120px;
+            height: 120px;
+            border: 3px solid #6366f1;
+            border-radius: 50%;
+        }
+
+        /* ════ Social Input Icons ════ */
+        .social-input-group .input-group-text {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            border-radius: 8px 0 0 8px !important;
+            min-width: 38px;
+            height: 36px !important;
+            font-size: 0.8rem;
+            justify-content: center;
+        }
+        .social-input-group .form-control {
+            border-radius: 0 8px 8px 0 !important;
+        }
+
+        /* ════ Security Gold Button ════ */
+        .btn-security {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             border: none;
-            color: #fff;
-            font-weight: 600;
-            padding: 10px 24px;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 8px 18px;
             border-radius: 10px;
             transition: all 0.3s ease;
         }
-        .btn-gold:hover {
+        .btn-security:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
-            color: #fff;
+            box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+            color: #ffffff;
+        }
+
+        /* 📱 Mobile Responsive Font Size Adjustments */
+        @media (max-width: 767.98px) {
+            .profile-cover-card {
+                padding: 16px 16px !important;
+            }
+            .main-profile-pic {
+                width: 70px !important;
+                height: 70px !important;
+            }
+            .avatar-upload-icon {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 0.65rem !important;
+            }
+            .profile-display-name {
+                font-size: 1.05rem !important;
+            }
+            .profile-role-badge {
+                font-size: 0.62rem !important;
+                padding: 2px 8px !important;
+            }
+            .profile-meta-chip {
+                font-size: 0.7rem !important;
+            }
+            .form-card .form-label {
+                font-size: 0.72rem !important;
+            }
+            .form-card .form-control,
+            .form-card .form-select {
+                font-size: 0.75rem !important;
+                height: 34px !important;
+            }
+            .form-card h5 {
+                font-size: 0.88rem !important;
+                margin-bottom: 12px !important;
+            }
+        }
+
+        /* 🌙 Dark Mode Profile Overrides */
+        [data-bs-theme="dark"] .profile-cover-card,
+        body.dark-mode .profile-cover-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f1a2e 100%) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+        }
+        [data-bs-theme="dark"] .main-profile-pic,
+        body.dark-mode .main-profile-pic {
+            border-color: #1e2d45 !important;
+            background: #0c1427 !important;
+        }
+        [data-bs-theme="dark"] .avatar-upload-icon,
+        body.dark-mode .avatar-upload-icon {
+            border-color: #0c1427 !important;
+        }
+        [data-bs-theme="dark"] .social-input-group .input-group-text,
+        body.dark-mode .social-input-group .input-group-text {
+            background-color: #0f1a2e !important;
+            border-color: #1e2d45 !important;
+        }
+        [data-bs-theme="dark"] .social-input-group .form-control,
+        body.dark-mode .social-input-group .form-control {
+            background-color: #0f1a2e !important;
+            border-color: #1e2d45 !important;
+            color: #e2e8f0 !important;
+        }
+        [data-bs-theme="dark"] .modal-content,
+        body.dark-mode .modal-content {
+            background: #0c1427 !important;
+            color: #f1f5f9 !important;
+            border-color: #1e2d45 !important;
+        }
+        [data-bs-theme="dark"] .img-container,
+        body.dark-mode .img-container {
+            background: #0f1a2e !important;
         }
     </style>
 @endsection
 
 @section('content')
+@php
+    $photoPath = $user->photo 
+        ?: ($user->role == 'teacher' && $user->teacher && $user->teacher->photo ? $user->teacher->photo 
+        : ($user->role == 'student' && $user->student && $user->student->photo ? $user->student->photo : null));
+    $profileImg = $photoPath ? asset($photoPath) : asset('assets/images/profile.webp');
+@endphp
+
 <div class="page-content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius: 16px;">
-                    <div class="profile-cover"></div>
-                    <div class="d-md-flex align-items-end">
-                        <div class="profile-pic-wrapper">
-                            <img id="mainProfilePic" class="main-profile-pic" 
-                                src="{{ asset($user->photo ?: ($user->role == 'teacher' && $user->teacher ? $user->teacher->photo : ($user->role == 'student' && $user->student ? $user->student->photo : 'main/img/default-photo.png'))) }}" 
-                                alt="profile">
-                        </div>
-                        <div class="profile-info flex-grow-1">
-                            <h3 class="profile-name">{{ $user->name }}</h3>
-                            <span class="profile-role">{{ strtoupper($user->role ?? 'User') }}</span>
-                        </div>
+        {{-- Profile Header Card --}}
+        <div class="profile-cover-card mb-4">
+            <div class="profile-header-wrap d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 text-center text-md-start">
+                <div class="profile-avatar-outer">
+                    <img id="mainProfilePic" class="main-profile-pic" 
+                        src="{{ $profileImg }}" 
+                        onerror="this.onerror=null;this.src='{{ asset('assets/images/profile.webp') }}';"
+                        alt="profile">
+                    <label for="imageInput" class="avatar-upload-icon" title="Change Photo">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                        <span class="profile-role-badge">
+                            <i class="fa-solid fa-shield-halved"></i> {{ strtoupper($user->role ?? 'User') }}
+                        </span>
+                        @if(auth()->user()?->school)
+                            <span class="profile-role-badge" style="background:rgba(255,255,255,0.12);">
+                                <i class="fa-solid fa-school"></i> {{ auth()->user()->school->name }}
+                            </span>
+                        @endif
+                    </div>
+                    <h2 class="profile-display-name text-white">{{ $user->name }}</h2>
+                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-3">
+                        <span class="profile-meta-chip"><i class="fa-regular fa-envelope"></i> {{ $user->email }}</span>
+                        @if($user->phone)
+                            <span class="profile-meta-chip"><i class="fa-solid fa-phone"></i> {{ $user->phone }}</span>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row g-4">
+            {{-- Personal Information Form --}}
             <div class="col-lg-8">
-                <div class="form-card card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="section-title">
-                            <i class="fa-solid fa-user-gear"></i> Personal Information
-                        </h5>
-                        
-                        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Full Name</label>
-                                    <input type="text" name="name" class="form-control" value="{{ $user->name }}" style="border-radius: 10px;">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Email Address</label>
-                                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ $user->email }}" style="border-radius: 10px;">
-                                    @error('email')
-                                        <small class="text-danger mt-1 d-block">{{ $message }}</small>
-                                    @enderror
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" style="border-radius: 10px;">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted text-uppercase">Profile Photo</label>
-                                    <input type="file" id="imageInput" class="form-control" accept="image/*" style="border-radius: 10px;">
-                                    <input type="hidden" name="cropped_image" id="croppedImage">
-                                </div>
+                <div class="form-card">
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i class="fa-solid fa-user-gear me-2"></i> Personal Information
+                    </h5>
+                    
+                    <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ $user->email }}" required>
+                                @error('email')
+                                    <small class="text-danger mt-1 d-block">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" placeholder="e.g. +880 1700-000000">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Profile Photo</label>
+                                <input type="file" id="imageInput" class="form-control" accept="image/*">
+                                <input type="hidden" name="cropped_image" id="croppedImage">
+                            </div>
+                        </div>
 
-                            @php
-                                $socialData = ($user->role == 'teacher' && $user->teacher) ? $user->teacher : $user;
-                            @endphp
+                        @php
+                            $socialData = ($user->role == 'teacher' && $user->teacher) ? $user->teacher : $user;
+                        @endphp
 
-                            @if($user->role == 'teacher' || $user->role == 'school_admin')
-                                <div class="border-top mt-4 pt-4">
-                                    <h6 class="section-title" style="font-size: 1rem;">
-                                        <i class="fa-solid fa-share-nodes"></i> Social Presence
-                                    </h6>
-                                    <div class="row">
-                                        @if($user->role == 'teacher')
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">Designation</label>
-                                            <input type="text" name="designation" class="form-control" value="{{ $user->teacher->designation ?? '' }}" style="border-radius: 10px;">
+                        @if($user->role == 'teacher' || $user->role == 'school_admin')
+                            <div class="border-top mt-4 pt-4">
+                                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.95rem;">
+                                    <i class="fa-solid fa-share-nodes me-2 text-indigo-600"></i> Social Presence & Info
+                                </h6>
+                                <div class="row g-3">
+                                    @if($user->role == 'teacher')
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Designation</label>
+                                        <input type="text" name="designation" class="form-control" value="{{ $user->teacher->designation ?? '' }}" placeholder="e.g. Senior Teacher">
+                                    </div>
+                                    @endif
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Facebook URL</label>
+                                        <div class="input-group social-input-group">
+                                            <span class="input-group-text"><i class="fa-brands fa-facebook text-primary"></i></span>
+                                            <input type="url" name="facebook" class="form-control" value="{{ $socialData->facebook ?? '' }}" placeholder="https://facebook.com/username">
                                         </div>
-                                        @endif
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">Facebook URL</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fa-brands fa-facebook text-primary"></i></span>
-                                                <input type="url" name="facebook" class="form-control border-start-0" value="{{ $socialData->facebook ?? '' }}" style="border-radius: 0 10px 10px 0;">
-                                            </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Twitter URL</label>
+                                        <div class="input-group social-input-group">
+                                            <span class="input-group-text"><i class="fa-brands fa-twitter text-info"></i></span>
+                                            <input type="url" name="twitter" class="form-control" value="{{ $socialData->twitter ?? '' }}" placeholder="https://twitter.com/username">
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">Twitter URL</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fa-brands fa-twitter text-info"></i></span>
-                                                <input type="url" name="twitter" class="form-control border-start-0" value="{{ $socialData->twitter ?? '' }}" style="border-radius: 0 10px 10px 0;">
-                                            </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">LinkedIn URL</label>
+                                        <div class="input-group social-input-group">
+                                            <span class="input-group-text"><i class="fa-brands fa-linkedin text-primary"></i></span>
+                                            <input type="url" name="linkedin" class="form-control" value="{{ $socialData->linkedin ?? '' }}" placeholder="https://linkedin.com/in/username">
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">LinkedIn URL</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fa-brands fa-linkedin text-primary"></i></span>
-                                                <input type="url" name="linkedin" class="form-control border-start-0" value="{{ $socialData->linkedin ?? '' }}" style="border-radius: 0 10px 10px 0;">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">Instagram URL</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fa-brands fa-instagram text-danger"></i></span>
-                                                <input type="url" name="instagram" class="form-control border-start-0" value="{{ $socialData->insta ?? '' }}" style="border-radius: 0 10px 10px 0;">
-                                            </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Instagram URL</label>
+                                        <div class="input-group social-input-group">
+                                            <span class="input-group-text"><i class="fa-brands fa-instagram text-danger"></i></span>
+                                            <input type="url" name="instagram" class="form-control" value="{{ $socialData->insta ?? '' }}" placeholder="https://instagram.com/username">
                                         </div>
                                     </div>
                                 </div>
-                            @endif
-                            <div class="text-end mt-4">
-                                <button type="submit" class="btn btn-primary-gradient px-5">Update Profile</button>
                             </div>
-                        </form>
-                    </div>
+                        @endif
+                        
+                        <div class="text-end mt-4 pt-2">
+                            <button type="submit" class="btn btn-primary-gradient fw-bold px-4 py-2" style="border-radius:10px; font-size:0.8rem;">
+                                <i class="fa-solid fa-check me-1"></i> Update Profile
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
+            {{-- Security / Change Password Form --}}
             <div class="col-lg-4">
-                <div class="form-card card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="section-title">
-                            <i class="fa-solid fa-lock"></i> Security
-                        </h5>
-                        <p class="text-muted small mb-4">Update your password to keep your account secure.</p>
-                        
-                        <form action="{{ route('user.password.update') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small text-muted text-uppercase">Current Password</label>
-                                <input type="password" name="old_password" class="form-control" style="border-radius: 10px;">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small text-muted text-uppercase">New Password</label>
-                                <input type="password" name="new_password" class="form-control" style="border-radius: 10px;">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small text-muted text-uppercase">Confirm New Password</label>
-                                <input type="password" name="new_password_confirmation" class="form-control" style="border-radius: 10px;">
-                            </div>
-                            <button type="submit" class="btn btn-gold w-100">Save New Password</button>
-                        </form>
-                    </div>
+                <div class="form-card">
+                    <h5 class="fw-bold text-primary mb-3">
+                        <i class="fa-solid fa-shield-halved me-2"></i> Security Settings
+                    </h5>
+                    <p class="text-muted small mb-4">Update your password to keep your account protected.</p>
+                    
+                    <form action="{{ route('user.password.update') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Current Password</label>
+                            <input type="password" name="old_password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">New Password</label>
+                            <input type="password" name="new_password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Confirm New Password</label>
+                            <input type="password" name="new_password_confirmation" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-security w-100 py-2">
+                            <i class="fa-solid fa-key me-1"></i> Save New Password
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -229,27 +404,27 @@
 <div class="modal fade" id="cropperModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" style="font-family: 'Outfit', sans-serif; color: #002147;">Crop Your Photo</h5>
+            <div class="modal-header border-bottom p-3">
+                <h5 class="modal-title fw-bold" style="font-family: 'Outfit', sans-serif;"><i class="fa-solid fa-crop-simple me-2 text-indigo-600"></i>Crop Profile Photo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-md-8">
                         <div class="img-container bg-light rounded" style="min-height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                             <img id="imageToCrop" src="" style="max-width: 100%;">
                         </div>
                     </div>
-                    <div class="col-md-4 text-center mt-3 mt-md-0">
+                    <div class="col-md-4 text-center mt-3 mt-md-0 d-flex flex-column align-items-center justify-content-center">
                         <p class="mb-2 fw-bold small text-muted text-uppercase">Circular Preview</p>
-                        <div class="mx-auto preview shadow-sm"></div>
-                        <p class="mt-3 small text-muted">Adjust the crop area to fit your face perfectly.</p>
+                        <div class="preview shadow-sm mb-3"></div>
+                        <p class="small text-muted mb-0">Adjust crop area for best appearance.</p>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="cropAndSave" class="btn btn-primary-gradient rounded-pill px-4">Crop & Apply</button>
+            <div class="modal-footer border-top p-3">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius:10px;">Cancel</button>
+                <button type="button" id="cropAndSave" class="btn btn-primary-gradient px-4" style="border-radius:10px;"><i class="fa-solid fa-check me-1"></i> Crop & Apply</button>
             </div>
         </div>
     </div>

@@ -95,8 +95,11 @@ body {
     font-family: 'Outfit', sans-serif;
 }
 @media (max-width: 768px) {
-    .page-title { font-size: 1.5rem; }
-    .page-header-card h2 { font-size: 1.25rem !important; }
+    .page-title { font-size: 1.15rem !important; margin-bottom: 4px !important; }
+    .page-subtitle { font-size: 0.78rem !important; }
+    .page-header-card { padding: 18px 20px !important; margin-bottom: 20px !important; }
+    .page-header-card h2 { font-size: 1.1rem !important; }
+    .form-card, .data-table-card { padding: 16px !important; }
 }
 .page-subtitle { font-size: 0.95rem; opacity: 0.85; }
 

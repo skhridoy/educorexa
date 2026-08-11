@@ -50,16 +50,34 @@
             box-shadow: 0 4px 15px rgba(15,23,42,0.03);
         }
 
+        /* Compact Exam Table Styles */
+        .desktop-exam-table .table th {
+            padding: 9px 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            color: #475569;
+            background-color: #f8fafc;
+        }
+        .desktop-exam-table .table td {
+            padding: 8px 10px;
+            vertical-align: middle;
+            font-size: 0.8rem;
+        }
+
         /* State Badges */
         .badge-state {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.73rem;
-            font-weight: 700;
-            letter-spacing: 0.3px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            white-space: nowrap;
         }
         .badge-ongoing  { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
         .badge-upcoming { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
@@ -68,8 +86,8 @@
 
         /* Switches */
         .form-switch .form-check-input {
-            width: 2.6em;
-            height: 1.3em;
+            width: 2.2em;
+            height: 1.1em;
             cursor: pointer;
         }
         .form-switch .form-check-input:checked {
@@ -79,11 +97,11 @@
 
         /* Actions Buttons */
         .btn-act {
-            width: 34px; height: 34px;
-            border-radius: 9px;
+            width: 30px; height: 30px;
+            border-radius: 7px;
             display: inline-flex; align-items: center; justify-content: center;
             transition: all 0.2s;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
         }
         .btn-act-edit { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
         .btn-act-edit:hover { background: #3b82f6; color: #fff; }
@@ -102,11 +120,24 @@
         }
 
         @media (max-width: 991.98px) {
-            .exam-stats-bar { grid-template-columns: 1fr; }
+            .exam-stats-bar { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 767.98px) {
+            .exam-stats-bar { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .exam-stat-card { padding: 10px 12px; gap: 10px; }
+            .exam-stat-icon { width: 36px; height: 36px; font-size: 1.1rem; }
+            .exam-stat-val  { font-size: 1.25rem; }
+            .exam-stat-lbl  { font-size: 0.7rem; }
             .desktop-exam-table { display: none !important; }
             .mobile-exam-card   { display: block !important; }
+            /* Filter bar stacks on mobile */
+            .exam-filter-card .row > [class*="col-"] { margin-bottom: 4px; }
+        }
+        @media (max-width: 575.98px) {
+            .exam-stats-bar { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .exam-stat-card { padding: 9px 10px; }
+            .exam-stat-val  { font-size: 1.1rem; }
+            .page-title     { font-size: 1.35rem; }
         }
     </style>
 @endsection
@@ -118,10 +149,10 @@
         {{-- ════ HERO HEADER BANNER ════ --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-start align-items-md-center justify-content-between flex-wrap gap-2">
                     <div>
                         <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i>Exams Management</h1>
-                        <p class="mb-0 opacity-85">Create, schedule and manage examinations & result publishing</p>
+                        <p class="mb-0 opacity-85">Create, schedule and manage examinations &amp; result publishing</p>
                     </div>
                 </div>
 
@@ -304,23 +335,23 @@
                                 @forelse($exams as $exam)
                                 <tr>
                                     <td>
-                                        <span class="fw-bold text-dark d-block" style="font-size:0.92rem;">{{ $exam->name }}</span>
+                                        <span class="fw-semibold text-dark d-block" style="font-size:0.83rem; white-space:nowrap;">{{ $exam->name }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark border" style="font-size:0.75rem;">
+                                        <span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.7rem; font-weight: 500; white-space:nowrap;">
                                             {{ $exam->category?->name ?? 'All' }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="fw-semibold text-secondary" style="font-size:0.83rem;">
+                                        <span class="fw-semibold text-secondary" style="font-size:0.78rem; white-space:nowrap;">
                                             {{ $exam->academicYear?->name ?? 'N/A' }}
                                         </span>
                                     </td>
                                     <td>
-                                        <div style="font-size:0.78rem;">
-                                            <i class="fa-regular fa-calendar me-1 text-primary"></i>{{ \Carbon\Carbon::parse($exam->start_date)->format('d M, Y') }}
+                                        <div style="font-size:0.72rem; white-space:nowrap; line-height: 1.35;">
+                                            <span><i class="fa-regular fa-calendar me-1 text-primary"></i>{{ \Carbon\Carbon::parse($exam->start_date)->format('d M, Y') }}</span>
                                             <br>
-                                            <i class="fa-solid fa-arrow-right-long me-1 text-muted opacity-50"></i>{{ \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') }}
+                                            <span class="text-muted"><i class="fa-solid fa-arrow-right-long me-1 opacity-50"></i>{{ \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') }}</span>
                                         </div>
                                     </td>
                                     <td class="text-center">
@@ -354,18 +385,14 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        @if ($exam->status == 1)
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input class="form-check-input resultToggle"
-                                                       type="checkbox"
-                                                       role="switch"
-                                                       data-id="{{ $exam->id }}"
-                                                       {{ $exam->is_published ? 'checked' : '' }}
-                                                       title="Publish/Unpublish Result">
-                                            </div>
-                                        @else
-                                            <span class="text-muted small">—</span>
-                                        @endif
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input resultToggle"
+                                                   type="checkbox"
+                                                   role="switch"
+                                                   data-id="{{ $exam->id }}"
+                                                   {{ $exam->is_published ? 'checked' : '' }}
+                                                   title="Publish/Unpublish Result">
+                                        </div>
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1">
@@ -398,7 +425,7 @@
                     </div>
 
                     {{-- ── MOBILE CARDS ── --}}
-                    <div class="p-3 d-block d-md-none">
+                    <div class="p-3">
                         @forelse($exams as $exam)
                             @php $state = $exam->exam_state; @endphp
                             <div class="mobile-exam-card">
@@ -431,12 +458,10 @@
                                             <input class="form-check-input statusToggle" type="checkbox" data-id="{{ $exam->id }}" data-year="{{ $exam->year_id }}" {{ $exam->status ? 'checked' : '' }}>
                                             <label class="small text-muted">Active</label>
                                         </div>
-                                        @if ($exam->status == 1)
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input class="form-check-input resultToggle" type="checkbox" role="switch" data-id="{{ $exam->id }}" {{ $exam->is_published ? 'checked' : '' }}>
-                                                <label class="small text-muted">Published</label>
-                                            </div>
-                                        @endif
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input resultToggle" type="checkbox" role="switch" data-id="{{ $exam->id }}" {{ $exam->is_published ? 'checked' : '' }}>
+                                            <label class="small text-muted">Published</label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -580,7 +605,18 @@
                             timer: 1200,
                             showConfirmButton: false
                         });
+                    } else {
+                        toggle.prop('checked', !toggle.is(':checked'));
                     }
+                },
+                error: function () {
+                    toggle.prop('checked', !toggle.is(':checked'));
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update result publish status.',
+                        confirmButtonColor: '#ef4444'
+                    });
                 }
             });
         });

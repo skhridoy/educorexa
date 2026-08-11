@@ -442,6 +442,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
                     Route::delete('holidays/{id}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
                 });
+                Route::middleware(['auth', 'permission:attendance.analytics|attendance.manage', 'school_package:attendance.manage'])->group(function () {
+                    Route::get('/attendance/analytics', [AttendanceController::class, 'analytics'])->name('attendance.analytics');
+                });
                 Route::middleware(['auth', 'permission:attendance.manage', 'school_package:attendance.manage'])->group(function () {
                     // Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
                     Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('student.attendance.report');

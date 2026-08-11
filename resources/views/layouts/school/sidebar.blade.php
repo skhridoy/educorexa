@@ -193,6 +193,11 @@
                     <ul class="edu-sub-nav">
                         @if($hasFeature('attendance.manage'))
                             <li class="edu-sub-item"><a href="{{ route('attendances.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance') ? 'active' : '' }}">Daily Attendance</a></li>
+                        @endif
+                        @if($hasFeature('attendance.analytics') || $hasFeature('attendance.manage'))
+                            <li class="edu-sub-item"><a href="{{ route('attendance.analytics', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/analytics*') ? 'active' : '' }}">Attendance Analytics</a></li>
+                        @endif
+                        @if($hasFeature('attendance.manage') || $hasFeature('attendance.report'))
                             <li class="edu-sub-item"><a href="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/report*') ? 'active' : '' }}">Attendance Report</a></li>
                         @endif
                         @if($hasFeature('holiday.manage'))

@@ -10,36 +10,43 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-book me-2"></i> Classes Management</h1>
-                <p style="margin: 0; opacity: 0.85;">Create and manage classes in your school</p>
+                <h1 class="page-title"><i class="fa-solid fa-graduation-cap me-2"></i> Classes Management</h1>
+                <p class="page-subtitle">Create, organize, and assign categories to school classes.</p>
             </div>
         </div>
 
-        <div class="row">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="row g-4">
             {{-- Form Column --}}
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-4">
                 <div class="form-card">
-                    <h6 class="mb-4 fw-bold text-primary" id="form-title">
+                    <h5 class="mb-4 fw-bold text-primary" id="form-title">
                         <i class="fa-solid fa-plus me-2"></i> Create Class
-                    </h6>
+                    </h5>
                     <form id="class-form" action="{{ route('classes.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div id="method-field"></div>
 
                         <div class="mb-3">
-                            <label for="name" class="form-label">Class Name</label>
+                            <label for="name" class="form-label fw-semibold">Class Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Class One, Grade 10" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="code" class="form-label">Class Code</label>
+                            <label for="code" class="form-label fw-semibold">Class Code</label>
                             <input type="text" class="form-control" id="code" name="code" placeholder="e.g., 101, A1">
                         </div>
 
                         <div class="mb-3">
-                            <label for="school_category_id" class="form-label">Category</label>
+                            <label for="school_category_id" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
                             <select id="school_category_id" name="school_category_id" class="form-select" required>
-                                <option value="">Select a category</option>
+                                <option value="">Select Category</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
@@ -47,16 +54,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Enter description (optional)"></textarea>
+                            <label for="description" class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Optional notes..."></textarea>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary-gradient w-100" id="submit-btn">
+                        <div class="d-flex gap-2 pt-2">
+                            <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-2 fw-bold" id="submit-btn">
                                 <i class="fa-solid fa-check me-1"></i> Create Class
                             </button>
-                            <button type="button" class="btn btn-secondary d-none" id="cancel-btn" onclick="resetForm()">
-                                <i class="fa-solid fa-times me-1"></i> Cancel
+                            <button type="button" class="btn btn-outline-secondary d-none py-2 px-3" id="cancel-btn" onclick="resetForm()">
+                                <i class="fa-solid fa-xmark me-1"></i> Cancel
                             </button>
                         </div>
                     </form>
@@ -66,67 +73,94 @@
             {{-- Classes List Column --}}
             <div class="col-lg-8">
                 <div class="data-table-card">
-                    <div class="table-header">
-                        <h5 class="table-title"><i class="fa-solid fa-list me-2"></i> Classes List</h5>
+                    <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
+                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-indigo-600"></i> Classes List</h5>
+                        <span class="badge bg-light text-muted border px-3 py-1" style="border-radius:10px;">
+                            {{ count($classes) }} Classes
+                        </span>
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table data-table mb-0">
-                            <thead>
+                        <table class="table data-table mb-0 align-middle">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Code</th>
-                                    <th>Category</th>
-                                    <th>Description</th>
-                                    <th class="text-center">Actions</th>
+                                    <th class="py-3 px-3">#</th>
+                                    <th class="py-3 px-3">Class Name</th>
+                                    <th class="py-3 px-3 text-center">Code</th>
+                                    <th class="py-3 px-3 text-center">Category</th>
+                                    <th class="py-3 px-3">Description</th>
+                                    <th class="py-3 px-3 text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($classes as $class)
                                 <tr>
-                                    <td data-label="#" style="font-weight: 600;">{{ $loop->iteration }}</td>
-                                    <td data-label="Name" style="font-weight: 600;">{{ $class->name }}</td>
-                                    <td data-label="Code"><span style="background: #eef2ff; color: #4f46e5; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem;">{{ $class->code }}</span></td>
-                                    <td data-label="Category">{{ $class->category?->name ?? 'N/A' }}</td>
-                                    <td data-label="Description"><small>{{ \Str::limit($class->description, 30) }}</small></td>
-                                    <td data-label="Actions" class="text-center">
-                                        <button type="button" class="btn btn-action btn-sm btn-outline-warning" 
-                                            onclick="editClass('{{ $class->id }}', '{{ $class->name }}', '{{ $class->code }}', '{{ $class->school_category_id }}', '{{ $class->description }}')">
-                                            <i class="fa-regular fa-pen-to-square"></i>
-                                        </button>
-                                        <form action="{{ route('classes.destroy', ['tenant' => auth()->user()->school->slug, 'class' => $class->id]) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger">
-                                                <i class="fa-solid fa-trash"></i>
+                                    <td class="px-3 fw-bold text-muted" style="font-size:0.8rem;">{{ $loop->iteration }}</td>
+                                    <td class="px-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:700;font-size:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                {{ substr($class->name, 0, 1) }}
+                                            </div>
+                                            <span class="fw-bold text-dark" style="font-size:0.88rem;">{{ $class->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center px-3">
+                                        <span class="badge bg-light text-primary border px-2 py-1" style="border-radius:8px; font-size:0.78rem;">
+                                            {{ $class->code ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center px-3">
+                                        <span class="badge-completed">
+                                            <i class="fa-solid fa-layer-group me-1"></i>{{ $class->category?->name ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3">
+                                        <small class="text-muted">{{ \Str::limit($class->description, 28) ?: '—' }}</small>
+                                    </td>
+                                    <td class="px-3 text-end">
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="Edit"
+                                                onclick="editClass('{{ $class->id }}', '{{ $class->name }}', '{{ $class->code }}', '{{ $class->school_category_id }}', '{{ $class->description }}')">
+                                                <i class="fa-regular fa-pen-to-square"></i>
                                             </button>
-                                        </form>
+                                            <form action="{{ route('classes.destroy', ['tenant' => auth()->user()->school->slug, 'class' => $class->id]) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="empty-state">
-                                        <i class="fa-solid fa-book-open"></i>
-                                        <p class="text-muted">No classes found.</p>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-folder-open fa-2x mb-2 d-block"></i>
+                                        No classes found.
                                     </td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
-                        <div class="mt-4 d-flex justify-content-center">
+                    </div>
+
+                    @if($classes->hasPages())
+                        <div class="p-3 border-top">
                             {{ $classes->links() }}
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
+
 @section('customJs')
 <script>
     function editClass(id, name, code, categoryId, description) {
-        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-edit me-2"></i> Edit Class';
+        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen-to-square me-2"></i> Update Class: ' + name;
         document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check me-1"></i> Update Class';
         document.getElementById('cancel-btn').classList.remove('d-none');
 
@@ -161,78 +195,15 @@
             text: "Do you want to delete this class?",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                button.closest('form').submit();
-            }
-        })
-    }
-
-    @if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: '{{ session('success') }}',
-    });
-    @endif
-</script>
-<script>
-    // এডিট মোড চালু করার ফাংশন
-    function editClass(id, name, code, categoryId, description) {
-        // শুরুতে স্ল্যাশ এবং টেন্যান্ট স্লাগ দেওয়ার দরকার নেই যদি আপনি সাবডোমেইনে থাকেন
-        // শুধু 'classes/id' দিলেই হবে
-        let updateUrl = "classes/" + id; 
-
-        // ফর্মের টেক্সট এবং টাইটেল পরিবর্তন
-        $('#form-title').text('Update Class: ' + name);
-        $('#submit-btn').text('Update Class');
-        $('#cancel-btn').removeClass('d-none');
-        
-        // ফর্মের অ্যাকশন ইউআরএল এবং মেথড পরিবর্তন
-        $('#class-form').attr('action', updateUrl);
-        $('#method-field').html('<input type="hidden" name="_method" value="PUT">');
-
-        // ফিল্ডগুলোতে ভ্যালু বসানো
-        $('#name').val(name);
-        $('#code').val(code);
-        $('#school_category_id').val(categoryId);
-        $('#description').val(description);
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // ফর্ম রিসেট বা ক্যানসেল করার ফাংশন
-    function resetForm() {
-        // স্টোর করার জন্য শুধু 'classes' দিলেই হবে
-        let storeUrl = "classes";
-
-        $('#form-title').text('Create Class');
-        $('#submit-btn').text('Create Class');
-        $('#cancel-btn').addClass('d-none');
-        
-        $('#class-form').attr('action', storeUrl);
-        $('#method-field').html('');
-        $('#class-form')[0].reset();
-    }
-
-    function confirmDelete(button) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this class?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();
             }
-        })
+        });
     }
 
     @if($errors->any())
@@ -240,18 +211,18 @@
             icon: 'error',
             title: 'Oops...',
             text: '{{ $errors->first() }}',
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#4f46e5',
         });
     @endif
 
     @if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        timer: 1500,
-        showConfirmButton: false
-    });
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session('success') }}',
+            timer: 1500,
+            showConfirmButton: false
+        });
     @endif
 </script>
 @endsection

@@ -183,14 +183,6 @@ class ExamController extends Controller
 
         $exam->save();
 
-        $today = now()->toDateString();
-
-        if ($exam->end_date < $today) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot activate finished exam'
-            ]);
-        }
         return response()->json([
             'success' => true,
             'current_id' => $exam->id,

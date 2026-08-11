@@ -7,14 +7,16 @@
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
+            {{-- Page Header --}}
             <div class="page-header-card mb-4">
                 <div class="page-header-content">
                     <h1 class="page-title"><i class="fa-solid fa-layer-group me-2"></i> Assign Subjects</h1>
-                    <p class="page-subtitle">Assign subjects to classes and manage current classroom assignments.</p>
+                    <p class="page-subtitle">Map subjects to classes, set pass & full marks, and configure subcategories.</p>
                 </div>
             </div>
 
             <div class="row g-4">
+                {{-- Form Column --}}
                 <div class="col-lg-4">
                     <div class="form-card">
                         <h5 class="mb-4 fw-bold text-primary"><i class="fa-solid fa-paper-plane me-2"></i> Assign Subject</h5>
@@ -22,7 +24,7 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label for="class_id" class="form-label">Class <span class="text-danger">*</span></label>
+                                <label for="class_id" class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
                                 <select id="class_id" name="class_id" class="form-select" required>
                                     <option value="">Select Class</option>
                                     @foreach($classes as $class)
@@ -34,19 +36,20 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="category_display" class="form-label">Category</label>
+                                <label for="category_display" class="form-label fw-semibold">Category</label>
                                 <input type="text" id="category_display" class="form-control" readonly placeholder="Category will show based on class">
+                                <input type="hidden" name="school_category_id" id="school_category_id">
                             </div>
 
                             <div class="mb-3">
-                                <label for="school_sub_category_id" class="form-label">Sub Category</label>
+                                <label for="school_sub_category_id" class="form-label fw-semibold">Sub Category</label>
                                 <select id="school_sub_category_id" name="school_sub_category_id" class="form-select" disabled>
                                     <option value="">Select Class First</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label for="subject_id" class="form-label">Subject <span class="text-danger">*</span></label>
+                                <label for="subject_id" class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
                                 <select id="subject_id" name="subject_id" class="form-select" required>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
@@ -56,28 +59,29 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="full_mark" class="form-label">Full Mark <span class="text-danger">*</span></label>
-                                <input type="text" id="full_mark" name="full_mark" class="form-control" placeholder="Enter full mark" required>
+                                <label for="full_mark" class="form-label fw-semibold">Full Mark <span class="text-danger">*</span></label>
+                                <input type="number" id="full_mark" name="full_mark" class="form-control" placeholder="e.g. 100" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="pass_mark" class="form-label">Pass Marks <span class="text-danger">*</span></label>
-                                <input type="text" id="pass_mark" name="pass_mark" class="form-control" placeholder="Pass Marks" required>
+                                <label for="pass_mark" class="form-label fw-semibold">Pass Marks <span class="text-danger">*</span></label>
+                                <input type="number" id="pass_mark" name="pass_mark" class="form-control" placeholder="e.g. 33" required>
                             </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary-gradient flex-grow-1">Assign</button>
-                                <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-outline-secondary flex-grow-1">Cancel</a>
+                            <div class="d-flex gap-2 pt-2">
+                                <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-2 fw-bold">Assign Subject</button>
+                                <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-outline-secondary py-2 px-3">Cancel</a>
                             </div>
                         </form>
                     </div>
                 </div>
 
+                {{-- Table Column --}}
                 <div class="col-lg-8">
                     <div class="data-table-card">
-                        <div class="table-header">
-                            <h5 class="table-title"><i class="fa-solid fa-table-list me-2"></i> Assigned Subjects</h5>
-                            <select id="filterClassId" name="class_id" class="form-select form-select-sm" style="min-width: 180px;">
+                        <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
+                            <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-table-list me-2 text-indigo-600"></i> Assigned Subjects</h5>
+                            <select id="filterClassId" name="class_id" class="form-select form-select-sm" style="width: 180px;">
                                 <option value="">All Classes</option>
                                 @foreach($classes as $class)
                                     <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
@@ -85,7 +89,7 @@
                             </select>
                         </div>
 
-                        <div id="assignTable" class="table-responsive px-3 pb-3">
+                        <div id="assignTable">
                             @include('school.subject.partials.assign-table')
                         </div>
                     </div>
@@ -103,8 +107,8 @@
                 text: "Do you want to delete this assignment?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'Cancel',
             }).then((result) => {
@@ -119,7 +123,7 @@
                 icon: 'error',
                 title: 'Oops...',
                 text: '{{ $errors->first() }}',
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#4f46e5',
             });
         @endif
 
@@ -146,8 +150,9 @@
             const classId = $(this).val();
             const categoryId = $(this).find(':selected').data('category-id');
             const categoryName = $(this).find(':selected').data('category-name') || '';
-
+            $('#school_category_id').val(categoryId);
             $('#category_display').val(categoryName ? categoryName : 'No category');
+            
             $('#school_sub_category_id').empty().append('<option value="">Select Sub Category</option>').prop('disabled', true);
 
             if (!classId) {
@@ -174,13 +179,9 @@
             }
         });
 
-        $('#school_sub_category_id').on('change', function() {
-            // Subjects are loaded server-side, no AJAX needed
-        });
-
         $('#assignSubjectForm').on('submit', function(e) {
             e.preventDefault();
-
+            $('#school_sub_category_id').prop('disabled', false);
             const form = $(this);
             const action = form.attr('action');
             const data = form.serialize();
@@ -196,13 +197,9 @@
                         text: response.message || 'Subject assigned successfully',
                         timer: 1500,
                         showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
                     });
-
-                    form[0].reset();
-                    $('#category_display').val('');
-                    $('#school_sub_category_id').prop('disabled', true).empty().append('<option value="">Select Class First</option>');
-                    $('#subject_id').prop('disabled', true).empty().append('<option value="">Select Class First</option>');
-                    loadAssignments();
                 },
                 error: function(xhr) {
                     if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
@@ -228,26 +225,15 @@
             if (!url) {
                 url = "{{ route('subjects.assign', ['tenant' => auth()->user()?->school?->slug]) }}";
             }
-            
-            const classId = $('#filterClassId').val();
-            const newUrl = new URL(url, window.location.origin);
-            
-            if (classId) {
-                newUrl.searchParams.set('class_id', classId);
+            const query = $('#filterClassId').serialize();
+            if (query) {
+                url += (url.includes('?') ? '&' : '?') + query;
             }
-            
             $.ajax({
-                url: newUrl.toString(),
+                url: url,
                 type: 'GET',
                 success: function(data) {
                     $('#assignTable').html(data);
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Unable to load assignments.',
-                    });
                 }
             });
         }

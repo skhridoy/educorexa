@@ -2,22 +2,16 @@
 
 @section('customCSS')
     @include('school.others._modern_design_styles')
-    <style>
-        .pagination {
-            --bs-pagination-border-radius: 50% !important;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
 @endsection
 
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
+            {{-- Page Header --}}
             <div class="page-header-card mb-4">
                 <div class="page-header-content">
-                    <h1 class="page-title"><i class="fa-solid fa-edit me-2"></i> Edit Subject Assignment</h1>
-                    <p class="page-subtitle">Update subject assignment details for a class.</p>
+                    <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Subject Assignment</h1>
+                    <p class="page-subtitle">Update subject marks and details for the selected class.</p>
                 </div>
             </div>
 
@@ -30,7 +24,7 @@
                             @method('PUT')
 
                             <div class="mb-3">
-                                <label for="class_id" class="form-label">Class <span class="text-danger">*</span></label>
+                                <label for="class_id" class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
                                 <select id="class_id" name="class_id" class="form-select" required>
                                     <option value="">Select Class</option>
                                     @foreach($classes as $class)
@@ -44,21 +38,17 @@
                                 @enderror
                             </div>
 
-                            <!-- ক্যাটাগরি ডিসপ্লে এবং হিডেন ID -->
                             <div class="mb-3">
-                                <label for="category_display" class="form-label">Category</label>
+                                <label for="category_display" class="form-label fw-semibold">Category</label>
                                 <input type="text" id="category_display" class="form-control" readonly 
                                     placeholder="Category will show based on class"
                                     value="{{ $assignment->class->category?->name ?? '' }}">
-                                
-                                <!-- আসল ID পাঠানোর জন্য এই হিডেন ইনপুটটি যোগ করুন -->
                                 <input type="hidden" name="school_category_id" id="school_category_id" 
                                     value="{{ old('school_category_id', $assignment->school_category_id) }}">
                             </div>
 
-                            <!-- সাব-ক্যাটেগরি সিলেক্ট (name="school_sub_category_id" যুক্ত করুন) -->
                             <div class="mb-3">
-                                <label for="school_sub_category_id" class="form-label">Sub Category</label>
+                                <label for="school_sub_category_id" class="form-label fw-semibold">Sub Category</label>
                                 <select id="school_sub_category_id" name="school_sub_category_id" class="form-select" {{ !isset($assignment->school_sub_category_id) ? 'disabled' : '' }}>
                                     <option value="">Select Sub Category</option>
                                     @if(isset($assignment->class) && $assignment->class->school_category_id)
@@ -72,7 +62,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="subject_id" class="form-label">Subject <span class="text-danger">*</span></label>
+                                <label for="subject_id" class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
                                 <select id="subject_id" name="subject_id" class="form-select" required>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
@@ -85,7 +75,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="full_mark" class="form-label">Full Mark <span class="text-danger">*</span></label>
+                                <label for="full_mark" class="form-label fw-semibold">Full Mark <span class="text-danger">*</span></label>
                                 <input type="number" id="full_mark" name="full_mark" class="form-control" placeholder="Enter full mark" value="{{ old('full_mark', $assignment->full_mark) }}" required>
                                 @error('full_mark')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
@@ -93,19 +83,19 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="pass_mark" class="form-label">Pass Marks <span class="text-danger">*</span></label>
+                                <label for="pass_mark" class="form-label fw-semibold">Pass Marks <span class="text-danger">*</span></label>
                                 <input type="number" id="pass_mark" name="pass_mark" class="form-control" placeholder="Pass Marks" value="{{ old('pass_mark', $assignment->pass_mark) }}" required>
                                 @error('pass_mark')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary-gradient flex-grow-1">
-                                    <i class="fa-solid fa-save me-2"></i> Update
+                            <div class="d-flex gap-2 pt-2">
+                                <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-2 fw-bold">
+                                    <i class="fa-solid fa-check me-1"></i> Update Assignment
                                 </button>
-                                <a href="{{ route('subjects.assign', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-outline-secondary flex-grow-1">
-                                    <i class="fa-solid fa-times me-2"></i> Cancel
+                                <a href="{{ route('subjects.assign', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-outline-secondary py-2 px-3">
+                                    Cancel
                                 </a>
                             </div>
                         </form>
@@ -114,9 +104,9 @@
 
                 <div class="col-lg-8">
                     <div class="data-table-card">
-                        <div class="table-header">
-                            <h5 class="table-title"><i class="fa-solid fa-table-list me-2"></i> Assigned Subjects</h5>
-                            <select id="filterClassId" name="class_id" class="form-select form-select-sm" style="min-width: 180px;">
+                        <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
+                            <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-table-list me-2 text-indigo-600"></i> Assigned Subjects</h5>
+                            <select id="filterClassId" name="class_id" class="form-select form-select-sm" style="width: 180px;">
                                 <option value="">All Classes</option>
                                 @foreach($classes as $class)
                                     <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
@@ -124,7 +114,7 @@
                             </select>
                         </div>
 
-                        <div id="assignTable" class="table-responsive px-3 pb-3">
+                        <div id="assignTable">
                             @include('school.subject.partials.assign-table')
                         </div>
                     </div>
@@ -142,8 +132,8 @@
                 text: "Do you want to delete this assignment?",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'Cancel',
             }).then((result) => {
@@ -158,7 +148,7 @@
                 icon: 'error',
                 title: 'Oops...',
                 text: '{{ $errors->first() }}',
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#4f46e5',
             });
         @endif
 
@@ -185,10 +175,7 @@
             const classId = $(this).val();
             const categoryId = $(this).find(':selected').data('category-id');
             const categoryName = $(this).find(':selected').data('category-name') || '';
-            // হিডেন ফিল্ডে আইডি সেট করুন (এটিই ডাটাবেসে যাবে)
             $('#school_category_id').val(categoryId); 
-            
-            // নাম ডিসপ্লে ফিল্ডে সেট করুন
             $('#category_display').val(categoryName ? categoryName : 'No category');
             
             $('#school_sub_category_id').empty().append('<option value="">Select Sub Category</option>').prop('disabled', true);
@@ -217,13 +204,8 @@
             }
         });
 
-        $('#school_sub_category_id').on('change', function() {
-            // Subjects are loaded server-side, no AJAX needed
-        });
-
         $('#assignSubjectForm').on('submit', function(e) {
             e.preventDefault();
-            // সাবমিট করার আগে সাব-ক্যাটেগরি এনাবল করুন যাতে ডাটা রিকোয়েস্টে যায়
             $('#school_sub_category_id').prop('disabled', false);
             const form = $(this);
             const action = form.attr('action');
@@ -270,7 +252,7 @@
             }
             const query = $('#filterClassId').serialize();
             if (query) {
-                url += '?' + query;
+                url += (url.includes('?') ? '&' : '?') + query;
             }
             $.ajax({
                 url: url,
