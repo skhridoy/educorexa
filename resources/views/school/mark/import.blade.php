@@ -38,10 +38,11 @@
         .mode-card {
             border: 2px solid #e2e8f0;
             border-radius: 14px;
-            padding: 16px 20px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: all 0.2s ease;
             background: #fff;
+            height: 100%;
         }
         .mode-card:hover { border-color: #818cf8; box-shadow: 0 4px 16px rgba(79,70,229,0.1); }
         .mode-card.selected {
@@ -50,12 +51,21 @@
             box-shadow: 0 4px 20px rgba(79,70,229,0.15);
         }
         .mode-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
+            width: 40px; height: 40px;
+            border-radius: 11px;
             background: linear-gradient(135deg,#4f46e5,#7c3aed);
             display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 1.1rem;
+            color: #fff; font-size: 1rem;
             flex-shrink: 0;
+        }
+        .mode-card-title { font-size: 13.5px; color: #1e293b; margin-bottom: 2px; }
+        .mode-card-sub   { font-size: 11.5px; }
+
+        @media (max-width: 575.98px) {
+            .mode-card { padding: 9px 8px; border-radius: 10px; }
+            .mode-icon { width: 30px; height: 30px; font-size: 0.8rem; border-radius: 8px; }
+            .mode-card-title { font-size: 11px; margin-bottom: 1px; }
+            .mode-card-sub { font-size: 9.5px; }
         }
 
         .dropzone-area {
@@ -96,6 +106,91 @@
             margin-bottom: 8px;
         }
 
+        /* ══ ACTION BUTTONS ══ */
+        .import-actions-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+            margin-top: 20px;
+        }
+        .btn-tpl-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #f8fafc;
+            color: #4f46e5 !important;
+            border: 1.5px solid #c7d2fe;
+            border-radius: 9px;
+            padding: 8px 18px;
+            font-size: 0.80rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
+            text-decoration: none;
+        }
+        .btn-tpl-download:hover {
+            background: #eff6ff;
+            border-color: #818cf8;
+            color: #4338ca !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        .btn-tpl-download:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.1);
+        }
+        .btn-action-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 8px 20px;
+            font-size: 0.80rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-action-cancel:hover {
+            background: #e2e8f0;
+            color: #1e293b !important;
+            border-color: #cbd5e1;
+        }
+        .btn-action-import {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%);
+            color: #ffffff !important;
+            border: none;
+            border-radius: 9px;
+            padding: 8px 26px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.28);
+            text-decoration: none;
+        }
+        .btn-action-import:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.42);
+            background: linear-gradient(135deg, #4338ca 0%, #4f46e5 50%, #6d28d9 100%);
+        }
+        .btn-action-import:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
+        }
+
         @media (max-width: 576px) {
             .import-hero { padding: 18px 16px; }
             .import-hero-title { font-size: 1.3rem; }
@@ -119,9 +214,9 @@
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ route('marks.index', ['tenant' => auth()->user()?->school?->slug]) }}"
-                       class="btn btn-sm"
-                       style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:6px 16px;font-size:13px;">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Mark Entry
+                       class="btn-tpl-download"
+                       style="background:rgba(255,255,255,0.14);color:#fff!important;border:1px solid rgba(255,255,255,0.28);border-radius:20px;padding:6px 16px;font-size:0.75rem;backdrop-filter:blur(8px);">
+                        <i class="fa-solid fa-arrow-left"></i> Mark Entry
                     </a>
                 </div>
             </div>
@@ -140,25 +235,25 @@
                         {{-- Step 1: Mode Selection --}}
                         <div class="mb-4">
                             <p class="form-section-label"><i class="fa-solid fa-list-check me-1"></i> Step 1 — Import Mode বেছে নিন</p>
-                            <div class="row g-3">
-                                <div class="col-sm-6">
+                            <div class="row g-2 g-sm-3">
+                                <div class="col-6">
                                     <div class="mode-card selected" id="card_single" onclick="selectMode('single')">
-                                        <div class="d-flex align-items-center gap-3">
+                                        <div class="d-flex align-items-center gap-2 gap-sm-3">
                                             <div class="mode-icon"><i class="fa-solid fa-book"></i></div>
-                                            <div>
-                                                <div class="fw-bold" style="font-size:14px;color:#1e293b;">Single Subject</div>
-                                                <div class="text-muted" style="font-size:12px;">একটি বিষয়ের মার্ক</div>
+                                            <div style="min-width:0; flex:1;">
+                                                <div class="mode-card-title fw-bold">Single Subject</div>
+                                                <div class="mode-card-sub text-muted">একটি বিষয়ের মার্ক</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-6">
                                     <div class="mode-card" id="card_multi" onclick="selectMode('multi')">
-                                        <div class="d-flex align-items-center gap-3">
+                                        <div class="d-flex align-items-center gap-2 gap-sm-3">
                                             <div class="mode-icon" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);"><i class="fa-solid fa-table-columns"></i></div>
-                                            <div>
-                                                <div class="fw-bold" style="font-size:14px;color:#1e293b;">Multi Subject</div>
-                                                <div class="text-muted" style="font-size:12px;">একাধিক বিষয় একসাথে</div>
+                                            <div style="min-width:0; flex:1;">
+                                                <div class="mode-card-title fw-bold">Multi Subject</div>
+                                                <div class="mode-card-sub text-muted">একাধিক বিষয় একসাথে</div>
                                             </div>
                                         </div>
                                     </div>
@@ -227,19 +322,23 @@
                             </div>
                         </div>
 
-                        {{-- Buttons --}}
-                        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                        {{-- Action Buttons --}}
+                        <div class="import-actions-bar">
                             <button type="button" id="btn_download_tpl"
-                                    class="btn btn-sm"
-                                    style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:20px;padding:7px 16px;font-size:13px;"
+                                    class="btn-tpl-download"
                                     onclick="downloadTemplate()">
-                                <i class="fa-solid fa-download me-1"></i> Template Download
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                                <span>Template Download</span>
                             </button>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex align-items-center gap-2">
                                 <a href="{{ route('marks.index', ['tenant' => auth()->user()?->school?->slug]) }}"
-                                   class="btn btn-light btn-sm rounded-pill px-4">Cancel</a>
-                                <button type="submit" id="mark_import_btn" class="btn btn-primary-modern btn-sm rounded-pill px-5">
-                                    <i class="fa-solid fa-file-import me-1"></i> Import Marks
+                                   class="btn-action-cancel">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <span>Cancel</span>
+                                </a>
+                                <button type="submit" id="mark_import_btn" class="btn-action-import">
+                                    <i class="fa-solid fa-file-import"></i>
+                                    <span>Import Marks</span>
                                 </button>
                             </div>
                         </div>
@@ -270,18 +369,17 @@
                                             <th style="padding:7px 8px;color:#4f46e5;">cq</th>
                                             <th style="padding:7px 8px;color:#4f46e5;">mcq</th>
                                             <th style="padding:7px 8px;color:#4f46e5;">practical</th>
-                                            <th style="padding:7px 8px;color:#4f46e5;">marks</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td style="padding:6px 8px;">1</td><td>Sumon Roy</td><td>45</td><td>25</td><td>20</td><td>90</td></tr>
-                                        <tr style="background:#f8fafc;"><td style="padding:6px 8px;">2</td><td>Rina Begum</td><td>40</td><td>22</td><td>18</td><td>80</td></tr>
+                                        <tr><td style="padding:6px 8px;">1</td><td>Sumon Roy</td><td>45</td><td>25</td><td>20</td></tr>
+                                        <tr style="background:#f8fafc;"><td style="padding:6px 8px;">2</td><td>Rina Begum</td><td>40</td><td>22</td><td>18</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                             <p class="text-muted mt-2" style="font-size:11.5px;">
                                 <i class="fa-solid fa-lightbulb me-1 text-warning"></i>
-                                CQ, MCQ ও Practical পূরণ করলে মোট নম্বর স্বয়ংক্রিয়ভাবে হিসাব হবে অথবা সরাসরি <strong>marks</strong> কলাম পূরণ করতে পারেন।
+                                CQ, MCQ ও Practical নম্বর পূরণ করলেই মোট নম্বর স্বয়ংক্রিয়ভাবে হিসাব হয়ে ডাটাবেসে সেভ হবে।
                             </p>
                         </div>
 

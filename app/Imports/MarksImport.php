@@ -111,14 +111,14 @@ class MarksImport implements ToCollection, WithHeadingRow
                     continue;
                 }
 
-                $cq        = $hasCq && is_numeric($rawCq) ? (float)$rawCq : null;
-                $mcq       = $hasMcq && is_numeric($rawMcq) ? (float)$rawMcq : null;
-                $practical = $hasPrac && is_numeric($rawPrac) ? (float)$rawPrac : null;
+                $cq        = $hasCq && is_numeric($rawCq) ? (int)$rawCq : null;
+                $mcq       = $hasMcq && is_numeric($rawMcq) ? (int)$rawMcq : null;
+                $practical = $hasPrac && is_numeric($rawPrac) ? (int)$rawPrac : null;
 
                 if ($cq !== null || $mcq !== null || $practical !== null) {
-                    $finalMarks = round(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0), 2);
+                    $finalMarks = (int)(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0));
                 } else {
-                    $finalMarks = $hasMark && is_numeric($rawMark) ? (float)$rawMark : 0;
+                    $finalMarks = $hasMark && is_numeric($rawMark) ? (int)$rawMark : 0;
                 }
 
                 try {
@@ -190,17 +190,17 @@ class MarksImport implements ToCollection, WithHeadingRow
                         continue;
                     }
 
-                    $subjectData[$resolvedSubjectId][$fieldType] = (float)$colVal;
+                    $subjectData[$resolvedSubjectId][$fieldType] = (int)$colVal;
                 }
 
                 foreach ($subjectData as $resolvedSubjectId => $subMarks) {
-                    $cq        = $subMarks['cq'] ?? null;
-                    $mcq       = $subMarks['mcq'] ?? null;
-                    $practical = $subMarks['practical'] ?? null;
-                    $rawMarks  = $subMarks['marks'] ?? null;
+                    $cq        = isset($subMarks['cq']) ? (int)$subMarks['cq'] : null;
+                    $mcq       = isset($subMarks['mcq']) ? (int)$subMarks['mcq'] : null;
+                    $practical = isset($subMarks['practical']) ? (int)$subMarks['practical'] : null;
+                    $rawMarks  = isset($subMarks['marks']) ? (int)$subMarks['marks'] : null;
 
                     if ($cq !== null || $mcq !== null || $practical !== null) {
-                        $finalMarks = round(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0), 2);
+                        $finalMarks = (int)(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0));
                     } else {
                         $finalMarks = $rawMarks ?? 0;
                     }

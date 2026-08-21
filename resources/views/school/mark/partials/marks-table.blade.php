@@ -15,62 +15,86 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 32px;
-        height: 28px;
-        border-radius: 7px;
-        font-size: 0.72rem;
+        min-width: 24px;
+        height: 20px;
+        border-radius: 6px;
+        font-size: 0.58rem;
         font-weight: 800;
+        letter-spacing: 0.3px;
         background: #f1f5f9;
         color: #64748b;
         border: 1px solid #e2e8f0;
-        padding: 0 6px;
+        padding: 0 4px;
         flex-shrink: 0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
-    .gpe-ap { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
-    .gpe-a  { background: #d1fae5; color: #047857; border-color: #a7f3d0; }
-    .gpe-am { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
-    .gpe-b  { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
-    .gpe-c  { background: #fef9c3; color: #a16207; border-color: #fef08a; }
-    .gpe-d  { background: #ffedd5; color: #c2410c; border-color: #fed7aa; }
-    .gpe-f  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
-    .gpe-default { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+    .gpe-ap { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #047857; border-color: #a7f3d0; }
+    .gpe-a  { background: linear-gradient(135deg, #f0fdf4, #dcfce7); color: #15803d; border-color: #bbf7d0; }
+    .gpe-am { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); color: #0f766e; border-color: #99f6e4; }
+    .gpe-b  { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #1d4ed8; border-color: #bfdbfe; }
+    .gpe-c  { background: linear-gradient(135deg, #fefce8, #fef9c3); color: #a16207; border-color: #fef08a; }
+    .gpe-d  { background: linear-gradient(135deg, #fff7ed, #ffedd5); color: #c2410c; border-color: #fed7aa; }
+    .gpe-f  { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #b91c1c; border-color: #fca5a5; }
+    .gpe-default { background: #f8fafc; color: #94a3b8; border-color: #e2e8f0; }
 
     /* ══ Mark Input Box ══ */
     .entry-mark-box {
         display: inline-flex;
         align-items: center;
-        border: 1.5px solid #cbd5e1;
-        border-radius: 9px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 6px;
         background: #fff;
         overflow: hidden;
-        height: 34px;
-        transition: all 0.2s;
+        height: 22px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         flex-shrink: 0;
     }
     .entry-mark-box:focus-within {
         border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+    }
+    .total-box-readonly {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        cursor: default;
+    }
+    .total-box-readonly .total-input {
+        color: #4338ca !important;
+        font-weight: 700 !important;
+        font-size: 0.62rem !important;
+        cursor: default !important;
+        user-select: none !important;
+    }
+    .total-box-readonly:focus-within {
+        border-color: #cbd5e1 !important;
+        box-shadow: none !important;
     }
     .mark-input {
-        width: 44px;
+        width: 24px;
         height: 100%;
         text-align: center;
         border: none;
-        font-size: 0.86rem;
-        font-weight: 700;
+        font-size: 0.62rem;
+        font-weight: 600;
         color: #0f172a;
         background: transparent;
         outline: none;
-        padding: 0 3px;
+        padding: 0 1px;
+    }
+    .mark-input::placeholder {
+        font-size: 0.54rem;
+        font-weight: 500;
+        color: #94a3b8;
+        opacity: 0.9;
     }
     .mark-input:focus { background: transparent; }
     .mark-input.is-valid  { color: #15803d; }
     .mark-input.is-invalid{ color: #dc2626; }
     .mark-denom {
-        font-size: 0.68rem;
+        font-size: 0.48rem;
         font-weight: 600;
         color: #94a3b8;
-        padding: 0 7px 0 5px;
+        padding: 0 3px 0 2px;
         border-left: 1px solid #e2e8f0;
         height: 100%;
         display: inline-flex;
@@ -80,97 +104,114 @@
         user-select: none;
     }
 
-    /* ══ Status Toggle ══ */
+    /* ══ Status Toggle (Pill Segmented Design) ══ */
     .entry-status-toggle {
         display: inline-flex;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1.5px solid #cbd5e1;
-        background: #f8fafc;
-        height: 34px;
-        flex-shrink: 0;
+        align-items: center;
+        border-radius: 20px;
+        background: #f1f5f9;
+        padding: 2px;
+        border: 1px solid #e2e8f0;
+        height: 24px;
+        gap: 2px;
+        transition: all 0.2s ease;
     }
     .entry-status-toggle .est-btn {
-        padding: 0 9px;
-        font-size: 0.72rem;
-        font-weight: 700;
+        padding: 0 8px;
+        font-size: 0.58rem;
+        font-weight: 600;
         border: none;
+        border-radius: 14px;
         background: transparent;
         color: #64748b;
         cursor: pointer;
-        transition: all 0.18s;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         white-space: nowrap;
         display: inline-flex;
         align-items: center;
         gap: 3px;
         height: 100%;
     }
-    .entry-status-toggle .est-btn:first-child { border-right: 1.5px solid #cbd5e1; }
-    .entry-status-toggle .est-btn.est-present { background: #dcfce7; color: #16a34a; }
-    .entry-status-toggle .est-btn.est-absent  { background: #fee2e2; color: #dc2626; }
+    .entry-status-toggle .est-btn:hover:not(.est-present):not(.est-absent) {
+        color: #1e293b;
+        background: rgba(255, 255, 255, 0.7);
+    }
+    .entry-status-toggle .est-btn.est-present {
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        color: #ffffff !important;
+        box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
+        font-weight: 700;
+    }
+    .entry-status-toggle .est-btn.est-absent {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        color: #ffffff !important;
+        box-shadow: 0 1px 4px rgba(239, 68, 68, 0.35);
+        font-weight: 700;
+    }
 
     /* ══ Section Header ══ */
     .entry-table-header {
-        padding: 16px 20px;
+        padding: 8px 12px;
         border-bottom: 1px solid #f1f5f9;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 6px;
     }
     .entry-table-title {
-        font-size: 1rem;
+        font-size: 0.78rem;
         font-weight: 700;
         color: #1e293b;
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
     }
     .full-mark-badge {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-        color: #7c3aed;
-        border: 1px solid #ddd6fe;
+        gap: 4px;
+        background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+        color: #6d28d9;
+        border: 1px solid #c4b5fd;
         border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        font-weight: 700;
+        padding: 2px 9px;
+        font-size: 0.62rem;
+        font-weight: 800;
+        box-shadow: 0 1px 3px rgba(109, 40, 217, 0.1);
     }
 
     /* ══════════════════════════════════════════════
        DESKTOP TABLE
     ══════════════════════════════════════════════ */
-    .entry-desktop-table { display: block; }
+    .entry-desktop-table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .entry-mobile-cards  { display: none; }
 
     .entry-data-table { width: 100%; border-collapse: collapse; }
     .entry-data-table thead th {
         background: linear-gradient(135deg, #1e293b, #334155);
         color: #fff;
-        font-size: 0.68rem;
+        font-size: 0.58rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        padding: 13px 16px;
+        letter-spacing: 0.02em;
+        padding: 5px 6px;
         border: none;
         white-space: nowrap;
     }
     .entry-data-table tbody td {
-        padding: 12px 16px;
+        padding: 3px 5px;
         vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.87rem;
+        font-size: 0.72rem;
     }
     .entry-data-table tbody tr:hover { background: #fafbff; }
     .entry-data-table tbody tr.row-absent { background: #fff8f8 !important; }
 
-    .student-id-cell { font-size: 0.78rem; color: #94a3b8; font-weight: 600; }
-    .roll-cell { font-weight: 800; color: #1e293b; }
-    .name-cell { font-weight: 700; color: #0f172a; }
+    .student-id-cell { font-size: 0.65rem; color: #64748b; font-weight: 600; white-space: nowrap; }
+    .roll-cell { font-weight: 700; color: #1e293b; font-size: 0.74rem; }
+    .name-cell { font-weight: 600; color: #0f172a; font-size: 0.72rem; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
 
     /* ══════════════════════════════════════════════
        MOBILE STUDENT CARD
@@ -337,22 +378,22 @@
                     <th style="width:10%;">ID</th>
                     <th style="width:6%;">Roll</th>
                     <th style="width:20%;">Student Name</th>
-                    <th style="width:11%; text-align:center;">CQ</th>
-                    <th style="width:11%; text-align:center;">MCQ</th>
-                    <th style="width:11%; text-align:center;">Practical</th>
-                    <th style="width:12%; text-align:center;">Total (Obt.)</th>
-                    <th style="width:7%; text-align:center;">Grade</th>
-                    <th style="width:12%; text-align:center;">Attendance</th>
+                    <th style="width:15%; text-align:center;">CQ</th>
+                    <th style="width:15%; text-align:center;">MCQ</th>
+                    <th style="width:15%; text-align:center;">Practical</th>
+                    <th style="width:15%; text-align:center;">Total (Obt.)</th>
+                    <th style="width:15%; text-align:center;">Grade</th>
+                    <th style="width:15%; text-align:center;">Attendance</th>
                 </tr>
-            </thead>
+            </thead> 
             <tbody>
                 @foreach($students as $student)
                     @php
                         $sts   = $marksWithGrade[$student->id]['status'] ?? 'present';
-                        $cq    = $marksWithGrade[$student->id]['cq'] ?? '';
-                        $mcq   = $marksWithGrade[$student->id]['mcq'] ?? '';
-                        $prac  = $marksWithGrade[$student->id]['practical'] ?? '';
-                        $mval  = $marksWithGrade[$student->id]['marks'] ?? '';
+                        $cq    = (isset($marksWithGrade[$student->id]['cq']) && $marksWithGrade[$student->id]['cq'] !== null && $marksWithGrade[$student->id]['cq'] !== '') ? (int)$marksWithGrade[$student->id]['cq'] : '';
+                        $mcq   = (isset($marksWithGrade[$student->id]['mcq']) && $marksWithGrade[$student->id]['mcq'] !== null && $marksWithGrade[$student->id]['mcq'] !== '') ? (int)$marksWithGrade[$student->id]['mcq'] : '';
+                        $prac  = (isset($marksWithGrade[$student->id]['practical']) && $marksWithGrade[$student->id]['practical'] !== null && $marksWithGrade[$student->id]['practical'] !== '') ? (int)$marksWithGrade[$student->id]['practical'] : '';
+                        $mval  = (isset($marksWithGrade[$student->id]['marks']) && $marksWithGrade[$student->id]['marks'] !== null && $marksWithGrade[$student->id]['marks'] !== '') ? (int)$marksWithGrade[$student->id]['marks'] : '';
                         $gval  = $marksWithGrade[$student->id]['grade'] ?? '-';
                         $inits = strtoupper(substr($student->name, 0, 1));
                         $gradeClass = match($gval) {
@@ -368,10 +409,9 @@
 
                         {{-- CQ --}}
                         <td class="text-center">
-                            <div class="entry-mark-box" style="width:70px;">
-                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <div class="entry-mark-box">
+                                <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                        class="mark-input cq-input"
-                                       style="width:100%;"
                                        data-student="{{ $student->id }}"
                                        data-type="cq"
                                        placeholder="CQ"
@@ -382,10 +422,9 @@
 
                         {{-- MCQ --}}
                         <td class="text-center">
-                            <div class="entry-mark-box" style="width:70px;">
-                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <div class="entry-mark-box">
+                                <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                        class="mark-input mcq-input"
-                                       style="width:100%;"
                                        data-student="{{ $student->id }}"
                                        data-type="mcq"
                                        placeholder="MCQ"
@@ -396,10 +435,9 @@
 
                         {{-- Practical --}}
                         <td class="text-center">
-                            <div class="entry-mark-box" style="width:70px;">
-                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <div class="entry-mark-box">
+                                <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                        class="mark-input prac-input"
-                                       style="width:100%;"
                                        data-student="{{ $student->id }}"
                                        data-type="practical"
                                        placeholder="Prac."
@@ -408,16 +446,18 @@
                             </div>
                         </td>
 
-                        {{-- Total Obtained --}}
+                        {{-- Total Obtained (Auto Calculated) --}}
                         <td class="text-center">
-                            <div class="entry-mark-box">
-                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <div class="entry-mark-box total-box-readonly" title="Auto calculated: CQ + MCQ + Practical">
+                                <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                        class="mark-input total-input"
                                        data-student="{{ $student->id }}"
                                        data-type="total"
                                        data-fullmarks="{{ $fullMarks }}"
-                                       placeholder="00"
+                                       placeholder="0"
                                        value="{{ $mval }}"
+                                       readonly
+                                       tabindex="-1"
                                        {{ $sts == 'absent' ? 'disabled' : '' }}>
                                 <span class="mark-denom">/ {{ $fullMarks }}</span>
                             </div>
@@ -462,10 +502,10 @@
         @foreach($students as $student)
             @php
                 $sts   = $marksWithGrade[$student->id]['status'] ?? 'present';
-                $cq    = $marksWithGrade[$student->id]['cq'] ?? '';
-                $mcq   = $marksWithGrade[$student->id]['mcq'] ?? '';
-                $prac  = $marksWithGrade[$student->id]['practical'] ?? '';
-                $mval  = $marksWithGrade[$student->id]['marks']  ?? '';
+                $cq    = (isset($marksWithGrade[$student->id]['cq']) && $marksWithGrade[$student->id]['cq'] !== null && $marksWithGrade[$student->id]['cq'] !== '') ? (int)$marksWithGrade[$student->id]['cq'] : '';
+                $mcq   = (isset($marksWithGrade[$student->id]['mcq']) && $marksWithGrade[$student->id]['mcq'] !== null && $marksWithGrade[$student->id]['mcq'] !== '') ? (int)$marksWithGrade[$student->id]['mcq'] : '';
+                $prac  = (isset($marksWithGrade[$student->id]['practical']) && $marksWithGrade[$student->id]['practical'] !== null && $marksWithGrade[$student->id]['practical'] !== '') ? (int)$marksWithGrade[$student->id]['practical'] : '';
+                $mval  = (isset($marksWithGrade[$student->id]['marks']) && $marksWithGrade[$student->id]['marks'] !== null && $marksWithGrade[$student->id]['marks'] !== '') ? (int)$marksWithGrade[$student->id]['marks'] : '';
                 $gval  = $marksWithGrade[$student->id]['grade']  ?? '-';
                 $inits = strtoupper(substr($student->name, 0, 1));
                 $gradeClass = match($gval) {
@@ -507,7 +547,7 @@
                     <div class="flex-fill">
                         <label style="font-size:10px;font-weight:700;color:#64748b;">CQ</label>
                         <div class="entry-mark-box w-100">
-                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                    class="mark-input cq-input w-100"
                                    data-student="{{ $student->id }}"
                                    data-type="cq"
@@ -519,7 +559,7 @@
                     <div class="flex-fill">
                         <label style="font-size:10px;font-weight:700;color:#64748b;">MCQ</label>
                         <div class="entry-mark-box w-100">
-                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                    class="mark-input mcq-input w-100"
                                    data-student="{{ $student->id }}"
                                    data-type="mcq"
@@ -531,7 +571,7 @@
                     <div class="flex-fill">
                         <label style="font-size:10px;font-weight:700;color:#64748b;">Practical</label>
                         <div class="entry-mark-box w-100">
-                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                    class="mark-input prac-input w-100"
                                    data-student="{{ $student->id }}"
                                    data-type="practical"
@@ -542,18 +582,20 @@
                     </div>
                 </div>
 
-                {{-- Bottom: Total mark input + Status toggle --}}
+                {{-- Bottom: Total mark input (Auto Calculated) + Status toggle --}}
                 <div class="esc-bottom">
                     <div class="esc-mark-group">
                         <label style="font-size:11px;font-weight:700;color:#334155;">Total:</label>
-                        <div class="entry-mark-box">
-                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                        <div class="entry-mark-box total-box-readonly" title="Auto calculated: CQ + MCQ + Practical">
+                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                    class="mark-input total-input"
                                    data-student="{{ $student->id }}"
                                    data-type="total"
                                    data-fullmarks="{{ $fullMarks }}"
-                                   placeholder="00"
+                                   placeholder="0"
                                    value="{{ $mval }}"
+                                   readonly
+                                   tabindex="-1"
                                    {{ $sts == 'absent' ? 'disabled' : '' }}>
                             <span class="mark-denom">/ {{ $fullMarks }}</span>
                         </div>

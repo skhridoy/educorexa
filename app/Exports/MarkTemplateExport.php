@@ -42,7 +42,6 @@ class MarkTemplateExport implements FromCollection, WithHeadings, WithTitle, Sho
                     $this->subjectColumns[] = "{$sName} (CQ)";
                     $this->subjectColumns[] = "{$sName} (MCQ)";
                     $this->subjectColumns[] = "{$sName} (Practical)";
-                    $this->subjectColumns[] = "{$sName} (Total)";
                 }
             }
         }
@@ -63,10 +62,9 @@ class MarkTemplateExport implements FromCollection, WithHeadings, WithTitle, Sho
             ];
 
             if ($this->mode === 'single') {
-                $row['CQ']          = '';
-                $row['MCQ']         = '';
-                $row['Practical']   = '';
-                $row['Total Marks'] = ''; // blank for user to fill
+                $row['CQ']        = '';
+                $row['MCQ']       = '';
+                $row['Practical'] = '';
             } else {
                 foreach ($this->subjectColumns as $colName) {
                     $row[$colName] = '';
@@ -82,7 +80,7 @@ class MarkTemplateExport implements FromCollection, WithHeadings, WithTitle, Sho
         $base = ['roll', 'student_name', 'student_id'];
 
         if ($this->mode === 'single') {
-            return array_merge($base, ['CQ', 'MCQ', 'Practical', 'Total Marks']);
+            return array_merge($base, ['CQ', 'MCQ', 'Practical']);
         }
 
         return array_merge($base, $this->subjectColumns);

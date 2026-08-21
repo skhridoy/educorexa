@@ -26,8 +26,8 @@
         if (!$user) return false;
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') return true;
         
-        // ১. চেক: স্কুলের প্যাকেজে এই পারমিশন আছে কি না
-        $inPackage = in_array($permission, $packagePermissions);
+        // ১. চেক: স্কুলের প্যাকেজে এই পারমিশন আছে কি না (যদি প্যাকেজ না থাকে, তাহলে ফুল এক্সেস)
+        $inPackage = empty($packagePermissions) || in_array($permission, $packagePermissions);
         
         // ২. চেক: ইউজারের এই পারমিশন আছে কি না (স্কুল এডমিন হলে সব পাবে যা প্যাকেজে আছে)
         $hasPerm = in_array($permission, $userPermissions) || $user->hasRole('school_admin') || $user->role === 'school_admin';
@@ -42,6 +42,11 @@
         if (!$user) return false;
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') return true;
         
+        if (empty($packagePermissions)) {
+            if ($user->hasRole('school_admin') || $user->role === 'school_admin') return true;
+            return count(array_intersect($permissionsArray, $userPermissions)) > 0;
+        }
+
         $packageIntersect = array_intersect($permissionsArray, $packagePermissions);
         if (count($packageIntersect) === 0) return false;
 
@@ -259,13 +264,13 @@
                 <div class="collapse {{ Request::is('*/notices*') || Request::is('*/message*') || Request::is('*/newsletter*') ? 'show' : '' }}" id="commMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('notice.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('notices.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Notices</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('notices.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/notices*') ? 'active' : '' }}">Notices</a></li>
                         @endif
                         @if($hasFeature('message.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('admin.message.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Website Messages</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('admin.message.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/message*') ? 'active' : '' }}">Website Messages</a></li>
                         @endif
                         @if($hasFeature('newsletter.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('admin.newsletter.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Newsletter Subscribers</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('admin.newsletter.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/newsletter*') ? 'active' : '' }}">Newsletter Subscribers</a></li>
                         @endif
                     </ul>
                 </div>

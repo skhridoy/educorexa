@@ -54,6 +54,7 @@ class MarkController extends Controller
         $students = collect();
         $marksWithGrade = [];
         $fullMarks = null;
+        $submittedSubjects = collect(); // সাবমিট হওয়া বিষয়গুলোর লিস্ট
 
         // load subjects assigned to class
         if ($classId) {
@@ -62,6 +63,37 @@ class MarkController extends Controller
                 ->with('subject')
                 ->get()
                 ->pluck('subject');
+        }
+
+        // যদি exam এবং class উভয় সিলেক্ট করা থাকে, সাবমিট হওয়া বিষয়গুলো লোড করো
+        if ($classId && $examId) {
+            $submittedSubjectIds = Mark::where([
+                'school_id' => $schoolId,
+                'class_id'  => $classId,
+                'exam_id'   => $examId,
+            ])->distinct()->pluck('subject_id');
+
+            $submittedSubjects = Subject::whereIn('id', $submittedSubjectIds)->get()->map(function ($sub) use ($classId, $schoolId, $examId) {
+                $totalStudents = Mark::where([
+                    'school_id'  => $schoolId,
+                    'class_id'   => $classId,
+                    'exam_id'    => $examId,
+                    'subject_id' => $sub->id,
+                ])->count();
+
+                $fullMark = AssignClass::where([
+                    'class_id'   => $classId,
+                    'subject_id' => $sub->id,
+                ])->value('full_mark');
+
+                return [
+                    'id'            => $sub->id,
+                    'name'          => $sub->name,
+                    'code'          => $sub->code ?? 'N/A',
+                    'total_entries' => $totalStudents,
+                    'full_mark'     => $fullMark,
+                ];
+            });
         }
 
         // load students
@@ -73,7 +105,6 @@ class MarkController extends Controller
                 ->where('class_id', $classId)->orderBy('roll', 'asc');
 
             // religion subject filter
-            // religion filter
             if (str_contains($subject->name, 'Islam')) {
                 $studentsQuery->where('religion', 'Islam');
             }
@@ -89,6 +120,7 @@ class MarkController extends Controller
                 'class_id' => $classId,
                 'subject_id' => $subjectId
             ])->value('full_mark');
+            $fullMarks = $fullMarks ? (int)$fullMarks : 100;
 
             // existing marks
             $marks = Mark::where([
@@ -107,10 +139,10 @@ class MarkController extends Controller
                     $grade = $this->getGradeWithPoint($mark->marks, $fullMarks);
 
                     $marksWithGrade[$student->id] = [
-                        'marks'     => $mark->marks,
-                        'cq'        => $mark->cq,
-                        'mcq'       => $mark->mcq,
-                        'practical' => $mark->practical,
+                        'marks'     => $mark->marks !== null ? (int)$mark->marks : null,
+                        'cq'        => $mark->cq !== null ? (int)$mark->cq : null,
+                        'mcq'       => $mark->mcq !== null ? (int)$mark->mcq : null,
+                        'practical' => $mark->practical !== null ? (int)$mark->practical : null,
                         'status'    => $mark->status ?? 'present',
                         'grade'     => $grade['grade'],
                         'point'     => $grade['point']
@@ -140,7 +172,8 @@ class MarkController extends Controller
             'classId',
             'examId',
             'subjectId',
-            'fullMarks'
+            'fullMarks',
+            'submittedSubjects'
         ));
     }
 
@@ -464,15 +497,15 @@ class MarkController extends Controller
                         ->where('is_active', 1)
                         ->value('id');
 
-        $cq        = ($request->cq !== null && $request->cq !== '') ? (float)$request->cq : null;
-        $mcq       = ($request->mcq !== null && $request->mcq !== '') ? (float)$request->mcq : null;
-        $practical = ($request->practical !== null && $request->practical !== '') ? (float)$request->practical : null;
+        $cq        = ($request->cq !== null && $request->cq !== '') ? (int)$request->cq : null;
+        $mcq       = ($request->mcq !== null && $request->mcq !== '') ? (int)$request->mcq : null;
+        $practical = ($request->practical !== null && $request->practical !== '') ? (int)$request->practical : null;
 
         // If CQ, MCQ, or Practical is entered, total = CQ + MCQ + Practical
         if ($cq !== null || $mcq !== null || $practical !== null) {
-            $totalMarks = round(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0), 2);
+            $totalMarks = (int)(($cq ?? 0) + ($mcq ?? 0) + ($practical ?? 0));
         } else {
-            $totalMarks = ($request->marks !== null && $request->marks !== '') ? (float)$request->marks : null;
+            $totalMarks = ($request->marks !== null && $request->marks !== '') ? (int)$request->marks : null;
         }
 
         // ডাটা আপডেট বা ক্রিয়েট

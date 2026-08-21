@@ -18,18 +18,27 @@ use App\Traits\SchoolMailConfig;
 class NoticeController extends Controller
 {
     use SchoolMailConfig;
-    // নোটিশের তালিকা দেখানো
+
+    // Admin Notice List & Management
+    public function index($tenant)
+    {
+        $school = School::where('slug', $tenant)->firstOrFail();
+        $notices = Notice::where('school_id', $school->id)
+                        ->orderBy('notice_date', 'desc')
+                        ->paginate(15);
+        return view('school.admin.notice.index', compact('school', 'notices'));
+    }
 
     // Front-end public notices list
     public function publicIndex($tenant)
     {
         $school = School::where('slug', $tenant)->firstOrFail();
         $notices = Notice::where('school_id', $school->id)
+                        ->where('is_active', true)
                         ->orderBy('notice_date', 'desc')
                         ->get();
         return view('school.website.notice', compact('school', 'notices'));
     }
-
 
     // নতুন নোটিশ সেভ করা
     public function store(Request $request, $tenant)
@@ -48,6 +57,7 @@ class NoticeController extends Controller
         $notice->title = $request->title;
         $notice->notice_date = $request->notice_date;
         $notice->description = $request->description;
+        $notice->is_active = $request->has('is_active') ? (bool)$request->is_active : true;
 
         // ফাইল হ্যান্ডলিং
         if ($request->hasFile('file')) {
@@ -67,6 +77,60 @@ class NoticeController extends Controller
         $notice->save();
 
         return back()->with('success', 'নোটিশটি সফলভাবে তৈরি করা হয়েছে!');
+    }
+
+    // নোটিশ এডিট তথ্য পাওয়া
+    public function edit($tenant, $id)
+    {
+        $school = School::where('slug', $tenant)->firstOrFail();
+        $notice = Notice::where('school_id', $school->id)->findOrFail($id);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($notice);
+        }
+
+        return view('school.admin.notice.edit', compact('school', 'notice'));
+    }
+
+    // নোটিশ আপডেট করা
+    public function update(Request $request, $tenant, $id)
+    {
+        $school = School::where('slug', $tenant)->firstOrFail();
+        $notice = Notice::where('school_id', $school->id)->findOrFail($id);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'notice_date' => 'required|date',
+            'description' => 'nullable|string',
+            'file' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $notice->title = $request->title;
+        $notice->notice_date = $request->notice_date;
+        $notice->description = $request->description;
+        if ($request->has('is_active')) {
+            $notice->is_active = (bool)$request->is_active;
+        }
+
+        if ($request->hasFile('file')) {
+            if ($notice->file && File::exists(public_path($notice->file))) {
+                File::delete(public_path($notice->file));
+            }
+
+            $folderPath = public_path("uploads/schools/{$tenant}/notices");
+            if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+            }
+
+            $file = $request->file('file');
+            $filename = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
+            $file->move($folderPath, $filename);
+            $notice->file = "uploads/schools/{$tenant}/notices/" . $filename;
+        }
+
+        $notice->save();
+
+        return redirect()->route('notices.index', ['tenant' => $tenant])->with('success', 'নোটিশটি সফলভাবে আপডেট করা হয়েছে!');
     }
 
     // নোটিশ ডিলিট করা
