@@ -17,7 +17,7 @@ class SuperAdminMiddleware
         $user = Auth::user();
 
         // ২. সুপার অ্যাডমিন হলে সরাসরি এক্সেস দিন
-        if ($user->hasRole('super_admin')) {
+        if ($user->hasRole('super_admin') || $user->role === 'super_admin') {
             return $next($request);
         }
 
@@ -28,8 +28,27 @@ class SuperAdminMiddleware
             return $next($request);
         }
 
-        // ৪. যদি কোনোটিই না হয় (যেমন স্কুলের টিচার/স্টুডেন্ট ভুল করে ঢুকলে)
-        Auth::logout(); // সিকিউরিটির জন্য সেশন ক্লিয়ার করে দেওয়া ভালো
+        // ৪. যদি স্কুলের ইউজার (school_admin, teacher, student) হয়, তবে তাদের স্কুল প্যানেলে রিডাইরেক্ট করুন
+        if ($user->hasRole('school_admin') || $user->role === 'school_admin') {
+            $tenant = $user->school?->slug;
+            if ($tenant) {
+                return redirect()->route('school.dashboard', ['tenant' => $tenant])
+                    ->with('error', 'আপনার সেন্ট্রাল সুপার এডমিন প্যানেলে প্রবেশের অনুমতি নেই।');
+            }
+        } elseif ($user->hasRole('teacher') || $user->role === 'teacher') {
+            $tenant = $user->school?->slug;
+            if ($tenant) {
+                return redirect()->route('teacher.dashboard', ['tenant' => $tenant]);
+            }
+        } elseif ($user->hasRole('student') || $user->role === 'student') {
+            $tenant = $user->school?->slug;
+            if ($tenant) {
+                return redirect()->route('student.dashboard', ['tenant' => $tenant]);
+            }
+        }
+
+        // ৫. যদি কোনোটিই না হয় (সিকিউরিটির জন্য সেশন ক্লিয়ার করে দেওয়া)
+        Auth::logout();
         abort(403, 'Unauthorized access to Central Admin Panel.');
     }
 }

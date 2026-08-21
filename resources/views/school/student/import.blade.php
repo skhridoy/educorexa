@@ -36,7 +36,6 @@
         .modal-dropzone:hover .modal-dz-icon { transform: translateY(-4px); }
         .modal-dz-title { font-weight: 700; font-size: 16px; color: #3730a3; margin-bottom: 4px; }
         .modal-dz-sub   { font-size: 12.5px; color: #64748b; margin: 0; }
-        /* Premium Header Action Buttons Alignment & Design */
         .header-actions {
             display: flex;
             align-items: center;
@@ -106,6 +105,7 @@
 @section('content')
 <div class="page-content">
     <div class="container-fluid">
+
         {{-- Page Header --}}
         <div class="page-header-card mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div class="page-header-content d-flex align-items-center gap-3">
@@ -149,30 +149,82 @@
                            onchange="previewStandaloneStuFile(this);">
                 </div>
 
-                <div class="mt-4 p-3.5 rounded-3 small" style="background:#f8fafc; border:1px solid #e2e8f0;">
-                    <p class="fw-bold mb-2 text-dark"><i class="fa-solid fa-circle-info me-1.5 text-primary"></i>Required Columns Guide:</p>
-                    <div class="d-flex flex-wrap gap-1.5 mb-2">
-                        @foreach(['name *','email *','class_name *','section_name *','roll','fathers_name','mothers_name','student_birth_nid','contact_number','gender','date_of_birth','address'] as $col)
-                            <span class="badge rounded-pill fw-normal px-2.5 py-1"
+                {{-- Column Guide --}}
+                <div class="mt-4 p-3 rounded-3 small" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <p class="fw-bold mb-2 text-dark">
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>Required Columns Guide:
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        @foreach(['class_code *','name *','section','roll','fathers_name','mothers_name','contact_number','date_of_birth','gender','religion','blood_group','address'] as $col)
+                            <span class="badge rounded-pill fw-normal px-2 py-1"
                                   style="background:{{ str_contains($col,'*') ? '#4f46e5' : '#64748b' }};color:#fff;font-size:11px;">
                                 {{ $col }}
                             </span>
                         @endforeach
                     </div>
                     <p class="text-muted mb-0" style="font-size:11.5px;">
-                        <span class="text-primary fw-bold">*</span> Mandatory columns &nbsp;|&nbsp;
+                        <span class="text-primary fw-bold">*</span> বাধ্যতামূলক কলাম &nbsp;|&nbsp;
+                        <span class="fw-semibold">section</span> কলামে সেকশনের <em>নাম</em> লিখুন (যেমন: A, B, Bangla) &nbsp;|&nbsp;
                         Default Password: <span class="badge bg-primary">12345678</span>
                     </p>
                 </div>
 
                 <div class="mt-4 d-flex justify-content-end gap-2">
-                    <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}"
+                       class="btn btn-light rounded-pill px-4">Cancel</a>
                     <button type="submit" id="stu_import_submit_btn" class="btn btn-primary-modern rounded-pill px-5">
                         <i class="fa-solid fa-file-import me-1"></i> Start Import
                     </button>
                 </div>
             </form>
         </div>
+
+        {{-- Per-row Error Report --}}
+        @if(session('import_errors') && count(session('import_errors')) > 0)
+        <div class="form-card mb-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#dc2626);
+                            display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-triangle-exclamation text-white" style="font-size:15px;"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold text-danger">Import সমস্যা রিপোর্ট</h6>
+                    <small class="text-muted">{{ count(session('import_errors')) }}টি row-এ সমস্যা পাওয়া গেছে</small>
+                </div>
+            </div>
+
+            <div style="max-height:320px;overflow-y:auto;border:1px solid #fee2e2;border-radius:10px;">
+                <table class="table table-sm mb-0" style="font-size:13px;">
+                    <thead style="background:#fef2f2;position:sticky;top:0;z-index:1;">
+                        <tr>
+                            <th style="width:50px;color:#dc2626;padding:8px 12px;">#</th>
+                            <th style="color:#dc2626;padding:8px 12px;">সমস্যার বিবরণ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(session('import_errors') as $i => $err)
+                        <tr style="border-bottom:1px solid #fee2e2;">
+                            <td style="padding:7px 12px;color:#6b7280;">{{ $i + 1 }}</td>
+                            <td style="padding:7px 12px;color:#374151;">{{ $err }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            @if(session('import_success_count'))
+            <div class="mt-3 p-2 rounded-3 small d-flex align-items-center gap-2"
+                 style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>
+                    {{ session('import_success_count') }} জন student সফলভাবে import হয়েছে।
+                    {{ session('import_skip_count', 0) }} টি row skip করা হয়েছে।
+                </span>
+            </div>
+            @endif
+        </div>
+        @endif
+
     </div>
 </div>
 @endsection
@@ -182,7 +234,7 @@
     function previewStandaloneStuFile(input) {
         const file = input.files[0];
         const label = document.getElementById('stu_standalone_label');
-        const icon = document.getElementById('stu_standalone_dz_icon');
+        const icon  = document.getElementById('stu_standalone_dz_icon');
 
         if (!file) return;
 
@@ -206,13 +258,22 @@
 
     @if(session('success'))
         Swal.fire({
-            icon: '{{ session('type', 'success') }}',
-            title: 'Success!',
+            icon: 'success',
+            title: 'সফল!',
             text: '{{ session('success') }}',
         });
     @endif
 
-    @if(session('error'))
+    @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'আংশিক সফল',
+            text: '{{ session('warning') }}',
+            footer: 'নিচের টেবিলে সমস্যার বিবরণ দেখুন।',
+        });
+    @endif
+
+    @if(session('error') && !session('import_errors'))
         Swal.fire({
             icon: 'error',
             title: 'Error!',

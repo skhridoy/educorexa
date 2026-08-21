@@ -11,40 +11,49 @@ use Illuminate\Http\Request;
 
 class TeacherAssignSubjectController extends Controller
 {
+    /**
+     * Get the active school ID from user or request context.
+     */
+    private function getSchoolId(?Request $request = null): ?int
+    {
+        return auth()->user()?->school_id
+            ?? (app()->bound('currentSchool') ? app('currentSchool')->id : null)
+            ?? ($request ? $request->school_id : null);
+    }
 
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId($request);
 
-        $teachers = Teacher::where('school_id',$schoolId)->orderBy('name','asc')->get();
-        $classes = Classes::where('school_id',$schoolId)->orderBy('name','asc')->get();
-        $subjects = Subject::where('school_id',$schoolId)->orderBy('name','asc')->get();
-        $sections = Section::where('school_id',$schoolId)->orderBy('name','asc')->get();
+        $teachers = Teacher::where('school_id', $schoolId)->orderBy('name', 'asc')->get();
+        $classes = Classes::where('school_id', $schoolId)->orderBy('name', 'asc')->get();
+        $subjects = Subject::where('school_id', $schoolId)->orderBy('name', 'asc')->get();
+        $sections = Section::where('school_id', $schoolId)->orderBy('name', 'asc')->get();
 
-        $assignments = TeacherAssignSubject::with([
-            'teacher','class','subject','section'
+        $query = TeacherAssignSubject::with([
+            'teacher', 'class', 'subject', 'section'
         ])
-        ->where('school_id',$schoolId);
+        ->where('school_id', $schoolId);
 
         // Class filter
-        if($request->filled('class_id')){
-            $assignments->where('class_id',$request->class_id);
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->class_id);
         }
 
         // Section filter
-        if($request->filled('section_id')){
-            $assignments->where('section_id',$request->section_id);
+        if ($request->filled('section_id')) {
+            $query->where('section_id', $request->section_id);
         }
 
         // Teacher filter
-        if($request->filled('teacher_id')){
-            $assignments->where('teacher_id',$request->teacher_id);
+        if ($request->filled('teacher_id')) {
+            $query->where('teacher_id', $request->teacher_id);
         }
 
         // Search text
-        if($request->filled('search')){
+        if ($request->filled('search')) {
             $search = $request->search;
-            $assignments->where(function($q) use ($search) {
+            $query->where(function($q) use ($search) {
                 $q->whereHas('teacher', function($tQuery) use ($search) {
                     $tQuery->where('name', 'like', "%{$search}%");
                 })->orWhereHas('subject', function($sQuery) use ($search) {
@@ -55,36 +64,37 @@ class TeacherAssignSubjectController extends Controller
             });
         }
 
-        $assignments = $assignments
-            ->orderBy('id','desc')
-            ->paginate(10)
-            ->withQueryString();
+        $allAssignments = $query->orderBy('class_id', 'asc')->orderBy('id', 'desc')->get();
+        $totalAssignmentsCount = $allAssignments->count();
+
+        // Group assignments by class_id
+        $groupedAssignments = $allAssignments->groupBy('class_id');
 
         if ($request->ajax()) {
             return view(
                 'school.teacher.partials.assign-table',
-                compact('assignments')
+                compact('groupedAssignments', 'totalAssignmentsCount')
             )->render();
         }
 
         $totalAssignments = TeacherAssignSubject::where('school_id', $schoolId)->count();
         $assignedTeachersCount = TeacherAssignSubject::where('school_id', $schoolId)->distinct('teacher_id')->count('teacher_id');
 
-        return view('school.teacher.assign',compact(
+        return view('school.teacher.assign', compact(
             'teachers',
             'classes',
             'subjects',
             'sections',
-            'assignments',
+            'groupedAssignments',
+            'totalAssignmentsCount',
             'totalAssignments',
             'assignedTeachersCount'
         ));
     }
 
-
     public function store(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId($request);
 
         $request->validate([
             'teacher_id' => 'required',
@@ -94,48 +104,47 @@ class TeacherAssignSubjectController extends Controller
         ]);
 
         // prevent duplicate
-        $exists = TeacherAssignSubject::where('school_id',$schoolId)
-            ->where('teacher_id',$request->teacher_id)
-            ->where('class_id',$request->class_id)
-            ->where('section_id',$request->section_id)
-            ->where('subject_id',$request->subject_id)
+        $exists = TeacherAssignSubject::where('school_id', $schoolId)
+            ->where('teacher_id', $request->teacher_id)
+            ->where('class_id', $request->class_id)
+            ->where('section_id', $request->section_id)
+            ->where('subject_id', $request->subject_id)
             ->exists();
 
-        if($exists){
+        if ($exists) {
             return back()->with([
-                'success'=>'Already assigned!',
-                'type'=>'warning'
+                'success' => 'Already assigned!',
+                'type' => 'warning'
             ]);
         }
 
         TeacherAssignSubject::create([
-            'school_id'=>$schoolId,
-            'teacher_id'=>$request->teacher_id,
-            'class_id'=>$request->class_id,
-            'section_id'=>$request->section_id,
-            'subject_id'=>$request->subject_id
+            'school_id' => $schoolId,
+            'teacher_id' => $request->teacher_id,
+            'class_id' => $request->class_id,
+            'section_id' => $request->section_id,
+            'subject_id' => $request->subject_id
         ]);
 
         return back()->with([
-            'success'=>'Teacher assigned successfully!',
-            'type'=>'success'
+            'success' => 'Teacher assigned successfully!',
+            'type' => 'success'
         ]);
     }
 
-
-    public function destroy($tenant,$assignment)
+    public function destroy($tenant, $assignment)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId();
 
-        $assignment = TeacherAssignSubject::where('id',$assignment)
-            ->where('school_id',$schoolId)
+        $assignment = TeacherAssignSubject::where('id', $assignment)
+            ->where('school_id', $schoolId)
             ->firstOrFail();
 
         $assignment->delete();
 
         return back()->with([
-            'success'=>'Assignment deleted successfully!',
-            'type'=>'warning'
+            'success' => 'Assignment deleted successfully!',
+            'type' => 'warning'
         ]);
     }
 }

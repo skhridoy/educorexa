@@ -334,20 +334,26 @@
         <table class="entry-data-table">
             <thead>
                 <tr>
-                    <th style="width:13%;">Student ID</th>
-                    <th style="width:8%;">Roll</th>
-                    <th>Student Name</th>
-                    <th style="width:22%;">Obtained Marks</th>
-                    <th style="width:9%; text-align:center;">Grade</th>
-                    <th style="width:18%; text-align:center;">Attendance</th>
+                    <th style="width:10%;">ID</th>
+                    <th style="width:6%;">Roll</th>
+                    <th style="width:20%;">Student Name</th>
+                    <th style="width:11%; text-align:center;">CQ</th>
+                    <th style="width:11%; text-align:center;">MCQ</th>
+                    <th style="width:11%; text-align:center;">Practical</th>
+                    <th style="width:12%; text-align:center;">Total (Obt.)</th>
+                    <th style="width:7%; text-align:center;">Grade</th>
+                    <th style="width:12%; text-align:center;">Attendance</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($students as $student)
                     @php
                         $sts   = $marksWithGrade[$student->id]['status'] ?? 'present';
-                        $mval  = $marksWithGrade[$student->id]['marks']  ?? '';
-                        $gval  = $marksWithGrade[$student->id]['grade']  ?? '-';
+                        $cq    = $marksWithGrade[$student->id]['cq'] ?? '';
+                        $mcq   = $marksWithGrade[$student->id]['mcq'] ?? '';
+                        $prac  = $marksWithGrade[$student->id]['practical'] ?? '';
+                        $mval  = $marksWithGrade[$student->id]['marks'] ?? '';
+                        $gval  = $marksWithGrade[$student->id]['grade'] ?? '-';
                         $inits = strtoupper(substr($student->name, 0, 1));
                         $gradeClass = match($gval) {
                             'A+' => 'gpe-ap', 'A' => 'gpe-a', 'A-' => 'gpe-am',
@@ -355,19 +361,62 @@
                             'F'  => 'gpe-f',  default => 'gpe-default'
                         };
                     @endphp
-                    <tr class="align-middle {{ $sts === 'absent' ? 'row-absent' : '' }}">
+                    <tr class="align-middle {{ $sts === 'absent' ? 'row-absent' : '' }}" data-student="{{ $student->id }}">
                         <td class="student-id-cell">{{ $student->student_id }}</td>
                         <td class="roll-cell">{{ $student->roll }}</td>
                         <td class="name-cell">{{ strtoupper($student->name) }}</td>
 
-                        <td>
-                            <div class="entry-mark-box">
-                                <input type="number"
-                                       class="mark-input"
+                        {{-- CQ --}}
+                        <td class="text-center">
+                            <div class="entry-mark-box" style="width:70px;">
+                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                       class="mark-input cq-input"
+                                       style="width:100%;"
                                        data-student="{{ $student->id }}"
+                                       data-type="cq"
+                                       placeholder="CQ"
+                                       value="{{ $cq }}"
+                                       {{ $sts == 'absent' ? 'disabled' : '' }}>
+                            </div>
+                        </td>
+
+                        {{-- MCQ --}}
+                        <td class="text-center">
+                            <div class="entry-mark-box" style="width:70px;">
+                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                       class="mark-input mcq-input"
+                                       style="width:100%;"
+                                       data-student="{{ $student->id }}"
+                                       data-type="mcq"
+                                       placeholder="MCQ"
+                                       value="{{ $mcq }}"
+                                       {{ $sts == 'absent' ? 'disabled' : '' }}>
+                            </div>
+                        </td>
+
+                        {{-- Practical --}}
+                        <td class="text-center">
+                            <div class="entry-mark-box" style="width:70px;">
+                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                       class="mark-input prac-input"
+                                       style="width:100%;"
+                                       data-student="{{ $student->id }}"
+                                       data-type="practical"
+                                       placeholder="Prac."
+                                       value="{{ $prac }}"
+                                       {{ $sts == 'absent' ? 'disabled' : '' }}>
+                            </div>
+                        </td>
+
+                        {{-- Total Obtained --}}
+                        <td class="text-center">
+                            <div class="entry-mark-box">
+                                <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                       class="mark-input total-input"
+                                       data-student="{{ $student->id }}"
+                                       data-type="total"
                                        data-fullmarks="{{ $fullMarks }}"
                                        placeholder="00"
-                                       min="0" max="{{ $fullMarks }}"
                                        value="{{ $mval }}"
                                        {{ $sts == 'absent' ? 'disabled' : '' }}>
                                 <span class="mark-denom">/ {{ $fullMarks }}</span>
@@ -413,6 +462,9 @@
         @foreach($students as $student)
             @php
                 $sts   = $marksWithGrade[$student->id]['status'] ?? 'present';
+                $cq    = $marksWithGrade[$student->id]['cq'] ?? '';
+                $mcq   = $marksWithGrade[$student->id]['mcq'] ?? '';
+                $prac  = $marksWithGrade[$student->id]['practical'] ?? '';
                 $mval  = $marksWithGrade[$student->id]['marks']  ?? '';
                 $gval  = $marksWithGrade[$student->id]['grade']  ?? '-';
                 $inits = strtoupper(substr($student->name, 0, 1));
@@ -450,17 +502,57 @@
                     </span>
                 </div>
 
-                {{-- Bottom: Mark input + Status toggle --}}
+                {{-- Middle: CQ, MCQ, Prac Inputs --}}
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <div class="flex-fill">
+                        <label style="font-size:10px;font-weight:700;color:#64748b;">CQ</label>
+                        <div class="entry-mark-box w-100">
+                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                   class="mark-input cq-input w-100"
+                                   data-student="{{ $student->id }}"
+                                   data-type="cq"
+                                   placeholder="CQ"
+                                   value="{{ $cq }}"
+                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
+                        </div>
+                    </div>
+                    <div class="flex-fill">
+                        <label style="font-size:10px;font-weight:700;color:#64748b;">MCQ</label>
+                        <div class="entry-mark-box w-100">
+                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                   class="mark-input mcq-input w-100"
+                                   data-student="{{ $student->id }}"
+                                   data-type="mcq"
+                                   placeholder="MCQ"
+                                   value="{{ $mcq }}"
+                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
+                        </div>
+                    </div>
+                    <div class="flex-fill">
+                        <label style="font-size:10px;font-weight:700;color:#64748b;">Practical</label>
+                        <div class="entry-mark-box w-100">
+                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                   class="mark-input prac-input w-100"
+                                   data-student="{{ $student->id }}"
+                                   data-type="practical"
+                                   placeholder="Prac"
+                                   value="{{ $prac }}"
+                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Bottom: Total mark input + Status toggle --}}
                 <div class="esc-bottom">
                     <div class="esc-mark-group">
-                        {{-- Mark Box --}}
+                        <label style="font-size:11px;font-weight:700;color:#334155;">Total:</label>
                         <div class="entry-mark-box">
-                            <input type="number"
-                                   class="mark-input"
+                            <input type="number" step="any" min="0" max="{{ $fullMarks }}"
+                                   class="mark-input total-input"
                                    data-student="{{ $student->id }}"
+                                   data-type="total"
                                    data-fullmarks="{{ $fullMarks }}"
                                    placeholder="00"
-                                   min="0" max="{{ $fullMarks }}"
                                    value="{{ $mval }}"
                                    {{ $sts == 'absent' ? 'disabled' : '' }}>
                             <span class="mark-denom">/ {{ $fullMarks }}</span>

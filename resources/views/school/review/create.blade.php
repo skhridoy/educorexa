@@ -6,7 +6,7 @@
 <div class="page-content">
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('school.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()?->school?->slug]) }}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Submit Review</li>
         </ol>
     </nav>

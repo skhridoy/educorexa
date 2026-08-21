@@ -12,42 +12,60 @@ use Illuminate\Validation\Rule;
 class AssignClassController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get the active school ID from user or request context.
      */
-    
+    private function getSchoolId(?Request $request = null): ?int
+    {
+        return auth()->user()?->school_id
+            ?? (app()->bound('currentSchool') ? app('currentSchool')->id : null)
+            ?? ($request ? $request->school_id : null);
+    }
+
     public function index(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId($request);
 
         $classes = Classes::where('school_id', $schoolId)->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
 
-        $assignments = AssignClass::with(['class','subject'])
+        $assignmentsQuery = AssignClass::with(['class', 'subject', 'category', 'subcategory'])
                         ->where('school_id', $schoolId);
 
-        // 🔥 Class Filter
+        // Class Filter
         if ($request->filled('class_id')) {
-            $assignments->where('class_id', $request->class_id);
+            $assignmentsQuery->where('class_id', $request->class_id);
         }
 
-        $assignments = $assignments->orderBy('id', 'desc')
-                        ->paginate(5)
-                        ->withQueryString(); // important for pagination
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $assignmentsQuery->where(function($q) use ($search) {
+                $q->whereHas('class', function($cQ) use ($search) {
+                    $cQ->where('name', 'like', "%{$search}%");
+                })->orWhereHas('subject', function($sQ) use ($search) {
+                    $sQ->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $allAssignments = $assignmentsQuery->orderBy('class_id', 'asc')->orderBy('id', 'desc')->get();
+        $groupedAssignments = $allAssignments->groupBy('class_id');
+        $totalAssignmentsCount = $allAssignments->count();
 
         if ($request->ajax()) {
             return view('school.subject.partials.assign-table',
-                compact('assignments')
+                compact('groupedAssignments', 'totalAssignmentsCount')
             )->render();
         }
 
         return view('school.subject.assign',
-            compact('classes', 'subjects', 'assignments')
+            compact('classes', 'subjects', 'groupedAssignments', 'totalAssignmentsCount')
         );
     }
 
     public function store(Request $request)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId($request);
 
         $request->validate([
             'class_id' => [
@@ -89,7 +107,7 @@ class AssignClassController extends Controller
 
     public function destroy($tenant, $assignment)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId();
 
         $assignment = AssignClass::where('id', $assignment)
             ->where('school_id', $schoolId)
@@ -105,30 +123,33 @@ class AssignClassController extends Controller
 
     public function edit($tenant, $assignment)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId();
         $classes = Classes::where('school_id', $schoolId)->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
         
-        $assignments = AssignClass::with(['class','subject'])
+        $allAssignments = AssignClass::with(['class', 'subject', 'category', 'subcategory'])
                     ->where('school_id', $schoolId)
+                    ->orderBy('class_id', 'asc')
                     ->orderBy('id', 'desc')
-                    ->paginate(5)
-                    ->withQueryString();
+                    ->get();
+
+        $groupedAssignments = $allAssignments->groupBy('class_id');
+        $totalAssignmentsCount = $allAssignments->count();
                     
         if (request()->ajax()) {
-            return view('school.subject.partials.assign-table', compact('assignments'))->render();
+            return view('school.subject.partials.assign-table', compact('groupedAssignments', 'totalAssignmentsCount'))->render();
         }
 
         $assignment = AssignClass::where('id', $assignment)
                             ->where('school_id', $schoolId)
                             ->firstOrFail();
 
-        return view('school.subject.assign-edit', compact('assignment', 'classes', 'subjects', 'assignments'));
+        return view('school.subject.assign-edit', compact('assignment', 'classes', 'subjects', 'groupedAssignments', 'totalAssignmentsCount'));
     }
 
     public function update(Request $request, $tenant, $assignment)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId($request);
         $assignment = AssignClass::where('id', $assignment)->where('school_id', $schoolId)->firstOrFail();
 
         $request->validate([
@@ -139,7 +160,7 @@ class AssignClassController extends Controller
                     return $query->where('school_id', $schoolId)
                                 ->where('class_id', $request->class_id)
                                 ->where('subject_id', $request->subject_id);
-                })->ignore($assignment->id), // নিজের আইডি ইগনোর করবে
+                })->ignore($assignment->id),
             ],
             'subject_id' => [
                 'required',
@@ -147,8 +168,8 @@ class AssignClassController extends Controller
             ],
             'full_mark'  => 'required|numeric',
             'pass_mark'  => 'required|numeric',
-            
         ]);
+
         $assignment->update([
             'class_id' => $request->class_id,
             'subject_id' => $request->subject_id,
@@ -167,5 +188,4 @@ class AssignClassController extends Controller
 
         return redirect()->back()->with(['success' => 'Assign Subject updated successfully', 'type' => 'success']);
     }
-    
 }

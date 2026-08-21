@@ -203,17 +203,27 @@
 
         {{-- ══ HERO BANNER ══ --}}
         <div class="entry-hero mb-4">
-            <div class="entry-hero-content">
-                <h1 class="entry-hero-title">
-                    <i class="fa-solid fa-file-signature me-2"></i>Marks Entry
-                </h1>
-                <p class="entry-hero-subtitle">Record and manage student academic performance</p>
-                <div class="entry-hero-pill">
-                    <i class="fa-solid fa-bolt"></i>
-                    Auto-saves on every input
+            <div class="entry-hero-content d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="entry-hero-title">
+                        <i class="fa-solid fa-file-signature me-2"></i>Marks Entry
+                    </h1>
+                    <p class="entry-hero-subtitle">Record and manage student academic performance</p>
+                    <div class="entry-hero-pill">
+                        <i class="fa-solid fa-bolt"></i>
+                        Auto-saves on every input
+                    </div>
                 </div>
+                <a href="{{ route('marks.import.form', ['tenant' => auth()->user()?->school?->slug]) }}"
+                   class="btn btn-sm d-inline-flex align-items-center gap-2"
+                   style="background:rgba(255,255,255,0.14);color:#fff;border:1px solid rgba(255,255,255,0.28);
+                          border-radius:22px;padding:8px 18px;font-size:13px;font-weight:600;
+                          backdrop-filter:blur(8px);transition:all 0.2s;text-decoration:none;">
+                    <i class="fa-solid fa-file-arrow-up"></i> Import Marks
+                </a>
             </div>
         </div>
+
 
         {{-- ══ FILTER SECTION ══ --}}
         <div class="entry-filter-card mb-4">
@@ -367,29 +377,47 @@
         return 'F';
     }
 
-    // MARKS INPUT — auto-save via AJAX
+    // MARKS INPUT (CQ, MCQ, Practical, Total) — auto-save via AJAX
     $(document).on('input', '.mark-input', function () {
         let input     = $(this);
-        let marks     = parseFloat(input.val());
+        let container = input.closest('tr, .entry-student-card');
         let studentId = input.data('student');
-        let fullMarks = parseFloat(input.data('fullmarks'));
+        let fullMarks = parseFloat($('#hidden_class_id').closest('.page-content').find('.full-mark-badge').text().replace(/[^0-9.]/g, '') || 100);
 
-        if (marks > fullMarks) {
+        let cqInput    = container.find('.cq-input');
+        let mcqInput   = container.find('.mcq-input');
+        let pracInput  = container.find('.prac-input');
+        let totalInput = container.find('.total-input');
+
+        let cqVal   = cqInput.val() !== '' ? parseFloat(cqInput.val()) : null;
+        let mcqVal  = mcqInput.val() !== '' ? parseFloat(mcqInput.val()) : null;
+        let pracVal = pracInput.val() !== '' ? parseFloat(pracInput.val()) : null;
+        let totalVal = totalInput.val() !== '' ? parseFloat(totalInput.val()) : null;
+
+        // If CQ / MCQ / Practical is edited, compute Total
+        if (input.hasClass('cq-input') || input.hasClass('mcq-input') || input.hasClass('prac-input')) {
+            if (cqVal !== null || mcqVal !== null || pracVal !== null) {
+                totalVal = (cqVal || 0) + (mcqVal || 0) + (pracVal || 0);
+                totalInput.val(totalVal);
+            }
+        }
+
+        if (totalVal !== null && totalVal > fullMarks) {
             Swal.fire({
                 icon: 'error',
                 title: 'Limit Exceeded',
                 text: `Marks cannot exceed ${fullMarks}`,
                 confirmButtonColor: '#4f46e5',
             });
-            marks = fullMarks;
-            input.val(marks);
+            totalVal = fullMarks;
+            totalInput.val(totalVal);
         }
 
         let classId   = $('#hidden_class_id').val();
         let examId    = $('#hidden_exam_id').val();
         let subjectId = $('#hidden_subject_id').val();
-        let status    = input.closest('tr, .entry-student-card').find('.status-input').val();
-        let grade     = calculateGrade(marks, fullMarks);
+        let status    = container.find('.status-input').val();
+        let grade     = totalVal !== null ? calculateGrade(totalVal, fullMarks) : '-';
 
         if ($(`#grade-${studentId}`).length) {
             $(`#grade-${studentId}`).text(grade);
@@ -404,15 +432,19 @@
                 class_id:   classId,
                 exam_id:    examId,
                 subject_id: subjectId,
-                marks:      marks,
+                cq:         cqVal,
+                mcq:        mcqVal,
+                practical:  pracVal,
+                marks:      totalVal,
+                full_marks: fullMarks,
                 status:     status,
                 _token:     "{{ csrf_token() }}"
             },
             success: function () {
-                input.addClass('is-valid').removeClass('is-invalid');
+                container.find('.mark-input').addClass('is-valid').removeClass('is-invalid');
                 const Toast = Swal.mixin({
                     toast: true, position: 'top-end',
-                    showConfirmButton: false, timer: 1000,
+                    showConfirmButton: false, timer: 800,
                 });
                 Toast.fire({ icon: 'success', title: 'Saved' });
             },
@@ -426,19 +458,19 @@
     $(document).on('change', '.status-input', function () {
         let container  = $(this).closest('tr, .entry-student-card');
         let status     = $(this).val();
-        let markInput  = container.find('.mark-input');
-        let studentId  = markInput.data('student');
+        let markInputs = container.find('.mark-input');
+        let studentId  = container.data('student');
         let classId    = $('#hidden_class_id').val();
         let examId     = $('#hidden_exam_id').val();
         let subjectId  = $('#hidden_subject_id').val();
 
         if (status == 'absent') {
-            markInput.val(0).prop('disabled', true);
+            markInputs.val(0).prop('disabled', true);
             $(`#grade-${studentId}`).text('ABS');
             updateGradeStyle(studentId, 'ABS');
             container.addClass('row-absent');
         } else {
-            markInput.prop('disabled', false);
+            markInputs.prop('disabled', false);
             $(`#grade-${studentId}`).text('-');
             updateGradeStyle(studentId, '-');
             container.removeClass('row-absent');
@@ -453,7 +485,10 @@
                 exam_id:    examId,
                 subject_id: subjectId,
                 status:     status,
-                marks:      markInput.val(),
+                cq:         container.find('.cq-input').val(),
+                mcq:        container.find('.mcq-input').val(),
+                practical:  container.find('.prac-input').val(),
+                marks:      container.find('.total-input').val(),
                 _token:     "{{ csrf_token() }}"
             }
         });

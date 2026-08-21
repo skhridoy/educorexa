@@ -42,6 +42,11 @@ class IdentifySchool
         // ৭. রিকোয়েস্টে স্কুল আইডি ঢুকিয়ে দিন
         $request->merge(['school_id' => $school->id]);
 
+        // ৮. যদি ইউজার লগইন করা থাকে এবং school_id না থাকে (যেমন সুপার এডমিন)
+        if (auth()->check() && empty(auth()->user()->school_id)) {
+            auth()->user()->school_id = $school->id;
+        }
+
         return $next($request);
     }
 }

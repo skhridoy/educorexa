@@ -40,7 +40,19 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Mark extends Model
 {
-    protected $fillable = ['school_id', 'academic_year_id', 'student_id', 'class_id', 'subject_id', 'exam_id', 'marks'];
+    protected $fillable = [
+        'school_id',
+        'academic_year_id',
+        'student_id',
+        'class_id',
+        'subject_id',
+        'exam_id',
+        'marks',
+        'cq',
+        'mcq',
+        'practical',
+        'status',
+    ];
 
     public function school() {
         return $this->belongsTo(School::class);

@@ -142,13 +142,15 @@
 
                 <div class="p-2 border-top">
                     @php
-                        $logoutRoute = ($user->role === 'super_admin' || $user->role === 'HR' || $user->role === 'Marketing') 
+                        $school = $currentSchool ?? $user?->school;
+                        $tenant = $school?->slug ?? $user?->school?->slug ?? request()->route('tenant') ?? '';
+                        $logoutRoute = ($user && ($user->role === 'super_admin' || $user->role === 'HR' || $user->role === 'Marketing')) 
                                         ? route('logout') 
-                                        : route('school.logout');
+                                        : ($tenant ? route('school.logout', ['tenant' => $tenant]) : route('logout'));
                     @endphp
                     <a href="javascript:;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                        class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger">
-                        <i data-feather="log-out" style="width:16px;height:16px;"></i> Log Out
+                       <i data-feather="log-out" style="width:16px;height:16px;"></i> Log Out
                     </a>
                     <form id="logout-form" action="{{ $logoutRoute }}" method="POST" class="d-none">
                         @csrf

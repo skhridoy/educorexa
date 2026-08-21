@@ -268,20 +268,26 @@ class StudentController extends Controller
                 'school_id'              => $schoolId,
                 'academic_year_id'       => $academicYear->id,
                 'class_id'               => $validated['class_id'],
-                'school_category_id'     => $validated['school_category_id'], // ইনসার্ট করা হচ্ছে
+                'school_category_id'     => $validated['school_category_id'],
                 'school_sub_category_id' => $request->school_sub_category_id,
                 'section_id'             => $validated['section_id'],
-                'student_id'             => $this->generateUniqueStudentId($schoolId, $academicYear), // আলাদা মেথডে করা ভালো
+                'student_id'             => $this->generateUniqueStudentId($schoolId, $academicYear),
                 'roll'                   => $this->getNextRoll($schoolId, $validated['class_id'], $academicYear->id),
                 'name'                   => $validated['name'],
-                'fathers_name'           => $request->father_name,
-                'mothers_name'           => $request->mother_name,
+                'fathers_name'           => $request->fathers_name ?? $request->father_name,
+                'mothers_name'           => $request->mothers_name ?? $request->mother_name,
+                'father_nid'             => $request->father_nid,
+                'mother_nid'             => $request->mother_nid,
+                'student_birth_nid'      => $request->student_birth_nid,
+                'previous_school'        => $request->previous_school,
+                'previous_class'         => $request->previous_class,
                 'date_of_birth'          => $request->date_of_birth,
-                'gender'                 => $request->gender,
-                'contact_number'         => $request->phone,
+                'gender'                 => $request->gender ? strtolower($request->gender) : null,
+                'contact_number'         => $request->contact_number ?? $request->phone,
                 'admission_date'         => $request->admission_date,
                 'address'                => $request->address,
                 'religion'               => $request->religion,
+                'blood_group'            => $request->blood_group,
                 'photo'                  => $photoPath,
                 'status'                 => 'active',
                 'password'               => Hash::make($password),
@@ -334,32 +340,48 @@ class StudentController extends Controller
     {
         $schoolId = auth()->user()->school_id;
 
-        if(auth()->user()->role == 'student') {
+        if (auth()->user()->role == 'student') {
             $student = Student::where('user_id', auth()->id())->firstOrFail();
         } else {
             // এডমিন হলে আইডি এবং স্কুল আইডি দিয়ে খুঁজবে
             $student = Student::where('id', $student)->where('school_id', $schoolId)->firstOrFail();
         }
 
+        $userId = $student->user ? $student->user->id : 'NULL';
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $student->user->id,
-            'school_category_id' => 'required',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'contact_number' => 'nullable|string|max:11',
-            'religion' => 'required|string|max:50',
-            'blood_group' => 'nullable|string|max:10',
-            'photo' => 'nullable|image|max:2048',
+            'name'                   => 'required|string|max:255',
+            'email'                  => 'required|email|unique:users,email,' . $userId,
+            'class_id'               => 'nullable|exists:classes,id',
+            'section_id'             => 'nullable|exists:sections,id',
+            'school_category_id'     => 'nullable',
+            'school_sub_category_id' => 'nullable',
+            'fathers_name'           => 'nullable|string|max:255',
+            'father_name'            => 'nullable|string|max:255',
+            'mothers_name'           => 'nullable|string|max:255',
+            'mother_name'            => 'nullable|string|max:255',
+            'father_nid'             => 'nullable|string|max:20',
+            'mother_nid'             => 'nullable|string|max:20',
+            'student_birth_nid'      => 'nullable|string|max:25',
+            'date_of_birth'          => 'nullable|date',
+            'gender'                 => 'nullable|string|max:20',
+            'contact_number'         => 'nullable|string|max:20',
+            'phone'                  => 'nullable|string|max:20',
+            'religion'               => 'nullable|string|max:50',
+            'blood_group'            => 'nullable|string|max:10',
+            'previous_school'        => 'nullable|string|max:255',
+            'previous_class'         => 'nullable|string|max:255',
+            'admission_date'         => 'nullable|date',
+            'address'                => 'nullable|string|max:500',
+            'photo'                  => 'nullable|image|max:2048',
         ]);
 
-        $tenant = auth()->user()->school->slug;
+        $tenantSlug = auth()->user()->school->slug ?? $tenant;
 
         $photoPath = $student->photo ?? null;
 
         if ($request->hasFile('photo')) {
-
-            $folder = public_path("uploads/schools/{$tenant}/students");
+            $folder = public_path("uploads/schools/{$tenantSlug}/students");
 
             if (!file_exists($folder)) {
                 mkdir($folder, 0755, true);
@@ -367,57 +389,51 @@ class StudentController extends Controller
 
             // delete old photo
             if ($student->photo && file_exists(public_path($student->photo))) {
-                unlink(public_path($student->photo));
+                @unlink(public_path($student->photo));
             }
 
             $file = $request->file('photo');
-
-            $filename = time().'_'.$file->getClientOriginalName();
-
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move($folder, $filename);
-
-            $photoPath = "uploads/schools/{$tenant}/students/".$filename;
+            $photoPath = "uploads/schools/{$tenantSlug}/students/" . $filename;
         }
 
         // Update Data
         DB::transaction(function () use ($student, $request, $validated, $photoPath) {
-
             if ($student->user) {
                 $student->user->update([
-                    'name' => $validated['name'],
+                    'name'  => $validated['name'],
                     'email' => $validated['email'],
                 ]);
             }
-           
+
             $student->update([
-                'name' => $validated['name'],
-                'class_id' => $request->class_id,
-                'school_category_id'     => $request->school_category_id,
-                'school_sub_category_id' => $request->school_sub_category_id,
-                'section_id' => $request->section_id,
-                'fathers_name' => $request->father_name,
-                'mothers_name' => $request->mother_name,
-                'mother_nid' => $request->mother_nid,
-                'father_nid' => $request->father_nid,
-                'student_birth_nid' => $request->student_birth_nid,
-                'date_of_birth' => $validated['date_of_birth'],
-                'gender' => $validated['gender'],
-                'contact_number' => $validated['contact_number'],
-                'previous_school' => $request->previous_school,
-                'previous_class' => $request->previous_class,
-                'admission_date' => $request->admission_date,
-                'address' => $request->address,
-                'religion' => $validated['religion'],
-                'blood_group' => $validated['blood_group'],
-                'photo' => $photoPath,
+                'name'                   => $validated['name'],
+                'class_id'               => $request->filled('class_id') ? $request->class_id : $student->class_id,
+                'school_category_id'     => $request->filled('school_category_id') ? $request->school_category_id : $student->school_category_id,
+                'school_sub_category_id' => $request->filled('school_sub_category_id') ? $request->school_sub_category_id : $student->school_sub_category_id,
+                'section_id'             => $request->filled('section_id') ? $request->section_id : $student->section_id,
+                'fathers_name'           => $request->fathers_name ?? $request->father_name ?? $student->fathers_name,
+                'mothers_name'           => $request->mothers_name ?? $request->mother_name ?? $student->mothers_name,
+                'father_nid'             => $request->has('father_nid') ? $request->father_nid : $student->father_nid,
+                'mother_nid'             => $request->has('mother_nid') ? $request->mother_nid : $student->mother_nid,
+                'student_birth_nid'      => $request->has('student_birth_nid') ? $request->student_birth_nid : $student->student_birth_nid,
+                'date_of_birth'          => $request->has('date_of_birth') ? $request->date_of_birth : $student->date_of_birth,
+                'gender'                 => $request->gender ? strtolower($request->gender) : $student->gender,
+                'contact_number'         => $request->contact_number ?? $request->phone ?? $student->contact_number,
+                'previous_school'        => $request->has('previous_school') ? $request->previous_school : $student->previous_school,
+                'previous_class'         => $request->has('previous_class') ? $request->previous_class : $student->previous_class,
+                'admission_date'         => $request->admission_date ?? $student->admission_date,
+                'address'                => $request->has('address') ? $request->address : $student->address,
+                'religion'               => $request->religion ?? $student->religion,
+                'blood_group'            => $request->blood_group ?? $student->blood_group,
+                'photo'                  => $photoPath,
             ]);
         });
 
-        // Password update only if provide
-
-        return redirect()->route('students.index', $tenant)->with([
+        return redirect()->route('students.index', ['tenant' => $tenantSlug])->with([
             'success' => 'Student updated successfully',
-            'type' => 'success'
+            'type'    => 'success'
         ]);
     }
 
@@ -462,18 +478,46 @@ class StudentController extends Controller
         return view('school.student.import', );
     }
 
-    public function import(Request $request )
+    public function import(Request $request)
     {
-        
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv'
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-        Excel::import(new StudentsImport, $request->file('file'));
-            return back()->with('success', 'Students imported successfully!');
+            $importer = new StudentsImport();
+            Excel::import($importer, $request->file('file'));
+
+            $success = $importer->successCount;
+            $skipped = $importer->skipCount;
+            $errors  = $importer->importErrors;
+
+            if ($success === 0 && count($errors) > 0) {
+                // Nothing imported at all
+                $errorText = implode("\n", $errors);
+                return back()->with('import_errors', $errors)
+                             ->with('error', "কোনো student import হয়নি। নিচের সমস্যাগুলো সমাধান করুন:\n" . $errorText);
+            }
+
+            if (count($errors) > 0) {
+                // Partial import
+                return back()
+                    ->with('import_errors', $errors)
+                    ->with('import_success_count', $success)
+                    ->with('import_skip_count', $skipped)
+                    ->with('warning', "{$success} জন student সফলভাবে import হয়েছে। {$skipped} টি row এ সমস্যা পাওয়া গেছে।");
+            }
+
+            return back()->with('success', "{$success} জন student সফলভাবে import হয়েছে!");
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Error during import: ' . $e->getMessage());
+            // Fatal error (e.g. no active academic year, file unreadable)
+            $msg = $e->getMessage();
+            // Strip raw SQL if present — only show the sentence before "SQL:"
+            if (str_contains($msg, '(SQL:')) {
+                $msg = trim(substr($msg, 0, strpos($msg, '(SQL:')));
+            }
+            return back()->with('error', 'Import ব্যর্থ হয়েছে: ' . $msg);
         }
     }
     public function export() 

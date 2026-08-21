@@ -1,159 +1,190 @@
-@if($assignments->count() > 0)
-    {{-- Desktop Table View --}}
-    <div class="table-responsive assign-desktop-table">
-        <table class="table edu-table align-middle mb-0">
-            <thead>
-                <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>Teacher Name</th>
-                    <th>Class & Section</th>
-                    <th>Assigned Subject</th>
-                    <th style="width: 100px;" class="text-end">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($assignments as $assignment)
-                    <tr>
-                        <td class="text-muted fw-bold">
-                            {{ $loop->iteration + ($assignments->currentPage() - 1) * $assignments->perPage() }}
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                @if(!empty($assignment->teacher->photo) && file_exists(public_path($assignment->teacher->photo)))
-                                    <img src="{{ asset($assignment->teacher->photo) }}" alt="{{ $assignment->teacher->name }}" class="rounded-circle shadow-sm me-2" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #e2e8f0;">
-                                @else
-                                    <div class="avatar-circle font-weight-bold text-white shadow-sm me-2" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; flex-shrink: 0;">
-                                        {{ strtoupper(substr($assignment->teacher->name ?? 'T', 0, 1)) }}
-                                    </div>
-                                @endif
-                                <div>
-                                    <div class="fw-bold text-dark fs-6 mb-0">{{ $assignment->teacher->name ?? 'N/A' }}</div>
-                                    @if(!empty($assignment->teacher->designation))
-                                        <div class="text-muted small" style="font-size: 0.78rem;">{{ $assignment->teacher->designation }}</div>
-                                    @elseif(!empty($assignment->teacher->phone))
-                                        <div class="text-muted small" style="font-size: 0.78rem;"><i class="fa-solid fa-phone me-1"></i>{{ $assignment->teacher->phone }}</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                                <span class="badge bg-soft-primary text-primary px-2.5 py-1.5 rounded-3 fw-semibold">
-                                    <i class="fa-solid fa-school me-1"></i> {{ $assignment->class->name ?? 'N/A' }}
-                                </span>
-                                @if($assignment->section)
-                                    <span class="badge bg-soft-info text-info px-2.5 py-1.5 rounded-3 fw-semibold">
-                                        <i class="fa-solid fa-layer-group me-1"></i> {{ $assignment->section->name }}
-                                    </span>
-                                @else
-                                    <span class="badge bg-soft-secondary text-secondary px-2 py-1 rounded-3 small">
-                                        All Sections
-                                    </span>
-                                @endif
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-soft-success text-success px-3 py-1.5 rounded-3 fw-bold text-capitalize" style="font-size: 0.83rem;">
-                                <i class="fa-solid fa-book-open me-1"></i> {{ $assignment->subject->name ?? 'N/A' }}
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <div class="d-inline-flex align-items-center justify-content-end gap-1">
-                                <form action="{{ route('teacher.assign.destroy', ['tenant' => auth()->user()?->school?->slug, 'assignment' => $assignment->id]) }}"
-                                      method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="confirmDelete(this)" 
-                                            class="btn btn-soft-danger btn-icon-sm" 
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Assignment">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Mobile Premium Cards View --}}
-    <div class="assign-mobile-cards">
-        @foreach($assignments as $assignment)
-            <div class="assign-mobile-card">
-                <div class="assign-mobile-card-header">
-                    <div class="d-flex align-items-center gap-3">
-                        @if(!empty($assignment->teacher->photo) && file_exists(public_path($assignment->teacher->photo)))
-                            <img src="{{ asset($assignment->teacher->photo) }}" alt="{{ $assignment->teacher->name }}" class="rounded-circle shadow-sm me-3" style="width: 44px; height: 44px; object-fit: cover; border: 2px solid #e2e8f0; margin-right: 12px;">
-                        @else
-                            <div class="avatar-circle font-weight-bold text-white shadow-sm me-3" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; flex-shrink: 0; margin-right: 12px;">
-                                {{ strtoupper(substr($assignment->teacher->name ?? 'T', 0, 1)) }}
-                            </div>
-                        @endif
+@if(isset($groupedAssignments) && $groupedAssignments->count() > 0)
+    <div class="class-cards-container">
+        @foreach($groupedAssignments as $classId => $classAssignments)
+            @php
+                $class = $classAssignments->first()->class ?? null;
+                $className = $class ? $class->name : 'Unassigned Class';
+                $categoryName = $class?->schoolCategory?->name ?? null;
+                $subjectCount = $classAssignments->count();
+                $teacherCount = $classAssignments->pluck('teacher_id')->unique()->count();
+            @endphp
+            <div class="class-assign-card mb-3">
+                {{-- Class Card Header --}}
+                <div class="class-card-header py-2.5 px-3">
+                    <div class="class-header-info">
+                        <div class="class-icon-badge" style="width: 36px; height: 36px; font-size: 1rem; border-radius: 10px;">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
                         <div>
-                            <div class="fw-bold text-dark fs-6 mb-0">{{ $assignment->teacher->name ?? 'N/A' }}</div>
-                            @if(!empty($assignment->teacher->designation))
-                                <div class="text-muted small" style="font-size: 0.78rem;">{{ $assignment->teacher->designation }}</div>
-                            @elseif(!empty($assignment->teacher->phone))
-                                <div class="text-muted small" style="font-size: 0.78rem;"><i class="fa-solid fa-phone me-1"></i>{{ $assignment->teacher->phone }}</div>
-                            @endif
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h5 class="class-name-title mb-0" style="font-size: 0.96rem;">{{ $className }}</h5>
+                                @if($categoryName)
+                                    <span class="class-category-badge" style="font-size: 0.7rem; padding: 1px 6px;">{{ $categoryName }}</span>
+                                @endif
+                            </div>
+                            <div class="class-meta-subtext" style="font-size: 0.72rem;">
+                                <i class="fa-regular fa-folder-open me-1"></i> Class Assigned Curriculum
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-light text-secondary rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.75rem;">
-                            #{{ $loop->iteration + ($assignments->currentPage() - 1) * $assignments->perPage() }}
+                    <div class="class-header-stats">
+                        <span class="badge stat-badge-primary" style="font-size: 0.75rem; padding: 4px 10px;">
+                            <i class="fa-solid fa-book-open me-1"></i> {{ $subjectCount }} {{ Str::plural('Subject', $subjectCount) }}
                         </span>
-                        <form action="{{ route('teacher.assign.destroy', ['tenant' => auth()->user()?->school?->slug, 'assignment' => $assignment->id]) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" onclick="confirmDelete(this)" class="btn btn-soft-danger btn-icon-sm" title="Remove Assignment">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </form>
+                        <span class="badge stat-badge-success" style="font-size: 0.75rem; padding: 4px 10px;">
+                            <i class="fa-solid fa-chalkboard-user me-1"></i> {{ $teacherCount }} {{ Str::plural('Teacher', $teacherCount) }}
+                        </span>
                     </div>
                 </div>
 
-                <div class="assign-mobile-card-body">
-                    <div class="d-flex align-items-center gap-1.5 flex-wrap">
-                        <span class="badge bg-soft-primary text-primary px-2.5 py-1.5 rounded-3 fw-semibold" style="font-size: 0.8rem;">
-                            <i class="fa-solid fa-school me-1"></i> {{ $assignment->class->name ?? 'N/A' }}
-                        </span>
-                        @if($assignment->section)
-                            <span class="badge bg-soft-info text-info px-2.5 py-1.5 rounded-3 fw-semibold" style="font-size: 0.8rem;">
-                                <i class="fa-solid fa-layer-group me-1"></i> {{ $assignment->section->name }}
-                            </span>
-                        @else
-                            <span class="badge bg-soft-secondary text-secondary px-2 py-1 rounded-3 small" style="font-size: 0.78rem;">
-                                All Sections
-                            </span>
-                        @endif
+                {{-- Desktop Table View --}}
+                <div class="class-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table class-subject-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 48px; padding: 8px 12px;" class="text-center">#</th>
+                                    <th style="width: 30%; padding: 8px 12px;">Subject</th>
+                                    <th style="width: 20%; padding: 8px 12px;">Section</th>
+                                    <th style="padding: 8px 12px;">Assigned Faculty</th>
+                                    <th style="width: 70px; padding: 8px 12px;" class="text-end pe-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($classAssignments as $assignment)
+                                    <tr>
+                                        <td class="text-center fw-semibold text-muted" style="font-size: 0.78rem; padding: 9px 12px;">
+                                            {{ $loop->iteration }}
+                                        </td>
+                                        <td style="padding: 9px 12px;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="subject-tile-icon" style="width: 28px; height: 28px; font-size: 0.75rem; border-radius: 6px;">
+                                                    <i class="fa-solid fa-book-bookmark"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark subject-title" style="font-size: 0.85rem;">{{ $assignment->subject->name ?? 'N/A' }}</div>
+                                                    @if(!empty($assignment->subject->code))
+                                                        <span class="subject-code-tag" style="font-size: 0.68rem;">Code: {{ $assignment->subject->code }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 9px 12px;">
+                                            @if($assignment->section)
+                                                <span class="badge badge-section-custom" style="font-size: 0.72rem; padding: 3px 8px;">
+                                                    <i class="fa-solid fa-layer-group me-1 text-info"></i> {{ $assignment->section->name }}
+                                                </span>
+                                            @else
+                                                <span class="badge badge-section-all" style="font-size: 0.7rem; padding: 3px 6px;">
+                                                    All Sections
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td style="padding: 9px 12px;">
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if(!empty($assignment->teacher->photo) && file_exists(public_path($assignment->teacher->photo)))
+                                                    <img src="{{ asset($assignment->teacher->photo) }}" alt="{{ $assignment->teacher->name }}" class="teacher-avatar-photo" style="width: 30px; height: 30px;">
+                                                @else
+                                                    <div class="teacher-avatar-initials" style="width: 30px; height: 30px; font-size: 0.78rem;">
+                                                        {{ strtoupper(substr($assignment->teacher->name ?? 'T', 0, 1)) }}
+                                                    </div>
+                                                @endif
+                                                <div>
+                                                    <div class="fw-bold text-dark teacher-title" style="font-size: 0.84rem;">{{ $assignment->teacher->name ?? 'N/A' }}</div>
+                                                    @if(!empty($assignment->teacher->designation))
+                                                        <div class="teacher-subtitle" style="font-size: 0.7rem;">{{ $assignment->teacher->designation }}</div>
+                                                    @elseif(!empty($assignment->teacher->phone))
+                                                        <div class="teacher-subtitle" style="font-size: 0.7rem;"><i class="fa-solid fa-phone me-1"></i>{{ $assignment->teacher->phone }}</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-end pe-3" style="padding: 9px 12px;">
+                                            <form action="{{ route('teacher.assign.destroy', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}"
+                                                  method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="confirmDelete(this)" 
+                                                        class="btn btn-soft-danger btn-icon-sm" 
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Remove Assignment">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <span class="badge bg-soft-success text-success px-3 py-1.5 rounded-3 fw-bold text-capitalize" style="font-size: 0.82rem;">
-                            <i class="fa-solid fa-book-open me-1"></i> {{ $assignment->subject->name ?? 'N/A' }}
-                        </span>
+                </div>
+
+                {{-- Mobile Responsive Subject Cards View --}}
+                <div class="class-mobile-view">
+                    <div class="mobile-subjects-list p-2.5">
+                        @foreach($classAssignments as $assignment)
+                            <div class="mobile-subject-card p-2.5 mb-2">
+                                <div class="mobile-subject-header">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="subject-tile-icon-sm" style="width: 26px; height: 26px; font-size: 0.72rem;">
+                                            <i class="fa-solid fa-book-bookmark"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark mobile-sub-name" style="font-size: 0.84rem;">{{ $assignment->subject->name ?? 'N/A' }}</div>
+                                            @if(!empty($assignment->subject->code))
+                                                <span class="text-muted" style="font-size: 0.68rem;">Code: {{ $assignment->subject->code }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <form action="{{ route('teacher.assign.destroy', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}" 
+                                          method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="confirmDelete(this)" class="btn btn-soft-danger btn-icon-sm" title="Remove Assignment">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="mobile-subject-footer mt-2 pt-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if(!empty($assignment->teacher->photo) && file_exists(public_path($assignment->teacher->photo)))
+                                            <img src="{{ asset($assignment->teacher->photo) }}" alt="{{ $assignment->teacher->name }}" class="teacher-avatar-photo-sm" style="width: 24px; height: 24px;">
+                                        @else
+                                            <div class="teacher-avatar-initials-sm" style="width: 24px; height: 24px; font-size: 0.7rem;">
+                                                {{ strtoupper(substr($assignment->teacher->name ?? 'T', 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <div class="fw-bold text-dark mobile-teacher-name" style="font-size: 0.8rem;">{{ $assignment->teacher->name ?? 'N/A' }}</div>
+                                            @if(!empty($assignment->teacher->designation))
+                                                <div class="text-muted mobile-teacher-des" style="font-size: 0.68rem;">{{ $assignment->teacher->designation }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div>
+                                        @if($assignment->section)
+                                            <span class="badge badge-section-custom" style="font-size: 0.68rem; padding: 2px 6px;">
+                                                <i class="fa-solid fa-layer-group me-1 text-info"></i> {{ $assignment->section->name }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-section-all" style="font-size: 0.66rem; padding: 2px 5px;">
+                                                All Sections
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
-
-    @if($assignments->hasPages())
-        <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="text-muted small">
-                Showing {{ $assignments->firstItem() }} to {{ $assignments->lastItem() }} of {{ $assignments->total() }} assignments
-            </div>
-            <div>
-                {{ $assignments->links() }}
-            </div>
-        </div>
-    @endif
 @else
-    <div class="text-center py-5 px-3">
-        <div class="avatar-icon bg-soft-primary text-primary rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem; display: flex; align-items: center; justify-content: center;">
-            <i class="fa-solid fa-folder-open"></i>
+    <div class="class-assign-empty-state py-4 px-3">
+        <div class="empty-icon-wrap" style="width: 56px; height: 56px; font-size: 1.5rem;">
+            <i class="fa-solid fa-chalkboard"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-1">No Teacher Assignments Found</h5>
-        <p class="text-muted small mb-3" style="max-width: 400px; margin: 0 auto;">No subject allocations match your current search or filter criteria. Select options from the left form to assign a teacher.</p>
+        <h5 class="empty-title" style="font-size: 1rem;">No Teacher Assignments Found</h5>
+        <p class="empty-desc" style="font-size: 0.82rem;">No subject allocations match your current search or filter criteria. Select class, section, subject and teacher from the left form to make an assignment.</p>
     </div>
 @endif

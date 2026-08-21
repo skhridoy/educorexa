@@ -1,25 +1,29 @@
 @php
     $user = auth()->user();
-    $school = $currentSchool;
-    $tenant = $school->slug; 
-    $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+    $school = $currentSchool ?? $user?->school;
+    $tenant = $school?->slug ?? $user?->school?->slug ?? request()->route('tenant') ?? ''; 
+    $userPermissions = $user ? $user->getAllPermissions()->pluck('name')->toArray() : [];
     
     // স্কুলের প্যাকেজে যে পারমিশনগুলো কেনা আছে
-    $packagePermissions = optional($school->subscriptionPackage)->permissions ?? [];
+    $packagePermissions = optional($school?->subscriptionPackage)->permissions ?? [];
 
     // ড্যাশবোর্ড রাউট নির্ধারণ
-    $dashboardRoute = match($user->role) {
-        'student' => route('student.dashboard'),
-        'teacher' => route('teacher.dashboard'),
-        'school_admin', 'school_staff' => route('school.dashboard'),
-        default => '#'
-    };
+    if ($user?->role === 'student' || ($user && method_exists($user, 'hasRole') && $user->hasRole('student'))) {
+        $dashboardRoute = route('student.dashboard', ['tenant' => $tenant]);
+    } elseif ($user?->role === 'teacher' || ($user && method_exists($user, 'hasRole') && $user->hasRole('teacher'))) {
+        $dashboardRoute = route('teacher.dashboard', ['tenant' => $tenant]);
+    } elseif ($user?->role === 'super_admin' || ($user && method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
+        $dashboardRoute = route('super.dashboard');
+    } else {
+        $dashboardRoute = route('school.dashboard', ['tenant' => $tenant]);
+    }
 
     /**
      * ডাইনামিক পারমিশন চেক হেল্পার
      * এটি চেক করে যে ইউজারের পারমিশন আছে কি না এবং সেটি স্কুলের প্যাকেজে অন্তর্ভুক্ত কি না।
      */
     $hasFeature = function($permission) use ($user, $userPermissions, $packagePermissions) {
+        if (!$user) return false;
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') return true;
         
         // ১. চেক: স্কুলের প্যাকেজে এই পারমিশন আছে কি না
@@ -35,6 +39,7 @@
      * কোনো নির্দিষ্ট গ্রুপের অন্তত একটি ফিচার প্যাকেজে আছে কি না চেক করার জন্য
      */
     $hasGroupAccess = function($permissionsArray) use ($user, $packagePermissions, $userPermissions) {
+        if (!$user) return false;
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') return true;
         
         $packageIntersect = array_intersect($permissionsArray, $packagePermissions);
@@ -49,7 +54,7 @@
 <nav class="sidebar edu-sidebar">
     {{-- Header Section --}}
     <div class="edu-sidebar-header">
-        <a href="{{ route('school.home') }}" class="edu-brand">
+        <a href="{{ route('school.home', ['tenant' => $tenant]) }}" class="edu-brand">
             <div class="edu-brand-icon" style="background: linear-gradient(135deg, #4f46e5, #818cf8); color: white;">
                 {{ strtoupper(substr($school->name ?? 'E', 0, 1)) }}
             </div>

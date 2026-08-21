@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\AboutSection;
+use App\Models\Classes;
 use App\Models\ContactMessage;
 use App\Models\Exam;
 use App\Models\Notice;
@@ -105,6 +106,25 @@ class SchoolWebsiteController extends Controller
         $exams = $query->orderBy('name')->get(['id', 'name']);
 
         return response()->json(['status' => true, 'exams' => $exams]);
+    }
+
+    /**
+     * AJAX: Return classes filtered by school_category_id.
+     * Used on the public result page for dynamic class dropdown loading.
+     */
+    public function classesByCategory(Request $request, $tenant)
+    {
+        $school = School::where('slug', $tenant)->firstOrFail();
+
+        $query = Classes::where('school_id', $school->id);
+
+        if ($request->filled('category_id')) {
+            $query->where('school_category_id', $request->category_id);
+        }
+
+        $classes = $query->orderBy('name')->get(['id', 'name']);
+
+        return response()->json(['status' => true, 'classes' => $classes]);
     }
 
     public function storeMessage($tenant, Request $request)

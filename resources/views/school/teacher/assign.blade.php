@@ -32,10 +32,10 @@
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 6px !important;
-            padding: 10px 18px !important;
-            border-radius: 12px !important;
-            font-size: 0.88rem !important;
+            gap: 5px !important;
+            padding: 7px 14px !important;
+            border-radius: 9px !important;
+            font-size: 0.8rem !important;
             font-weight: 600 !important;
             white-space: nowrap !important;
             width: auto !important;
@@ -69,117 +69,7 @@
             transform: translateY(-2px) !important;
         }
 
-        @media (max-width: 768px) {
-            .page-header-card {
-                padding: 20px 16px !important;
-                border-radius: 16px !important;
-                margin-bottom: 20px !important;
-            }
-            .page-header-card .page-title {
-                font-size: 1.35rem !important;
-                margin-bottom: 6px !important;
-            }
-            .page-header-card .page-subtitle {
-                font-size: 0.85rem !important;
-                line-height: 1.4 !important;
-            }
-            .header-actions-group {
-                width: 100% !important;
-                margin-top: 12px !important;
-                display: flex !important;
-                flex-direction: row !important;
-                gap: 8px !important;
-            }
-            .header-actions-group .edu-header-btn {
-                flex: 1 1 0px !important;
-                padding: 9px 10px !important;
-                font-size: 0.8rem !important;
-                text-align: center !important;
-            }
-
-            /* Mobile Cards Responsive Override */
-            .assign-desktop-table {
-                display: none !important;
-            }
-            .assign-mobile-cards {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 12px !important;
-                padding: 12px 14px !important;
-            }
-            .assign-mobile-card {
-                background: #ffffff;
-                border: 1px solid #e2e8f0;
-                border-radius: 16px;
-                padding: 16px;
-                box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
-                transition: all 0.2s ease;
-                position: relative;
-            }
-            [data-bs-theme="dark"] .assign-mobile-card,
-            body.dark-mode .assign-mobile-card {
-                background: #0c1427 !important;
-                border-color: #1a253b !important;
-            }
-            .assign-mobile-card-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-            }
-            .assign-mobile-card-body {
-                margin-top: 12px;
-                padding-top: 12px;
-                border-top: 1px dashed #e2e8f0;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-            [data-bs-theme="dark"] .assign-mobile-card-body,
-            body.dark-mode .assign-mobile-card-body {
-                border-top-color: #1a253b !important;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .assign-mobile-cards {
-                display: none !important;
-            }
-        }
-
-        .pagination {
-            --bs-pagination-border-radius: 50% !important;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0;
-        }
-        .pagination .page-item .page-link {
-            border-radius: 8px !important;
-            margin: 0 2px;
-            border: 1px solid #e2e8f0;
-            color: #475569;
-            font-weight: 600;
-        }
-        .pagination .page-item.active .page-link {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            border-color: transparent;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-        .bg-soft-info {
-            background-color: rgba(6, 182, 212, 0.1) !important;
-            color: #0891b2 !important;
-        }
-        .bg-soft-secondary {
-            background-color: rgba(100, 116, 139, 0.1) !important;
-            color: #475569 !important;
-        }
-        .bg-soft-warning {
-            background-color: rgba(245, 158, 11, 0.1) !important;
-            color: #d97706 !important;
-        }
+        /* Filter Toolbar Card */
         .filter-card {
             background: #ffffff;
             border: 1px solid #f1f5f9;
@@ -205,6 +95,307 @@
         .search-icon-group input {
             padding-left: 38px;
         }
+
+        /* Class-wise Assign Cards Styling */
+        .class-assign-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .class-assign-card:hover {
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+        }
+        [data-bs-theme="dark"] .class-assign-card,
+        body.dark-mode .class-assign-card {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Class Card Header */
+        .class-card-header {
+            background: linear-gradient(to right, #f8fafc, #ffffff);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        [data-bs-theme="dark"] .class-card-header,
+        body.dark-mode .class-card-header {
+            background: linear-gradient(to right, #111c35, #0c1427) !important;
+            border-bottom-color: #1a253b !important;
+        }
+        .class-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .class-icon-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+            flex-shrink: 0;
+        }
+        .class-name-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+        [data-bs-theme="dark"] .class-name-title,
+        body.dark-mode .class-name-title {
+            color: #f8fafc !important;
+        }
+        .class-category-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        [data-bs-theme="dark"] .class-category-badge,
+        body.dark-mode .class-category-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+        .class-meta-subtext {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        [data-bs-theme="dark"] .class-meta-subtext,
+        body.dark-mode .class-meta-subtext {
+            color: #94a3b8;
+        }
+        .class-header-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .stat-badge-primary {
+            background: rgba(79, 70, 229, 0.1) !important;
+            color: #4f46e5 !important;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .stat-badge-success {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #059669 !important;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Desktop Table View */
+        .class-subject-table {
+            margin-bottom: 0;
+        }
+        .class-subject-table thead th {
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            background: #f8fafc;
+            padding: 10px 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        [data-bs-theme="dark"] .class-subject-table thead th,
+        body.dark-mode .class-subject-table thead th {
+            background: #0e172c !important;
+            color: #94a3b8 !important;
+            border-bottom-color: #1a253b !important;
+        }
+        .class-subject-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        [data-bs-theme="dark"] .class-subject-table tbody td,
+        body.dark-mode .class-subject-table tbody td {
+            border-bottom-color: #162035 !important;
+        }
+        .class-subject-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .class-subject-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        [data-bs-theme="dark"] .class-subject-table tbody tr:hover,
+        body.dark-mode .class-subject-table tbody tr:hover {
+            background-color: #131e36 !important;
+        }
+
+        .subject-tile-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .subject-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        [data-bs-theme="dark"] .subject-title,
+        body.dark-mode .subject-title {
+            color: #f1f5f9 !important;
+        }
+        .subject-code-tag {
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+        .badge-section-custom {
+            background: rgba(6, 182, 212, 0.1) !important;
+            color: #0891b2 !important;
+            font-size: 0.78rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .badge-section-all {
+            background: rgba(100, 116, 139, 0.1) !important;
+            color: #475569 !important;
+            font-size: 0.76rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        [data-bs-theme="dark"] .badge-section-all,
+        body.dark-mode .badge-section-all {
+            color: #94a3b8 !important;
+        }
+
+        .teacher-avatar-photo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        .teacher-avatar-initials {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .teacher-title {
+            font-size: 0.88rem;
+            color: #1e293b;
+        }
+        [data-bs-theme="dark"] .teacher-title,
+        body.dark-mode .teacher-title {
+            color: #f1f5f9 !important;
+        }
+        .teacher-subtitle {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        [data-bs-theme="dark"] .teacher-subtitle,
+        body.dark-mode .teacher-subtitle {
+            color: #94a3b8 !important;
+        }
+
+        .btn-icon-sm {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-soft-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        .btn-soft-danger:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        .btn-primary-gradient {
+            padding: 7px 16px !important;
+            font-size: 0.84rem !important;
+            border-radius: 8px !important;
+        }
+
+        /* Empty State */
+        .class-assign-empty-state {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 18px;
+            padding: 48px 24px;
+            text-align: center;
+        }
+        [data-bs-theme="dark"] .class-assign-empty-state,
+        body.dark-mode .class-assign-empty-state {
+            background: #0c1427 !important;
+            border-color: #1e293b !important;
+        }
+        .empty-icon-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+        }
+        .empty-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+        [data-bs-theme="dark"] .empty-title,
+        body.dark-mode .empty-title {
+            color: #f8fafc !important;
+        }
+        .empty-desc {
+            font-size: 0.88rem;
+            color: #64748b;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+        [data-bs-theme="dark"] .empty-desc,
+        body.dark-mode .empty-desc {
+            color: #94a3b8 !important;
+        }
+
+        /* Loading Spinner Overlay */
         .table-loading-overlay {
             position: relative;
             min-height: 200px;
@@ -237,6 +428,152 @@
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
+
+        /* Responsive Breakpoints (Desktop vs Mobile) */
+        @media (max-width: 768px) {
+            .page-header-card {
+                padding: 20px 16px !important;
+                border-radius: 16px !important;
+                margin-bottom: 20px !important;
+            }
+            .page-header-card .page-title {
+                font-size: 1.35rem !important;
+                margin-bottom: 6px !important;
+            }
+            .page-header-card .page-subtitle {
+                font-size: 0.85rem !important;
+                line-height: 1.4 !important;
+            }
+            .header-actions-group {
+                width: 100% !important;
+                margin-top: 12px !important;
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 8px !important;
+            }
+            .header-actions-group .edu-header-btn {
+                flex: 1 1 0px !important;
+                padding: 9px 10px !important;
+                font-size: 0.8rem !important;
+                text-align: center !important;
+            }
+
+            /* Hide Desktop Table on Mobile */
+            .class-desktop-view {
+                display: none !important;
+            }
+            /* Show Mobile Cards View */
+            .class-mobile-view {
+                display: block !important;
+            }
+            .class-card-header {
+                padding: 12px 14px;
+            }
+            .class-header-stats {
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
+            .mobile-subjects-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px;
+            }
+            .mobile-subject-card {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 12px;
+                transition: all 0.2s ease;
+            }
+            [data-bs-theme="dark"] .mobile-subject-card,
+            body.dark-mode .mobile-subject-card {
+                background: #111c35 !important;
+                border-color: #1e2c4a !important;
+            }
+            .mobile-subject-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+            }
+            .mobile-subject-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px dashed #e2e8f0;
+            }
+            [data-bs-theme="dark"] .mobile-subject-footer,
+            body.dark-mode .mobile-subject-footer {
+                border-top-color: #1e2c4a !important;
+            }
+            .subject-tile-icon-sm {
+                width: 30px;
+                height: 30px;
+                border-radius: 7px;
+                background: rgba(79, 70, 229, 0.1);
+                color: #4f46e5;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.78rem;
+                flex-shrink: 0;
+            }
+            .teacher-avatar-photo-sm {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+            .teacher-avatar-initials-sm {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #0ea5e9, #6366f1);
+                color: #ffffff;
+                font-size: 0.75rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+            .mobile-sub-name {
+                font-size: 0.88rem;
+                color: #1e293b;
+            }
+            [data-bs-theme="dark"] .mobile-sub-name,
+            body.dark-mode .mobile-sub-name {
+                color: #f1f5f9 !important;
+            }
+            .mobile-teacher-name {
+                font-size: 0.82rem;
+                color: #1e293b;
+            }
+            [data-bs-theme="dark"] .mobile-teacher-name,
+            body.dark-mode .mobile-teacher-name {
+                color: #f1f5f9 !important;
+            }
+            .mobile-teacher-des {
+                font-size: 0.72rem;
+                color: #64748b;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .class-mobile-view {
+                display: none !important;
+            }
+            .class-desktop-view {
+                display: block !important;
+            }
+        }
     </style>
 @endsection
 
@@ -253,15 +590,15 @@
                             <span>Assign Subject to Teacher</span>
                         </h1>
                         <p class="page-subtitle mb-0">
-                            Allocate subjects and class sections to faculty members efficiently.
+                            Allocate subjects and class sections to faculty members organized by class curriculum.
                         </p>
                     </div>
                     <div class="header-actions-group d-flex align-items-center flex-row gap-2">
-                        <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" 
+                        <a href="{{ route('teachers.index', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" 
                            class="edu-header-btn edu-header-btn-white">
                             <i class="fa-solid fa-users text-primary"></i> <span>Faculty Directory</span>
                         </a>
-                        <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" 
+                        <a href="{{ route('subjects.index', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" 
                            class="edu-header-btn edu-header-btn-outline">
                             <i class="fa-solid fa-book"></i> <span>Subjects List</span>
                         </a>
@@ -276,7 +613,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="stat-label">Total Assignments</div>
-                                <div class="stat-value text-primary">{{ $totalAssignments ?? $assignments->total() }}</div>
+                                <div class="stat-value text-primary">{{ $totalAssignments ?? ($groupedAssignments->flatten()->count()) }}</div>
                             </div>
                             <div class="icon-wrap bg-soft-primary text-primary">
                                 <i class="fa-solid fa-clipboard-check"></i>
@@ -301,11 +638,11 @@
                     <div class="edu-stat-card">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <div class="stat-label">Total Faculty</div>
-                                <div class="stat-value text-info">{{ $teachers->count() }}</div>
+                                <div class="stat-label">Total Classes</div>
+                                <div class="stat-value text-info">{{ $classes->count() }}</div>
                             </div>
                             <div class="icon-wrap bg-soft-info text-info">
-                                <i class="fa-solid fa-users"></i>
+                                <i class="fa-solid fa-graduation-cap"></i>
                             </div>
                         </div>
                     </div>
@@ -341,7 +678,7 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('teacher.assign.store', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST">
+                        <form action="{{ route('teacher.assign.store', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" method="POST">
                             @csrf
                             
                             {{-- Teacher --}}
@@ -416,7 +753,7 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-primary-gradient w-100 py-2.5 shadow-sm">
+                            <button type="submit" class="btn btn-primary-gradient w-100 py-1.5 shadow-sm fw-bold" style="font-size: 0.84rem; border-radius: 8px;">
                                 <i class="fa-solid fa-check-circle me-1"></i> Assign Subject
                             </button>
                         </form>
@@ -465,19 +802,18 @@
                         </form>
                     </div>
 
-                    {{-- Data Table Card --}}
-                    <div class="schools-panel white-panel">
-                        <div class="panel-header d-flex align-items-center justify-content-between flex-wrap gap-2 py-3 px-4">
-                            <h5 class="panel-title d-flex align-items-center gap-2 mb-0">
-                                <i class="fa-solid fa-list-check text-primary"></i> Assigned Teachers & Subjects
-                            </h5>
-                            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-1.5 fw-bold" style="font-size: 0.8rem;">
-                                Active Records: {{ $assignments->total() }}
-                            </span>
-                        </div>
-                        <div id="assignTable">
-                            @include('school.teacher.partials.assign-table')
-                        </div>
+                    {{-- Class-wise Cards Container Wrapper --}}
+                    <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                        <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-primary"></i> Class-wise Subject Allocation
+                        </h6>
+                        <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
+                            {{ $totalAssignmentsCount ?? ($groupedAssignments->count() ? $groupedAssignments->flatten()->count() : 0) }} Total Allocations
+                        </span>
+                    </div>
+
+                    <div id="assignTable">
+                        @include('school.teacher.partials.assign-table')
                     </div>
                 </div>
 
@@ -539,14 +875,6 @@
             loadAssignments();
         });
 
-        $(document).on('click', '.pagination a', function(e){
-            e.preventDefault();
-            let url = $(this).attr('href');
-            if(url && url !== '#') {
-                loadAssignments(url);
-            }
-        });
-
         function loadAssignments(url = null) {
             let query = $('#filterForm').serialize();
             let tableContainer = $('#assignTable');
@@ -554,7 +882,7 @@
             tableContainer.addClass('table-loading-overlay');
 
             if (!url) {
-                url = "{{ route('teacher.assign', ['tenant' => auth()->user()?->school?->slug]) }}?" + query;
+                url = "{{ route('teacher.assign', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}?" + query;
             }
 
             $.ajax({

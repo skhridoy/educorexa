@@ -68,15 +68,25 @@ Route::domain(config('app.main_domain'))->group(function () {
 
     // --- Dynamic Dashboard Redirector ---
     Route::get('/dashboard', function () {
-        if (auth()->user()->hasRole('super_admin')) {
+        $user = auth()->user();
+        if ($user->hasRole('super_admin') || $user->role === 'super_admin') {
             return redirect()->route('super.dashboard');
-        } elseif (auth()->user()->hasRole('employee')) {
+        } elseif ($user->hasRole('employee')) {
             return redirect()->route('employee.dashboard');
+        } elseif ($user->hasRole('school_admin') || $user->role === 'school_admin') {
+            $tenant = $user->school?->slug ?? '';
+            return $tenant ? redirect()->route('school.dashboard', ['tenant' => $tenant]) : redirect('/');
+        } elseif ($user->hasRole('teacher') || $user->role === 'teacher') {
+            $tenant = $user->school?->slug ?? '';
+            return $tenant ? redirect()->route('teacher.dashboard', ['tenant' => $tenant]) : redirect('/');
+        } elseif ($user->hasRole('student') || $user->role === 'student') {
+            $tenant = $user->school?->slug ?? '';
+            return $tenant ? redirect()->route('student.dashboard', ['tenant' => $tenant]) : redirect('/');
         }
         return redirect('/');
     })->middleware('auth')->name('common.dashboard');
 
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth', 'superadmin'])->group(function () {
 
         
         // --- Management Group (Prefix: manage, Name: manage.) ---
@@ -221,6 +231,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
             Route::post('/search-result', [MarkController::class, 'publicResult'])->name('frontend.search_result');
             Route::get('/download-marksheet/{studentId}/{classId}/{examId}', [MarkController::class, 'generateMarksheet'])->name('frontend.generate_marksheet');
             Route::get('/exams-by-category', [SchoolWebsiteController::class, 'examsByCategory'])->name('frontend.exams_by_category');
+            Route::get('/classes-by-category', [SchoolWebsiteController::class, 'classesByCategory'])->name('frontend.classes_by_category');
 
             // Protected Routes
             Route::middleware(['auth'])->group(function () {
@@ -407,6 +418,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
 
                 Route::middleware(['auth', 'permission:exam.manage', 'school_package:exam.manage'])->group(function () {
+                    Route::post('exams/clone-year', [ExamController::class, 'cloneFromYear'])->name('exams.clone-year');
+                    Route::post('exams/bulk-generate', [ExamController::class, 'bulkGenerate'])->name('exams.bulk-generate');
+                    Route::get('exams/get-by-year/{yearId}', [ExamController::class, 'getExamsByYear'])->name('exams.by-year');
                     Route::post('exams/{exam}/status', [ExamController::class, 'toggleStatus'])->name('exams.status');
                     Route::get('exams/admit-card', [ExamController::class, 'generateAdmitIndex'])->name('exams.admit-card');
                     Route::get('exams/bulk-admit-card', [ExamController::class, 'bulkAdmitCard'])->name('exam.bulk_admit_card');
@@ -422,8 +436,15 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('marks-view', [MarkController::class, 'viewMarks'])->name('marks.view-marks');
                     Route::get('marksheet/{student}/{class}/{exam}',[MarkController::class, 'generateMarksheet'])->name('marks.marksheet');
                     Route::get('download-result-sheet', [MarkController::class, 'downloadResultSheet'])->name('marks.download-sheet');
+
+                    // Mark Import routes
+                    Route::get('marks-import',          [MarkController::class, 'importForm'])->name('marks.import.form');
+                    Route::post('marks-import',         [MarkController::class, 'import'])->name('marks.import');
+                    Route::get('marks-import/template', [MarkController::class, 'downloadMarkTemplate'])->name('marks.import.template');
+
                     Route::resource('marks', MarkController::class);
                 });
+
                 
                 // Lesson Plan
                 // ১. এটি শিক্ষক বা যারা ডায়েরি ম্যানেজ করতে পারেন তাদের জন্য

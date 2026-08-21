@@ -10,9 +10,21 @@ class AcademicYearController extends Controller
 {
 
 
-    public function index()
+    /**
+     * Get the active school ID from user or request context.
+     */
+    private function getSchoolId(?Request $request = null): ?int
     {
-        $academicYears = AcademicYear::where('school_id', auth()->user()->school_id)
+        return auth()->user()?->school_id
+            ?? (app()->bound('currentSchool') ? app('currentSchool')->id : null)
+            ?? ($request ? $request->school_id : null);
+    }
+
+    public function index(Request $request)
+    {
+        $schoolId = $this->getSchoolId($request);
+
+        $academicYears = AcademicYear::where('school_id', $schoolId)
             ->latest()
             ->paginate(10);
 
@@ -21,21 +33,27 @@ class AcademicYearController extends Controller
 
     public function store(Request $request)
     {
+        $schoolId = $this->getSchoolId($request);
+
+        if (!$schoolId) {
+            return back()->withErrors(['school_id' => 'School context could not be identified.']);
+        }
+
         $request->validate([
             'name' => 'required|string|max:50',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $schoolId) {
 
             if ($request->is_active) {
-                AcademicYear::where('school_id', auth()->user()->school_id)
+                AcademicYear::where('school_id', $schoolId)
                     ->update(['is_active' => false]);
             }
 
             AcademicYear::create([
-                'school_id' => auth()->user()->school_id,
+                'school_id' => $schoolId,
                 'name' => $request->name,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
@@ -46,9 +64,14 @@ class AcademicYearController extends Controller
         return back()->with('success', 'Academic Year created successfully.');
     }
 
-    public function update(Request $request, AcademicYear $academicYear)
+    public function update(Request $request, $tenant, $academic_year)
     {
-        abort_if($academicYear->school_id !== auth()->user()->school_id, 403);
+        $schoolId = $this->getSchoolId($request);
+        $academicYearId = $academic_year instanceof AcademicYear ? $academic_year->id : $academic_year;
+
+        $academicYear = AcademicYear::where('id', $academicYearId)
+            ->where('school_id', $schoolId)
+            ->firstOrFail();
 
         $request->validate([
             'name' => 'required|string|max:50',
@@ -56,10 +79,10 @@ class AcademicYearController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        DB::transaction(function () use ($request, $academicYear) {
+        DB::transaction(function () use ($request, $academicYear, $schoolId) {
 
             if ($request->is_active) {
-                AcademicYear::where('school_id', auth()->user()->school_id)
+                AcademicYear::where('school_id', $schoolId)
                     ->update(['is_active' => false]);
             }
 
@@ -76,21 +99,22 @@ class AcademicYearController extends Controller
 
     public function destroy($tenant, $academic_year)
     {
-        // Make sure the academic year belongs to the tenant (school)
-        $schoolId = auth()->user()->school_id; 
+        $schoolId = $this->getSchoolId(); 
         $academicYear = AcademicYear::where('id', $academic_year)
                                     ->where('school_id', $schoolId)
                                     ->firstOrFail();
 
         $academicYear->delete();
 
-        return redirect()->route('academic-year.index', ['tenant' => auth()->user()->school->slug])
+        $tenantSlug = app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? $tenant);
+
+        return redirect()->route('academic-year.index', ['tenant' => $tenantSlug])
                         ->with('success', 'Academic year deleted successfully.');
     }
 
     public function toggleActive($tenant, $academic_year)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId();
 
         // Find the selected academic year for this school
         $academicYear = AcademicYear::where('id', $academic_year)
@@ -110,7 +134,7 @@ class AcademicYearController extends Controller
 
     public function toggleInactive($tenant, $academic_year)
     {
-        $schoolId = auth()->user()->school_id;
+        $schoolId = $this->getSchoolId();
 
         // Find the selected academic year for this school
         $academicYear = AcademicYear::where('id', $academic_year)

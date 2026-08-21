@@ -10,16 +10,21 @@ class Authenticate extends Middleware
     protected function redirectTo(Request $request): ?string
     {
         if (! $request->expectsJson()) {
-            // ১. সুপার এডমিন চেক
-            if ($request->is('super-admin') || $request->is('super-admin/*')) {
+            $host = $request->getHost();
+            $mainDomain = config('app.main_domain', 'schoolerp.test');
+
+            // ১. সুপার এডমিন বা সেন্ট্রাল ম্যানেজমেন্ট চেক
+            if ($request->is('super-admin') || $request->is('super-admin/*') || $request->is('manage/*') || $host === $mainDomain || $host === 'www.' . $mainDomain) {
                 return route('login.form');
             }
 
             // ২. টেন্যান্ট চেক (সাবডোমেইন বা রুট প্যারামিটার থেকে)
-            $tenant = $request->route('tenant') ?? explode('.', $request->getHost())[0];
+            $tenant = $request->route('tenant');
+            if (!$tenant && str_contains($host, '.' . $mainDomain)) {
+                $tenant = str_replace('.' . $mainDomain, '', $host);
+            }
 
-            // যদি টেন্যান্ট প্যারামিটার থাকে বা সাবডোমেইন হিসেবে থাকে
-            if ($tenant && !in_array($tenant, ['www', 'educorexa.com'])) {
+            if ($tenant && !in_array($tenant, ['www', $mainDomain])) {
                 return route('school.login.form', ['tenant' => $tenant]);
             }
 

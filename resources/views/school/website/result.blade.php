@@ -255,7 +255,7 @@
                     <form id="resultSearchForm" novalidate>
                         @csrf
 
-                        {{-- 2×2 GRID: all 4 fields side-by-side (2 per row on every screen) --}}
+                        {{-- 2-column GRID --}}
                         <div class="row g-3 mb-3">
 
                             {{-- 1. শিক্ষাবর্ষ --}}
@@ -286,22 +286,36 @@
                                 </select>
                             </div>
 
-                            {{-- 3. পরীক্ষার নাম (dynamic) --}}
+                            {{-- 3. শ্রেণী (Class) --}}
+                            <div class="col-6">
+                                <label class="res-label">
+                                    <i class="fa-solid fa-chalkboard-user"></i>
+                                    শ্রেণী <small class="text-muted" style="font-size:10px;">(রোলের জন্য আবশ্যক)</small>
+                                    <span id="classLoadTag" style="display:none;">
+                                        <i class="fa-solid fa-spinner fa-spin"></i>
+                                    </span>
+                                </label>
+                                <select name="class_id" id="res_class" class="res-control" disabled>
+                                    <option value="">-- আগে ক্যাটেগরি দিন --</option>
+                                </select>
+                            </div>
+
+                            {{-- 4. পরীক্ষার নাম (dynamic) --}}
                             <div class="col-6">
                                 <label class="res-label">
                                     <i class="fa-solid fa-file-pen"></i>
                                     পরীক্ষার নাম <span class="text-danger">*</span>
-                                    <span id="examLoadTag">
+                                    <span id="examLoadTag" style="display:none;">
                                         <i class="fa-solid fa-spinner fa-spin"></i>
                                     </span>
                                 </label>
                                 <select name="exam_id" id="res_exam" class="res-control" required disabled>
-                                    <option value="">-- ক্যাটেগরি দিন --</option>
+                                    <option value="">-- আগে ক্যাটেগরি দিন --</option>
                                 </select>
                             </div>
 
-                            {{-- 4. আইডি / রোল --}}
-                            <div class="col-6">
+                            {{-- 5. আইডি / রোল --}}
+                            <div class="col-12">
                                 <label class="res-label">
                                     <i class="fa-solid fa-id-card"></i>
                                     আইডি / রোল <span class="text-danger">*</span>
@@ -310,8 +324,12 @@
                                        name="student_id"
                                        id="res_student_id"
                                        class="res-control"
-                                       placeholder="STD-261002 বা রোল"
+                                       placeholder="রোল নম্বর (যেমন: 1) অথবা স্টুডেন্ট আইডি (যেমন: STD-261004)"
                                        required />
+                                <div class="mt-1 text-muted" style="font-size:11.5px;">
+                                    <i class="fa-solid fa-circle-info text-primary me-1"></i>
+                                    <strong>রোল</strong> দিয়ে দেখতে উপরের <strong>শ্রেণী</strong> বেছে নিন। শ্রেণী ছাড়া দেখতে শুধু পূর্ণাঙ্গ <strong>স্টুডেন্ট আইডি</strong> লিখুন।
+                                </div>
                             </div>
 
                         </div>
@@ -342,7 +360,7 @@
                             কীভাবে ফলাফল দেখবেন?
                         </p>
                         <p class="text-muted mb-0" style="font-size:0.8rem; line-height:1.65;">
-                            ক্যাটেগরি সিলেক্ট করুন → পরীক্ষার নাম বেছে নিন →
+                            ক্যাটেগরি সিলেক্ট করুন → শ্রেণী ও পরীক্ষার নাম বেছে নিন →
                             আইডি বা রোল লিখুন → ফলাফল দেখুন বাটনে চাপুন।
                         </p>
                     </div>
@@ -359,21 +377,59 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 (function () {
-    const EXAMS_URL  = "{{ route('frontend.exams_by_category', ['tenant' => $school->slug]) }}";
-    const RESULT_URL = "{{ route('frontend.search_result',     ['tenant' => $school->slug]) }}";
-    const CSRF_TOKEN = "{{ csrf_token() }}";
+    const EXAMS_URL   = "{{ route('frontend.exams_by_category',   ['tenant' => $school->slug]) }}";
+    const CLASSES_URL = "{{ route('frontend.classes_by_category', ['tenant' => $school->slug]) }}";
+    const RESULT_URL  = "{{ route('frontend.search_result',       ['tenant' => $school->slug]) }}";
+    const CSRF_TOKEN  = "{{ csrf_token() }}";
 
-    const yearSel    = document.getElementById('res_year');
-    const catSel     = document.getElementById('res_category');
-    const examSel    = document.getElementById('res_exam');
-    const studentInp = document.getElementById('res_student_id');
-    const submitBtn  = document.getElementById('submitBtn');
-    const btnSpinner = document.getElementById('btnSpinner');
-    const btnText    = submitBtn.querySelector('.btn-text');
-    const examTag    = document.getElementById('examLoadTag');
-    const infoNotice = document.getElementById('infoNotice');
+    const yearSel     = document.getElementById('res_year');
+    const catSel      = document.getElementById('res_category');
+    const classSel    = document.getElementById('res_class');
+    const examSel     = document.getElementById('res_exam');
+    const studentInp  = document.getElementById('res_student_id');
+    const submitBtn   = document.getElementById('submitBtn');
+    const btnSpinner  = document.getElementById('btnSpinner');
+    const btnText     = submitBtn.querySelector('.btn-text');
+    const examTag     = document.getElementById('examLoadTag');
+    const classTag    = document.getElementById('classLoadTag');
+    const infoNotice  = document.getElementById('infoNotice');
     const displayArea = document.getElementById('resultDisplayArea');
-    const container  = document.getElementById('resultContainer');
+    const container   = document.getElementById('resultContainer');
+
+    /* ── Load classes dynamically ── */
+    function loadClasses() {
+        const catId = catSel.value;
+        if (!catId) {
+            classSel.innerHTML = '<option value="">-- আগে ক্যাটেগরি দিন --</option>';
+            classSel.disabled  = true;
+            return;
+        }
+
+        classSel.disabled  = true;
+        classSel.innerHTML = '<option value="">লোড হচ্ছে…</option>';
+        if (classTag) classTag.style.display = 'inline-flex';
+
+        fetch(CLASSES_URL + '?category_id=' + encodeURIComponent(catId))
+            .then(r => r.json())
+            .then(data => {
+                if (classTag) classTag.style.display = 'none';
+                if (data.status && data.classes.length > 0) {
+                    classSel.innerHTML = '<option value="">-- শ্রেণী নির্বাচন করুন --</option>';
+                    data.classes.forEach(c => {
+                        classSel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                    classSel.disabled = false;
+                } else {
+                    classSel.innerHTML = '<option value="">এই ক্যাটেগরিতে শ্রেণী নেই</option>';
+                    classSel.disabled  = true;
+                }
+            })
+            .catch(() => {
+                if (classTag) classTag.style.display = 'none';
+                classSel.innerHTML = '<option value="">লোড করতে সমস্যা হয়েছে</option>';
+                classSel.disabled  = true;
+            });
+    }
 
     /* ── Load exams dynamically ── */
     function loadExams() {
@@ -381,14 +437,14 @@
         const yearId = yearSel.value;
 
         if (!catId) {
-            examSel.innerHTML = '<option value="">-- আগে ক্যাটেগরি সিলেক্ট করুন --</option>';
+            examSel.innerHTML = '<option value="">-- আগে ক্যাটেগরি দিন --</option>';
             examSel.disabled  = true;
             return;
         }
 
         examSel.disabled  = true;
         examSel.innerHTML = '<option value="">লোড হচ্ছে…</option>';
-        examTag.style.display = 'inline-flex';
+        if (examTag) examTag.style.display = 'inline-flex';
 
         const params = new URLSearchParams({ category_id: catId });
         if (yearId) params.append('academic_year_id', yearId);
@@ -396,7 +452,7 @@
         fetch(EXAMS_URL + '?' + params.toString())
             .then(r => r.json())
             .then(data => {
-                examTag.style.display = 'none';
+                if (examTag) examTag.style.display = 'none';
                 if (data.status && data.exams.length > 0) {
                     examSel.innerHTML = '<option value="">-- পরীক্ষা বেছে নিন --</option>';
                     data.exams.forEach(e => {
@@ -409,20 +465,27 @@
                 }
             })
             .catch(() => {
-                examTag.style.display = 'none';
+                if (examTag) examTag.style.display = 'none';
                 examSel.innerHTML = '<option value="">লোড করতে সমস্যা হয়েছে</option>';
                 examSel.disabled  = true;
             });
     }
 
-    catSel.addEventListener('change', loadExams);
-    yearSel.addEventListener('change', function () { if (catSel.value) loadExams(); });
+    catSel.addEventListener('change', function () {
+        loadClasses();
+        loadExams();
+    });
+
+    yearSel.addEventListener('change', function () {
+        if (catSel.value) loadExams();
+    });
 
     /* ── Form submit ── */
     document.getElementById('resultSearchForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
         const catId     = catSel.value;
+        const classId   = classSel.value;
         const examId    = examSel.value;
         const studentId = studentInp.value.trim();
         const yearId    = yearSel.value;
@@ -462,6 +525,7 @@
                 exam_id         : examId,
                 academic_year_id: yearId || null,
                 category_id     : catId,
+                class_id        : classId || null,
             })
         })
         .then(r => r.json().then(data => ({ ok: r.ok, data })))
