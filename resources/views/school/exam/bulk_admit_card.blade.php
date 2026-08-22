@@ -195,14 +195,14 @@
             font-size: 11px;
             font-weight: bold;
             padding: 1.5px 3px;
-            border: 1px solid #1e293b;
+            border: 1px solid #c5d2e0ff;
             text-transform: uppercase;
             text-align: center;
             line-height: 1.05;
         }
         .sub-tbl td {
             padding: 1.5px 3px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #c5d2e0ff;
             color: #0f172a;
             vertical-align: middle;
             line-height: 1.05;
