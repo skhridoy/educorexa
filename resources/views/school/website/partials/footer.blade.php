@@ -29,7 +29,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <h5 class="text-white mb-4">Quick Links</h5>
-                <a class="btn btn-link text-white-50 small mb-2" href="{{ route('school.about', ['tenant' => $school->slug]) }}">About Us</a>
+                <a class="btn btn-link text-white-50 small mb-2" href="{{ route('school.home', ['tenant' => $school->slug]) }}">About Us</a>
                 <a class="btn btn-link text-white-50 small mb-2" href="#notice">Notice Board</a>
                 <a class="btn btn-link text-white-50 small mb-2" href="{{ route('admission.create', ['tenant' => $school->slug]) }}">Online Admission</a>
                 <a class="btn btn-link text-white-50 small mb-2" href="#contact">Contact Us</a>

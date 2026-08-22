@@ -19,6 +19,7 @@
             background: #ffffff;
             font-size: 10px;
             line-height: 1.1;
+            margin: 10px;
         }
 
         /* ── Main Outer Table Container for DomPDF stability ── */
@@ -125,6 +126,8 @@
             border-radius: 3px;
             letter-spacing: 0.8px;
             line-height: 1.05;
+            padding: 5px;   
+            margin-top: 10px; 
         }
         .hdr-qr {
             width: 55px;
@@ -148,6 +151,7 @@
             border-radius: 3px;
             margin-bottom: 3px;
             table-layout: fixed;
+            margin-top: 5px; 
         }
         .student-info-tbl td {
             padding: 1.5px 4px;
@@ -234,7 +238,7 @@
 
         /* ── Signatures ── */
         .footer-wrap {
-            margin-top: 15px;
+            margin-top: 40px;
             padding-top: 0;
         }
         .footer-tbl {
