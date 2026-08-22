@@ -98,10 +98,11 @@
                         $studentSubCategoryId = $student->school_sub_category_id;
                         
                         // Filter routines for this specific student:
-                        // Include common/compulsory subjects (where subject has no school_sub_category_id)
-                        // AND subjects matching the student's subcategory/group.
-                        $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId) {
-                            $subCatId = $rtn->subject?->school_sub_category_id;
+                        // Look up subcategory from assign_classes (where class-subject mappings are stored), then fallback to subject
+                        $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId, $assignClasses) {
+                            $ac = isset($assignClasses) ? $assignClasses->get($rtn->subject_id) : null;
+                            $subCatId = $ac ? $ac->school_sub_category_id : $rtn->subject?->school_sub_category_id;
+
                             if ($studentSubCategoryId) {
                                 return empty($subCatId) || $subCatId == $studentSubCategoryId;
                             }

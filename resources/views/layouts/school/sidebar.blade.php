@@ -107,10 +107,10 @@
                         @if($hasFeature('academic-year.manage'))
                             <li class="edu-sub-item"><a href="{{ route('academic-year.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/academic-year*') ? 'active' : '' }}">Academic Years</a></li>
                         @endif
-                        @if($hasFeature('category.manage'))
+                        @if($hasFeature('category.manage') || $hasFeature('class.manage'))
                             <li class="edu-sub-item"><a href="{{ route('categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/categories*') ? 'active' : '' }}">Categories</a></li>
                         @endif
-                        @if($hasFeature('sub-category.manage'))
+                        @if($hasFeature('sub-category.manage') || $hasFeature('class.manage'))
                             <li class="edu-sub-item"><a href="{{ route('sub-categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sub-categories*') ? 'active' : '' }}">Sub Categories</a></li>
                         @endif
                         @if($hasFeature('class.manage'))
