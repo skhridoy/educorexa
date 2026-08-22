@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 6mm 10mm 6mm 10mm;
+            margin: 10mm 14mm 10mm 14mm;
         }
         * {
             box-sizing: border-box;
@@ -17,8 +17,9 @@
             font-family: Helvetica, Arial, sans-serif;
             color: #0f172a;
             background: #ffffff;
-            font-size: 10px;
+            font-size: 11px;
             line-height: 1.1;
+            margin: 20px;
         }
 
         /* ── Main Outer Table Container for DomPDF stability ── */
@@ -27,6 +28,7 @@
             table-layout: fixed;
             border-collapse: collapse;
             margin-bottom: 0;
+
         }
         .card-table-wrap td.card-cell {
             border: 1.5px solid #0f172a;
@@ -50,13 +52,13 @@
             table-layout: fixed;
         }
         .hdr-logo {
-            width: 60px;
+            width: 76px;
             vertical-align: middle;
             text-align: left;
         }
         .hdr-logo img { 
-            width: 52px; 
-            height: 52px;
+            width: 76px; 
+            height: 76px;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -67,7 +69,7 @@
         }
         .school-name {
             width: 100%;
-            font-size: 15px;
+            font-size: 18px;
             font-weight: bold;
             text-transform: uppercase;
             color: #0f172a;
@@ -89,7 +91,7 @@
             line-height: 1;
         }
         .exam-name-line {
-            font-size: 11.5px;
+            font-size: 12px;
             font-weight: bold;
             color: #1e3a8a;
             margin: 1px 0;
@@ -105,10 +107,10 @@
             border-radius: 3px;
             letter-spacing: 0.8px;
             line-height: 1.05;
-            margin-top: 2px;
+            margin-top: 5px;
         }
         .hdr-qr {
-            width: 60px;
+            width: 70px;
             vertical-align: middle;
             text-align: right;
         }
@@ -136,6 +138,7 @@
             vertical-align: middle;
             font-size: 10px;
             line-height: 1.05;
+            padding: 5px 3px;
         }
         .lbl {
             color: #475569;
@@ -158,7 +161,7 @@
 
         /* ── Routine Section (2 Columns with Time) ── */
         .routine-heading {
-            font-size: 9.5px;
+            font-size: 11px;
             font-weight: bold;
             color: #0f172a;
             background: #f1f5f9;
@@ -166,10 +169,11 @@
             padding: 2px 6px;
             border-radius: 2px;
             margin-bottom: 2px;
-            margin-top: 2px;
+            margin-top: 10px;
+            padding: 5px 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-align: center;
+            text-align: center; 
             line-height: 1.05;
         }
         .routine-grid-tbl {
@@ -180,13 +184,13 @@
         .sub-tbl {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9.5px;
+            font-size: 11px; 
             table-layout: fixed;
         }
         .sub-tbl th {
             background: #1e293b;
-            color: #ffffff;
-            font-size: 9.5px;
+            color: #ffffff; 
+            font-size: 11px;
             font-weight: bold;
             padding: 1.5px 3px;
             border: 1px solid #1e293b;
@@ -200,7 +204,7 @@
             color: #0f172a;
             vertical-align: middle;
             line-height: 1.05;
-            font-size: 9.5px;
+            font-size: 11px; 
         }
         .sub-tbl tr:nth-child(even) td {
             background: #f8fafc;
