@@ -103,12 +103,13 @@
             background: #0f172a;
             color: #ffffff;
             padding: 1.5px 8px;
-            font-size: 10.5px;
+            font-size: 12px;
             font-weight: bold;
             border-radius: 3px;
             letter-spacing: 0.8px;
             line-height: 1.05;
-            margin-top: 5px;
+            margin-top: 10px;
+            padding: 5px;
         }
         .hdr-qr {
             width: 70px;
