@@ -190,8 +190,8 @@
             table-layout: fixed;
         }
         .sub-tbl th {
-            background: #1e293b;
-            color: #ffffff; 
+            background: #c6d3f7ff;
+            color: #0f172a;
             font-size: 11px;
             font-weight: bold;
             padding: 1.5px 3px;
