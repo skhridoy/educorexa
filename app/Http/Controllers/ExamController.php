@@ -441,7 +441,7 @@ class ExamController extends Controller
                 ->get();
         }
 
-        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines'));
+        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines', 'school'));
     }
     
     public function bulkAdmitCard(Request $request, $tenant)

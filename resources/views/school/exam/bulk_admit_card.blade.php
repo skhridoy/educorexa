@@ -334,10 +334,19 @@
                                     <td class="hdr-qr">
                                         <div class="qr-box">
                                             @php
-                                                $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . "\nExam: {$exam->name}";
-                                                $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(75)->generate($qrData));
+                                                $qrSvg = null;
+                                                try {
+                                                    $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . "\nExam: " . ($exam->name ?? '');
+                                                    $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(75)->generate($qrData));
+                                                } catch (\Throwable $e) {
+                                                    $qrSvg = null;
+                                                }
                                             @endphp
-                                            <img src="data:image/svg+xml;base64,{!! $qrSvg !!}" style="width:75px; height:75px; display:block;">
+                                            @if($qrSvg)
+                                                <img src="data:image/svg+xml;base64,{!! $qrSvg !!}" style="width:75px; height:75px; display:block;">
+                                            @else
+                                                <div style="width:75px; height:75px; border:1px solid #cbd5e1; border-radius:4px; text-align:center; line-height:75px; font-size:8px; color:#94a3b8; background:#f8fafc;">QR CODE</div>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

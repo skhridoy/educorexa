@@ -122,19 +122,20 @@
                                         </td>
                                         {{-- Center Info --}}
                                         <td class="text-center" style="vertical-align: middle; padding: 0 8px;">
-                                            <h6 class="fw-bold mb-1 text-uppercase" style="font-size: 0.95rem; color: #0f172a; word-break: break-word;">{{ auth()->user()->school->name }}</h6>
                                             @php
-                                                $sch = auth()->user()->school;
-                                                $metaStr = implode(' | ', array_filter([$sch->address, $sch->phone ? 'Mobile: '.$sch->phone : null, $sch->email]));
-                                                $codeStr = implode('  |  ', array_filter([$sch->emis_code ? 'EMIS: '.$sch->emis_code : null, $sch->ein_number ? 'EIN: '.$sch->ein_number : null, $sch->app_code ? 'Code: '.$sch->app_code : null]));
+                                                $sch = $school ?? (app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null));
+                                                $schoolName = $sch?->name ?? 'SCHOOL NAME';
+                                                $metaStr = implode(' | ', array_filter([$sch?->address, $sch?->phone ? 'Mobile: '.$sch->phone : null, $sch?->email]));
+                                                $codeStr = implode('  |  ', array_filter([$sch?->emis_code ? 'EMIS: '.$sch->emis_code : null, $sch?->ein_number ? 'EIN: '.$sch->ein_number : null, $sch?->app_code ? 'Code: '.$sch->app_code : null]));
                                             @endphp
+                                            <h6 class="fw-bold mb-1 text-uppercase" style="font-size: 0.95rem; color: #0f172a; word-break: break-word;">{{ $schoolName }}</h6>
                                             @if($metaStr)
                                                 <div class="text-muted" style="font-size: 0.72rem;">{{ $metaStr }}</div>
                                             @endif
                                             @if($codeStr)
                                                 <div class="text-secondary fw-semibold" style="font-size: 0.7rem;">{{ $codeStr }}</div>
                                             @endif
-                                            <div class="fw-bold my-1" style="font-size: 0.82rem; color: #1e3a8a;">{{ $selected_exam->name }} &mdash; {{ date('Y') }}</div>
+                                            <div class="fw-bold my-1" style="font-size: 0.82rem; color: #1e3a8a;">{{ $selected_exam?->name }} &mdash; {{ date('Y') }}</div>
                                             <div>
                                                 <span class="badge bg-dark px-2 py-1" style="font-size: 0.65rem; letter-spacing: 1px;">প্রবেশপত্র / ADMIT CARD</span>
                                             </div>
@@ -142,7 +143,19 @@
                                         {{-- QR Code Right --}}
                                         <td style="width: 55px; vertical-align: middle; text-align: right; padding: 0;">
                                             <div style="display: inline-block; padding: 2px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
-                                                {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(46)->color(15, 23, 42)->generate("ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}") !!}
+                                                @php
+                                                    $previewQr = null;
+                                                    try {
+                                                        $previewQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(46)->color(15, 23, 42)->generate("ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}");
+                                                    } catch (\Throwable $e) {
+                                                        $previewQr = null;
+                                                    }
+                                                @endphp
+                                                @if($previewQr)
+                                                    {!! $previewQr !!}
+                                                @else
+                                                    <div style="width:46px; height:46px; display:flex; align-items:center; justify-content:center; font-size:8px; color:#94a3b8;">QR</div>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
