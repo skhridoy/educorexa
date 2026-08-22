@@ -128,7 +128,7 @@
                                                 $metaStr = implode(' | ', array_filter([$sch?->address, $sch?->phone ? 'Mobile: '.$sch->phone : null, $sch?->email]));
                                                 $codeStr = implode('  |  ', array_filter([$sch?->emis_code ? 'EMIS: '.$sch->emis_code : null, $sch?->ein_number ? 'EIN: '.$sch->ein_number : null, $sch?->app_code ? 'Code: '.$sch->app_code : null]));
                                             @endphp
-                                            <h6 class="fw-bold mb-1 text-uppercase" style="font-size: 0.95rem; color: #0f172a; word-break: break-word;">{{ $schoolName }}</h6>
+                                            <h6 class="fw-bold mb-1 text-uppercase" style="font-size: 0.95rem; color: #0f172a; white-space: nowrap;">{{ $schoolName }}</h6>
                                             @if($metaStr)
                                                 <div class="text-muted" style="font-size: 0.72rem;">{{ $metaStr }}</div>
                                             @endif
