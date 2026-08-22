@@ -807,6 +807,9 @@
             .desktop-report-table { display: none !important; }
             .mobile-report-cards  { display: block !important; }
             .mobile-result-card   { display: block !important; }
+            /* Section header stacks vertically on tablet */
+            .section-header-bar { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+            .pdf-actions-bar { width: 100%; flex-wrap: wrap; }
         }
 
         /* ── Mobile (≤ 767px) ── */
@@ -866,7 +869,30 @@
 
             /* Buttons stay compact on mobile too */
             .btn-show-results { font-size: 0.8rem; padding: 0 12px; }
-            .btn-download-csv { padding: 0 10px; }
+
+            /* PDF action buttons: 2-column grid on mobile */
+            .pdf-actions-bar {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                width: 100%;
+                gap: 8px !important;
+            }
+            .pdf-actions-bar .btn-download-pdf,
+            .pdf-actions-bar .btn-summary-all-pdf,
+            .pdf-actions-bar .btn-summary-class-pdf,
+            .pdf-actions-bar .btn-download-csv {
+                width: 100%;
+                justify-content: center;
+                white-space: nowrap;
+                font-size: 0.75rem;
+                padding: 0 8px;
+                height: 38px;
+            }
+            .pdf-actions-bar .badge {
+                grid-column: 1 / -1;
+                text-align: center;
+                width: 100%;
+            }
         }
 
         /* ── Very small (≤ 400px) ── */
@@ -1230,21 +1256,21 @@
                             </span>
                         @endif
                     </h5>
-                    <div class="d-flex align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center flex-wrap gap-2 pdf-actions-bar">
                         <a href="{{ route('marks.bulk-marksheet', ['tenant' => auth()->user()->school->slug, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-download-pdf" title="Download All Marksheets in one PDF">
                             <i class="fa-solid fa-file-pdf"></i>
-                            <span>All Marksheets (PDF)</span>
+                            <span>Marksheets</span>
                         </a>
                         <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-summary-all-pdf" title="Download All Classes Result Summary in one PDF">
                             <i class="fa-solid fa-list-check"></i>
-                            <span>All Classes Summary (PDF)</span>
+                            <span>All Summary</span>
                         </a>
                         <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'class_id' => $selectedClassId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-summary-class-pdf" title="Download This Class Result Summary in PDF">
                             <i class="fa-solid fa-file-lines"></i>
-                            <span>Class Summary (PDF)</span>
+                            <span>Class Summary</span>
                         </a>
                         <a href="{{ route('marks.download-sheet', array_merge(['tenant' => auth()->user()->school->slug], request()->all())) }}"
                            class="btn-download-csv" title="Download CSV Result Sheet">

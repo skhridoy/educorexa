@@ -219,7 +219,7 @@
                         @endif
                         @if($hasFeature('mark.manage'))
                             <li class="edu-sub-item"><a href="{{ route('marks.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks*') ? 'active' : '' }}">Marks Entry</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks') ? 'active' : '' }}">Marks Report</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks') ? 'active' : '' }}">Result Report</a></li>
                         @endif
                     </ul>
                 </div>

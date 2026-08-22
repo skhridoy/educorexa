@@ -21,18 +21,22 @@
         /* ── WATERMARK ── */
         .watermark {
             position: fixed;
-            top: 30%;
+            top: 0;
             left: 0;
             right: 0;
+            bottom: 0;
             width: 100%;
-            text-align: center;
-            opacity: 0.06;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: -1000;
+            pointer-events: none;
         }
         .watermark img {
-            width: 340px;
+            width: 380px;
             height: auto;
-            opacity: 0.06;
+            opacity: 0.065;
         }
 
         /* ── PAGE FOOTER ── */
@@ -189,9 +193,9 @@
 <body>
 
 {{-- Watermark --}}
-@if(!empty($instituteLogo))
+@if(!empty($watermarkLogo ?? $instituteLogo))
 <div class="watermark">
-    <img src="{{ $instituteLogo }}" alt="Watermark">
+    <img src="{{ $watermarkLogo ?? $instituteLogo }}" alt="Watermark">
 </div>
 @endif
 
