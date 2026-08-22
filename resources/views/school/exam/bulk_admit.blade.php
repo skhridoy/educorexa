@@ -89,7 +89,7 @@
                 <h6 class="fw-bold mb-0 text-dark">
                     <i class="fa-solid fa-eye me-1 text-primary"></i> এডমিট কার্ড প্রিভিউ (মোট {{ $students->count() }} জন শিক্ষার্থী)
                 </h6>
-                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ৩টি করে প্রবেশপত্র প্রিন্ট হবে</small>
+                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ২টি করে প্রবেশপত্র প্রিন্ট হবে</small>
             </div>
 
             <div class="row">
@@ -125,15 +125,11 @@
                                             @php
                                                 $sch = $school ?? (app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null));
                                                 $schoolName = $sch?->name ?? 'SCHOOL NAME';
-                                                $metaStr = implode(' | ', array_filter([$sch?->address, $sch?->phone ? 'Mobile: '.$sch->phone : null, $sch?->email]));
-                                                $codeStr = implode('  |  ', array_filter([$sch?->emis_code ? 'EMIS: '.$sch->emis_code : null, $sch?->ein_number ? 'EIN: '.$sch->ein_number : null, $sch?->app_code ? 'Code: '.$sch->app_code : null]));
+                                                $schoolCode = $sch?->app_code ?? $sch?->emis_code ?? $sch?->ein_number ?? null;
                                             @endphp
                                             <h6 class="fw-bold mb-1 text-uppercase" style="font-size: 0.95rem; color: #0f172a; white-space: nowrap;">{{ $schoolName }}</h6>
-                                            @if($metaStr)
-                                                <div class="text-muted" style="font-size: 0.72rem;">{{ $metaStr }}</div>
-                                            @endif
-                                            @if($codeStr)
-                                                <div class="text-secondary fw-semibold" style="font-size: 0.7rem;">{{ $codeStr }}</div>
+                                            @if($schoolCode)
+                                                <div class="text-secondary fw-semibold mb-1" style="font-size: 0.72rem;">School Code: {{ $schoolCode }}</div>
                                             @endif
                                             <div class="fw-bold my-1" style="font-size: 0.82rem; color: #1e3a8a;">{{ $selected_exam?->name }} &mdash; {{ date('Y') }}</div>
                                             <div>

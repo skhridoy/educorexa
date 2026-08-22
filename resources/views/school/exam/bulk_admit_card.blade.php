@@ -270,7 +270,7 @@
     </style>
 </head>
 <body>
-    @foreach($students->chunk(3) as $chunkIndex => $trio)
+    @foreach($students->chunk(2) as $chunkIndex => $pair)
         @php
             $totalRoutines = $examRoutines->count();
             $half = ceil($totalRoutines / 2);
@@ -278,7 +278,7 @@
             $colB = $examRoutines->slice($half);
         @endphp
 
-        @foreach($trio as $pairIndex => $student)
+        @foreach($pair as $pairIndex => $student)
             {{-- ── ADMIT CARD BOX TABLE WRAPPER ── --}}
             <table class="card-table-wrap" cellpadding="0" cellspacing="0">
                 <tr>
@@ -303,22 +303,15 @@
                                         @endif
                                     </td>
 
-                                    {{-- Center: School Name, Address, Code, Exam, Badge --}}
+                                    {{-- Center: School Name, School Code Only, Exam, Badge --}}
                                     <td class="hdr-center">
                                         <div class="school-name">{{ $school->name ?? 'SCHOOL NAME' }}</div>
 
-                                        @if(count($metaParts) > 0)
-                                            <div class="school-meta">{{ implode(' | ', $metaParts) }}</div>
-                                        @endif
-
                                         @php
-                                            $codeParts = [];
-                                            if(!empty($school->emis_code))  $codeParts[] = 'EMIS: ' . $school->emis_code;
-                                            if(!empty($school->ein_number)) $codeParts[] = 'EIN: '  . $school->ein_number;
-                                            if(!empty($school->app_code))   $codeParts[] = 'Code: ' . $school->app_code;
+                                            $schoolCode = $school->app_code ?? $school->emis_code ?? $school->ein_number ?? null;
                                         @endphp
-                                        @if(count($codeParts) > 0)
-                                            <div class="school-code-line">{{ implode('  |  ', $codeParts) }}</div>
+                                        @if($schoolCode)
+                                            <div class="school-code-line">School Code: {{ $schoolCode }}</div>
                                         @endif
 
                                         <div class="exam-name-line">{{ $exam->name }} &mdash; {{ date('Y') }}</div>
