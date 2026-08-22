@@ -426,17 +426,17 @@ class ExamController extends Controller
         if ($request->filled('class_id') && $request->filled('exam_id')) {
             $students = Student::where('school_id', $schoolId)
                 ->where('class_id', $request->class_id)
-                ->with(['class', 'section'])
+                ->with(['class', 'section', 'group', 'category'])
                 ->orderBy('roll', 'asc')
                 ->get();
                 
             $selected_exam = Exam::find($request->exam_id);
 
-            // Load Exam Routine for this exam & class
+            // Load Exam Routine for this exam & class with subject subcategories
             $examRoutines = ExamRoutine::where('school_id', $schoolId)
                 ->where('exam_id', $request->exam_id)
                 ->where('class_id', $request->class_id)
-                ->with('subject')
+                ->with(['subject.subCategory', 'subject.category'])
                 ->orderBy('exam_date', 'asc')
                 ->get();
         }
@@ -449,24 +449,24 @@ class ExamController extends Controller
         $schoolId = $this->getSchoolId($request);
         $students = Student::where('school_id', $schoolId)
             ->where('class_id', $request->class_id)
-            ->with(['class', 'section'])
+            ->with(['class', 'section', 'group', 'category'])
             ->orderBy('roll', 'asc')
             ->get();
 
         $exam = Exam::findOrFail($request->exam_id);
         $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
 
-        // Load exam routine specifically for this exam & class
+        // Load exam routine specifically for this exam & class with subject subcategories
         $examRoutines = ExamRoutine::where('school_id', $schoolId)
             ->where('exam_id', $request->exam_id)
             ->where('class_id', $request->class_id)
-            ->with('subject')
+            ->with(['subject.subCategory', 'subject.category'])
             ->orderBy('exam_date', 'asc')
             ->get();
         
         $pdf = Pdf::loadView('school.exam.bulk_admit_card', compact('students', 'exam', 'school', 'examRoutines'));
         
-        // Portrait mode — 2 cards stacked vertically per A4 page
+        // Portrait mode — 3 cards stacked vertically per A4 page
         return $pdf->setPaper('a4', 'portrait')->download('bulk-admit-card.pdf');
     }
 

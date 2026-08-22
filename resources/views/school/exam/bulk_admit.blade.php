@@ -93,14 +93,31 @@
             </div>
 
             <div class="row">
-                @php
-                    $totalRoutines = $examRoutines->count();
-                    $half = ceil($totalRoutines / 2);
-                    $colA = $examRoutines->slice(0, $half);
-                    $colB = $examRoutines->slice($half);
-                @endphp
-
                 @foreach($students as $student)
+                    @php
+                        $studentSubCategoryId = $student->school_sub_category_id;
+                        
+                        // Filter routines for this specific student:
+                        // Include common/compulsory subjects (where subject has no school_sub_category_id)
+                        // AND subjects matching the student's subcategory/group.
+                        $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId) {
+                            $subCatId = $rtn->subject?->school_sub_category_id;
+                            if ($studentSubCategoryId) {
+                                return empty($subCatId) || $subCatId == $studentSubCategoryId;
+                            }
+                            return empty($subCatId);
+                        });
+
+                        if ($studentRoutines->isEmpty()) {
+                            $studentRoutines = $examRoutines;
+                        }
+
+                        $totalRoutines = $studentRoutines->count();
+                        $half = ceil($totalRoutines / 2);
+                        $colA = $studentRoutines->slice(0, $half);
+                        $colB = $studentRoutines->slice($half);
+                    @endphp
+
                     <div class="col-lg-6 mb-4">
                         <div class="admit-card-preview p-3">
                             {{-- Watermark --}}
@@ -142,7 +159,8 @@
                                                 @php
                                                     $previewQr = null;
                                                     try {
-                                                        $previewQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(46)->color(15, 23, 42)->generate("ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}");
+                                                        $grp = $student->group->name ?? '';
+                                                        $previewQr = \SimpleSoftwareIO\QrCode\Facades\QrCode::size(46)->color(15, 23, 42)->generate("ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}" . ($grp ? "\nGroup: {$grp}" : ''));
                                                     } catch (\Throwable $e) {
                                                         $previewQr = null;
                                                     }
@@ -173,10 +191,10 @@
                                             <td class="fw-bold py-0">{{ $student->roll ?? 'N/A' }}</td>
                                         </tr>
                                         <tr>
+                                            <td class="text-muted fw-bold py-0">গ্রুপ:</td>
+                                            <td class="fw-bold py-0" style="color: #1e3a8a;">{{ $student->group->name ?? 'General' }}</td>
                                             <td class="text-muted fw-bold py-0">শাখা:</td>
                                             <td class="fw-bold py-0">{{ $student->section->name ?? 'N/A' }}</td>
-                                            <td class="text-muted fw-bold py-0">সেশন:</td>
-                                            <td class="fw-bold py-0">{{ date('Y') }}</td>
                                         </tr>
                                     </table>
                                 </div>

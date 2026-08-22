@@ -385,7 +385,7 @@
                                                     <option value="">-- বিষয় নির্বাচন করুন --</option>
                                                     @foreach($classSubjects as $subject)
                                                         <option value="{{ $subject->id }}" {{ $routine->subject_id == $subject->id ? 'selected' : '' }}>
-                                                            {{ $subject->name }} {{ $subject->code ? '('.$subject->code.')' : '' }}
+                                                            {{ $subject->name }} {{ $subject->subCategory ? '[' . $subject->subCategory->name . ']' : '' }} {{ $subject->code ? '('.$subject->code.')' : '' }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -414,11 +414,11 @@
                                             <td>
                                                 <select name="routines[{{ $index }}][subject_id]" class="form-select form-select-sm subject-select" required>
                                                     <option value="">-- বিষয় নির্বাচন করুন --</option>
-                                                    @foreach($classSubjects as $sub)
-                                                        <option value="{{ $sub->id }}" {{ $sub->id == $subject->id ? 'selected' : '' }}>
-                                                            {{ $sub->name }} {{ $sub->code ? '('.$sub->code.')' : '' }}
-                                                        </option>
-                                                    @endforeach
+                                                     @foreach($classSubjects as $sub)
+                                                         <option value="{{ $sub->id }}" {{ $sub->id == $subject->id ? 'selected' : '' }}>
+                                                             {{ $sub->name }} {{ $sub->subCategory ? '[' . $sub->subCategory->name . ']' : '' }} {{ $sub->code ? '('.$sub->code.')' : '' }}
+                                                         </option>
+                                                     @endforeach
                                                 </select>
                                             </td>
                                             <td>
@@ -566,7 +566,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let opts = '<option value="">-- বিষয় নির্বাচন করুন --</option>';
         currentClassSubjects.forEach(s => {
             const isSel = (selectedId && selectedId == s.id) ? 'selected' : '';
-            opts += `<option value="${s.id}" ${isSel}>${s.name}${s.code ? ' ('+s.code+')' : ''}</option>`;
+            const subCatBadge = s.sub_category_name ? ` [${s.sub_category_name}]` : '';
+            opts += `<option value="${s.id}" ${isSel}>${s.name}${subCatBadge}${s.code ? ' ('+s.code+')' : ''}</option>`;
         });
         return opts;
     }

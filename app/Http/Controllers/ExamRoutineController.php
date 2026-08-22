@@ -65,16 +65,16 @@ class ExamRoutineController extends Controller
             $routines = ExamRoutine::where('school_id', $schoolId)
                 ->where('exam_id', $selectedExamId)
                 ->where('class_id', $selectedClassId)
-                ->with('subject')
+                ->with(['subject.subCategory', 'subject.category'])
                 ->orderBy('exam_date')
                 ->get();
 
-            // Load subjects assigned to this class
+            // Load subjects assigned to this class with subCategory (group) info
             if ($selectedClass) {
-                $classSubjects = $selectedClass->subjects;
+                $classSubjects = $selectedClass->subjects()->with(['subCategory', 'category'])->get();
                 if ($classSubjects->isEmpty()) {
                     // Fallback to all school subjects if not specifically mapped
-                    $classSubjects = Subject::where('school_id', $schoolId)->orderBy('name')->get();
+                    $classSubjects = Subject::where('school_id', $schoolId)->with(['subCategory', 'category'])->orderBy('name')->get();
                 }
             }
         }
@@ -108,21 +108,30 @@ class ExamRoutineController extends Controller
     }
 
     /**
-     * AJAX endpoint: Get subjects assigned to a specific class.
+     * AJAX endpoint: Get subjects assigned to a specific class with group info.
      */
     public function subjectsByClass(Request $request, $classId)
     {
         $schoolId = $this->getSchoolId($request);
-        $class = Classes::with('subjects')->where('school_id', $schoolId)->findOrFail($classId);
+        $class = Classes::with('subjects.subCategory')->where('school_id', $schoolId)->findOrFail($classId);
 
         $subjects = $class->subjects;
         if ($subjects->isEmpty()) {
-            $subjects = Subject::where('school_id', $schoolId)->orderBy('name')->get();
+            $subjects = Subject::where('school_id', $schoolId)->with('subCategory')->orderBy('name')->get();
         }
+
+        $formattedSubjects = $subjects->map(function($sub) {
+            return [
+                'id' => $sub->id,
+                'name' => $sub->name,
+                'code' => $sub->code,
+                'sub_category_name' => $sub->subCategory?->name ?? null,
+            ];
+        });
 
         return response()->json([
             'status' => true,
-            'subjects' => $subjects
+            'subjects' => $formattedSubjects
         ]);
     }
 

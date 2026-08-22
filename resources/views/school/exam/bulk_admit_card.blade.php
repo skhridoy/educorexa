@@ -260,14 +260,32 @@
 </head>
 <body>
     @foreach($students->chunk(3) as $chunkIndex => $pair)
-        @php
-            $totalRoutines = $examRoutines->count();
-            $half = ceil($totalRoutines / 2);
-            $colA = $examRoutines->slice(0, $half);
-            $colB = $examRoutines->slice($half);
-        @endphp
-
         @foreach($pair as $pairIndex => $student)
+            @php
+                $studentSubCategoryId = $student->school_sub_category_id;
+                
+                // Filter routines for this specific student:
+                // Include common/compulsory subjects (where subject has no school_sub_category_id)
+                // AND subjects matching the student's subcategory/group.
+                $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId) {
+                    $subCatId = $rtn->subject?->school_sub_category_id;
+                    if ($studentSubCategoryId) {
+                        return empty($subCatId) || $subCatId == $studentSubCategoryId;
+                    }
+                    return empty($subCatId);
+                });
+
+                // Fallback: If no routines match the filter, fallback to all class routines
+                if ($studentRoutines->isEmpty()) {
+                    $studentRoutines = $examRoutines;
+                }
+
+                $totalRoutines = $studentRoutines->count();
+                $half = ceil($totalRoutines / 2);
+                $colA = $studentRoutines->slice(0, $half);
+                $colB = $studentRoutines->slice($half);
+            @endphp
+
             {{-- ── ADMIT CARD BOX TABLE WRAPPER ── --}}
             <table class="card-table-wrap" cellpadding="0" cellspacing="0">
                 <tr>
@@ -306,7 +324,8 @@
                                             @php
                                                 $qrSvg = null;
                                                 try {
-                                                    $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . "\nExam: " . ($exam->name ?? '');
+                                                    $groupStr = $student->group->name ?? '';
+                                                    $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . ($groupStr ? "\nGroup: {$groupStr}" : '') . "\nExam: " . ($exam->name ?? '');
                                                     $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->generate($qrData));
                                                 } catch (\Throwable $e) {
                                                     $qrSvg = null;
@@ -334,7 +353,9 @@
                                 </tr>
                                 <tr>
                                     <td class="lbl">ID</td>
-                                    <td class="val" colspan="3">: {{ $student->student_id ?? 'N/A' }}</td>
+                                    <td class="val">: {{ $student->student_id ?? 'N/A' }}</td>
+                                    <td class="lbl">Group</td>
+                                    <td class="val" style="color: #1e3a8a; font-weight: bold;">: {{ $student->group->name ?? 'General' }}</td>
                                     <td class="lbl">Section</td>
                                     <td class="val">: {{ $student->section->name ?? 'N/A' }}</td>
                                     <td class="lbl">Session</td>
