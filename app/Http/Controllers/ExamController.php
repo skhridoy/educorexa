@@ -6,6 +6,7 @@ use App\Models\Exam;
 use App\Models\AcademicYear;
 use App\Models\Classes;
 use App\Models\SchoolCategory;
+use App\Models\ExamRoutine;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\School;
@@ -420,6 +421,7 @@ class ExamController extends Controller
         $schoolLogo = $school?->logo;
         $students = null;
         $selected_exam = null;
+        $examRoutines = collect();
 
         if ($request->filled('class_id') && $request->filled('exam_id')) {
             $students = Student::where('school_id', $schoolId)
@@ -429,9 +431,17 @@ class ExamController extends Controller
                 ->get();
                 
             $selected_exam = Exam::find($request->exam_id);
+
+            // Load Exam Routine for this exam & class
+            $examRoutines = ExamRoutine::where('school_id', $schoolId)
+                ->where('exam_id', $request->exam_id)
+                ->where('class_id', $request->class_id)
+                ->with('subject')
+                ->orderBy('exam_date', 'asc')
+                ->get();
         }
 
-        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo'));
+        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines'));
     }
     
     public function bulkAdmitCard(Request $request, $tenant)
@@ -445,11 +455,19 @@ class ExamController extends Controller
 
         $exam = Exam::findOrFail($request->exam_id);
         $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
+
+        // Load exam routine specifically for this exam & class
+        $examRoutines = ExamRoutine::where('school_id', $schoolId)
+            ->where('exam_id', $request->exam_id)
+            ->where('class_id', $request->class_id)
+            ->with('subject')
+            ->orderBy('exam_date', 'asc')
+            ->get();
         
-        $pdf = Pdf::loadView('school.exam.bulk_admit_card', compact('students', 'exam', 'school'));
+        $pdf = Pdf::loadView('school.exam.bulk_admit_card', compact('students', 'exam', 'school', 'examRoutines'));
         
-        // ল্যান্ডস্কেপ মোড সেট করা
-        return $pdf->setPaper('a4', 'landscape')->download('bulk-admit-card.pdf');
+        // Portrait mode — 2 cards stacked vertically per A4 page
+        return $pdf->setPaper('a4', 'portrait')->download('bulk-admit-card.pdf');
     }
 
     public function publishResult(Request $request, $tenant, $id)

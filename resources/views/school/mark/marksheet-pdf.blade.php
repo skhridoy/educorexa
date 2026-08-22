@@ -28,19 +28,20 @@
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             z-index: -1000;
             pointer-events: none;
+            text-align: center;
         }
         .watermark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 380px;
             height: auto;
+            margin-top: -190px;
+            margin-left: -190px;
             opacity: 0.07;
         }
 

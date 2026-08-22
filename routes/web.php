@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     FooterSettingController, SchoolOverviewController, LessonPlanController,
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
     MainContactMsgController, ReviewController,
-    RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController
+    RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController,
+    ExamRoutineController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -201,8 +202,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
     ->scopeBindings()
     ->group(function () {
 
+            Route::get('exam-routine/subjects-by-class/{classId}', [ExamRoutineController::class, 'subjectsByClass'])->name('exam.routine.subjects.by.class');
             Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
-            Route::get('/about-us', [SchoolWebsiteController::class, 'about'])->name('school.about');
+            // Duplicate DELETE route removed (handled in auth middleware group)
 
             // Login Form
             Route::get('/login', [AuthController::class, 'loginForm'])
@@ -426,6 +428,13 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('exams/bulk-admit-card', [ExamController::class, 'bulkAdmitCard'])->name('exam.bulk_admit_card');
                     Route::post('/exams/{exam}/publish', [ExamController::class, 'publishResult'])->name('exams.publish');
                     Route::resource('exams', ExamController::class);
+
+                    // Exam Routine
+                    Route::get('exam-routine', [ExamRoutineController::class, 'index'])->name('exam.routine.index');
+                    Route::post('exam-routine', [ExamRoutineController::class, 'store'])->name('exam.routine.store');
+                    Route::post('exam-routine/delete-all', [ExamRoutineController::class, 'destroyAll'])->name('exam.routine.destroyAll');
+                    Route::delete('exam-routine/{id?}', [ExamRoutineController::class, 'destroy'])->name('exam.routine.destroy');
+                    Route::get('exam-routine/filter-data', [ExamRoutineController::class, 'getFilterData'])->name('exam.routine.filter.data');
                 });
 
                 Route::middleware(['auth', 'permission:mark.manage', 'school_package:mark.manage'])->group(function () {

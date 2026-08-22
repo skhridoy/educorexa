@@ -2,178 +2,466 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Admit Card - {{ $exam->name }}</title>
     <style>
         @page {
-            size: A4 landscape;
-            margin: 15px;
+            size: A4 portrait;
+            margin: 12mm 16mm 12mm 16mm;
         }
-        body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        .container {
-            width: 100%;
-        }
-        .card-wrapper {
-            width: 47%; /* উইডথ কিছুটা কমানো হলো গ্যাপ বাড়ানোর জন্য */
-            float: left;
-            margin: 15px 1.5%; /* ডবল গ্যাপ তৈরির জন্য মার্জিন বাড়ানো হয়েছে (উপরে-নিচে ১৫px, পাশে ১.৫%) */
-            gap: 5;
-            border: 1px solid #000;
-            margin-bottom: 20px;
-            position: relative;
-            height: 330px; /* উচ্চতা অ্যাডজাস্ট করা হয়েছে */
-            background: #fff;
-            box-sizing: border-box; /* বর্ডারকে উইডথের ভেতরে রাখার জন্য */
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            color: #0f172a;
+            background: #ffffff;
+            font-size: 11px;
+            line-height: 1.15;
         }
 
-        .card-wrapper {
-            outline: 1px dashed #ccc; /* কাটার গাইডলাইন হিসেবে হালকা ডটেড লাইন */
-            outline-offset: 10px; /* কার্ড থেকে ১০px দূরে ডটেড লাইন দেখাবে */
+        /* ── Main Outer Table Container for DomPDF stability ── */
+        .card-table-wrap {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-bottom: 0;
         }
+        .card-table-wrap td.card-cell {
+            border: 2px solid #0f172a;
+            border-radius: 6px;
+            padding: 7px 10px 5px 10px;
+            background: #ffffff;
+            position: relative;
+            vertical-align: top;
+        }
+
+        /* Watermark */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.1;
-            z-index: -1;
-            text-align: center;
+            width: 140px;
+            height: 140px;
+            margin-top: -70px;
+            margin-left: -70px;
+            opacity: 0.06;
+            z-index: 0;
         }
         .watermark img {
-            width: 180px;
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
         }
-        .header {
-            text-align: center;
-            border-bottom: 1px solid #000;
-            padding: 5px;
-            background: #f8f9fa;
+
+        .card-content {
+            position: relative;
+            z-index: 1;
         }
-        .header h3 { margin: 0; font-size: 16px; text-transform: uppercase; }
-        .header p { margin: 2px 0; font-size: 12px; }
-        
-        .content {
-            padding: 10px;
-            
-        }
-        .student-info {
-            width: 65%;
-           
-            float: left;
-        }
-        .student-photo {
-            width: 30%;
-            float: right;
-            text-align: center;
-        }
-        .info-table {
+
+        /* ── Header: Logo | School Info | QR ── */
+        .header-tbl {
             width: 100%;
-            font-size: 14px;
-        
             border-collapse: collapse;
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            table-layout: fixed;
         }
-        .info-table td {
-            padding: 8px 0; 
-            line-height: 1.6;
-            vertical-align: top;
+        .hdr-logo {
+            width: 80px;
+            vertical-align: middle;
+            text-align: left;
         }
-        .photo-box {
-            width: 85px;
-            height: 85px;
-            border: 1px solid #666;
-            margin: 0 auto;
-            display: block;
-            margin-top: 5px;
+        .hdr-logo img {
+            width: 78px;
+            height: 78px;
+            object-fit: contain;
+            border-radius: 4px;
         }
-        .qr-code {
-            margin-top: 10px;
+        .hdr-center {
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
         }
-        .footer {
-            position: absolute;
-            bottom: 15px;
+        .school-name {
             width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #0f172a;
+            margin: 0 0 2px 0;
+            line-height: 1.05;
         }
-        .sig-box-1 {
-            width: 40%;
-            float: left;
-            text-align: center;
-            margin: 0 5%;
+        .school-meta {
+            font-size: 10px;
+            color: #334155;
+            margin: 1px 0;
+            line-height: 1.1;
+        }
+        .school-code-line {
+            font-size: 9.5px;
+            color: #475569;
+            margin: 1px 0;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .exam-name-line {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 2px 0 1px 0;
+            line-height: 1;
+        }
+        .admit-badge {
+            display: inline-block;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 2px 10px;
             font-size: 14px;
-            border-top: 1px solid #000;
+            font-weight: bold;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            line-height: 1.1;
         }
-        .sig-box-2 {
-            width: 40%;
-            float: right;
+        .hdr-qr {
+            width: 80px;
+            vertical-align: middle;
+            text-align: right;
+        }
+        .qr-box {
+            display: inline-block;
+            padding: 2px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* ── Student Info Table ── */
+        .student-info-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            table-layout: fixed;
+        }
+        .student-info-tbl td {
+            padding: 2.5px 5px;
+            vertical-align: middle;
+            font-size: 12px;
+            line-height: 1.1;
+        }
+        .lbl {
+            color: #475569;
+            font-weight: bold;
+            width: 13%;
+            font-size: 11px;
+        }
+        .val {
+            color: #0f172a;
+            font-weight: bold;
+            width: 20%;
+            font-size: 12px;
+        }
+        .val-name {
+            color: #1e3a8a;
+            font-weight: bold;
+            width: 34%;
+            font-size: 12px;
+        }
+
+        /* ── Routine Section (2 Columns with Time) ── */
+        .routine-heading {
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            background: #0f172a;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             text-align: center;
-            margin: 0 5%;
-            font-size: 14px;
-            border-top: 1px solid #000;
+            line-height: 1.1;
         }
-        .clear { clear: both; }
-        .page-break { page-break-after: always; }
+        .routine-grid-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .sub-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            table-layout: fixed;
+        }
+        .sub-tbl th {
+            background: #1e293b;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2.5px 4px;
+            border: 1px solid #1e293b;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.1;
+        }
+        .sub-tbl td {
+            padding: 2.5px 4px;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            vertical-align: middle;
+            line-height: 1.1;
+            font-size: 12px;
+        }
+        .sub-tbl tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+        .no-rtn {
+            font-size: 10px;
+            color: #94a3b8;
+            font-style: italic;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            line-height: 1.1;
+        }
+
+        /* ── Signatures ── */
+        .footer-wrap {
+            margin-top: 40px;
+            padding-top: 0;
+        }
+        .footer-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .sig-box {
+            width: 40%;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #1e293b;
+            text-transform: uppercase;
+            padding-top: 4px;
+            border-top: 1.5px dashed #334155;
+            line-height: 1.1;
+        }
+
+        /* Scissor cut line */
+        .cut-line {
+            width: 100%;
+            text-align: center;
+            font-size: 9.5px;
+            color: #64748b;
+            margin: 2.5mm 0;
+            line-height: 1;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        @foreach($students as $index => $student)
-            <div class="card-wrapper">
-                {{-- ওয়াটারমার্ক --}}
-                <div class="watermark">
-                    <img src="{{ ($school->logo) }}">
-                </div>
+    @foreach($students->chunk(3) as $chunkIndex => $trio)
+        @php
+            $totalRoutines = $examRoutines->count();
+            $half = ceil($totalRoutines / 2);
+            $colA = $examRoutines->slice(0, $half);
+            $colB = $examRoutines->slice($half);
+        @endphp
 
-                <div class="header">
-                    <h3>{{ auth()->user()->school->name }}</h3>
-                    <p>{{ $exam->name }} - {{ date('Y') }}</p>
-                </div>
-
-                <div class="content">
-                    <div class="student-info">
-                        <table class="info-table">
-                            <tr><td width="30%"><strong>Roll</strong></td><td>: {{ $student->roll }}</td></tr>
-                            <tr><td><strong>ID</strong></td><td>: {{ $student->student_id }}</td></tr>
-                            <tr><td><strong>Name</strong></td><td>: {{ $student->name }}</td></tr>
-                            <tr><td><strong>Class</strong></td><td>: {{ $student->class->name }}</td></tr>
-                            <tr><td><strong>Session</strong></td><td>: {{ date('Y') }}</td></tr>
-                        </table>
-                    </div>
-
-                    <div class="student-photo">
-                        <div class="photo-box">
-                            @if($student->photo)
-                                <img src="{{ public_path($student->photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
-                            @else
-                                <span style="font-size: 10px; line-height: 80px; color: #ccc;">Photo</span>
+        @foreach($trio as $pairIndex => $student)
+            {{-- ── ADMIT CARD BOX TABLE WRAPPER ── --}}
+            <table class="card-table-wrap" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="card-cell">
+                        {{-- Watermark --}}
+                        <div class="watermark">
+                            @if($school && $school->logo && file_exists(public_path($school->logo)))
+                                <img src="{{ public_path($school->logo) }}">
                             @endif
                         </div>
-                        <div class="qr-code">
-                            @php
-                                $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(50)->generate("ID: " . $student->student_id));
-                            @endphp
-                            <img src="data:image/svg+xml;base64, {!! $qrCode !!}">
+
+                        <div class="card-content">
+                            {{-- 1. Header: Logo | School Info Center | QR --}}
+                            <table class="header-tbl" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    {{-- Left: School Logo --}}
+                                    <td class="hdr-logo">
+                                        @if($school && $school->logo && file_exists(public_path($school->logo)))
+                                            <img src="{{ public_path($school->logo) }}">
+                                        @else
+                                            <div style="width:78px; height:78px; border:1px solid #cbd5e1; border-radius:4px; text-align:center; line-height:78px; font-size:9px; color:#94a3b8; background:#f8fafc;">LOGO</div>
+                                        @endif
+                                    </td>
+
+                                    {{-- Center: School Name, Address, Code, Exam, Badge --}}
+                                    <td class="hdr-center">
+                                        <div class="school-name">{{ $school->name ?? 'SCHOOL NAME' }}</div>
+
+                                        @php
+                                            $metaParts = [];
+                                            if(!empty($school->address)) $metaParts[] = $school->address;
+                                            if(!empty($school->phone))   $metaParts[] = 'Mobile: ' . $school->phone;
+                                            if(!empty($school->email))   $metaParts[] = $school->email;
+                                        @endphp
+                                        @if(count($metaParts) > 0)
+                                            <div class="school-meta">{{ implode(' | ', $metaParts) }}</div>
+                                        @endif
+
+                                        @php
+                                            $codeParts = [];
+                                            if(!empty($school->emis_code))  $codeParts[] = 'EMIS: ' . $school->emis_code;
+                                            if(!empty($school->ein_number)) $codeParts[] = 'EIN: '  . $school->ein_number;
+                                            if(!empty($school->app_code))   $codeParts[] = 'Code: ' . $school->app_code;
+                                        @endphp
+                                        @if(count($codeParts) > 0)
+                                            <div class="school-code-line">{{ implode('  |  ', $codeParts) }}</div>
+                                        @endif
+
+                                        <div class="exam-name-line">{{ $exam->name }} &mdash; {{ date('Y') }}</div>
+                                        <div><span class="admit-badge">ADMIT CARD</span></div>
+                                    </td>
+
+                                    {{-- Right: QR Code --}}
+                                    <td class="hdr-qr">
+                                        <div class="qr-box">
+                                            @php
+                                                $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . "\nExam: {$exam->name}";
+                                                $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(75)->generate($qrData));
+                                            @endphp
+                                            <img src="data:image/svg+xml;base64,{!! $qrSvg !!}" style="width:75px; height:75px; display:block;">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            {{-- 2. Student Info --}}
+                            <table class="student-info-tbl" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td class="lbl">Name</td>
+                                    <td class="val-name" colspan="3">: {{ strtoupper($student->name) }}</td>
+                                    <td class="lbl">Class</td>
+                                    <td class="val">: {{ $student->class->name ?? 'N/A' }}</td>
+                                    <td class="lbl">Roll</td>
+                                    <td class="val">: {{ $student->roll ?? 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="lbl">ID</td>
+                                    <td class="val" colspan="3">: {{ $student->student_id ?? 'N/A' }}</td>
+                                    <td class="lbl">Section</td>
+                                    <td class="val">: {{ $student->section->name ?? 'N/A' }}</td>
+                                    <td class="lbl">Session</td>
+                                    <td class="val">: {{ date('Y') }}</td>
+                                </tr>
+                            </table>
+
+                            {{-- 3. Exam Routine (2 Columns with Time) --}}
+                            <div class="routine-heading">{{ $exam->name }} Routine</div>
+                            @if($totalRoutines > 0)
+                                <table class="routine-grid-tbl" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        {{-- Column A --}}
+                                        <td style="width: 49%; vertical-align: top;">
+                                            <table class="sub-tbl" cellpadding="0" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 28%;">Date</th>
+                                                        <th style="width: 42%;">Subject</th>
+                                                        <th style="width: 30%;">Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($colA as $rtn)
+                                                        <tr>
+                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap;">
+                                                                {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
+                                                            </td>
+                                                            <td style="font-weight: bold;">
+                                                                {{ $rtn->subject->name ?? 'N/A' }}
+                                                            </td>
+                                                            <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 600;">
+                                                                {{ $rtn->start_time ? \Carbon\Carbon::parse($rtn->start_time)->format('h:i A') : '-' }}
+                                                                {{ $rtn->end_time ? '- ' . \Carbon\Carbon::parse($rtn->end_time)->format('h:i A') : '' }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </td>
+
+                                        <td style="width: 2%;"></td>
+
+                                        {{-- Column B --}}
+                                        <td style="width: 49%; vertical-align: top;">
+                                            <table class="sub-tbl" cellpadding="0" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 28%;">Date</th>
+                                                        <th style="width: 42%;">Subject</th>
+                                                        <th style="width: 30%;">Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse($colB as $rtn)
+                                                        <tr>
+                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap;">
+                                                                {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
+                                                            </td>
+                                                            <td style="font-weight: bold;">
+                                                                {{ $rtn->subject->name ?? 'N/A' }}
+                                                            </td>
+                                                            <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 600;">
+                                                                {{ $rtn->start_time ? \Carbon\Carbon::parse($rtn->start_time)->format('h:i A') : '-' }}
+                                                                {{ $rtn->end_time ? '- ' . \Carbon\Carbon::parse($rtn->end_time)->format('h:i A') : '' }}
+                                                            </td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr><td colspan="3" style="text-align:center; color:#94a3b8;">&mdash;</td></tr>
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            @else
+                                <div class="no-rtn">No examination routine has been scheduled for this class.</div>
+                            @endif
+
+                            {{-- 4. Signature Footer (with proper space above) --}}
+                            <div class="footer-wrap">
+                                <table class="footer-tbl" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="sig-box">Class Teacher</td>
+                                        <td style="width: 20%;"></td>
+                                        <td class="sig-box">Principal / Headmaster</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    </td>
+                </tr>
+            </table>
+
+            {{-- Scissor cut line between cards --}}
+            @if(!$loop->last)
+                <div class="cut-line">
+                    &#9986; -----------------------------------------------------------------------------------------------------------------------------------------------
                 </div>
-
-                <div class="clear"></div>
-
-                <div class="footer">
-                    <div class="sig-box-1">Class Teacher</div>
-                    <div class="sig-box-2">Principal</div>
-                    <div class="clear"></div>
-                </div>
-            </div>
-
-            {{-- প্রতি ৪টি কার্ডের পর পেজ ব্রেক এবং ২টির পর ফ্লোট ক্লিয়ার --}}
-            @if(($index + 1) % 2 == 0)
-                <div class="clear"></div>
-            @endif
-
-            @if(($index + 1) % 4 == 0 && !$loop->last)
-                <div class="page-break"></div>
             @endif
         @endforeach
-    </div>
+
+        {{-- Page break after every 3 students --}}
+        @if(!$loop->last)
+            <div class="page-break"></div>
+        @endif
+    @endforeach
 </body>
 </html>

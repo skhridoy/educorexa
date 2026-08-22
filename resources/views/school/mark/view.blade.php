@@ -201,123 +201,175 @@
         .status-toggle .st-btn:hover:not(.active-present):not(.active-absent) { background: #f1f5f9; color: #475569; }
 
         /* ══════════════════════════════════════════════
-           STUDENT MARK CARD (EDIT MODE)
+           RESPONSIVE TABLE STYLES (DESKTOP & MOBILE)
         ══════════════════════════════════════════════ */
-        .student-card-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 14px;
+        .edit-table-wrap,
+        .report-table-wrap {
+            width: 100%;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 0 6px;
         }
-        .student-mark-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 13px 18px;
-            gap: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            transition: all 0.22s ease;
+        .edit-table-wrap::-webkit-scrollbar,
+        .report-table-wrap::-webkit-scrollbar { height: 6px; }
+        .edit-table-wrap::-webkit-scrollbar-track,
+        .report-table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
+        .edit-table-wrap::-webkit-scrollbar-thumb,
+        .report-table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .edit-tbl,
+        .report-tbl {
+            width: 100% !important;
+            min-width: 720px;
+            border-collapse: collapse !important;
+            display: table !important;
         }
-        .student-mark-card:hover {
-            box-shadow: 0 8px 24px rgba(15,23,42,0.08);
-            border-color: #c7d2fe;
-            transform: translateY(-1px);
+        .edit-tbl thead,
+        .report-tbl thead {
+            display: table-header-group !important;
         }
-        .student-mark-card.card-absent {
-            background: #fff8f8;
-            border-color: #fecaca;
+        .edit-tbl thead th,
+        .report-tbl thead th {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            font-size: 0.65rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+            padding: 8px 10px !important;
+            border: none !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+            white-space: nowrap !important;
+            display: table-cell !important;
+            vertical-align: middle !important;
+        }
+        .edit-tbl tbody,
+        .report-tbl tbody {
+            display: table-row-group !important;
+        }
+        .edit-tbl tbody tr,
+        .report-tbl tbody tr {
+            display: table-row !important;
+            padding: 0 !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            transition: background 0.15s ease;
+        }
+        .edit-tbl tbody tr:hover,
+        .report-tbl tbody tr:hover { background: #fafbff !important; }
+        .edit-tbl tbody tr.row-absent { background: #fff8f8 !important; }
+
+        .edit-tbl tbody td,
+        .report-tbl tbody td {
+            display: table-cell !important;
+            padding: 6px 10px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f1f5f9 !important;
+            font-size: 0.75rem !important;
+            white-space: nowrap !important;
+            text-align: center;
+        }
+        .edit-tbl tbody td::before,
+        .report-tbl tbody td::before {
+            display: none !important;
+            content: none !important;
         }
 
-        /* LEFT: Avatar + Info */
-        .smc-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-            flex: 1;
+        /* Student name column */
+        .student-name-text {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: #0f172a;
         }
-        .smc-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: #ffffff;
-            font-size: 1.1rem;
+        .edit-tbl .col-name,
+        .report-tbl .col-name {
+            min-width: 150px;
+            white-space: normal !important;
+            text-align: left !important;
+        }
+
+        /* Avatar chip */
+        .tbl-avatar {
+            width: 26px; height: 26px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-size: 0.7rem;
             font-weight: 800;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(79,70,229,0.25);
         }
-        .smc-info { min-width: 0; flex: 1; }
-        .smc-name {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.25;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .tbl-id-badge {
+            display: inline-flex; align-items: center;
+            font-size: 0.6rem; font-weight: 600;
+            padding: 2px 5px; border-radius: 4px;
+            background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;
         }
+        .tbl-roll-badge {
+            display: inline-flex; align-items: center;
+            font-size: 0.6rem; font-weight: 600;
+            padding: 2px 5px; border-radius: 4px;
+            background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+        }
+
+        .mark-cell { font-weight: 600; color: #374151; }
+        .grade-text { font-size: 0.65rem; color: #94a3b8; font-weight: 400; }
+        .total-badge {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1d4ed8;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            border: 1px solid #bfdbfe;
+        }
+        .gpa-badge {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            color: #15803d;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            border: 1px solid #bbf7d0;
+        }
+        .merit-badge {
+            background: linear-gradient(135deg, #fef9c3, #fef08a);
+            color: #a16207;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            border: 1px solid #fde68a;
+        }
+
+        /* Mark Box */
         .smc-meta {
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-top: 4px;
             flex-wrap: wrap;
         }
-        .smc-badge {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 2px 7px;
-            border-radius: 5px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            color: #475569;
-        }
-        .smc-roll-badge { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-        .smc-id-badge   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-
-        /* RIGHT: Controls */
-        .smc-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-        .smc-mark-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Mark Box */
         .smc-mark-box {
             display: inline-flex;
             align-items: center;
             border: 1.5px solid #cbd5e1;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #ffffff;
             overflow: hidden;
             transition: all 0.2s;
-            height: 38px;
+            height: 32px;
         }
         .smc-mark-box:focus-within {
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
         .mark-input {
-            width: 46px;
+            width: 40px;
             height: 100%;
             text-align: center;
             border: none;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: #0f172a;
             background: transparent;
@@ -333,11 +385,11 @@
             height: 100%;
         }
         .smc-mark-denom {
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: #94a3b8;
-            padding-right: 8px;
-            padding-left: 6px;
+            padding-right: 6px;
+            padding-left: 4px;
             border-left: 1px solid #e2e8f0;
             height: 100%;
             display: inline-flex;
@@ -355,13 +407,13 @@
             gap: 2px;
         }
         .grade-pill-lg {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 800;
             background: #f1f5f9;
             color: #64748b;
@@ -377,133 +429,9 @@
         .grade-pill-lg.gp-f  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
 
         /* ══════════════════════════════════════════════
-           FULL REPORT TABLE ENHANCEMENTS
+           FULL REPORT TABLE: always scrollable
         ══════════════════════════════════════════════ */
-        .report-table-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .report-table-wrap::-webkit-scrollbar { height: 5px; }
-        .report-table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
-        .report-table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .data-table.report-tbl thead th {
-            background: linear-gradient(135deg, #1e293b, #334155);
-            color: #fff;
-            font-size: 0.68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 13px 14px;
-            border: none;
-            white-space: nowrap;
-        }
-        .data-table.report-tbl thead th:first-child { border-radius: 0; }
-        .data-table.report-tbl tbody td {
-            padding: 12px 14px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-        .data-table.report-tbl tbody tr:hover { background: #fafbff; }
-        .mark-cell { font-weight: 600; color: #374151; }
-        .grade-text { font-size: 0.72rem; color: #94a3b8; font-weight: 400; }
-        .total-badge {
-            background: linear-gradient(135deg, #eff6ff, #dbeafe);
-            color: #1d4ed8;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            border: 1px solid #bfdbfe;
-        }
-        .gpa-badge {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            color: #15803d;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            border: 1px solid #bbf7d0;
-        }
-        .merit-badge {
-            background: linear-gradient(135deg, #fef9c3, #fef08a);
-            color: #a16207;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid #fde68a;
-        }
-
-        /* ══════════════════════════════════════════════
-           MOBILE CARD VIEW (Full Report Mobile)
-        ══════════════════════════════════════════════ */
-        .mobile-result-card {
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(15,23,42,0.04);
-            transition: all 0.2s;
-            display: none;
-        }
-        .mobile-result-card:hover { border-color: #c7d2fe; }
-        .mrc-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .mrc-student {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .mrc-avatar {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 800;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .mrc-name { font-size: 0.85rem; font-weight: 700; color: #0f172a; }
-        .mrc-roll { font-size: 0.68rem; color: #64748b; font-weight: 600; margin-top: 2px; }
-        .mrc-badges { display: flex; gap: 6px; flex-shrink: 0; }
-        .mrc-subjects {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .mrc-subject-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 8px 10px;
-        }
-        .mrc-sub-name { font-size: 0.67rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px; }
-        .mrc-sub-mark { font-size: 0.9rem; font-weight: 800; color: #1e293b; }
-        .mrc-sub-grade { font-size: 0.7rem; color: #64748b; font-weight: 600; }
-        .mrc-sub-na { font-size: 0.78rem; color: #ef4444; font-weight: 600; }
-        .mrc-footer {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid #f1f5f9;
-            flex-wrap: wrap;
-        }
-
-        /* ══════════════════════════════════════════════
-           SHOW/HIDE: TABLE vs CARDS
-        ══════════════════════════════════════════════ */
-        .desktop-report-table { display: block; }
-        .mobile-report-cards  { display: none; }
+        .desktop-report-table { display: block; width: 100%; }
 
         /* ══════════════════════════════════════════════
            EDITING MODE BADGE
@@ -519,6 +447,12 @@
             padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid #bfdbfe;
+        }
+
+        .records-badge {
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
         }
 
         /* ══════════════════════════════════════════════
@@ -742,7 +676,9 @@
         body.dark-mode .stat-card .num,
         [data-bs-theme="dark"] .stat-card .num { color: #f8fafc !important; }
         body.dark-mode .smc-name,
-        [data-bs-theme="dark"] .smc-name { color: #f8fafc !important; }
+        [data-bs-theme="dark"] .smc-name,
+        body.dark-mode .student-name-text,
+        [data-bs-theme="dark"] .student-name-text { color: #f8fafc !important; }
         body.dark-mode .smc-mark-box,
         [data-bs-theme="dark"] .smc-mark-box {
             background: #0c1427 !important;
@@ -755,20 +691,24 @@
             background: #060c18 !important;
             border-color: #1a253b !important;
         }
-        body.dark-mode .mobile-result-card,
-        [data-bs-theme="dark"] .mobile-result-card {
-            background: #0c1427 !important;
-            border-color: #1a253b !important;
+        body.dark-mode .edit-tbl thead th,
+        body.dark-mode .report-tbl thead th,
+        [data-bs-theme="dark"] .edit-tbl thead th,
+        [data-bs-theme="dark"] .report-tbl thead th {
+            background: linear-gradient(135deg, #0c1427, #1a253b) !important;
+            color: #f8fafc !important;
         }
-        body.dark-mode .mrc-subject-item,
-        [data-bs-theme="dark"] .mrc-subject-item {
-            background: #060c18 !important;
+        body.dark-mode .edit-tbl tbody td,
+        body.dark-mode .report-tbl tbody td,
+        [data-bs-theme="dark"] .edit-tbl tbody td,
+        [data-bs-theme="dark"] .report-tbl tbody td {
             border-color: #1a253b !important;
+            color: #e2e8f0 !important;
         }
-        body.dark-mode .mrc-name,
-        [data-bs-theme="dark"] .mrc-name { color: #f8fafc !important; }
-        body.dark-mode .mrc-sub-mark,
-        [data-bs-theme="dark"] .mrc-sub-mark { color: #f8fafc !important; }
+        body.dark-mode .edit-tbl tbody tr:hover,
+        body.dark-mode .report-tbl tbody tr:hover,
+        [data-bs-theme="dark"] .edit-tbl tbody tr:hover,
+        [data-bs-theme="dark"] .report-tbl tbody tr:hover { background: #0a1020 !important; }
         body.dark-mode .tab-toggle,
         [data-bs-theme="dark"] .tab-toggle { background: #1a253b; }
         body.dark-mode .tab-btn.active,
@@ -793,6 +733,12 @@
             background: #0c1427 !important;
             border-color: #1a253b !important;
         }
+        body.dark-mode .records-badge,
+        [data-bs-theme="dark"] .records-badge {
+            background: #060c18 !important;
+            color: #94a3b8 !important;
+            border-color: #1a253b !important;
+        }
 
         /* ══════════════════════════════════════════════
            RESPONSIVE BREAKPOINTS
@@ -804,9 +750,6 @@
             .mark-hero { padding: 22px 20px; }
             .mark-hero-title { font-size: 1.4rem; }
             .mark-filter-card { padding: 16px 18px; }
-            .desktop-report-table { display: none !important; }
-            .mobile-report-cards  { display: block !important; }
-            .mobile-result-card   { display: block !important; }
             /* Section header stacks vertically on tablet */
             .section-header-bar { flex-direction: column; align-items: flex-start !important; gap: 10px; }
             .pdf-actions-bar { width: 100%; flex-wrap: wrap; }
@@ -825,34 +768,6 @@
             .st-text { display: none; }
             .st-icon { margin-right: 0 !important; }
 
-            /* Student mark card stacks vertically on mobile */
-            .student-mark-card {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 12px 14px;
-                gap: 10px;
-            }
-            .smc-left { width: 100%; }
-            .smc-avatar { width: 38px; height: 38px; font-size: 1rem; border-radius: 10px; }
-            .smc-name   { font-size: 0.83rem; white-space: normal; }
-            .smc-right {
-                width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 9px;
-                margin-top: 2px;
-                gap: 8px;
-            }
-            .smc-mark-row { gap: 6px; }
-            .status-toggle { height: 34px; }
-            .status-toggle .st-btn { padding: 0 10px; font-size: 0.75rem; }
-            .smc-mark-box { height: 34px; }
-            .mark-input   { width: 40px; font-size: 0.88rem; }
-            .smc-mark-denom { font-size: 0.66rem; padding: 0 6px; }
-            .grade-pill-lg { width: 34px; height: 34px; font-size: 0.78rem; border-radius: 8px; }
-
             /* Stats bar on mobile */
             .stat-card { min-width: 68px; padding: 10px 12px; }
             .stat-card .num { font-size: 1.1rem; }
@@ -860,8 +775,10 @@
             /* Section header */
             .section-header-bar { padding: 12px 14px; flex-direction: column; align-items: flex-start; }
 
-            /* Mobile result cards */
-            .mrc-subjects { grid-template-columns: repeat(2, 1fr); }
+            /* Edit table on small mobile: compact */
+            .edit-tbl thead th { font-size: 0.62rem; padding: 9px 10px; }
+            .edit-tbl tbody td { font-size: 0.8rem; padding: 8px 10px; }
+            .tbl-avatar { width: 28px; height: 28px; font-size: 0.75rem; }
 
             /* Filter grid: 2 cols on small mobile */
             .filter-grid-row .col-md-2,
@@ -897,9 +814,8 @@
 
         /* ── Very small (≤ 400px) ── */
         @media (max-width: 399.98px) {
-            .mrc-subjects { grid-template-columns: repeat(2, 1fr); }
-            .smc-right { flex-wrap: wrap; }
             .mark-hero-title { font-size: 1.1rem; }
+            .status-toggle .st-btn { padding: 0 7px; font-size: 0.7rem; }
         }
     </style>
 @endsection
@@ -1093,74 +1009,85 @@
                     </div>
                 </div>
 
-                {{-- Card Grid --}}
-                <div class="student-card-grid">
-                    @forelse($students as $i => $student)
-                        @php
-                            $markRecord = $subjectMarks->get($student->id);
-                            $markValue  = $markRecord?->marks;
-                            $status     = $markRecord?->status ?? 'present';
-                            $grade      = null;
-                            $gradeClass = '';
-                            if ($markValue !== null && $fullMark > 0) {
-                                $pct = ($markValue / $fullMark) * 100;
-                                if      ($pct >= 80) { $grade = 'A+'; $gradeClass = 'gp-ap'; }
-                                elseif  ($pct >= 70) { $grade = 'A';  $gradeClass = 'gp-a';  }
-                                elseif  ($pct >= 60) { $grade = 'A-'; $gradeClass = 'gp-am'; }
-                                elseif  ($pct >= 50) { $grade = 'B';  $gradeClass = 'gp-b';  }
-                                elseif  ($pct >= 40) { $grade = 'C';  $gradeClass = 'gp-c';  }
-                                elseif  ($pct >= 33) { $grade = 'D';  $gradeClass = 'gp-d';  }
-                                else                 { $grade = 'F';  $gradeClass = 'gp-f';  }
-                            }
-                            $initials = strtoupper(substr($student->name, 0, 1));
-                        @endphp
+                {{-- Responsive Table --}}
+                <div class="edit-table-wrap">
+                    <table class="edit-tbl mb-0 text-center">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;">#</th>
+                                <th>Roll</th>
+                                <th>Student ID</th>
+                                <th class="text-start">Student Name</th>
+                                <th>Attendance</th>
+                                <th>Mark <small class="opacity-60" style="font-weight:400;font-size:0.6rem;">(/ {{ $fullMark }})</small></th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @forelse($students as $i => $student)
+                            @php
+                                $markRecord = $subjectMarks->get($student->id);
+                                $markValue  = $markRecord?->marks;
+                                $status     = $markRecord?->status ?? 'present';
+                                $grade      = null;
+                                $gradeClass = '';
+                                if ($markValue !== null && $fullMark > 0) {
+                                    $pct = ($markValue / $fullMark) * 100;
+                                    if      ($pct >= 80) { $grade = 'A+'; $gradeClass = 'gp-ap'; }
+                                    elseif  ($pct >= 70) { $grade = 'A';  $gradeClass = 'gp-a';  }
+                                    elseif  ($pct >= 60) { $grade = 'A-'; $gradeClass = 'gp-am'; }
+                                    elseif  ($pct >= 50) { $grade = 'B';  $gradeClass = 'gp-b';  }
+                                    elseif  ($pct >= 40) { $grade = 'C';  $gradeClass = 'gp-c';  }
+                                    elseif  ($pct >= 33) { $grade = 'D';  $gradeClass = 'gp-d';  }
+                                    else                 { $grade = 'F';  $gradeClass = 'gp-f';  }
+                                }
+                                $initials = strtoupper(substr($student->name, 0, 1));
+                            @endphp
+                            <tr id="row-{{ $student->id }}" data-student="{{ $student->id }}"
+                                class="{{ $status === 'absent' ? 'row-absent' : '' }} align-middle">
 
-                        <div class="student-mark-card {{ $status === 'absent' ? 'card-absent' : '' }}"
-                             id="row-{{ $student->id }}"
-                             data-student="{{ $student->id }}">
+                                {{-- # (Serial) --}}
+                                <td class="text-muted fw-bold" style="font-size:0.7rem;">{{ $i + 1 }}</td>
 
-                            {{-- LEFT: Profile + Info --}}
-                            <div class="smc-left">
-                                <div class="smc-avatar">{{ $initials }}</div>
-                                <div class="smc-info">
-                                    <div class="smc-name">{{ strtoupper($student->name) }}</div>
-                                    <div class="smc-meta">
-                                        <span class="smc-badge smc-id-badge">
-                                            <i class="fa-solid fa-id-badge me-1"></i>{{ $student->student_id ?? 'N/A' }}
-                                        </span>
-                                        <span class="smc-badge smc-roll-badge">
-                                            <i class="fa-solid fa-hashtag me-1"></i>Roll {{ $student->roll }}
-                                        </span>
+                                {{-- Roll --}}
+                                <td><span class="tbl-roll-badge"><i class="fa-solid fa-hashtag me-1"></i>{{ $student->roll }}</span></td>
+
+                                {{-- Student ID --}}
+                                <td><span class="tbl-id-badge"><i class="fa-solid fa-id-badge me-1"></i>{{ $student->student_id ?? 'N/A' }}</span></td>
+
+                                {{-- Student Name + Avatar --}}
+                                <td class="col-name text-start">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="tbl-avatar">{{ $initials }}</div>
+                                        <span class="student-name-text">{{ strtoupper($student->name) }}</span>
                                     </div>
-                                </div>
-                            </div>
+                                </td>
 
-                            {{-- RIGHT: Controls --}}
-                            <div class="smc-right">
+                                {{-- Attendance Toggle --}}
+                                <td>
+                                    <div class="status-toggle" data-student="{{ $student->id }}">
+                                        <button type="button"
+                                                class="st-btn {{ $status == 'present' ? 'active-present' : '' }}"
+                                                data-value="present"
+                                                data-student="{{ $student->id }}"
+                                                onclick="setStatus({{ $student->id }}, 'present', this)">
+                                            <i class="fa-solid fa-check me-1 st-icon"></i>
+                                            <span class="st-text">Present</span>
+                                        </button>
+                                        <button type="button"
+                                                class="st-btn {{ $status == 'absent' ? 'active-absent' : '' }}"
+                                                data-value="absent"
+                                                data-student="{{ $student->id }}"
+                                                onclick="setStatus({{ $student->id }}, 'absent', this)">
+                                            <i class="fa-solid fa-xmark me-1 st-icon"></i>
+                                            <span class="st-text">Absent</span>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" class="status-hidden" id="status-{{ $student->id }}" value="{{ $status }}">
+                                </td>
 
-                                {{-- Status Toggle --}}
-                                <div class="status-toggle" data-student="{{ $student->id }}">
-                                    <button type="button"
-                                            class="st-btn {{ $status == 'present' ? 'active-present' : '' }}"
-                                            data-value="present"
-                                            data-student="{{ $student->id }}"
-                                            onclick="setStatus({{ $student->id }}, 'present', this)">
-                                        <i class="fa-solid fa-check me-1 st-icon"></i>
-                                        <span class="st-text">Present</span>
-                                    </button>
-                                    <button type="button"
-                                            class="st-btn {{ $status == 'absent' ? 'active-absent' : '' }}"
-                                            data-value="absent"
-                                            data-student="{{ $student->id }}"
-                                            onclick="setStatus({{ $student->id }}, 'absent', this)">
-                                        <i class="fa-solid fa-xmark me-1 st-icon"></i>
-                                        <span class="st-text">Absent</span>
-                                    </button>
-                                </div>
-                                <input type="hidden" class="status-hidden" id="status-{{ $student->id }}" value="{{ $status }}">
-
-                                {{-- Mark + Grade Row --}}
-                                <div class="smc-mark-row">
+                                {{-- Mark Input --}}
+                                <td>
                                     <div class="smc-mark-box">
                                         <input type="number"
                                                class="mark-input"
@@ -1177,22 +1104,26 @@
                                         </span>
                                         <span class="smc-mark-denom">/ {{ $fullMark }}</span>
                                     </div>
+                                </td>
 
-                                    <div class="smc-grade-wrap">
-                                        <div class="grade-pill-lg {{ $gradeClass }}" id="grade-{{ $student->id }}">
-                                            {{ $grade ?? '—' }}
-                                        </div>
+                                {{-- Grade --}}
+                                <td>
+                                    <div class="grade-pill-lg {{ $gradeClass }}" id="grade-{{ $student->id }}">
+                                        {{ $grade ?? '—' }}
                                     </div>
-                                </div>
+                                </td>
 
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-5 text-muted w-100">
-                            <i class="fa-solid fa-users fa-2x mb-2 d-block"></i>
-                            No students found for this class.
-                        </div>
-                    @endforelse
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-users fa-2x mb-2 d-block"></i>
+                                    No students found for this class.
+                                </td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -1277,26 +1208,27 @@
                             <i class="fa-solid fa-file-csv"></i>
                             <span>CSV</span>
                         </a>
-                        <span class="badge bg-light text-muted border py-2 px-3" style="font-size:0.75rem; border-radius:8px;">
+                        <span class="badge records-badge py-2 px-3" style="font-size:0.75rem; border-radius:8px;">
                             {{ $paginatedResults->total() }} Records
                         </span>
                     </div>
                 </div>
 
-                {{-- ── DESKTOP TABLE ── --}}
-                <div class="desktop-report-table report-table-wrap">
-                    <table class="table data-table report-tbl mb-0 text-center">
+                {{-- ── FULL REPORT TABLE (RESPONSIVE) ── --}}
+                <div class="report-table-wrap">
+                    <table class="report-tbl mb-0 text-center">
                         <thead>
                             <tr>
-                                <th>Student ID</th>
+                                <th style="width:40px;">#</th>
                                 <th>Roll</th>
+                                <th>Student ID</th>
                                 <th class="text-start">Student Name</th>
                                 @foreach($subjects as $subject)
                                     <th>{{ $subject->name }}<br><small class="opacity-50" style="font-size:0.6rem;">(M | G)</small></th>
                                 @endforeach
-                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">Total</th>
-                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">GPA</th>
-                                <th style="background:linear-gradient(135deg,#1a2a44,#243552);">Merit</th>
+                                <th>Total</th>
+                                <th>GPA</th>
+                                <th>Merit</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -1313,9 +1245,17 @@
                                 @endphp
                                 @if($student)
                                 <tr class="align-middle">
-                                    <td class="fw-bold text-muted" style="font-size:0.8rem;">{{ $displayId }}</td>
-                                    <td class="fw-bold">{{ $student->roll }}</td>
-                                    <td class="text-start fw-bold" style="color:#0f172a;">{{ strtoupper($student->name) }}</td>
+                                    <td class="text-muted fw-bold" style="font-size:0.7rem;">
+                                        {{ $loop->iteration + ($paginatedResults->currentPage() - 1) * $paginatedResults->perPage() }}
+                                    </td>
+                                    <td><span class="tbl-roll-badge"><i class="fa-solid fa-hashtag me-1"></i>{{ $student->roll }}</span></td>
+                                    <td><span class="tbl-id-badge"><i class="fa-solid fa-id-badge me-1"></i>{{ $displayId }}</span></td>
+                                    <td class="col-name text-start">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="tbl-avatar">{{ strtoupper(substr($student->name, 0, 1)) }}</div>
+                                            <span class="student-name-text">{{ strtoupper($student->name) }}</span>
+                                        </div>
+                                    </td>
                                     @foreach($subjects as $subject)
                                         @php
                                             $m = $marksData[$student->id][$subject->id]['marks'] ?? null;
@@ -1325,7 +1265,7 @@
                                             @if($m !== null)
                                                 {{ $m }} <span class="grade-text">| {{ $g }}</span>
                                             @else
-                                                <span class="text-danger" style="font-size:0.75rem;">N/A</span>
+                                                <span class="text-danger" style="font-size:0.7rem;">N/A</span>
                                             @endif
                                         </td>
                                     @endforeach
@@ -1345,75 +1285,7 @@
                     </table>
                 </div>
 
-                {{-- ── MOBILE CARDS ── --}}
-                <div class="mobile-report-cards p-3">
-                    @foreach($paginatedResults as $item)
-                        @php
-                            $studentId = $item['student_id'];
-                            $student   = $students->where('id', $studentId)->first();
-                            $history   = DB::table('student_sessions')
-                                            ->where('student_id', $studentId)
-                                            ->where('academic_year_id', $selectedYearId)
-                                            ->first();
-                            $displayId = $history ? $history->old_student_id : ($student ? $student->student_id : 'N/A');
-                        @endphp
-                        @if($student)
-                        <div class="mobile-result-card">
-                            {{-- Header --}}
-                            <div class="mrc-header">
-                                <div class="mrc-student">
-                                    <div class="mrc-avatar">{{ strtoupper(substr($student->name, 0, 1)) }}</div>
-                                    <div>
-                                        <div class="mrc-name">{{ strtoupper($student->name) }}</div>
-                                        <div class="mrc-roll">
-                                            <i class="fa-solid fa-hashtag" style="font-size:0.6rem;"></i>
-                                            Roll {{ $student->roll }} &nbsp;·&nbsp;
-                                            <i class="fa-solid fa-id-badge" style="font-size:0.6rem;"></i>
-                                            {{ $displayId }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="{{ route('marks.marksheet', ['tenant' => auth()->user()->school->slug, 'student' => $student->id, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'year' => $selectedYearId]) }}"
-                                   class="btn-marksheet" title="Download Marksheet">
-                                    <i class="fa-solid fa-file-arrow-down"></i>
-                                </a>
-                            </div>
-
-                            {{-- Subject Marks Grid --}}
-                            <div class="mrc-subjects">
-                                @foreach($subjects as $subject)
-                                    @php
-                                        $m = $marksData[$student->id][$subject->id]['marks'] ?? null;
-                                        $g = $marksData[$student->id][$subject->id]['grade'] ?? '-';
-                                    @endphp
-                                    <div class="mrc-subject-item">
-                                        <div class="mrc-sub-name">{{ $subject->name }}</div>
-                                        @if($m !== null)
-                                            <div class="mrc-sub-mark">{{ $m }}</div>
-                                            <div class="mrc-sub-grade">Grade: {{ $g }}</div>
-                                        @else
-                                            <div class="mrc-sub-na">N/A</div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            {{-- Footer: Total / GPA / Merit --}}
-                            <div class="mrc-footer">
-                                <span class="total-badge">
-                                    <i class="fa-solid fa-sigma me-1" style="font-size:0.7rem;"></i>
-                                    Total: {{ $item['total_marks'] }}
-                                </span>
-                                <span class="gpa-badge">GPA: {{ $marksData[$student->id]['GPA'] ?? '0.00' }}</span>
-                                <span class="merit-badge">
-                                    <i class="fa-solid fa-trophy me-1" style="font-size:0.68rem;"></i>
-                                    Merit: {{ $meritPosition[$student->id] ?? '-' }}
-                                </span>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
-                </div>
+                {{-- Mobile cards removed — table is responsive via overflow-x --}}
             </div>
 
             {{-- Pagination --}}
