@@ -374,9 +374,9 @@
                                             <table class="sub-tbl" cellpadding="0" cellspacing="0">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 28%;">Date</th>
-                                                        <th style="width: 42%;">Subject</th>
-                                                        <th style="width: 30%;">Time</th>
+                                                        <th style="width: 25%;">Date</th>
+                                                        <th style="width: 55%;">Subject</th>
+                                                        <th style="width: 20%;">Time</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
