@@ -270,7 +270,7 @@
     </style>
 </head>
 <body>
-    @foreach($students->chunk(3) as $chunkIndex => $trio)
+    @foreach($students->chunk(3) as $chunkIndex => $pair)
         @php
             $totalRoutines = $examRoutines->count();
             $half = ceil($totalRoutines / 2);
@@ -305,16 +305,16 @@
 
                                     {{-- Center: School Name, School Code Only, Exam, Badge --}}
                                     <td class="hdr-center">
-                                        <div class="school-name">{{ $school->name ?? 'SCHOOL NAME' }}</div>
+                                        <div class="school-name">{{ $school?->name ?? 'SCHOOL NAME' }}</div>
 
                                         @php
-                                            $schoolCode = $school->app_code ?? $school->emis_code ?? $school->ein_number ?? null;
+                                            $schoolCode = $school?->app_code ?? $school?->emis_code ?? $school?->ein_number ?? null;
                                         @endphp
                                         @if($schoolCode)
                                             <div class="school-code-line">School Code: {{ $schoolCode }}</div>
                                         @endif
 
-                                        <div class="exam-name-line">{{ $exam->name }} &mdash; {{ date('Y') }}</div>
+                                        <div class="exam-name-line">{{ $exam?->name ?? 'EXAM' }} &mdash; {{ date('Y') }}</div>
                                         <div><span class="admit-badge">ADMIT CARD</span></div>
                                     </td>
 
