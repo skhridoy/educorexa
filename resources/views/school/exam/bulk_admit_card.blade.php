@@ -52,13 +52,14 @@
             table-layout: fixed;
         }
         .hdr-logo {
-            width: 76px;
+            width: 70px;
             vertical-align: middle;
             text-align: left;
+            padding: 10px;
         }
         .hdr-logo img { 
-            width: 76px; 
-            height: 76px;
+            width: 70px; 
+            height: 70px;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -222,7 +223,7 @@
 
         /* ── Signatures ── */
         .footer-wrap {
-            margin-top: 15px;
+            margin-top: 35px;
             padding-top: 0;
         }
         .footer-tbl {
