@@ -38,27 +38,15 @@
             vertical-align: top;
         }
 
-        /* Watermark */
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120px;
-            height: 120px;
-            margin-top: -60px;
-            margin-left: -60px;
-            opacity: 0.05;
-            z-index: 0;
-        }
-        .watermark img {
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
+        /* Watermark — DomPDF compatible via background-image on td */
+        .card-cell-wm {
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 130px 130px;
         }
 
         .card-content {
             position: relative;
-            z-index: 1;
         }
 
         /* ── Header: Logo | School Info | QR ── */
@@ -150,6 +138,7 @@
             border: 1px solid #cbd5e1;
             border-radius: 3px;
             margin-bottom: 3px;
+            
             table-layout: fixed;
             margin-top: 5px; 
         }
@@ -158,6 +147,7 @@
             vertical-align: middle;
             font-size: 10.5px;
             line-height: 1.05;
+            padding: 3px 2px;
         }
         .lbl {
             color: #475569;
@@ -182,11 +172,13 @@
         .routine-heading {
             font-size: 10px;
             font-weight: bold;
-            color: #ffffff;
-            background: #0f172a;
-            padding: 1.5px 6px;
+            color: #0f172a;
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            padding: 5px 6px;
             border-radius: 2px;
             margin-bottom: 2px;
+            margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
@@ -200,7 +192,7 @@
         .sub-tbl {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9.5px;
+            font-size: 11px;
             table-layout: fixed;
         }
         .sub-tbl th {
@@ -286,13 +278,16 @@
             {{-- ── ADMIT CARD BOX TABLE WRAPPER ── --}}
             <table class="card-table-wrap" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td class="card-cell">
-                        {{-- Watermark --}}
-                        <div class="watermark">
-                            @if($school && $school->logo && file_exists(public_path($school->logo)))
-                                <img src="{{ public_path($school->logo) }}">
-                            @endif
-                        </div>
+                    @php
+                        $wmStyle = '';
+                        if ($school && $school->logo && file_exists(public_path($school->logo))) {
+                            $wmExt = strtolower(pathinfo($school->logo, PATHINFO_EXTENSION));
+                            $wmMime = $wmExt === 'png' ? 'image/png' : ($wmExt === 'svg' ? 'image/svg+xml' : 'image/jpeg');
+                            $wmData = base64_encode(file_get_contents(public_path($school->logo)));
+                            $wmStyle = 'background-image: url(data:' . $wmMime . ';base64,' . $wmData . '); background-repeat: no-repeat; background-position: center center; background-size: 130px 130px;';
+                        }
+                    @endphp
+                    <td class="card-cell card-cell-wm" {!! $wmStyle ? 'style="' . $wmStyle . '"' : '' !!}>
 
                         <div class="card-content">
                             {{-- 1. Header: Logo | School Info Center | QR --}}
@@ -382,10 +377,10 @@
                                                 <tbody>
                                                     @foreach($colA as $rtn)
                                                         <tr>
-                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap;">
+                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap; font-size: 11px;">
                                                                 {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
                                                             </td>
-                                                            <td style="font-weight: bold;">
+                                                            <td style="font-weight: bold; font-size: 11px;">
                                                                 {{ $rtn->subject->name ?? 'N/A' }}
                                                             </td>
                                                             <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 600;">
@@ -413,10 +408,10 @@
                                                 <tbody>
                                                     @forelse($colB as $rtn)
                                                         <tr>
-                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap;">
+                                                            <td style="font-weight: bold; text-align: center; white-space: nowrap; font-size: 11px;">
                                                                 {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
                                                             </td>
-                                                            <td style="font-weight: bold;">
+                                                            <td style="font-weight: bold; font-size: 11px;">
                                                                 {{ $rtn->subject->name ?? 'N/A' }}
                                                             </td>
                                                             <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 600;">
