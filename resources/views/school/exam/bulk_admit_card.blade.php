@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 8mm 12mm 8mm 12mm;
+            margin: 6mm 10mm 6mm 10mm;
         }
         * {
             box-sizing: border-box;
@@ -19,7 +19,6 @@
             background: #ffffff;
             font-size: 10px;
             line-height: 1.1;
-            margin: 10px;
         }
 
         /* ── Main Outer Table Container for DomPDF stability ── */
@@ -31,10 +30,9 @@
         }
         .card-table-wrap td.card-cell {
             border: 1.5px solid #0f172a;
-            border-radius: 5px;
+            border-radius: 4px;
             padding: 4px 8px 3px 8px;
             background: #ffffff;
-            position: relative;
             vertical-align: top;
         }
 
@@ -52,13 +50,13 @@
             table-layout: fixed;
         }
         .hdr-logo {
-            width: 70px;
+            width: 60px;
             vertical-align: middle;
             text-align: left;
         }
         .hdr-logo img { 
-            width: 100%; 
-            height: 100%;
+            width: 52px; 
+            height: 52px;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -101,17 +99,16 @@
             display: inline-block;
             background: #0f172a;
             color: #ffffff;
-            padding: 1px 8px;
-            font-size: 11px;
+            padding: 1.5px 8px;
+            font-size: 10.5px;
             font-weight: bold;
             border-radius: 3px;
             letter-spacing: 0.8px;
             line-height: 1.05;
-            padding: 5px;   
-            margin-top: 10px; 
+            margin-top: 2px;
         }
         .hdr-qr {
-            width: 55px;
+            width: 60px;
             vertical-align: middle;
             text-align: right;
         }
@@ -130,48 +127,46 @@
             background: #f8fafc;
             border: 1px solid #cbd5e1;
             border-radius: 3px;
-            margin-bottom: 3px;
-            
+            margin-bottom: 2px;
+            margin-top: 2px;
             table-layout: fixed;
-            margin-top: 5px; 
         }
         .student-info-tbl td {
             padding: 1.5px 4px;
             vertical-align: middle;
-            font-size: 10.5px;
+            font-size: 10px;
             line-height: 1.05;
-            padding: 3px 2px;
         }
         .lbl {
             color: #475569;
             font-weight: bold;
             width: 13%;
-            font-size: 10px;
+            font-size: 9.5px;
         }
         .val {
             color: #0f172a;
             font-weight: bold;
             width: 20%;
-            font-size: 10.5px;
+            font-size: 10px;
         }
         .val-name {
             color: #1e3a8a;
             font-weight: bold;
             width: 34%;
-            font-size: 10.5px;
+            font-size: 10px;
         }
 
         /* ── Routine Section (2 Columns with Time) ── */
         .routine-heading {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: bold;
             color: #0f172a;
-            background: transparent;
+            background: #f1f5f9;
             border: 1px solid #cbd5e1;
-            padding: 5px 6px;
+            padding: 2px 6px;
             border-radius: 2px;
             margin-bottom: 2px;
-            margin-top: 10px;
+            margin-top: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
@@ -185,13 +180,13 @@
         .sub-tbl {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 9.5px;
             table-layout: fixed;
         }
         .sub-tbl th {
             background: #1e293b;
             color: #ffffff;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: bold;
             padding: 1.5px 3px;
             border: 1px solid #1e293b;
@@ -205,7 +200,7 @@
             color: #0f172a;
             vertical-align: middle;
             line-height: 1.05;
-            font-size: 10px;
+            font-size: 9.5px;
         }
         .sub-tbl tr:nth-child(even) td {
             background: #f8fafc;
@@ -223,7 +218,7 @@
 
         /* ── Signatures ── */
         .footer-wrap {
-            margin-top: 40px;
+            margin-top: 15px;
             padding-top: 0;
         }
         .footer-tbl {
@@ -234,7 +229,7 @@
         .sig-box {
             width: 40%;
             text-align: center;
-            font-size: 9.5px;
+            font-size: 9px;
             font-weight: bold;
             color: #1e293b;
             text-transform: uppercase;
