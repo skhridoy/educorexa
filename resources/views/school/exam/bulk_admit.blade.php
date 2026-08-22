@@ -191,10 +191,10 @@
                                             <td class="fw-bold py-0">{{ $student->roll ?? 'N/A' }}</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-muted fw-bold py-0">গ্রুপ:</td>
-                                            <td class="fw-bold py-0" style="color: #1e3a8a;">{{ $student->group->name ?? 'General' }}</td>
                                             <td class="text-muted fw-bold py-0">শাখা:</td>
                                             <td class="fw-bold py-0">{{ $student->section->name ?? 'N/A' }}</td>
+                                            <td class="text-muted fw-bold py-0">সেশন:</td>
+                                            <td class="fw-bold py-0">{{ date('Y') }}</td>
                                         </tr>
                                     </table>
                                 </div>

@@ -353,9 +353,7 @@
                                 </tr>
                                 <tr>
                                     <td class="lbl">ID</td>
-                                    <td class="val">: {{ $student->student_id ?? 'N/A' }}</td>
-                                    <td class="lbl">Group</td>
-                                    <td class="val" style="color: #1e3a8a; font-weight: bold;">: {{ $student->group->name ?? 'General' }}</td>
+                                    <td class="val" colspan="3">: {{ $student->student_id ?? 'N/A' }}</td>
                                     <td class="lbl">Section</td>
                                     <td class="val">: {{ $student->section->name ?? 'N/A' }}</td>
                                     <td class="lbl">Session</td>
