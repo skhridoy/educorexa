@@ -307,12 +307,6 @@
                                     <td class="hdr-center">
                                         <div class="school-name">{{ $school->name ?? 'SCHOOL NAME' }}</div>
 
-                                        @php
-                                            $metaParts = [];
-                                            if(!empty($school->address)) $metaParts[] = $school->address;
-                                            if(!empty($school->phone))   $metaParts[] = 'Mobile: ' . $school->phone;
-                                            if(!empty($school->email))   $metaParts[] = $school->email;
-                                        @endphp
                                         @if(count($metaParts) > 0)
                                             <div class="school-meta">{{ implode(' | ', $metaParts) }}</div>
                                         @endif
