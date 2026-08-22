@@ -5,30 +5,49 @@
     <title>Grade & Mark Sheet - {{ $student->name }}</title>
     <style>
         @page {
-            margin: 10px 12px 8px 12px;
+            margin: 20px 24px 16px 24px;
             size: A4 portrait;
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif;
-            font-size: 8.5px;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px;
             color: #000;
             margin: 0; padding: 0;
             line-height: 1.25;
         }
         .page-border {
             border: 2px solid #000;
-            padding: 6px 8px;
+            padding: 10px 12px;
+            position: relative;
+            min-height: 1045px;
+        }
+
+        /* ── WATERMARK ── */
+        .watermark {
+            position: fixed;
+            top: 28%;
+            left: 0;
+            right: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0.08;
+            z-index: -1000;
+        }
+        .watermark img {
+            width: 320px;
+            height: auto;
+            opacity: 0.08;
         }
 
         /* ── HEADER ── */
         .hdr { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-        .hdr-logo { width: 52px; vertical-align: middle; }
-        .hdr-logo img { width: 48px; height: 48px; object-fit: contain; }
+        .hdr-logo { width: 75px; vertical-align: middle; text-align: right; padding-right: 8px; }
+        .hdr-logo img { width: 68px; height: 68px; object-fit: contain; display: inline-block; }
         .hdr-text { text-align: center; vertical-align: middle; padding: 0 4px; }
         .school-title {
             font-family: 'Helvetica Neue', 'Arial Black', Arial, sans-serif;
-            font-size: 21px;
+            font-size: 26px;
             font-weight: 900;
             letter-spacing: 0.6px;
             margin: 0 0 2px 0;
@@ -36,21 +55,21 @@
             color: #111;
         }
         .exam-title {
-            font-size: 10.5px;
+            font-size: 14px;
             font-weight: bold;
             margin: 0 0 1px 0;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
         .class-sub {
-            font-size: 9px;
+            font-size: 11px;
             font-weight: bold;
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 0.2px;
         }
         .hdr-grade { width: 120px; vertical-align: middle; }
-        .hdr-grade table { width: 100%; border-collapse: collapse; font-size: 7.5px; text-align: center; }
+        .hdr-grade table { width: 100%; border-collapse: collapse; font-size: 8px; text-align: center; }
         .hdr-grade th, .hdr-grade td { border: 1px solid #000; padding: 1px 1.5px; }
         .hdr-grade th { font-weight: bold; background: #eee; }
 
@@ -58,7 +77,7 @@
         .sinfo {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.5px;
+            font-size: 10px;
             margin: 3px 0 4px 0;
         }
         .sinfo td { vertical-align: top; padding: 0.5px 2px; }
@@ -67,12 +86,12 @@
         .info-card {
             border: 1px solid #000;
             padding: 4px 6px;
-            background: #fff;
+            background: transparent;
         }
         .info-card table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 11px;
         }
         .info-card td { padding: 1px 0; }
 
@@ -80,17 +99,20 @@
         .banner {
             text-align: center;
             font-weight: bold;
-            font-size: 10px;
-            margin: 4px 0 3px 0;
-            letter-spacing: 0.5px;
+            font-size: 12px;
+            margin: 10px 0 5px 0;
+            letter-spacing: 0.7px;
             text-transform: uppercase;
+            padding: 5px 10px;
+            border: 1px solid #000; 
+            border-radius: 5px;
         }
 
         /* ── MARKS TABLE ── */
-        .mt { width: 100%; border-collapse: collapse; font-size: 8.5px; margin-bottom: 5px; }
+        .mt { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 5px; }
         .mt th, .mt td { border: 1px solid #000; padding: 2.5px 1.5px; text-align: center; height: 14px; }
-        .mt th { font-weight: bold; text-transform: uppercase; font-size: 9px; }
-        .tl { text-align: left; padding-left: 6px !important; font-size: 10px; font-weight: bold; color: #111; }
+        .mt th { font-weight: bold; text-transform: uppercase; font-size: 11px; }
+        .tl { text-align: left; padding-left: 6px !important; font-size: 11px; font-weight: bold; color: #111; }
         .bd { font-weight: bold; }
 
         /* ── BOTTOM AREA ── */
@@ -98,23 +120,34 @@
         .bot td { vertical-align: top; padding: 0; }
         .bx { border: 1px solid #000; }
         .bxh {
-            text-align: center; font-weight: bold; font-size: 8px;
+            text-align: center; font-weight: bold; font-size: 10px;
             padding: 2px; border-bottom: 1px solid #000; text-transform: uppercase;
         }
         .bxsh {
-            text-align: center; font-size: 7.5px; padding: 1.5px;
+            text-align: center; font-size: 10px; padding: 1.5px;
             border-bottom: 1px solid #000; font-weight: bold;
         }
-        .mt2 { width: 100%; border-collapse: collapse; text-align: center; font-size: 8px; }
+        .mt2 { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; }
         .mt2 td { border: 1px solid #000; padding: 1.5px 2px; height: 12px; }
 
         /* ── SIGNATURE ── */
-        .sig { width: 100%; border-collapse: collapse; margin-top: 30px; margin-bottom: 2px; }
-        .sig td { text-align: center; font-size: 9px; font-weight: bold; }
-        .sig-line { border-top: 1px dotted #000; display: inline-block; width: 140px; padding-top: 3px; }
+        .footer-sig {
+            position: absolute;
+            bottom: 30px;
+            left: 12px;
+            right: 12px;
+        }
+        .sig { width: 100%; border-collapse: collapse; margin: 0; }
+        .sig td { text-align: center; font-size: 10px; font-weight: bold; }
+        .sig-line { border-top: 1px dotted #000; display: inline-block; width: 150px; padding-top: 4px; }
     </style>
 </head>
 <body>
+@if(!empty($instituteLogo))
+<div class="watermark">
+    <img src="{{ $instituteLogo }}" alt="Watermark">
+</div>
+@endif
 <div class="page-border">
 
 {{-- 1. HEADER --}}
@@ -145,6 +178,7 @@
     </tr>
 </table>
 
+<div class="banner">STUDENT'S INFORMATION</div>
 {{-- 2. STUDENT INFO (2 BALANCED 5-ROW PARTS: LEFT & RIGHT) --}}
 @php
     $grp = $student->group ?? '';
@@ -274,7 +308,7 @@
 
                         {{-- GPA single merged cell across all rows --}}
                         @if($i === 0)
-                            <td rowspan="{{ $mcount }}"style="vertical-align: middle; font-size: 11px; text-align: center; background: #fff;">
+                            <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center;">
                                 {{ $numericGpa ?? '0.00' }}
                             </td>
                         @endif
@@ -288,7 +322,7 @@
 
                         {{-- If 2nd paper happened to be first row (safety) --}}
                         @if($i === 0)
-                            <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center; background: #fff;">
+                            <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center;">
                                 {{ $numericGpa ?? '0.00' }}
                             </td>
                         @endif
@@ -313,7 +347,7 @@
 
                     {{-- GPA single merged cell across all rows --}}
                     @if($i === 0)
-                        <td rowspan="{{ $mcount }}" class="bd" style="vertical-align: middle; font-size: 11px; text-align: center; background: #fff;">
+                        <td rowspan="{{ $mcount }}" class="bd" style="vertical-align: middle; font-size: 11px; text-align: center;">
                             {{ $numericGpa ?? '0.00' }}
                         </td>
                     @endif
@@ -323,70 +357,8 @@
     </tbody>
 </table>
 
-{{-- 5. BOTTOM: ATTENDANCE + EXTRA ACTIVITIES + ACHIEVEMENT --}}
-<table class="bot">
-    <tr>
-        {{-- Left: Attendance (49%) --}}
-        <td style="width: 49%; padding-right: 4px;">
-            <div class="bx">
-                <div class="bxh">ATTENDANCE REPORT</div>
-                <div class="bxsh">Month : Presence/Working Days</div>
-                <table class="mt2" style="border: none;">
-                    <tr>
-                        <td style="width: 50%; text-align: left; padding-left: 6px;">Jan : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Feb : --/--</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left; padding-left: 6px;">Mar : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Apr : --/--</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left; padding-left: 6px;">May : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Jun : --/--</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left; padding-left: 6px;">Jul : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Aug : --/--</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left; padding-left: 6px;">Sep : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Oct : --/--</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left; padding-left: 6px;">Nov : --/--</td>
-                        <td style="text-align: left; padding-left: 6px;">Dec : --/--</td>
-                    </tr>
-                </table>
-            </div>
-        </td>
-
-        {{-- Right: Extra Activities + Achievement (51%) --}}
-        <td style="width: 51%;">
-            <div class="bx" style="margin-bottom: 3px;">
-                <div class="bxh">EXTRA ACTIVITIES</div>
-                <table class="mt2">
-                    <tr><td>Cultural Activity / Dramatic Performance</td></tr>
-                    <tr><td>Scout / BNCC / Red Crescent</td></tr>
-                    <tr><td>Games And Sports</td></tr>
-                    <tr><td>Math / Science Olympiad</td></tr>
-                </table>
-            </div>
-            <div class="bx">
-                <div class="bxh">ACHIEVEMENT</div>
-                <table class="mt2">
-                    <tr><td>Outstanding</td></tr>
-                    <tr><td>Excellent</td></tr>
-                    <tr><td>Good</td></tr>
-                    <tr><td>Need To Improve</td></tr>
-                </table>
-            </div>
-        </td>
-    </tr>
-</table>
-
-{{-- 6. SIGNATURES --}}
-<footer>
-
+{{-- 5. SIGNATURES AT THE BOTTOM OF THE PAGE --}}
+<div class="footer-sig">
     <table class="sig">
         <tr>
             <td style="width: 33%;"><span class="sig-line">Signature (Guardian)</span></td>
@@ -394,7 +366,7 @@
             <td style="width: 33%;"><span class="sig-line">Signature (Head Master)</span></td>
         </tr>
     </table>
-</footer>
+</div>
 
 </div>
 </body>

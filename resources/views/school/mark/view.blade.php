@@ -573,47 +573,123 @@
         }
 
         /* ══════════════════════════════════════════════
-           DOWNLOAD BUTTON
+           DOWNLOAD & ACTION BUTTONS
         ══════════════════════════════════════════════ */
         .btn-download-csv {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 6px;
             background: linear-gradient(135deg, #ecfdf5, #d1fae5);
             color: #047857;
             border: 1.5px solid #a7f3d0;
             border-radius: 9px;
-            height: 38px;
-            padding: 0 14px;
-            font-size: 0.82rem;
+            height: 36px;
+            padding: 0 13px;
+            font-size: 0.80rem;
             font-weight: 700;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             white-space: nowrap;
             flex-shrink: 0;
         }
         .btn-download-csv:hover {
             background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
+            color: #064e3b;
             transform: translateY(-1px);
             box-shadow: 0 3px 10px rgba(16,185,129,0.2);
+        }
+
+        .btn-download-pdf {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            border: 1.5px solid #fca5a5;
+            border-radius: 9px;
+            height: 36px;
+            padding: 0 13px;
+            font-size: 0.80rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-download-pdf:hover {
+            background: linear-gradient(135deg, #fecaca, #f87171);
+            color: #7f1d1d;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(239,68,68,0.25);
+        }
+
+        .btn-summary-all-pdf {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #0369a1;
+            border: 1.5px solid #7dd3fc;
+            border-radius: 9px;
+            height: 36px;
+            padding: 0 13px;
+            font-size: 0.80rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-summary-all-pdf:hover {
+            background: linear-gradient(135deg, #bae6fd, #7dd3fc);
+            color: #0c4a6e;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(14,165,233,0.25);
+        }
+
+        .btn-summary-class-pdf {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            color: #6d28d9;
+            border: 1.5px solid #c4b5fd;
+            border-radius: 9px;
+            height: 36px;
+            padding: 0 13px;
+            font-size: 0.80rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-summary-class-pdf:hover {
+            background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+            color: #4c1d95;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(124,58,237,0.25);
         }
 
         .btn-show-results {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: #fff !important;
             border: none;
             border-radius: 9px;
             padding: 0 16px;
-            height: 38px;
+            height: 36px;
             font-size: 0.82rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.25s ease;
             white-space: nowrap;
         }
         .btn-show-results:hover {
@@ -880,7 +956,7 @@
         <div class="mark-filter-card mb-4">
             <form method="GET" action="{{ route('marks.view-marks', ['tenant' => auth()->user()->school->slug]) }}" id="filterForm">
                 <div class="row align-items-end g-2 filter-grid-row">
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
                             <i class="fa-solid fa-calendar-days me-1 text-indigo-500"></i>
                             Academic Year
@@ -893,7 +969,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
                             <i class="fa-solid fa-chalkboard me-1"></i> Class
                         </label>
@@ -906,7 +982,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-6 col-md-2">
+                    <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
                             <i class="fa-solid fa-file-pen me-1"></i> Exam
                         </label>
@@ -919,10 +995,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-3 col-lg-3">
                         <label class="filter-label">
                             <i class="fa-solid fa-book-open me-1"></i>
-                            Subject <small class="text-muted fw-normal" style="text-transform:none;letter-spacing:0">(optional — for edit)</small>
+                            Subject <small class="text-muted fw-normal" style="text-transform:none;letter-spacing:0">(optional)</small>
                         </label>
                         <select name="subject_id" id="subjectSelect" class="form-select">
                             <option value="">All Subjects (Full Report)</option>
@@ -933,19 +1009,10 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-12 col-md-3">
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn-show-results flex-grow-1">
-                                <i class="fa-solid fa-magnifying-glass"></i> Show Results
-                            </button>
-                            @if($selectedClassId && $selectedExamId && !$selectedSubjectId)
-                                <a href="{{ route('marks.download-sheet', array_merge(['tenant' => auth()->user()->school->slug], request()->all())) }}"
-                                   class="btn-download-csv dl-btn-wrap" title="Download CSV">
-                                    <i class="fa-solid fa-download"></i>
-                                    <span class="d-none d-sm-inline">CSV</span>
-                                </a>
-                            @endif
-                        </div>
+                    <div class="col-12 col-lg-3">
+                        <button type="submit" class="btn-show-results w-100">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Show Results
+                        </button>
                     </div>
                 </div>
             </form>
@@ -1151,12 +1218,11 @@
             </div>
 
             <div class="data-table-card">
-                <div class="section-header-bar">
-                    <h5 class="sec-title">
-                        <i class="fa-solid fa-table" style="color:#6366f1;"></i>
-                        Result Sheet
+                <div class="section-header-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h5 class="sec-title mb-0 d-flex align-items-center flex-wrap gap-2">
+                        <span><i class="fa-solid fa-table me-1" style="color:#6366f1;"></i> Result Sheet</span>
                         @if($selectedExamObj ?? false)
-                            <span class="badge ms-2" style="background:#eff6ff; color:#3b82f6; font-size:0.72rem; padding:4px 10px; border-radius:8px; font-weight:700;">{{ $selectedExamObj->name }}</span>
+                            <span class="badge" style="background:#eff6ff; color:#3b82f6; font-size:0.72rem; padding:4px 10px; border-radius:8px; font-weight:700;">{{ $selectedExamObj->name }}</span>
                         @endif
                         @if($isHistorical ?? false)
                             <span class="badge ms-1" style="background:#fef9c3; color:#a16207; font-size:0.7rem; padding:4px 9px; border-radius:8px; font-weight:700;">
@@ -1164,9 +1230,31 @@
                             </span>
                         @endif
                     </h5>
-                    <span class="badge bg-light text-muted border" style="font-size:0.75rem; padding:5px 10px; border-radius:8px;">
-                        {{ $paginatedResults->total() }} Records
-                    </span>
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <a href="{{ route('marks.bulk-marksheet', ['tenant' => auth()->user()->school->slug, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
+                           class="btn-download-pdf" title="Download All Marksheets in one PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>All Marksheets (PDF)</span>
+                        </a>
+                        <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
+                           class="btn-summary-all-pdf" title="Download All Classes Result Summary in one PDF">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>All Classes Summary (PDF)</span>
+                        </a>
+                        <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'class_id' => $selectedClassId, 'academic_year_id' => $selectedYearId]) }}"
+                           class="btn-summary-class-pdf" title="Download This Class Result Summary in PDF">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span>Class Summary (PDF)</span>
+                        </a>
+                        <a href="{{ route('marks.download-sheet', array_merge(['tenant' => auth()->user()->school->slug], request()->all())) }}"
+                           class="btn-download-csv" title="Download CSV Result Sheet">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>CSV</span>
+                        </a>
+                        <span class="badge bg-light text-muted border py-2 px-3" style="font-size:0.75rem; border-radius:8px;">
+                            {{ $paginatedResults->total() }} Records
+                        </span>
+                    </div>
                 </div>
 
                 {{-- ── DESKTOP TABLE ── --}}

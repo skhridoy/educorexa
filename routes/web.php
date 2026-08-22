@@ -435,7 +435,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
                     Route::get('marks-view', [MarkController::class, 'viewMarks'])->name('marks.view-marks');
                     Route::get('marksheet/{student}/{class}/{exam}',[MarkController::class, 'generateMarksheet'])->name('marks.marksheet');
+                    Route::get('bulk-marksheet/{class}/{exam}', [MarkController::class, 'generateBulkMarksheet'])->name('marks.bulk-marksheet');
                     Route::get('download-result-sheet', [MarkController::class, 'downloadResultSheet'])->name('marks.download-sheet');
+                    Route::get('exam-result-summary', [MarkController::class, 'downloadExamResultSummary'])->name('marks.result-summary');
 
                     // Mark Import routes
                     Route::get('marks-import',          [MarkController::class, 'importForm'])->name('marks.import.form');

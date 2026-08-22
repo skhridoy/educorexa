@@ -16,6 +16,7 @@ use App\Models\AssignClass;
 use App\Models\AcademicYear;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\MarksImport;
 use App\Exports\MarkTemplateExport;
@@ -877,8 +878,8 @@ class MarkController extends Controller
             'address'              => $school->address ?? 'Address',
             'emis'                 => $school->emis_code ?? 'N/A',
             'academic_year'        => $academicYearName,
-            'instituteLogo'        => $this->compressImageToBase64($instituteLogo, 250),
-            'studentPhoto'         => $this->compressImageToBase64($studentPhoto, 150),
+            'instituteLogo'        => $this->compressImageToBase64($instituteLogo, 160),
+            'studentPhoto'         => $this->compressImageToBase64($studentPhoto, 120),
             'formattedDOB'         => $student->date_of_birth ? date('Y-m-d', strtotime($student->date_of_birth)) : 'N/A',
             'totalWorkingDays'     => $totalWorkingDays,
             'presentDays'          => $presentDays,
@@ -890,51 +891,207 @@ class MarkController extends Controller
         return $pdf->download('marksheet-'.$displayCustomId.'.pdf');
     }
 
-    private function compressImageToBase64($path, $maxWidth = 150)
+    public function generateBulkMarksheet($tenant, $classId, $examId, Request $request)
+    {
+        $school = DB::table('schools')->where('slug', $tenant)->first();
+        if (!$school) {
+            abort(404, 'School not found.');
+        }
+        $schoolId = $school->id;
+
+        $exam   = Exam::where('id', $examId)->where('school_id', $schoolId)->where('is_published', 1)->firstOrFail();
+        $class  = Classes::where('id', $classId)->where('school_id', $schoolId)->firstOrFail();
+        $targetYearId = $request->academic_year_id ?? $exam->year_id;
+
+        $currentYearId    = AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
+        $academicYearName = AcademicYear::where('id', $targetYearId)->value('name');
+
+        if ($targetYearId == $currentYearId) {
+            $allStudents = Student::where([
+                'class_id'         => $classId, 
+                'academic_year_id' => $targetYearId, 
+                'school_id'        => $schoolId
+            ])->orderBy('roll', 'asc')->get();
+        } else {
+            $sessionStudentIds = DB::table('student_sessions')
+                            ->where(['class_id' => $classId, 'academic_year_id' => $targetYearId])
+                            ->pluck('student_id')
+                            ->toArray();
+            $allStudents = Student::whereIn('id', $sessionStudentIds)->orderBy('roll', 'asc')->get();
+        }
+
+        if ($allStudents->isEmpty()) {
+            return back()->with('error', 'এই ক্লাসের কোনো শিক্ষার্থী পাওয়া যায়নি।');
+        }
+
+        $subjectIds = AssignClass::where('class_id', $classId)
+                        ->where('school_id', $schoolId)
+                        ->pluck('subject_id');
+        $subjects   = Subject::whereIn('id', $subjectIds)->get();
+
+        $allMarks   = Mark::where([
+                        'class_id'         => $classId, 
+                        'exam_id'          => $examId, 
+                        'academic_year_id' => $targetYearId, 
+                        'school_id'        => $schoolId
+                    ])->get();
+
+        if ($allMarks->isEmpty()) {
+            return back()->with('error', 'এই পরীক্ষার কোনো নম্বর খুঁজে পাওয়া যায়নি।');
+        }
+
+        // Calculate summaries and merit list
+        $studentSummaries = [];
+        $meritList = [];
+
+        foreach ($allStudents as $st) {
+            $stSummary = $this->calculateStudentMarksheetData($st, $subjects, $allMarks, $classId);
+            $studentSummaries[$st->id] = $stSummary;
+
+            $meritList[] = [
+                'id'    => $st->id,
+                'total' => $stSummary['total_marks'],
+                'gpa'   => $stSummary['gpa'],
+                'fail'  => $stSummary['fail_count'],
+            ];
+        }
+
+        // Sorting for merit positions
+        usort($meritList, function($a, $b) {
+            if ($a['fail'] !== $b['fail']) return $a['fail'] <=> $b['fail'];
+            return $b['gpa'] <=> $a['gpa'] ?: $b['total'] <=> $a['total'];
+        });
+
+        $meritMap = [];
+        foreach ($meritList as $key => $m) {
+            $meritMap[$m['id']] = $key + 1;
+        }
+
+        $instituteLogo = public_path($school->logo ?? 'no-logo.png');
+        $compressedLogo = $this->compressImageToBase64($instituteLogo, 160);
+
+        $sheets = [];
+        foreach ($allStudents as $student) {
+            if ($targetYearId == $currentYearId) {
+                $displayRoll     = $student->roll;
+                $displayCustomId = $student->student_id;
+            } else {
+                $history = DB::table('student_sessions')
+                            ->where(['student_id' => $student->id, 'academic_year_id' => $targetYearId])
+                            ->first();
+                $displayRoll     = $history ? $history->old_roll : $student->roll;
+                $displayCustomId = $history ? $history->old_student_id : $student->student_id;
+            }
+
+            $stSummary   = $studentSummaries[$student->id] ?? null;
+            $targetData  = collect($meritList)->where('id', $student->id)->first();
+            $numericGpa  = $targetData['gpa'] ?? 0;
+            $failCount   = $targetData['fail'] ?? 0;
+
+            if ($failCount > 0) {
+                $finalGrade = 'F';
+            } elseif ($numericGpa >= 5.0) {
+                $finalGrade = 'A+';
+            } elseif ($numericGpa >= 4.0) {
+                $finalGrade = 'A';
+            } elseif ($numericGpa >= 3.5) {
+                $finalGrade = 'A-';
+            } elseif ($numericGpa >= 3.0) {
+                $finalGrade = 'B';
+            } elseif ($numericGpa >= 2.0) {
+                $finalGrade = 'C';
+            } elseif ($numericGpa >= 1.0) {
+                $finalGrade = 'D';
+            } else {
+                $finalGrade = 'F';
+            }
+
+            $sheets[] = [
+                'student'         => $student,
+                'displayRoll'     => $displayRoll,
+                'displayCustomId' => $displayCustomId,
+                'marksData'       => $stSummary['marks_data'] ?? [],
+                'totalMarks'      => $targetData['total'] ?? 0,
+                'numericGpa'      => number_format($numericGpa, 2),
+                'finalGrade'      => $finalGrade,
+                'meritPosition'   => $meritMap[$student->id] ?? 0,
+                'formattedDOB'    => $student->date_of_birth ? date('Y-m-d', strtotime($student->date_of_birth)) : 'N/A',
+            ];
+        }
+
+        $data = [
+            'class'            => $class,
+            'exam'             => $exam,
+            'schoolName'       => $school->name ?? 'School Name',
+            'academic_year'    => $academicYearName,
+            'instituteLogo'    => $compressedLogo,
+            'sheets'           => $sheets,
+        ];
+
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '512M');
+
+        $pdf = Pdf::loadView('school.mark.bulk-marksheet-pdf', $data);
+        $fileName = 'marksheet-class-' . Str::slug($class->name) . '-' . Str::slug($exam->name) . '.pdf';
+        return $pdf->download($fileName);
+    }
+
+    private function compressImageToBase64($path, $maxWidth = 160)
     {
         if (!file_exists($path) || !is_file($path)) return '';
         try {
-            $info = getimagesize($path);
+            $info = @getimagesize($path);
             if (!$info) return '';
             
-            $width = $info[0];
+            $width  = $info[0];
             $height = $info[1];
-            $mime = $info['mime'];
+            $mime   = $info['mime'];
             
+            // Calculate proportional dimensions
             if ($width > $maxWidth) {
-                $newWidth = $maxWidth;
-                $newHeight = floor($height * ($maxWidth / $width));
-                
-                $image = null;
-                if ($mime == 'image/jpeg') $image = @imagecreatefromjpeg($path);
-                elseif ($mime == 'image/png') $image = @imagecreatefrompng($path);
-                elseif ($mime == 'image/webp') $image = @imagecreatefromwebp($path);
-                
-                if ($image) {
-                    $newImage = imagecreatetruecolor($newWidth, $newHeight);
-                    
-                    if ($mime == 'image/png' || $mime == 'image/webp') {
-                        imagealphablending($newImage, false);
-                        imagesavealpha($newImage, true);
-                        $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
-                        imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
-                    }
-                    
-                    imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-                    
-                    ob_start();
-                    if ($mime == 'image/jpeg') imagejpeg($newImage, null, 75);
-                    elseif ($mime == 'image/png') imagepng($newImage, null, 6);
-                    elseif ($mime == 'image/webp') imagewebp($newImage, null, 75);
-                    $imageData = ob_get_clean();
-                    
-                    imagedestroy($image);
-                    imagedestroy($newImage);
-                    
-                    return 'data:' . $mime . ';base64,' . base64_encode($imageData);
-                }
+                $newWidth  = $maxWidth;
+                $newHeight = (int)floor($height * ($maxWidth / $width));
+            } else {
+                $newWidth  = $width;
+                $newHeight = $height;
             }
-            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+            
+            $image = null;
+            if ($mime == 'image/jpeg' || $mime == 'image/jpg') $image = @imagecreatefromjpeg($path);
+            elseif ($mime == 'image/png') $image = @imagecreatefrompng($path);
+            elseif ($mime == 'image/webp') $image = @imagecreatefromwebp($path);
+            
+            if ($image) {
+                $newImage = imagecreatetruecolor($newWidth, $newHeight);
+                
+                if ($mime == 'image/png' || $mime == 'image/webp') {
+                    imagealphablending($newImage, false);
+                    imagesavealpha($newImage, true);
+                    $transparent = imagecolorallocatealpha($newImage, 255, 255, 255, 127);
+                    imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $transparent);
+                }
+                
+                imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                
+                ob_start();
+                if ($mime == 'image/png') {
+                    imagepng($newImage, null, 8); // PNG compression 0-9
+                    $outMime = 'image/png';
+                } elseif ($mime == 'image/webp') {
+                    imagewebp($newImage, null, 60);
+                    $outMime = 'image/webp';
+                } else {
+                    imagejpeg($newImage, null, 60); // JPEG quality 60%
+                    $outMime = 'image/jpeg';
+                }
+                $imageData = ob_get_clean();
+                
+                imagedestroy($image);
+                imagedestroy($newImage);
+                
+                return 'data:' . $outMime . ';base64,' . base64_encode($imageData);
+            }
+            return '';
         } catch (\Exception $e) {
             return '';
         }
@@ -994,6 +1151,189 @@ class MarkController extends Controller
 
         $pdf = Pdf::loadView('school.mark.result-sheet-pdf', compact('results', 'class', 'exam'));
         return $pdf->download("Result_Sheet_{$class->name}_{$exam->name}.pdf");
+    }
+
+    public function downloadExamResultSummary(Request $request, $tenant)
+    {
+        $school = DB::table('schools')->where('slug', $tenant)->first();
+        if (!$school) {
+            abort(404, 'School not found.');
+        }
+        $schoolId = $school->id;
+
+        $examId = $request->exam_id;
+        $yearId = $request->academic_year_id;
+        $classId = $request->class_id;
+
+        $exam = Exam::where('id', $examId)->where('school_id', $schoolId)->firstOrFail();
+        $targetYearId = $yearId ?? $exam->year_id;
+        $currentYearId = AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
+        $academicYearName = AcademicYear::where('id', $targetYearId)->value('name');
+
+        // Fetch classes to process
+        if (!empty($classId)) {
+            $classes = Classes::where('id', $classId)->where('school_id', $schoolId)->get();
+        } else {
+            $classes = Classes::where('school_id', $schoolId)->get();
+        }
+
+        $classesData = [];
+
+        foreach ($classes as $class) {
+            if ($targetYearId == $currentYearId) {
+                $students = Student::where([
+                    'class_id'         => $class->id,
+                    'academic_year_id' => $targetYearId,
+                    'school_id'        => $schoolId
+                ])->orderBy('roll', 'asc')->get();
+            } else {
+                $sessionStudentIds = DB::table('student_sessions')
+                    ->where(['class_id' => $class->id, 'academic_year_id' => $targetYearId])
+                    ->pluck('student_id')
+                    ->toArray();
+                $students = Student::whereIn('id', $sessionStudentIds)->orderBy('roll', 'asc')->get();
+            }
+
+            if ($students->isEmpty()) {
+                continue;
+            }
+
+            $subjectIds = AssignClass::where('class_id', $class->id)
+                ->where('school_id', $schoolId)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $subjectIds)->get();
+
+            $allMarks = Mark::where([
+                'class_id'         => $class->id,
+                'exam_id'          => $examId,
+                'academic_year_id' => $targetYearId,
+                'school_id'        => $schoolId
+            ])->get();
+
+            if ($allMarks->isEmpty()) {
+                continue;
+            }
+
+            $results = [];
+            foreach ($students as $student) {
+                if ($targetYearId == $currentYearId) {
+                    $displayRoll = $student->roll;
+                    $displayId   = $student->student_id ?? $student->id;
+                } else {
+                    $history = DB::table('student_sessions')
+                        ->where(['student_id' => $student->id, 'academic_year_id' => $targetYearId])
+                        ->first();
+                    $displayRoll = $history ? $history->old_roll : $student->roll;
+                    $displayId   = $history ? $history->old_student_id : ($student->student_id ?? $student->id);
+                }
+
+                $stSummary = $this->calculateStudentMarksheetData($student, $subjects, $allMarks, $class->id);
+                $numericGpa = $stSummary['gpa'] ?? 0;
+                $failCount  = $stSummary['fail_count'] ?? 0;
+
+                if ($failCount > 0) {
+                    $finalGrade = 'F';
+                } elseif ($numericGpa >= 5.0) {
+                    $finalGrade = 'A+';
+                } elseif ($numericGpa >= 4.0) {
+                    $finalGrade = 'A';
+                } elseif ($numericGpa >= 3.5) {
+                    $finalGrade = 'A-';
+                } elseif ($numericGpa >= 3.0) {
+                    $finalGrade = 'B';
+                } elseif ($numericGpa >= 2.0) {
+                    $finalGrade = 'C';
+                } elseif ($numericGpa >= 1.0) {
+                    $finalGrade = 'D';
+                } else {
+                    $finalGrade = 'F';
+                }
+
+                $results[] = [
+                    'student_id'  => $student->id,
+                    'display_id'  => $displayId,
+                    'roll'        => $displayRoll,
+                    'name'        => $student->name,
+                    'total_marks' => $stSummary['total_marks'],
+                    'numeric_gpa' => $numericGpa,
+                    'gpa_text'    => $failCount > 0 ? '0.00' : number_format($numericGpa, 2),
+                    'grade'       => $finalGrade,
+                    'fail_count'  => $failCount,
+                ];
+            }
+
+            if (empty($results)) {
+                continue;
+            }
+
+            // Sort by Merit (GPA desc, Total desc, Fail count asc, Roll asc)
+            usort($results, function($a, $b) {
+                if ($a['fail_count'] !== $b['fail_count']) return $a['fail_count'] <=> $b['fail_count'];
+                if ($b['numeric_gpa'] != $a['numeric_gpa']) return $b['numeric_gpa'] <=> $a['numeric_gpa'];
+                if ($b['total_marks'] != $a['total_marks']) return $b['total_marks'] <=> $a['total_marks'];
+                return (int)$a['roll'] <=> (int)$b['roll'];
+            });
+
+            // Assign merit rank
+            foreach ($results as $index => &$res) {
+                $res['merit'] = $index + 1;
+            }
+            unset($res);
+
+            // Sort by Roll number ascending (for student convenience)
+            usort($results, function($a, $b) {
+                return (int)$a['roll'] <=> (int)$b['roll'];
+            });
+
+            // Compute class statistics
+            $totalCount = count($results);
+            $passCount  = collect($results)->where('fail_count', 0)->count();
+            $failCountTotal = $totalCount - $passCount;
+            $passRate   = $totalCount > 0 ? round(($passCount / $totalCount) * 100, 1) : 0;
+            $highestMark = collect($results)->max('total_marks') ?? 0;
+            $passedStudents = collect($results)->where('fail_count', 0);
+            $avgGpa = $passedStudents->count() > 0 ? number_format($passedStudents->avg('numeric_gpa'), 2) : '0.00';
+
+            // Split into 2 vertical columns for side-by-side display
+            $half = (int)ceil($totalCount / 2);
+            $leftCol = array_slice($results, 0, $half);
+            $rightCol = array_slice($results, $half);
+
+            $classesData[] = [
+                'class'         => $class,
+                'total_count'   => $totalCount,
+                'pass_count'    => $passCount,
+                'fail_count'    => $failCountTotal,
+                'pass_rate'     => $passRate,
+                'highest_mark'  => $highestMark,
+                'avg_gpa'       => $avgGpa,
+                'left_col'      => $leftCol,
+                'right_col'     => $rightCol,
+                'max_rows'      => max(count($leftCol), count($rightCol)),
+            ];
+        }
+
+        if (empty($classesData)) {
+            return back()->with('error', 'এই পরীক্ষার কোনো ফলাফল পাওয়া যায়নি।');
+        }
+
+        $instituteLogo = public_path($school->logo ?? 'no-logo.png');
+        $compressedLogo = $this->compressImageToBase64($instituteLogo, 160);
+
+        $data = [
+            'school'           => $school,
+            'exam'             => $exam,
+            'academic_year'    => $academicYearName,
+            'instituteLogo'    => $compressedLogo,
+            'classesData'      => $classesData,
+        ];
+
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '512M');
+
+        $pdf = Pdf::loadView('school.mark.result-summary-pdf', $data);
+        $fileName = 'Result_Summary_' . Str::slug($exam->name) . '_' . Str::slug($academicYearName ?? date('Y')) . '.pdf';
+        return $pdf->download($fileName);
     }
 
     public function promotionForm()
