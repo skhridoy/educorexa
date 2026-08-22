@@ -38,13 +38,6 @@
             vertical-align: top;
         }
 
-        /* Watermark — DomPDF compatible via background-image on td */
-        .card-cell-wm {
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: 130px 130px;
-        }
-
         .card-content {
             position: relative;
         }
@@ -59,13 +52,13 @@
             table-layout: fixed;
         }
         .hdr-logo {
-            width: 55px;
+            width: 70px;
             vertical-align: middle;
             text-align: left;
         }
-        .hdr-logo img {
-            width: 50px;
-            height: 50px;
+        .hdr-logo img { 
+            width: 100%; 
+            height: 100%;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -278,17 +271,7 @@
             {{-- ── ADMIT CARD BOX TABLE WRAPPER ── --}}
             <table class="card-table-wrap" cellpadding="0" cellspacing="0">
                 <tr>
-                    @php
-                        $wmStyle = '';
-                        if ($school && $school->logo && file_exists(public_path($school->logo))) {
-                            $wmExt = strtolower(pathinfo($school->logo, PATHINFO_EXTENSION));
-                            $wmMime = $wmExt === 'png' ? 'image/png' : ($wmExt === 'svg' ? 'image/svg+xml' : 'image/jpeg');
-                            $wmData = base64_encode(file_get_contents(public_path($school->logo)));
-                            $wmStyle = 'background-image: url(data:' . $wmMime . ';base64,' . $wmData . '); background-repeat: no-repeat; background-position: center center; background-size: 130px 130px;';
-                        }
-                    @endphp
-                    <td class="card-cell card-cell-wm" {!! $wmStyle ? 'style="' . $wmStyle . '"' : '' !!}>
-
+                    <td class="card-cell">
                         <div class="card-content">
                             {{-- 1. Header: Logo | School Info Center | QR --}}
                             <table class="header-tbl" cellpadding="0" cellspacing="0">
