@@ -89,7 +89,7 @@
                 <h6 class="fw-bold mb-0 text-dark">
                     <i class="fa-solid fa-eye me-1 text-primary"></i> এডমিট কার্ড প্রিভিউ (মোট {{ $students->count() }} জন শিক্ষার্থী)
                 </h6>
-                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ২টি করে প্রবেশপত্র প্রিন্ট হবে</small>
+                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ৩টি করে প্রবেশপত্র প্রিন্ট হবে</small>
             </div>
 
             <div class="row">

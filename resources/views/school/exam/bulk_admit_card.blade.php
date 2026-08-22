@@ -6,7 +6,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 12mm 16mm 12mm 16mm;
+            margin: 6mm 10mm 6mm 10mm;
         }
         * {
             box-sizing: border-box;
@@ -17,8 +17,8 @@
             font-family: Helvetica, Arial, sans-serif;
             color: #0f172a;
             background: #ffffff;
-            font-size: 11px;
-            line-height: 1.15;
+            font-size: 10px;
+            line-height: 1.1;
         }
 
         /* ── Main Outer Table Container for DomPDF stability ── */
@@ -29,9 +29,9 @@
             margin-bottom: 0;
         }
         .card-table-wrap td.card-cell {
-            border: 2px solid #0f172a;
-            border-radius: 6px;
-            padding: 7px 10px 5px 10px;
+            border: 1.5px solid #0f172a;
+            border-radius: 5px;
+            padding: 4px 8px 3px 8px;
             background: #ffffff;
             position: relative;
             vertical-align: top;
@@ -42,16 +42,16 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 140px;
-            height: 140px;
-            margin-top: -70px;
-            margin-left: -70px;
-            opacity: 0.06;
+            width: 120px;
+            height: 120px;
+            margin-top: -60px;
+            margin-left: -60px;
+            opacity: 0.05;
             z-index: 0;
         }
         .watermark img {
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
         }
 
@@ -64,19 +64,19 @@
         .header-tbl {
             width: 100%;
             border-collapse: collapse;
-            border-bottom: 2px solid #0f172a;
-            padding-bottom: 4px;
-            margin-bottom: 4px;
+            border-bottom: 1.5px solid #0f172a;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
             table-layout: fixed;
         }
         .hdr-logo {
-            width: 65px;
+            width: 55px;
             vertical-align: middle;
             text-align: left;
         }
         .hdr-logo img {
-            width: 62px;
-            height: 62px;
+            width: 50px;
+            height: 50px;
             object-fit: contain;
             border-radius: 4px;
         }
@@ -87,56 +87,56 @@
         }
         .school-name {
             width: 100%;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             text-transform: uppercase;
             color: #0f172a;
-            margin: 0 0 2px 0;
+            margin: 0 0 1px 0;
             line-height: 1.05;
             white-space: nowrap;
         }
         .school-meta {
-            font-size: 10px;
+            font-size: 9px;
             color: #334155;
             margin: 1px 0;
-            line-height: 1.1;
+            line-height: 1.05;
         }
         .school-code-line {
-            font-size: 9.5px;
+            font-size: 8.5px;
             color: #475569;
-            margin: 1px 0;
+            margin: 0.5px 0;
             font-weight: 600;
             line-height: 1;
         }
         .exam-name-line {
-            font-size: 13px;
+            font-size: 11.5px;
             font-weight: bold;
             color: #1e3a8a;
-            margin: 2px 0 1px 0;
+            margin: 1px 0;
             line-height: 1;
         }
         .admit-badge {
             display: inline-block;
             background: #0f172a;
             color: #ffffff;
-            padding: 2px 10px;
-            font-size: 14px;
+            padding: 1px 8px;
+            font-size: 11px;
             font-weight: bold;
             border-radius: 3px;
-            letter-spacing: 1px;
-            line-height: 1.1;
+            letter-spacing: 0.8px;
+            line-height: 1.05;
         }
         .hdr-qr {
-            width: 65px;
+            width: 55px;
             vertical-align: middle;
             text-align: right;
         }
         .qr-box {
             display: inline-block;
-            padding: 2px;
+            padding: 1px;
             background: #fff;
             border: 1px solid #cbd5e1;
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         /* ── Student Info Table ── */
@@ -145,48 +145,48 @@
             border-collapse: collapse;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            border-radius: 3px;
+            margin-bottom: 3px;
             table-layout: fixed;
         }
         .student-info-tbl td {
-            padding: 2.5px 5px;
+            padding: 1.5px 4px;
             vertical-align: middle;
-            font-size: 12px;
-            line-height: 1.1;
+            font-size: 10.5px;
+            line-height: 1.05;
         }
         .lbl {
             color: #475569;
             font-weight: bold;
             width: 13%;
-            font-size: 11px;
+            font-size: 10px;
         }
         .val {
             color: #0f172a;
             font-weight: bold;
             width: 20%;
-            font-size: 12px;
+            font-size: 10.5px;
         }
         .val-name {
             color: #1e3a8a;
             font-weight: bold;
             width: 34%;
-            font-size: 12px;
+            font-size: 10.5px;
         }
 
         /* ── Routine Section (2 Columns with Time) ── */
         .routine-heading {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
             color: #ffffff;
             background: #0f172a;
-            padding: 2px 8px;
-            border-radius: 3px;
-            margin-bottom: 3px;
+            padding: 1.5px 6px;
+            border-radius: 2px;
+            margin-bottom: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.05;
         }
         .routine-grid-tbl {
             width: 100%;
@@ -196,45 +196,45 @@
         .sub-tbl {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 9.5px;
             table-layout: fixed;
         }
         .sub-tbl th {
             background: #1e293b;
             color: #ffffff;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
-            padding: 2.5px 4px;
+            padding: 1.5px 3px;
             border: 1px solid #1e293b;
             text-transform: uppercase;
             text-align: center;
-            line-height: 1.1;
+            line-height: 1.05;
         }
         .sub-tbl td {
-            padding: 2.5px 4px;
+            padding: 1.5px 3px;
             border: 1px solid #cbd5e1;
             color: #0f172a;
             vertical-align: middle;
-            line-height: 1.1;
-            font-size: 12px;
+            line-height: 1.05;
+            font-size: 10px;
         }
         .sub-tbl tr:nth-child(even) td {
             background: #f8fafc;
         }
         .no-rtn {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
             font-style: italic;
-            padding: 5px;
+            padding: 3px;
             text-align: center;
             border: 1px solid #e2e8f0;
             border-radius: 3px;
-            line-height: 1.1;
+            line-height: 1.05;
         }
 
         /* ── Signatures ── */
         .footer-wrap {
-            margin-top: 40px;
+            margin-top: 15px;
             padding-top: 0;
         }
         .footer-tbl {
@@ -245,22 +245,22 @@
         .sig-box {
             width: 40%;
             text-align: center;
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: bold;
             color: #1e293b;
             text-transform: uppercase;
-            padding-top: 4px;
-            border-top: 1.5px dashed #334155;
-            line-height: 1.1;
+            padding-top: 3px;
+            border-top: 1px dashed #334155;
+            line-height: 1.05;
         }
 
         /* Scissor cut line */
         .cut-line {
             width: 100%;
             text-align: center;
-            font-size: 9.5px;
+            font-size: 8px;
             color: #64748b;
-            margin: 2.5mm 0;
+            margin: 1.5mm 0;
             line-height: 1;
         }
 
@@ -270,7 +270,7 @@
     </style>
 </head>
 <body>
-    @foreach($students->chunk(2) as $chunkIndex => $pair)
+    @foreach($students->chunk(3) as $chunkIndex => $trio)
         @php
             $totalRoutines = $examRoutines->count();
             $half = ceil($totalRoutines / 2);
