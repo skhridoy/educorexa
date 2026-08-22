@@ -27,7 +27,7 @@
             width: 100%;
             table-layout: fixed;
             border-collapse: collapse;
-            margin-bottom: 0;
+            margin-bottom: 10px;
 
         }
         .card-table-wrap td.card-cell {
@@ -100,7 +100,7 @@
         }
         .admit-badge {
             display: inline-block;
-            background: #1e3a8a; 
+            background: #1e3a8a;  
             color: #0f172a;
             padding: 1.5px 8px;
             font-size: 12px;
