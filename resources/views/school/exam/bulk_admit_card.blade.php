@@ -100,7 +100,7 @@
         }
         .admit-badge {
             display: inline-block;
-            background: #1e3a8a;  
+            background: #c6d3f7ff;  
             color: #0f172a;
             padding: 1.5px 8px;
             font-size: 12px;
