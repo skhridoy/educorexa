@@ -100,8 +100,8 @@
         }
         .admit-badge {
             display: inline-block;
-            background: #0f172a;
-            color: #ffffff;
+            background: #1e3a8a; 
+            color: #0f172a;
             padding: 1.5px 8px;
             font-size: 12px;
             font-weight: bold;
@@ -109,7 +109,7 @@
             letter-spacing: 0.8px;
             line-height: 1.05;
             margin-top: 10px;
-            padding: 5px;
+            padding: 5px 10px;
         }
         .hdr-qr {
             width: 70px;
