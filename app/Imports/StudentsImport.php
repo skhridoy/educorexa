@@ -35,12 +35,11 @@ class StudentsImport implements ToCollection, WithHeadingRow
             throw new Exception('কোনো সক্রিয় শিক্ষাবর্ষ পাওয়া যায়নি। অনুগ্রহ করে আগে একটি শিক্ষাবর্ষ সক্রিয় করুন।');
         }
 
-        $yearPart   = substr($academicYear->name, -2);
-        $prefix     = 'STD-' . $yearPart;
+        $yearPart = substr($academicYear->name, -2);
+        $prefix   = 'STD-' . $yearPart;
 
-        // ───── Last serial for student_id generation ─────
-        $lastSerial = Student::where('school_id', $schoolId)
-            ->where('student_id', 'like', $prefix . '%')
+        // ───── Global max serial for student_id generation ─────
+        $lastSerial = Student::where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
             ->value('max_serial');
 
@@ -53,29 +52,38 @@ class StudentsImport implements ToCollection, WithHeadingRow
             $rowNumber = $rowIndex + 2; // heading row = 1, data starts at 2
 
             // ── 1. Validate student name ──
-            $name = trim($row['name'] ?? '');
+            $name = trim($row['name'] ?? $row['student_name'] ?? '');
             if (empty($name)) {
                 $this->importErrors[] = "Row {$rowNumber}: 'name' ফাঁকা রাখা যাবে না।";
                 $this->skipCount++;
                 continue;
             }
 
-            // ── 2. Resolve class by code ──
-            $rawCode = trim($row['class_code'] ?? '');
+            // ── 2. Resolve class (by code, id, or name) ──
+            $rawCode = trim($row['class_code'] ?? $row['class'] ?? $row['class_name'] ?? $row['class_id'] ?? '');
             if (empty($rawCode)) {
                 $this->importErrors[] = "Row {$rowNumber} ({$name}): 'class_code' কলামটি পূরণ করতে হবে।";
                 $this->skipCount++;
                 continue;
             }
 
-            $excelCode = str_pad($rawCode, 2, '0', STR_PAD_LEFT);
+            $excelCode = is_numeric($rawCode) ? str_pad($rawCode, 2, '0', STR_PAD_LEFT) : $rawCode;
 
             $class = Classes::where('school_id', $schoolId)
-                            ->where('code', $excelCode)
-                            ->first();
+                ->where(function($q) use ($rawCode, $excelCode) {
+                    $q->where('code', $rawCode)
+                      ->orWhere('code', $excelCode)
+                      ->orWhere('code', ltrim($rawCode, '0'))
+                      ->orWhereRaw('LOWER(name) = ?', [strtolower($rawCode)])
+                      ->orWhere('name', 'LIKE', '%' . $rawCode . '%');
+                    if (is_numeric($rawCode)) {
+                        $q->orWhere('id', (int)$rawCode);
+                    }
+                })
+                ->first();
 
             if (!$class) {
-                $this->importErrors[] = "Row {$rowNumber} ({$name}): class_code '{$rawCode}' এর কোনো ক্লাস পাওয়া যায়নি। অনুগ্রহ করে ক্লাস কোডটি যাচাই করুন।";
+                $this->importErrors[] = "Row {$rowNumber} ({$name}): class '{$rawCode}' এর কোনো শ্রেণি পাওয়া যায়নি। অনুগ্রহ করে শ্রেণি/কোড যাচাই করুন।";
                 $this->skipCount++;
                 continue;
             }
@@ -83,114 +91,149 @@ class StudentsImport implements ToCollection, WithHeadingRow
             $classId    = $class->id;
             $categoryId = $class->school_category_id;
 
-            // ── 3. Sub-category ──
-            $subCategoryId = isset($row['sub_category_id']) && !empty($row['sub_category_id'])
-                             ? (int)$row['sub_category_id']
-                             : null;
+            // ── 3. Sub-category (Group) resolution ──
+            $subCategoryId = null;
+            $rawSubCat = trim($row['sub_category_id'] ?? $row['sub_category'] ?? $row['subcategory'] ?? $row['group'] ?? $row['group_name'] ?? '');
 
-            // ── 4. Resolve section by NAME (not raw value) ──
+            if (!empty($rawSubCat)) {
+                if (is_numeric($rawSubCat)) {
+                    $subCatObj = \App\Models\SchoolSubCategory::where('school_id', $schoolId)->where('id', (int)$rawSubCat)->first();
+                    $subCategoryId = $subCatObj?->id;
+                } else {
+                    $subCatObj = \App\Models\SchoolSubCategory::where('school_id', $schoolId)
+                        ->where(function($q) use ($rawSubCat) {
+                            $q->whereRaw('LOWER(name) = ?', [strtolower($rawSubCat)])
+                              ->orWhere('name', 'LIKE', '%' . $rawSubCat . '%');
+                        })->first();
+                    $subCategoryId = $subCatObj?->id;
+                }
+            }
+
+            // ── 4. Resolve section by NAME or ID ──
             $sectionId = null;
-            $rawSection = trim($row['section'] ?? '');
+            $rawSection = trim($row['section'] ?? $row['section_name'] ?? $row['section_id'] ?? '');
 
             if (!empty($rawSection)) {
-                // Try to find by section name (sections table has no class_id)
                 $sectionObj = Section::where('school_id', $schoolId)
-                                     ->whereRaw('LOWER(name) = ?', [strtolower($rawSection)])
-                                     ->first();
+                    ->where(function($q) use ($rawSection) {
+                        $q->whereRaw('LOWER(name) = ?', [strtolower($rawSection)])
+                          ->orWhere('name', 'LIKE', '%' . $rawSection . '%');
+                        if (is_numeric($rawSection)) {
+                            $q->orWhere('id', (int)$rawSection);
+                        }
+                    })
+                    ->first();
 
                 if ($sectionObj) {
                     $sectionId = $sectionObj->id;
-                } else {
-                    // If it's a numeric value, treat it as ID
-                    if (is_numeric($rawSection)) {
-                        $sectionObj = Section::where('school_id', $schoolId)
-                                             ->where('id', (int)$rawSection)
-                                             ->first();
-                        if ($sectionObj) {
-                            $sectionId = $sectionObj->id;
-                        } else {
-                            $this->importErrors[] = "Row {$rowNumber} ({$name}): section '{$rawSection}' — এই ID-তে কোনো section পাওয়া যায়নি। প্রথম section ব্যবহার করা হয়েছে।";
-                        }
-                    } else {
-                        $this->importErrors[] = "Row {$rowNumber} ({$name}): section '{$rawSection}' — এই নামের কোনো section নেই। প্রথম section ব্যবহার করা হয়েছে।";
-                    }
                 }
             }
 
             // Fallback: default to first section for this school
             if (!$sectionId) {
-                $defaultSection = Section::where('school_id', $schoolId)
-                                         ->first();
+                $defaultSection = Section::where('school_id', $schoolId)->first();
                 $sectionId = $defaultSection?->id;
             }
 
-            // ── 5. Roll assignment ──
-            if (!isset($usedRolls[$classId])) {
-                $usedRolls[$classId] = Student::where('school_id', $schoolId)
+            // ── 5. Roll assignment (Group-specific) ──
+            $groupKey = $classId . '_' . ($subCategoryId ?? 'common');
+
+            if (!isset($usedRolls[$groupKey])) {
+                $rollQuery = Student::where('school_id', $schoolId)
                     ->where('class_id', $classId)
-                    ->where('academic_year_id', $academicYear->id)
-                    ->pluck('roll')
-                    ->toArray();
+                    ->where('academic_year_id', $academicYear->id);
+
+                if ($subCategoryId) {
+                    $rollQuery->where('school_sub_category_id', $subCategoryId);
+                } else {
+                    $rollQuery->whereNull('school_sub_category_id');
+                }
+
+                $usedRolls[$groupKey] = $rollQuery->pluck('roll')->toArray();
             }
 
             $finalRoll = null;
-            if (isset($row['roll']) && $row['roll'] !== '' && $row['roll'] !== null) {
-                $rollVal = trim($row['roll']);
-                if (!is_numeric($rollVal)) {
-                    $this->importErrors[] = "Row {$rowNumber} ({$name}): 'roll' এর মান '{$rollVal}' একটি সংখ্যা হতে হবে। স্বয়ংক্রিয় roll নম্বর দেওয়া হয়েছে।";
-                    // auto-assign
+            $rawRoll = $row['roll'] ?? $row['roll_no'] ?? $row['roll_number'] ?? null;
+            if ($rawRoll !== '' && $rawRoll !== null) {
+                $rollVal = trim($rawRoll);
+                if (is_numeric($rollVal)) {
+                    $finalRoll = (int)$rollVal;
+                } else {
                     $suggestedRoll = 1;
-                    while (in_array($suggestedRoll, $usedRolls[$classId])) {
+                    while (in_array($suggestedRoll, $usedRolls[$groupKey])) {
                         $suggestedRoll++;
                     }
                     $finalRoll = $suggestedRoll;
-                } else {
-                    $finalRoll = (int)$rollVal;
                 }
             } else {
                 $suggestedRoll = 1;
-                while (in_array($suggestedRoll, $usedRolls[$classId])) {
+                while (in_array($suggestedRoll, $usedRolls[$groupKey])) {
                     $suggestedRoll++;
                 }
                 $finalRoll = $suggestedRoll;
             }
 
-            $usedRolls[$classId][] = $finalRoll;
+            $usedRolls[$groupKey][] = $finalRoll;
 
             // ── 6. Date of birth ──
             $dob = null;
-            if (!empty($row['date_of_birth'])) {
+            $rawDob = $row['date_of_birth'] ?? $row['dob'] ?? $row['birth_date'] ?? null;
+            if (!empty($rawDob)) {
                 try {
-                    $rawDob = $row['date_of_birth'];
                     if (is_numeric($rawDob)) {
                         $dob = Date::excelToDateTimeObject($rawDob)->format('Y-m-d');
                     } else {
-                        $dob = \Carbon\Carbon::parse($rawDob)->format('Y-m-d');
+                        $dob = \Carbon\Carbon::parse(str_replace('/', '-', $rawDob))->format('Y-m-d');
                     }
                 } catch (\Exception $e) {
-                    $this->importErrors[] = "Row {$rowNumber} ({$name}): date_of_birth '{$row['date_of_birth']}' ফরম্যাট বোঝা যাচ্ছে না। খালি রাখা হয়েছে।";
                     $dob = null;
                 }
             }
 
-            // ── 7. Validate gender ──
-            $gender = trim($row['gender'] ?? '');
-            $allowedGenders = ['male', 'female', 'other', 'Male', 'Female', 'Other'];
-            if (!empty($gender) && !in_array($gender, $allowedGenders)) {
-                $this->importErrors[] = "Row {$rowNumber} ({$name}): gender '{$gender}' অবৈধ। Male / Female / Other ব্যবহার করুন। খালি রাখা হয়েছে।";
-                $gender = null;
+            // ── 7. Normalize gender ──
+            $rawGender = trim($row['gender'] ?? '');
+            $gender = null;
+            if (!empty($rawGender)) {
+                $gLower = strtolower($rawGender);
+                if (in_array($gLower, ['male', 'm', 'পুরুষ', 'ছেলে', 'boy'])) {
+                    $gender = 'Male';
+                } elseif (in_array($gLower, ['female', 'f', 'মহিলা', 'মেয়ে', 'মেয়ে', 'girl'])) {
+                    $gender = 'Female';
+                } else {
+                    $gender = 'Other';
+                }
             }
 
-            // ── 8. Student ID ──
-            $studentId = $prefix . str_pad($currentNextNumber, 4, '0', STR_PAD_LEFT);
-            $currentNextNumber++;
+            // ── 8. Normalize religion ──
+            $rawRel = trim($row['religion'] ?? '');
+            $religion = 'Islam';
+            if (!empty($rawRel)) {
+                $relLower = strtolower($rawRel);
+                if (str_contains($relLower, 'islam') || str_contains($relLower, 'ইসলাম') || str_contains($relLower, 'muslim') || str_contains($relLower, 'মুসলিম')) {
+                    $religion = 'Islam';
+                } elseif (str_contains($relLower, 'hindu') || str_contains($relLower, 'হিন্দু') || str_contains($relLower, 'সনাতন')) {
+                    $religion = 'Hinduism';
+                } elseif (str_contains($relLower, 'buddh') || str_contains($relLower, 'বৌদ্ধ') || str_contains($relLower, 'বুদ্ধ')) {
+                    $religion = 'Buddhism';
+                } elseif (str_contains($relLower, 'christ') || str_contains($relLower, 'খ্রিস্ট') || str_contains($relLower, 'খ্রিষ্ট')) {
+                    $religion = 'Christianity';
+                } else {
+                    $religion = ucfirst($rawRel);
+                }
+            }
 
-            // ── 9. Save with transaction ──
+            // ── 9. Generate guaranteed unique Student ID ──
+            do {
+                $studentId = $prefix . str_pad($currentNextNumber, 4, '0', STR_PAD_LEFT);
+                $currentNextNumber++;
+            } while (Student::where('student_id', $studentId)->exists() || User::where('email', $studentId . '@gmail.com')->exists());
+
+            // ── 10. Save with transaction ──
             try {
                 DB::transaction(function () use (
                     $row, $schoolId, $academicYear, $class, $categoryId,
                     $subCategoryId, $sectionId, $studentId, $finalRoll,
-                    $name, $dob, $gender
+                    $name, $dob, $gender, $religion
                 ) {
                     $user = User::updateOrCreate(
                         ['email' => $studentId . '@gmail.com'],
@@ -217,16 +260,17 @@ class StudentsImport implements ToCollection, WithHeadingRow
                         'student_id'             => $studentId,
                         'roll'                   => $finalRoll,
                         'name'                   => $name,
-                        'fathers_name'           => $row['fathers_name'] ?? null,
-                        'mothers_name'           => $row['mothers_name'] ?? null,
-                        'contact_number'         => $row['contact_number'] ?? null,
+                        'fathers_name'           => $row['fathers_name'] ?? $row['father_name'] ?? null,
+                        'mothers_name'           => $row['mothers_name'] ?? $row['mother_name'] ?? null,
+                        'contact_number'         => $row['contact_number'] ?? $row['phone'] ?? null,
                         'date_of_birth'          => $dob,
                         'gender'                 => $gender,
                         'blood_group'            => $row['blood_group'] ?? null,
-                        'religion'               => $row['religion'] ?? null,
+                        'religion'               => $religion,
                         'address'                => $row['address'] ?? null,
                         'password'               => Hash::make($row['password'] ?? '12345678'),
                         'status'                 => 'active',
+                        'admission_date'         => now()->format('Y-m-d'),
                         'created_by'             => Auth::id(),
                     ]);
                 });
@@ -252,18 +296,17 @@ class StudentsImport implements ToCollection, WithHeadingRow
             return 'এই তথ্য ইতিমধ্যে ডেটাবেজে রয়েছে (Duplicate Entry)।';
         }
         if (str_contains($message, 'section_id') && str_contains($message, 'Incorrect integer')) {
-            return 'section_id অবশ্যই একটি সংখ্যা হতে হবে (কলামে section-এর নাম দিন, যেমন A বা Bangla)।';
+            return 'section কলামে সঠিক সেকশন নাম (যেমন A বা B) দিন।';
         }
         if (str_contains($message, 'class_id') && str_contains($message, 'Incorrect integer')) {
-            return 'class_id অবশ্যই একটি সংখ্যা হতে হবে।';
+            return 'class_code কলামে সঠিক ক্লাস কোড বা নাম দিন।';
         }
         if (str_contains($message, 'Cannot add or update a child row')) {
-            return 'Section বা Class ID ডেটাবেজে পাওয়া যায়নি — অনুগ্রহ করে ক্লাস কোড ও section নাম যাচাই করুন।';
+            return 'শ্রেণি, সেকশন বা গ্রুপের তথ্য ডেটাবেজে পাওয়া যায়নি।';
         }
         if (str_contains($message, 'date_of_birth') || str_contains($message, 'Invalid datetime')) {
             return 'date_of_birth এর ফরম্যাট সঠিক নয়। YYYY-MM-DD ফরম্যাট ব্যবহার করুন।';
         }
-        // fallback short message (no raw SQL)
-        return 'অপ্রত্যাশিত সমস্যা হয়েছে। টেমপ্লেটের নির্দেশনা অনুসরণ করুন।';
+        return 'অপ্রত্যাশিত সমস্যা: ' . (str_contains($message, '(SQL:') ? trim(substr($message, 0, strpos($message, '(SQL:'))) : $message);
     }
 }

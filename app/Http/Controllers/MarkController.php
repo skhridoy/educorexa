@@ -105,13 +105,55 @@ class MarkController extends Controller
             $studentsQuery = Student::where('school_id', $schoolId)
                 ->where('class_id', $classId)->orderBy('roll', 'asc');
 
-            // religion subject filter
-            if (str_contains($subject->name, 'Islam')) {
-                $studentsQuery->where('religion', 'Islam');
+            // 1. Group / Subcategory filter for subject:
+            $assignClass = AssignClass::where('class_id', $classId)->where('subject_id', $subjectId)->first();
+            $subCatId = $assignClass?->school_sub_category_id ?: $subject->school_sub_category_id;
+            if ($subCatId) {
+                $studentsQuery->where('school_sub_category_id', $subCatId);
             }
 
-            if (str_contains($subject->name, 'Hindu')) {
-                $studentsQuery->where('religion', 'Hinduism');
+            // 2. Religion subject filter:
+            $subName = mb_strtolower(trim($subject->name ?? ''));
+            $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন') || str_contains($subName, 'হাদিস') || str_contains($subName, 'ফিকহ');
+            $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+            $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+            $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+            if ($isIslam) {
+                $studentsQuery->where(function($q) {
+                    $q->where('religion', 'Islam')
+                      ->orWhere('religion', 'islam')
+                      ->orWhere('religion', 'LIKE', '%Islam%')
+                      ->orWhere('religion', 'LIKE', '%ইসলাম%')
+                      ->orWhere('religion', 'LIKE', '%Muslim%')
+                      ->orWhere('religion', 'LIKE', '%মুসলিম%')
+                      ->orWhereNull('religion')
+                      ->orWhere('religion', '');
+                });
+            } elseif ($isHindu) {
+                $studentsQuery->where(function($q) {
+                    $q->where('religion', 'Hinduism')
+                      ->orWhere('religion', 'hinduism')
+                      ->orWhere('religion', 'LIKE', '%Hindu%')
+                      ->orWhere('religion', 'LIKE', '%হিন্দু%')
+                      ->orWhere('religion', 'LIKE', '%সনাতন%');
+                });
+            } elseif ($isBuddha) {
+                $studentsQuery->where(function($q) {
+                    $q->where('religion', 'Buddhism')
+                      ->orWhere('religion', 'buddhism')
+                      ->orWhere('religion', 'LIKE', '%Buddh%')
+                      ->orWhere('religion', 'LIKE', '%বৌদ্ধ%')
+                      ->orWhere('religion', 'LIKE', '%বুদ্ধ%');
+                });
+            } elseif ($isChristian) {
+                $studentsQuery->where(function($q) {
+                    $q->where('religion', 'Christianity')
+                      ->orWhere('religion', 'christianity')
+                      ->orWhere('religion', 'LIKE', '%Christ%')
+                      ->orWhere('religion', 'LIKE', '%খ্রিস্ট%')
+                      ->orWhere('religion', 'LIKE', '%খ্রিষ্ট%');
+                });
             }
 
             $students = $studentsQuery->get();
@@ -345,15 +387,71 @@ class MarkController extends Controller
      */
     private function calculateStudentMarksheetData($student, $subjects, $allMarks, $classId)
     {
-        $stRel = mb_strtolower($student->religion ?? '');
+        $stRel = mb_strtolower(trim($student->religion ?? ''));
+        $studentSubCatId = $student->school_sub_category_id;
 
-        // 1. Filter out religion mismatches
-        $validSubjects = $subjects->filter(function ($subject) use ($stRel) {
-            $subName = mb_strtolower($subject->name);
-            if ((str_contains($subName, 'islam') && $stRel !== 'islam') ||
-                (str_contains($subName, 'hindu') && !str_contains($stRel, 'hindu'))) {
-                return false;
+        // Load AssignClass mapping for this class to get each subject's group/subcategory
+        static $assignClassesCache = [];
+        if (!isset($assignClassesCache[$classId])) {
+            $assignClassesCache[$classId] = AssignClass::where('class_id', $classId)
+                ->get()
+                ->keyBy('subject_id');
+        }
+        $assignMap = $assignClassesCache[$classId];
+
+        // 1. Filter subjects: Common Subjects + Student's Group Subjects + Student's Religion Subject
+        $validSubjects = $subjects->filter(function ($subject) use ($stRel, $studentSubCatId, $assignMap) {
+            $ac = $assignMap->get($subject->id);
+            $subCatId = $ac ? $ac->school_sub_category_id : $subject->school_sub_category_id;
+
+            // A) Group / Subcategory check:
+            if ($studentSubCatId) {
+                // If subject is group-specific and doesn't match student's group, exclude it
+                if (!empty($subCatId) && $subCatId != $studentSubCatId) {
+                    return false;
+                }
+            } else {
+                // If student has no group, exclude group-specific subjects
+                if (!empty($subCatId)) {
+                    return false;
+                }
             }
+
+            // B) Religion check:
+            $subName = mb_strtolower(trim($subject->name ?? ''));
+
+            $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন') || str_contains($subName, 'হাদিস') || str_contains($subName, 'ফিকহ');
+            $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+            $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+            $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+            if ($isIslam || $isHindu || $isBuddha || $isChristian) {
+                if ($isIslam) {
+                    $matchesIslam = str_contains($stRel, 'islam') || str_contains($stRel, 'ইসলাম') || str_contains($stRel, 'muslim') || str_contains($stRel, 'মুসলিম') || empty($stRel);
+                    if (!$matchesIslam) {
+                        return false;
+                    }
+                }
+                if ($isHindu) {
+                    $matchesHindu = str_contains($stRel, 'hindu') || str_contains($stRel, 'হিন্দু') || str_contains($stRel, 'সনাতন');
+                    if (!$matchesHindu) {
+                        return false;
+                    }
+                }
+                if ($isBuddha) {
+                    $matchesBuddha = str_contains($stRel, 'buddh') || str_contains($stRel, 'বৌদ্ধ') || str_contains($stRel, 'বুদ্ধ');
+                    if (!$matchesBuddha) {
+                        return false;
+                    }
+                }
+                if ($isChristian) {
+                    $matchesChristian = str_contains($stRel, 'christ') || str_contains($stRel, 'খ্রিস্ট') || str_contains($stRel, 'খ্রিষ্ট');
+                    if (!$matchesChristian) {
+                        return false;
+                    }
+                }
+            }
+
             return true;
         });
 
@@ -636,9 +734,31 @@ class MarkController extends Controller
 
             // ══════════════════════════════════════════════
             // মোড ১: সিঙ্গেল সাবজেক্ট ভিউ + এডিট
-            // ══════════════════════════════════════════
+            // ══════════════════════════════════════════════
             if ($selectedSubjectId) {
                 $selectedSubject = Subject::find($selectedSubjectId);
+
+                // Filter students for single subject if group/religion specific
+                $assignClass = AssignClass::where('class_id', $selectedClassId)->where('subject_id', $selectedSubjectId)->first();
+                $subCatId = $assignClass?->school_sub_category_id ?: $selectedSubject?->school_sub_category_id;
+
+                $subName = mb_strtolower(trim($selectedSubject?->name ?? ''));
+                $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন');
+                $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+                $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+                $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+                $students = $students->filter(function($st) use ($subCatId, $isIslam, $isHindu, $isBuddha, $isChristian) {
+                    if ($subCatId && $st->school_sub_category_id != $subCatId) {
+                        return false;
+                    }
+                    $stRel = mb_strtolower(trim($st->religion ?? ''));
+                    if ($isIslam && !(str_contains($stRel, 'islam') || str_contains($stRel, 'ইসলাম') || str_contains($stRel, 'muslim') || str_contains($stRel, 'মুসলিম') || empty($stRel))) return false;
+                    if ($isHindu && !(str_contains($stRel, 'hindu') || str_contains($stRel, 'হিন্দু') || str_contains($stRel, 'সনাতন'))) return false;
+                    if ($isBuddha && !(str_contains($stRel, 'buddh') || str_contains($stRel, 'বৌদ্ধ') || str_contains($stRel, 'বুদ্ধ'))) return false;
+                    if ($isChristian && !(str_contains($stRel, 'christ') || str_contains($stRel, 'খ্রিস্ট') || str_contains($stRel, 'খ্রিষ্ট'))) return false;
+                    return true;
+                });
 
                 $fullMark = AssignClass::where([
                     'class_id'   => $selectedClassId,
@@ -655,7 +775,7 @@ class MarkController extends Controller
 
             } else {
                 // ══════════════════════════════════════════
-                // মোড ২: সব সাবজেক্ট রিপোর্ট (আগের লজিক)
+                // মোড ২: সব সাবজেক্ট রিপোর্ট
                 // ══════════════════════════════════════════
                 $allMarks = Mark::where([
                     'class_id'         => $selectedClassId,
@@ -670,11 +790,20 @@ class MarkController extends Controller
 
                         // Individual subject marks for table view
                         foreach ($subjects as $subject) {
-                            $mRecord = $allMarks->where('student_id', $student->id)->where('subject_id', $subject->id)->first();
-                            $fm = AssignClass::where(['class_id' => $selectedClassId, 'subject_id' => $subject->id])->value('full_mark') ?? 100;
-                            $rawMark = $mRecord ? $mRecord->marks : null;
-                            $gradeInfo = $this->getGradeWithPoint($rawMark, $fm);
-                            $marksData[$student->id][$subject->id] = ['marks' => $rawMark, 'grade' => $gradeInfo['grade']];
+                            if (isset($stSummary['marks_data'][$subject->id])) {
+                                $subInfo = $stSummary['marks_data'][$subject->id];
+                                $marksData[$student->id][$subject->id] = [
+                                    'marks'         => $subInfo['marks'],
+                                    'grade'         => $subInfo['grade'],
+                                    'is_applicable' => true
+                                ];
+                            } else {
+                                $marksData[$student->id][$subject->id] = [
+                                    'marks'         => null,
+                                    'grade'         => null,
+                                    'is_applicable' => false
+                                ];
+                            }
                         }
 
                         $marksData[$student->id]['GPA'] = $stSummary['gpa_text'];

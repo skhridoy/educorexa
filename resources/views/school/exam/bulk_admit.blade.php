@@ -96,17 +96,61 @@
                 @foreach($students as $student)
                     @php
                         $studentSubCategoryId = $student->school_sub_category_id;
+                        $studentReligion = mb_strtolower(trim($student->religion ?? ''));
                         
                         // Filter routines for this specific student:
-                        // Look up subcategory from assign_classes (where class-subject mappings are stored), then fallback to subject
-                        $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId, $assignClasses) {
+                        // 1. Group / SubCategory filter
+                        // 2. Religion subject filter
+                        $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId, $assignClasses, $studentReligion) {
                             $ac = isset($assignClasses) ? $assignClasses->get($rtn->subject_id) : null;
                             $subCatId = $ac ? $ac->school_sub_category_id : $rtn->subject?->school_sub_category_id;
 
+                            // 1. Group / Subcategory check
                             if ($studentSubCategoryId) {
-                                return empty($subCatId) || $subCatId == $studentSubCategoryId;
+                                if (!empty($subCatId) && $subCatId != $studentSubCategoryId) {
+                                    return false;
+                                }
+                            } else {
+                                if (!empty($subCatId)) {
+                                    return false;
+                                }
                             }
-                            return empty($subCatId);
+
+                            // 2. Religion subject check
+                            $subName = mb_strtolower(trim($rtn->subject?->name ?? ''));
+                            $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন');
+                            $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+                            $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+                            $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+                            if ($isIslam || $isHindu || $isBuddha || $isChristian) {
+                                if ($isIslam) {
+                                    $matchesIslam = str_contains($studentReligion, 'islam') || str_contains($studentReligion, 'ইসলাম') || str_contains($studentReligion, 'muslim') || str_contains($studentReligion, 'মুসলিম') || empty($studentReligion);
+                                    if (!$matchesIslam) {
+                                        return false;
+                                    }
+                                }
+                                if ($isHindu) {
+                                    $matchesHindu = str_contains($studentReligion, 'hindu') || str_contains($studentReligion, 'হিন্দু') || str_contains($studentReligion, 'সনাতন');
+                                    if (!$matchesHindu) {
+                                        return false;
+                                    }
+                                }
+                                if ($isBuddha) {
+                                    $matchesBuddha = str_contains($studentReligion, 'buddh') || str_contains($studentReligion, 'বৌদ্ধ') || str_contains($studentReligion, 'বুদ্ধ');
+                                    if (!$matchesBuddha) {
+                                        return false;
+                                    }
+                                }
+                                if ($isChristian) {
+                                    $matchesChristian = str_contains($studentReligion, 'christ') || str_contains($studentReligion, 'খ্রিস্ট') || str_contains($studentReligion, 'খ্রিষ্ট');
+                                    if (!$matchesChristian) {
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            return true;
                         });
 
                         if ($studentRoutines->isEmpty()) {
@@ -132,7 +176,7 @@
                                     <tr>
                                         {{-- Logo Left --}}
                                         <td style="width: 55px; vertical-align: middle; padding: 0;">
-                                            @if($schoolLogo)
+                                             @if($schoolLogo)
                                                 <img src="{{ asset($schoolLogo) }}" style="width: 48px; height: 48px; object-fit: contain;">
                                             @else
                                                 <div style="width:48px; height:48px; border:1px solid #cbd5e1; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:9px; color:#94a3b8;">LOGO</div>
@@ -156,7 +200,7 @@
                                         </td>
                                         {{-- QR Code Right --}}
                                         <td style="width: 55px; vertical-align: middle; text-align: right; padding: 0;">
-                                            <div style="display: inline-block; padding: 2px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                             <div style="display: inline-block; padding: 2px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
                                                 @php
                                                     $previewQr = null;
                                                     try {
@@ -180,22 +224,20 @@
                                 <div class="bg-light p-2 rounded mb-2 border">
                                     <table class="table table-borderless table-sm mb-0" style="font-size: 0.75rem; background: transparent;">
                                         <tr>
-                                            <td class="text-muted fw-bold py-0" style="width: 12%;">নাম:</td>
+                                            <td class="text-muted fw-bold py-0" style="width: 10%;">নাম:</td>
                                             <td class="fw-bold py-0" style="width: 38%; color: #1e3a8a;">{{ strtoupper($student->name) }}</td>
-                                            <td class="text-muted fw-bold py-0" style="width: 12%;">শ্রেণি:</td>
-                                            <td class="fw-bold py-0" style="width: 38%;">{{ $student->class->name ?? 'N/A' }}</td>
+                                            <td class="text-muted fw-bold py-0" style="width: 10%;">শ্রেণি:</td>
+                                            <td class="fw-bold py-0" style="width: 22%;">{{ $student->class->name ?? 'N/A' }}</td>
+                                            <td class="text-muted fw-bold py-0" style="width: 8%;">রোল:</td>
+                                            <td class="fw-bold py-0" style="width: 12%;">{{ $student->roll ?? 'N/A' }}</td>
                                         </tr>
                                         <tr>
                                             <td class="text-muted fw-bold py-0">আইডি:</td>
                                             <td class="fw-bold py-0">{{ $student->student_id ?? 'N/A' }}</td>
-                                            <td class="text-muted fw-bold py-0">রোল:</td>
-                                            <td class="fw-bold py-0">{{ $student->roll ?? 'N/A' }}</td>
-                                        </tr>
-                                        <tr>
                                             <td class="text-muted fw-bold py-0">শাখা:</td>
                                             <td class="fw-bold py-0">{{ $student->section->name ?? 'N/A' }}</td>
-                                            <td class="text-muted fw-bold py-0">সেশন:</td>
-                                            <td class="fw-bold py-0">{{ date('Y') }}</td>
+                                            <td class="text-muted fw-bold py-0">গ্রুপ:</td>
+                                            <td class="fw-bold py-0 text-primary">{{ $student->group->name ?? 'N/A' }}</td>
                                         </tr>
                                     </table>
                                 </div>

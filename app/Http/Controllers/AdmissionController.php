@@ -284,6 +284,20 @@ class AdmissionController extends Controller
         $studentId = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         $admissionDate = now()->format('Y-m-d');
 
+        $subCatId = $subCategoryId ?? $admission->school_sub_category_id;
+        $lastRollQuery = Student::where('school_id', $schoolId)
+            ->where('class_id', $admission->class_id)
+            ->where('academic_year_id', $academicYear->id);
+
+        if ($subCatId) {
+            $lastRollQuery->where('school_sub_category_id', $subCatId);
+        } else {
+            $lastRollQuery->whereNull('school_sub_category_id');
+        }
+
+        $lastRoll = $lastRollQuery->max('roll');
+        $nextRoll = $lastRoll ? $lastRoll + 1 : 1;
+
         // ৫. ফটো হ্যান্ডেলিং (Admissions ফোল্ডার থেকে Students ফোল্ডারে মুভ করা)
         $finalPhotoPath = $admission->photo;
         if ($admission->photo && file_exists(public_path($admission->photo))) {
@@ -301,14 +315,9 @@ class AdmissionController extends Controller
                 $finalPhotoPath = $newPath;
             }
         }
-        $lastRoll = Student::where('school_id', $schoolId)
-            ->where('class_id', $admission->class_id)
-            ->where('academic_year_id', $admission->academic_year_id)
-            ->max('roll');
 
-        $nextRoll = $lastRoll ? $lastRoll + 1 : 1;
         // ৬. ডাটাবেজ ট্রানজ্যাকশন (নিরাপদ ইনসার্ট নিশ্চিত করতে)
-        DB::transaction(function () use ($admission, $studentId, $schoolId, $admissionDate, $finalPhotoPath, $sectionId, $categoryId, $subCategoryId, $nextRoll) {
+        DB::transaction(function () use ($admission, $studentId, $schoolId, $admissionDate, $finalPhotoPath, $sectionId, $categoryId, $subCategoryId, $nextRoll, $tenantSlug) {
            // ১. ইউজার খুঁজে বের করা অথবা আপডেট করা
             $user = User::where('email', $admission->email)
                         ->where('school_id', $schoolId)
@@ -328,71 +337,78 @@ class AdmissionController extends Controller
                 ]);
             }
 
-            // রোল সিঙ্ক করা (Spatie)
-            if (method_exists($user, 'syncRoles')) {
-                $user->syncRoles(['student']);
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole('student');
             }
-            // স্টুডেন্ট টেবিলে ডাটা ইনসার্ট (সহ অ্যাডমিশন আইডি রেফারেন্স)
-            Student::create([
+
+            // ২. স্টুডেন্ট তৈরি করা
+            $student = Student::create([
                 'user_id'           => $user->id,
                 'school_id'         => $schoolId,
-                'admission_id'      => $admission->id, // Reference to Admission History
                 'academic_year_id'  => $admission->academic_year_id,
                 'class_id'          => $admission->class_id,
-                'section_id'             => $sectionId,
-                'school_category_id'     => $categoryId,
+                'section_id'        => $sectionId,
+                'school_category_id' => $categoryId,
                 'school_sub_category_id' => $subCategoryId,
                 'student_id'        => $studentId,
-                'roll'              => $nextRoll,
                 'name'              => $admission->name,
-                'email'             => $admission->email,
-                'contact_number'    => $admission->contact_number,
                 'fathers_name'      => $admission->fathers_name,
                 'mothers_name'      => $admission->mothers_name,
                 'father_nid'        => $admission->father_nid,
                 'mother_nid'        => $admission->mother_nid,
                 'student_birth_nid' => $admission->student_birth_nid,
-                'gender'            => $admission->gender,
-                'religion'          => $admission->religion,
-                'blood_group'       => $admission->blood_group,
-                'date_of_birth'     => $admission->date_of_birth,
-                'admission_date'    => $admissionDate,
-                'address'           => $admission->address,
-                'previous_school'   => $admission->previous_school,
-                'previous_class'    => $admission->previous_class,
+                'contact_number'    => $admission->contact_number,
+                'password'          => $admission->password,
                 'photo'             => $finalPhotoPath,
                 'status'            => 'active',
-                'password'          => $admission->password,
+                'religion'          => $admission->religion,
+                'gender'            => $admission->gender,
+                'date_of_birth'     => $admission->date_of_birth,
+                'admission_date'    => $admissionDate,
+                'blood_group'       => $admission->blood_group,
+                'address'           => $admission->address,
+                'created_by'        => auth()->id(),
+                'roll'              => $nextRoll,
+                'admission_id'      => $admission->id,
             ]);
 
-            // অ্যাডমিশন স্ট্যাটাস আপডেট (হিস্ট্রি সংরক্ষণের জন্য ডিলিট না করে অনুমোদিত হিসেবে মার্ক করা)
+            // ৩. পেমেন্ট রেকর্ড আপডেট (যদি থাকে)
+            \App\Models\FeePayment::where('admission_id', $admission->id)
+                ->whereNull('student_id')
+                ->update(['student_id' => $student->id]);
+
+            // ৪. অ্যাডমিশন স্ট্যাটাস আপডেট
             $admission->update(['status' => 'approved']);
         });
 
-        return back()->with([
-            'success' => 'শিক্ষার্থী সফলভাবে ভর্তি করা হয়েছে এবং হিস্ট্রি সংরক্ষিত রয়েছে।',
-            'type'    => 'success'
-        ]);
+        return redirect()->route('admissions.index', ['tenant' => $tenantSlug])
+            ->with('success', 'Student admitted successfully!');
     }
 
-    public function bulkApprove(Request $request, $tenant)
+    public function bulkApprove(Request $request)
     {
+        $schoolId = auth()->user()->school_id;
+        $tenantSlug = auth()->user()->school->slug;
+
         // 1. Validation
         $request->validate([
-            'admission_ids'        => 'required|array',
-            'admission_ids.*'      => 'exists:admissions,id',
-            'section_id'           => 'required|exists:sections,id',
-            'school_category_id'   => 'nullable|exists:school_categories,id',
+            'admission_ids'          => 'required|array|min:1',
+            'admission_ids.*'        => 'exists:admissions,id',
+            'section_id'             => 'nullable|exists:sections,id',
+            'school_category_id'     => 'nullable|exists:school_categories,id',
             'school_sub_category_id' => 'nullable|exists:school_sub_categories,id',
+            'admission_date'         => 'nullable|date',
         ]);
 
-        $currentSchool = app('currentSchool');
-        $schoolId = $currentSchool->id;
-        $tenantSlug = $currentSchool->slug;
+        $admissionIds = $request->admission_ids;
+        $sectionId = $request->section_id;
+        $categoryId = $request->school_category_id;
+        $subCategoryId = $request->school_sub_category_id;
+        $admissionDate = $request->admission_date ?? now()->format('Y-m-d');
 
-        // 2. Fetch pending admissions for this school
-        $admissions = Admission::whereIn('id', $request->admission_ids)
-            ->where('school_id', $schoolId)
+        // 2. Fetch Admissions
+        $admissions = Admission::where('school_id', $schoolId)
+            ->whereIn('id', $admissionIds)
             ->where('status', 'pending')
             ->get();
 
@@ -403,23 +419,7 @@ class AdmissionController extends Controller
             ]);
         }
 
-        // 3. Find selected section
-        $selectedSection = Section::where('id', $request->section_id)
-            ->where('school_id', $schoolId)
-            ->first();
-
-        if (!$selectedSection) {
-            return back()->with([
-                'success' => 'নির্বাচিত সেকশন পাওয়া যায়নি। আবার চেষ্টা করুন।',
-                'type'    => 'danger'
-            ]);
-        }
-
-        $sectionId          = $selectedSection->id;
-        $categoryId         = $request->school_category_id;
-        $subCategoryId      = $request->school_sub_category_id;
-
-        // 4. Find active academic year
+        // 3. Find active academic year
         $academicYear = AcademicYear::where('school_id', $schoolId)
             ->where('is_active', 1)
             ->first();
@@ -431,53 +431,63 @@ class AdmissionController extends Controller
             ]);
         }
 
-        // 5. Setup Unique Student ID generation
+        // 4. Setup Unique Student ID generation
         $yearPart = substr($academicYear->name, -2);
         $prefix = 'STD-' . $yearPart;
 
-        $lastSerial = Student::where('school_id', $schoolId)
-            ->where('student_id', 'like', $prefix . '%')
+        $lastSerial = Student::where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
             ->value('max_serial');
 
         $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
-        $admissionDate = now()->format('Y-m-d');
 
-        // Track rolls per class to prevent duplicate rolls in the batch
+        // Track rolls per class and group to prevent duplicate rolls in the batch
         $classRolls = [];
         $approvedCount = 0;
 
-        // 6. DB Transaction to ensure everything succeeds or fails together
+        // 5. DB Transaction to ensure everything succeeds or fails together
         DB::transaction(function () use ($admissions, $schoolId, $tenantSlug, $academicYear, $prefix, &$nextNumber, $admissionDate, $sectionId, $categoryId, $subCategoryId, &$classRolls, &$approvedCount) {
             foreach ($admissions as $admission) {
-                // Generate Student ID
-                $studentId = $prefix . str_pad($nextNumber++, 4, '0', STR_PAD_LEFT);
+                // Generate guaranteed unique Student ID
+                do {
+                    $studentId = $prefix . str_pad($nextNumber++, 4, '0', STR_PAD_LEFT);
+                } while (Student::where('student_id', $studentId)->exists() || User::where('email', $admission->email)->exists());
 
-                // Handle Roll Number
+                // Handle Roll Number (Group-specific)
                 $classId = $admission->class_id;
-                if (!isset($classRolls[$classId])) {
-                    $lastRoll = Student::where('school_id', $schoolId)
+                $effectiveSubCatId = $subCategoryId ?? $admission->school_sub_category_id;
+                $groupKey = $classId . '_' . ($effectiveSubCatId ?? 'common');
+
+                if (!isset($classRolls[$groupKey])) {
+                    $rollQuery = Student::where('school_id', $schoolId)
                         ->where('class_id', $classId)
-                        ->where('academic_year_id', $academicYear->id)
-                        ->max('roll');
-                    $classRolls[$classId] = $lastRoll ? $lastRoll : 0;
+                        ->where('academic_year_id', $academicYear->id);
+
+                    if ($effectiveSubCatId) {
+                        $rollQuery->where('school_sub_category_id', $effectiveSubCatId);
+                    } else {
+                        $rollQuery->whereNull('school_sub_category_id');
+                    }
+
+                    $lastRoll = $rollQuery->max('roll');
+                    $classRolls[$groupKey] = $lastRoll ? $lastRoll : 0;
                 }
-                $classRolls[$classId]++;
-                $nextRoll = $classRolls[$classId];
+                $classRolls[$groupKey]++;
+                $nextRoll = $classRolls[$groupKey];
 
                 // Handle Photo Move
                 $finalPhotoPath = $admission->photo;
                 if ($admission->photo && file_exists(public_path($admission->photo))) {
                     $oldPath = public_path($admission->photo);
                     $newFolder = "uploads/schools/{$tenantSlug}/students";
-                    
+
                     if (!file_exists(public_path($newFolder))) {
                         mkdir(public_path($newFolder), 0755, true);
                     }
 
                     $fileName = basename($oldPath);
                     $newPath = $newFolder . '/' . $fileName;
-                    
+
                     if (rename($oldPath, public_path($newPath))) {
                         $finalPhotoPath = $newPath;
                     }
@@ -500,30 +510,29 @@ class AdmissionController extends Controller
                     ]);
                 }
 
-                if (method_exists($user, 'syncRoles')) {
-                    $user->syncRoles(['student']);
+                if (method_exists($user, 'assignRole')) {
+                    $user->assignRole('student');
                 }
 
                 // Create Student with Admission Reference
                 Student::create([
                     'user_id'                => $user->id,
                     'school_id'              => $schoolId,
-                    'admission_id'           => $admission->id, // Reference to Admission History
+                    'admission_id'           => $admission->id,
                     'academic_year_id'       => $academicYear->id,
                     'class_id'               => $admission->class_id,
-                    'section_id'             => $sectionId,
-                    'school_category_id'     => $categoryId,
-                    'school_sub_category_id' => $subCategoryId,
+                    'section_id'             => $sectionId ?? $admission->section_id,
+                    'school_category_id'     => $categoryId ?? $admission->school_category_id,
+                    'school_sub_category_id' => $effectiveSubCatId,
                     'student_id'             => $studentId,
                     'roll'                   => $nextRoll,
                     'name'                   => $admission->name,
-                    'email'                  => $admission->email,
-                    'contact_number'         => $admission->contact_number,
                     'fathers_name'           => $admission->fathers_name,
                     'mothers_name'           => $admission->mothers_name,
                     'father_nid'             => $admission->father_nid,
                     'mother_nid'             => $admission->mother_nid,
                     'student_birth_nid'      => $admission->student_birth_nid,
+                    'contact_number'         => $admission->contact_number,
                     'gender'                 => $admission->gender,
                     'religion'               => $admission->religion,
                     'blood_group'            => $admission->blood_group,

@@ -272,7 +272,7 @@ class StudentController extends Controller
                 'school_sub_category_id' => $request->school_sub_category_id,
                 'section_id'             => $validated['section_id'],
                 'student_id'             => $this->generateUniqueStudentId($schoolId, $academicYear),
-                'roll'                   => $this->getNextRoll($schoolId, $validated['class_id'], $academicYear->id),
+                'roll'                   => $this->getNextRoll($schoolId, $validated['class_id'], $academicYear->id, $request->school_sub_category_id),
                 'name'                   => $validated['name'],
                 'fathers_name'           => $request->fathers_name ?? $request->father_name,
                 'mothers_name'           => $request->mothers_name ?? $request->mother_name,
@@ -449,11 +449,18 @@ class StudentController extends Controller
         return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
-    private function getNextRoll($schoolId, $classId, $academicYearId) {
-        $lastRoll = Student::where('school_id', $schoolId)
+    private function getNextRoll($schoolId, $classId, $academicYearId, $subCategoryId = null) {
+        $query = Student::where('school_id', $schoolId)
             ->where('class_id', $classId)
-            ->where('academic_year_id', $academicYearId)
-            ->max('roll');
+            ->where('academic_year_id', $academicYearId);
+
+        if ($subCategoryId) {
+            $query->where('school_sub_category_id', $subCategoryId);
+        } else {
+            $query->whereNull('school_sub_category_id');
+        }
+
+        $lastRoll = $query->max('roll');
         return $lastRoll ? $lastRoll + 1 : 1;
     }
 

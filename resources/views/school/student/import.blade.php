@@ -155,7 +155,7 @@
                         <i class="fa-solid fa-circle-info me-1 text-primary"></i>Required Columns Guide:
                     </p>
                     <div class="d-flex flex-wrap gap-2 mb-2">
-                        @foreach(['class_code *','name *','section','roll','fathers_name','mothers_name','contact_number','date_of_birth','gender','religion','blood_group','address'] as $col)
+                        @foreach(['class_code *','name *','group / sub_category','section','roll','fathers_name','mothers_name','contact_number','date_of_birth','gender','religion','blood_group','address'] as $col)
                             <span class="badge rounded-pill fw-normal px-2 py-1"
                                   style="background:{{ str_contains($col,'*') ? '#4f46e5' : '#64748b' }};color:#fff;font-size:11px;">
                                 {{ $col }}
@@ -164,7 +164,9 @@
                     </div>
                     <p class="text-muted mb-0" style="font-size:11.5px;">
                         <span class="text-primary fw-bold">*</span> বাধ্যতামূলক কলাম &nbsp;|&nbsp;
-                        <span class="fw-semibold">section</span> কলামে সেকশনের <em>নাম</em> লিখুন (যেমন: A, B, Bangla) &nbsp;|&nbsp;
+                        <span class="fw-semibold">class_code</span> কলামে ক্লাস কোড (যেমন: 01, 06) বা নাম (যেমন: Six, Nine) &nbsp;|&nbsp;
+                        <span class="fw-semibold">group</span> কলামে গ্রুপের নাম (যেমন: Science, Humanities) বা ID &nbsp;|&nbsp;
+                        <span class="fw-semibold">section</span> কলামে সেকশনের <em>নাম</em> (যেমন: A, B, Padma) &nbsp;|&nbsp;
                         Default Password: <span class="badge bg-primary">12345678</span>
                     </p>
                 </div>

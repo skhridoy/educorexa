@@ -145,19 +145,19 @@
         .lbl {
             color: #475569;
             font-weight: bold;
-            width: 13%;
+            width: 10%;
             font-size: 9.5px;
         }
         .val {
             color: #0f172a;
             font-weight: bold;
-            width: 20%;
+            width: 19%;
             font-size: 10px;
         }
         .val-name {
             color: #1e3a8a;
             font-weight: bold;
-            width: 34%;
+            width: 32%;
             font-size: 10px;
         }
 
@@ -264,19 +264,63 @@
         @foreach($pair as $pairIndex => $student)
             @php
                 $studentSubCategoryId = $student->school_sub_category_id;
+                $studentReligion = mb_strtolower(trim($student->religion ?? ''));
                 
                 // Filter routines for this specific student:
-                // Look up subcategory from assign_classes (where class-subject mappings are stored), then fallback to subject
-                $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId, $assignClasses) {
+                // 1. Group / SubCategory filter
+                // 2. Religion subject filter
+                $studentRoutines = $examRoutines->filter(function($rtn) use ($studentSubCategoryId, $assignClasses, $studentReligion) {
                     $ac = isset($assignClasses) ? $assignClasses->get($rtn->subject_id) : null;
                     $subCatId = $ac ? $ac->school_sub_category_id : $rtn->subject?->school_sub_category_id;
 
+                    // 1. Group / Subcategory check
                     if ($studentSubCategoryId) {
                         // Common/compulsory subject (null) OR matches student's group/subcategory
-                        return empty($subCatId) || $subCatId == $studentSubCategoryId;
+                        if (!empty($subCatId) && $subCatId != $studentSubCategoryId) {
+                            return false;
+                        }
+                    } else {
+                        // If student has no group, include only common subjects (null)
+                        if (!empty($subCatId)) {
+                            return false;
+                        }
                     }
-                    // If student has no group, include common subjects (null)
-                    return empty($subCatId);
+
+                    // 2. Religion subject check
+                    $subName = mb_strtolower(trim($rtn->subject?->name ?? ''));
+                    $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন');
+                    $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+                    $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+                    $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+                    if ($isIslam || $isHindu || $isBuddha || $isChristian) {
+                        if ($isIslam) {
+                            $matchesIslam = str_contains($studentReligion, 'islam') || str_contains($studentReligion, 'ইসলাম') || str_contains($studentReligion, 'muslim') || str_contains($studentReligion, 'মুসলিম') || empty($studentReligion);
+                            if (!$matchesIslam) {
+                                return false;
+                            }
+                        }
+                        if ($isHindu) {
+                            $matchesHindu = str_contains($studentReligion, 'hindu') || str_contains($studentReligion, 'হিন্দু') || str_contains($studentReligion, 'সনাতন');
+                            if (!$matchesHindu) {
+                                return false;
+                            }
+                        }
+                        if ($isBuddha) {
+                            $matchesBuddha = str_contains($studentReligion, 'buddh') || str_contains($studentReligion, 'বৌদ্ধ') || str_contains($studentReligion, 'বুদ্ধ');
+                            if (!$matchesBuddha) {
+                                return false;
+                            }
+                        }
+                        if ($isChristian) {
+                            $matchesChristian = str_contains($studentReligion, 'christ') || str_contains($studentReligion, 'খ্রিস্ট') || str_contains($studentReligion, 'খ্রিষ্ট');
+                            if (!$matchesChristian) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
                 });
 
                 // Fallback: If no routines match the filter, fallback to all class routines
@@ -349,7 +393,7 @@
                             <table class="student-info-tbl" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td class="lbl">Name</td>
-                                    <td class="val-name" colspan="3">: {{ strtoupper($student->name) }}</td>
+                                    <td class="val-name">: {{ strtoupper($student->name) }}</td>
                                     <td class="lbl">Class</td>
                                     <td class="val">: {{ $student->class->name ?? 'N/A' }}</td>
                                     <td class="lbl">Roll</td>
@@ -357,11 +401,11 @@
                                 </tr>
                                 <tr>
                                     <td class="lbl">ID</td>
-                                    <td class="val" colspan="3">: {{ $student->student_id ?? 'N/A' }}</td>
+                                    <td class="val-name">: {{ $student->student_id ?? 'N/A' }}</td>
                                     <td class="lbl">Section</td>
                                     <td class="val">: {{ $student->section->name ?? 'N/A' }}</td>
-                                    <td class="lbl">Session</td>
-                                    <td class="val">: {{ date('Y') }}</td>
+                                    <td class="lbl">Group</td>
+                                    <td class="val">: {{ $student->group->name ?? 'N/A' }}</td>
                                 </tr>
                             </table>
 

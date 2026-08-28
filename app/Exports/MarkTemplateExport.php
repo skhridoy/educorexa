@@ -49,10 +49,64 @@ class MarkTemplateExport implements FromCollection, WithHeadings, WithTitle, Sho
 
     public function collection()
     {
-        $students = Student::where('school_id', $this->schoolId)
+        $query = Student::where('school_id', $this->schoolId)
             ->where('class_id', $this->classId)
-            ->orderBy('roll')
-            ->get(['id', 'roll', 'student_id', 'name']);
+            ->orderBy('roll');
+
+        if ($this->mode === 'single' && $this->subjectId) {
+            $subject = \App\Models\Subject::find($this->subjectId);
+            $assignClass = AssignClass::where('class_id', $this->classId)->where('subject_id', $this->subjectId)->first();
+            $subCatId = $assignClass?->school_sub_category_id ?: $subject?->school_sub_category_id;
+
+            if ($subCatId) {
+                $query->where('school_sub_category_id', $subCatId);
+            }
+
+            $subName = mb_strtolower(trim($subject?->name ?? ''));
+            $isIslam = str_contains($subName, 'islam') || str_contains($subName, 'ইসলাম') || str_contains($subName, 'deeniyat') || str_contains($subName, 'দ্বীনিয়াত') || str_contains($subName, 'কোরআন') || str_contains($subName, 'কুরআন') || str_contains($subName, 'হাদিস') || str_contains($subName, 'ফিকহ');
+            $isHindu = str_contains($subName, 'hindu') || str_contains($subName, 'হিন্দু') || str_contains($subName, 'সনাতন');
+            $isBuddha = str_contains($subName, 'buddh') || str_contains($subName, 'বৌদ্ধ') || str_contains($subName, 'বুদ্ধ');
+            $isChristian = str_contains($subName, 'christ') || str_contains($subName, 'খ্রিস্ট') || str_contains($subName, 'খ্রিষ্ট');
+
+            if ($isIslam) {
+                $query->where(function($q) {
+                    $q->where('religion', 'Islam')
+                      ->orWhere('religion', 'islam')
+                      ->orWhere('religion', 'LIKE', '%Islam%')
+                      ->orWhere('religion', 'LIKE', '%ইসলাম%')
+                      ->orWhere('religion', 'LIKE', '%Muslim%')
+                      ->orWhere('religion', 'LIKE', '%মুসলিম%')
+                      ->orWhereNull('religion')
+                      ->orWhere('religion', '');
+                });
+            } elseif ($isHindu) {
+                $query->where(function($q) {
+                    $q->where('religion', 'Hinduism')
+                      ->orWhere('religion', 'hinduism')
+                      ->orWhere('religion', 'LIKE', '%Hindu%')
+                      ->orWhere('religion', 'LIKE', '%হিন্দু%')
+                      ->orWhere('religion', 'LIKE', '%সনাতন%');
+                });
+            } elseif ($isBuddha) {
+                $query->where(function($q) {
+                    $q->where('religion', 'Buddhism')
+                      ->orWhere('religion', 'buddhism')
+                      ->orWhere('religion', 'LIKE', '%Buddh%')
+                      ->orWhere('religion', 'LIKE', '%বৌদ্ধ%')
+                      ->orWhere('religion', 'LIKE', '%বুদ্ধ%');
+                });
+            } elseif ($isChristian) {
+                $query->where(function($q) {
+                    $q->where('religion', 'Christianity')
+                      ->orWhere('religion', 'christianity')
+                      ->orWhere('religion', 'LIKE', '%Christ%')
+                      ->orWhere('religion', 'LIKE', '%খ্রিস্ট%')
+                      ->orWhere('religion', 'LIKE', '%খ্রিষ্ট%');
+                });
+            }
+        }
+
+        $students = $query->get(['id', 'roll', 'student_id', 'name']);
 
         return $students->map(function ($s) {
             $row = [

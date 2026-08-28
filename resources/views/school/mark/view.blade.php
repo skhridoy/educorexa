@@ -1258,11 +1258,15 @@
                                     </td>
                                     @foreach($subjects as $subject)
                                         @php
-                                            $m = $marksData[$student->id][$subject->id]['marks'] ?? null;
-                                            $g = $marksData[$student->id][$subject->id]['grade'] ?? '-';
+                                            $cellData = $marksData[$student->id][$subject->id] ?? null;
+                                            $isApplicable = $cellData['is_applicable'] ?? true;
+                                            $m = $cellData['marks'] ?? null;
+                                            $g = $cellData['grade'] ?? '-';
                                         @endphp
                                         <td class="mark-cell">
-                                            @if($m !== null)
+                                            @if(!$isApplicable)
+                                                <span class="text-muted" style="font-size:0.75rem;">—</span>
+                                            @elseif($m !== null)
                                                 {{ $m }} <span class="grade-text">| {{ $g }}</span>
                                             @else
                                                 <span class="text-danger" style="font-size:0.7rem;">N/A</span>
