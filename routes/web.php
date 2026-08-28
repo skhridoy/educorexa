@@ -453,6 +453,10 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::post('marks-import',         [MarkController::class, 'import'])->name('marks.import');
                     Route::get('marks-import/template', [MarkController::class, 'downloadMarkTemplate'])->name('marks.import.template');
 
+                    // Result Search Panel
+                    Route::get('result-search',         [MarkController::class, 'resultSearchIndex'])->name('marks.result-search');
+                    Route::post('result-search',        [MarkController::class, 'resultSearchQuery'])->name('marks.result-search-query');
+
                     Route::resource('marks', MarkController::class);
                 });
 

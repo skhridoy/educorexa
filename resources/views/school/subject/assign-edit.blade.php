@@ -556,7 +556,7 @@
                                 <select id="subject_id" name="subject_id" class="form-select" required>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}" {{ old('subject_id', $assignment->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
+                                        <option value="{{ $subject->id }}" {{ old('subject_id', $assignment->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('subject_id')

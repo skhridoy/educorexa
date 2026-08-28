@@ -706,7 +706,7 @@
                             <select class="form-select form-select-custom @error('subject_id') is-invalid @enderror" id="subject_id" name="subject_id" required>
                                 <option value="">Select Subject</option>
                                 @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }} class="text-capitalize">{{ $subject->name }}</option>
+                                    <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }} class="text-capitalize">{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
                                 @endforeach
                             </select>
                             @error('subject_id')

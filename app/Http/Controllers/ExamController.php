@@ -35,14 +35,16 @@ class ExamController extends Controller
         $years = AcademicYear::where('school_id', $schoolId)->orderBy('name', 'desc')->get();
         $categories = SchoolCategory::where('school_id', $schoolId)->orderBy('name')->get();
 
-        $query = Exam::with(['academicYear', 'category'])
+        $query = Exam::with(['academicYear', 'categories'])
             ->where('school_id', $schoolId);
 
         if ($request->filled('year_id')) {
             $query->where('year_id', $request->year_id);
         }
         if ($request->filled('category_id')) {
-            $query->where('school_category_id', $request->category_id);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('school_category_id', $request->category_id);
+            });
         }
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -66,36 +68,43 @@ class ExamController extends Controller
         $schoolId = $this->getSchoolId($request);
 
         $request->validate([
-            'year_id'            => 'required|exists:academicyears,id',
-            'school_category_id' => 'required|exists:school_categories,id', 
-            'name'               => 'required|string|max:255',
-            'start_date'         => 'required|date',
-            'end_date'           => 'required|date|after_or_equal:start_date',
+            'year_id'               => 'required|exists:academicyears,id',
+            'school_category_ids'   => 'required|array|min:1',
+            'school_category_ids.*' => 'exists:school_categories,id',
+            'name'                  => 'required|string|max:255',
+            'start_date'            => 'required|date',
+            'end_date'              => 'required|date|after_or_equal:start_date',
         ], [
-            'year_id.required'            => 'শিক্ষাবর্ষ সিলেক্ট করা বাধ্যতামূলক।',
-            'school_category_id.required' => 'স্কুল ক্যাটেগরি সিলেক্ট করুন।',
-            'end_date.after_or_equal'     => 'শেষ তারিখ অবশ্যই শুরু তারিখের সমান বা পরে হতে হবে।'
+            'year_id.required'             => 'শিক্ষাবর্ষ সিলেক্ট করা বাধ্যতামূলক।',
+            'school_category_ids.required' => 'অন্তত একটি স্কুল ক্যাটেগরি সিলেক্ট করুন।',
+            'end_date.after_or_equal'      => 'শেষ তারিখ অবশ্যই শুরু তারিখের সমান বা পরে হতে হবে।'
         ]);
 
         try {
-            Exam::create([
+            $categoryIds = $request->school_category_ids;
+
+            // Store first category in legacy column for backward compat
+            $exam = Exam::create([
                 'school_id'          => $schoolId,
-                'school_category_id' => $request->school_category_id, 
+                'school_category_id' => $categoryIds[0],
                 'year_id'            => $request->year_id,
                 'name'               => $request->name,
-                'status'             => 0, // ডিফল্ট ইন-অ্যাক্টিভ
+                'status'             => 0,
                 'start_date'         => $request->start_date,
                 'end_date'           => $request->end_date,
                 'is_published'       => 0,
             ]);
 
+            // Sync pivot table
+            $exam->categories()->sync($categoryIds);
+
             return back()->with([
-                'success' => 'নতুন পরীক্ষা সফলভাবে তৈরি করা হয়েছে!', 
+                'success' => 'নতুন পরীক্ষা সফলভাবে তৈরি করা হয়েছে!',
                 'type'    => 'success'
             ]);
         } catch (\Exception $e) {
             return back()->with([
-                'success' => 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।', 
+                'success' => 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।',
                 'type'    => 'danger'
             ]);
         }
@@ -108,9 +117,13 @@ class ExamController extends Controller
     {
         $schoolId = $this->getSchoolId();
 
-        $exam = Exam::where('school_id', $schoolId)
+        $exam = Exam::with('categories')
+            ->where('school_id', $schoolId)
             ->where('id', $exam)
             ->firstOrFail();
+
+        // Include selected category IDs for the edit form
+        $exam->selected_category_ids = $exam->categories->pluck('id')->toArray();
 
         return response()->json($exam);
     }
@@ -127,24 +140,30 @@ class ExamController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'year_id'            => 'required|exists:academicyears,id',
-            'school_category_id' => 'required|exists:school_categories,id',
-            'name'               => 'required|string|max:255',
-            'start_date'         => 'required|date',
-            'end_date'           => 'required|date|after_or_equal:start_date',
+            'year_id'               => 'required|exists:academicyears,id',
+            'school_category_ids'   => 'required|array|min:1',
+            'school_category_ids.*' => 'exists:school_categories,id',
+            'name'                  => 'required|string|max:255',
+            'start_date'            => 'required|date',
+            'end_date'              => 'required|date|after_or_equal:start_date',
         ], [
-            'year_id.required'            => 'শিক্ষাবর্ষ সিলেক্ট করা বাধ্যতামূলক।',
-            'school_category_id.required' => 'স্কুল ক্যাটেগরি সিলেক্ট করুন।',
-            'end_date.after_or_equal'     => 'শেষ তারিখ অবশ্যই শুরু তারিখের সমান বা পরে হতে হবে।'
+            'year_id.required'             => 'শিক্ষাবর্ষ সিলেক্ট করা বাধ্যতামূলক।',
+            'school_category_ids.required' => 'অন্তত একটি স্কুল ক্যাটেগরি সিলেক্ট করুন।',
+            'end_date.after_or_equal'      => 'শেষ তারিখ অবশ্যই শুরু তারিখের সমান বা পরে হতে হবে।'
         ]);
 
+        $categoryIds = $request->school_category_ids;
+
         $exam->update([
-            'school_category_id' => $request->school_category_id,
+            'school_category_id' => $categoryIds[0], // keep legacy column in sync
             'year_id'            => $request->year_id,
             'name'               => $request->name,
             'start_date'         => $request->start_date,
             'end_date'           => $request->end_date,
         ]);
+
+        // Sync pivot table
+        $exam->categories()->sync($categoryIds);
 
         return back()->with([
             'success' => 'Exam updated successfully!',
@@ -177,7 +196,7 @@ class ExamController extends Controller
     public function getExamsByYear($tenant, $yearId)
     {
         $schoolId = $this->getSchoolId();
-        $exams = Exam::with(['category'])
+        $exams = Exam::with(['categories'])
             ->where('school_id', $schoolId)
             ->where('year_id', $yearId)
             ->orderBy('id', 'asc')
@@ -212,12 +231,13 @@ class ExamController extends Controller
         $toYearNum   = (int) preg_replace('/[^0-9]/', '', $toYear->name);
         $yearDiff    = ($fromYearNum && $toYearNum) ? ($toYearNum - $fromYearNum) : 1;
 
-        $sourceExams = Exam::where('school_id', $schoolId)
+        $sourceExams = Exam::with('categories')
+            ->where('school_id', $schoolId)
             ->where('year_id', $request->from_year_id)
             ->whereIn('id', $request->exam_ids)
             ->get();
 
-        $copiedCount = 0;
+        $copiedCount  = 0;
         $skippedCount = 0;
 
         foreach ($sourceExams as $source) {
@@ -226,53 +246,56 @@ class ExamController extends Controller
                 $newName = str_replace((string)$fromYearNum, (string)$toYearNum, $newName);
             }
 
-            // Check if already exists in target year
-            $exists = Exam::where('school_id', $schoolId)
+            // Check if already exists in target year (by name only — not per-category)
+            $existingExam = Exam::where('school_id', $schoolId)
                 ->where('year_id', $request->to_year_id)
-                ->where('school_category_id', $source->school_category_id)
                 ->where('name', $newName)
-                ->exists();
+                ->first();
 
-            if ($exists) {
+            if ($existingExam) {
+                // Sync categories from source to existing
+                $existingExam->categories()->syncWithoutDetaching(
+                    $source->categories->pluck('id')->toArray()
+                );
                 $skippedCount++;
                 continue;
             }
 
             // Calculate adjusted dates
             $newStartDate = null;
-            $newEndDate = null;
+            $newEndDate   = null;
             if ($source->start_date) {
-                try {
-                    $newStartDate = \Carbon\Carbon::parse($source->start_date)->addYears($yearDiff)->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $newStartDate = $source->start_date;
-                }
+                try { $newStartDate = \Carbon\Carbon::parse($source->start_date)->addYears($yearDiff)->format('Y-m-d'); }
+                catch (\Exception $e) { $newStartDate = $source->start_date; }
             }
             if ($source->end_date) {
-                try {
-                    $newEndDate = \Carbon\Carbon::parse($source->end_date)->addYears($yearDiff)->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $newEndDate = $source->end_date;
-                }
+                try { $newEndDate = \Carbon\Carbon::parse($source->end_date)->addYears($yearDiff)->format('Y-m-d'); }
+                catch (\Exception $e) { $newEndDate = $source->end_date; }
             }
 
-            Exam::create([
+            $sourceCategoryIds = $source->categories->pluck('id')->toArray();
+
+            $newExam = Exam::create([
                 'school_id'          => $schoolId,
                 'school_category_id' => $source->school_category_id,
                 'year_id'            => $request->to_year_id,
                 'name'               => $newName,
-                'status'             => 0, // start inactive
+                'status'             => 0,
                 'start_date'         => $newStartDate,
                 'end_date'           => $newEndDate,
                 'is_published'       => 0,
             ]);
 
+            if (!empty($sourceCategoryIds)) {
+                $newExam->categories()->sync($sourceCategoryIds);
+            }
+
             $copiedCount++;
         }
 
-        $message = "{$copiedCount}টি পরীক্ষা সফলভাবে '{$toYear->name}' শিক্ষাবর্ষে কপি করা হয়েছে।";
+        $message = "{$copiedCount}টি পরীক্ষা সফলভাবে '{$toYear->name}' শিক্ষাবর্ষে কপি করা হয়েছে।";
         if ($skippedCount > 0) {
-            $message .= " ({$skippedCount}টি পরীক্ষা আগেই বিদ্যমান থাকায় স্কিপ করা হয়েছে)";
+            $message .= " ({$skippedCount}টি বিদ্যমান পরীক্ষায় ক্যাটেগরি আপডেট হয়েছে)";
         }
 
         return back()->with([
@@ -289,76 +312,54 @@ class ExamController extends Controller
         $schoolId = $this->getSchoolId($request);
 
         $request->validate([
-            'year_id'            => 'required|exists:academicyears,id',
-            'school_category_id' => 'required|exists:school_categories,id',
-            'presets'            => 'required|array|min:1',
+            'year_id'               => 'required|exists:academicyears,id',
+            'school_category_ids'   => 'required|array|min:1',
+            'school_category_ids.*' => 'exists:school_categories,id',
+            'presets'               => 'required|array|min:1',
         ], [
-            'year_id.required'            => 'শিক্ষাবর্ষ নির্বাচন করুন।',
-            'school_category_id.required' => 'স্কুল ক্যাটেগরি নির্বাচন করুন।',
-            'presets.required'            => 'কমপক্ষে একটি পরীক্ষার ধরন নির্বাচন করুন।',
+            'year_id.required'             => 'শিক্ষাবর্ষ নির্বাচন করুন।',
+            'school_category_ids.required' => 'অন্তত একটি স্কুল ক্যাটেগরি নির্বাচন করুন।',
+            'presets.required'             => 'কমপক্ষে একটি পরীক্ষার ধরন নির্বাচন করুন।',
         ]);
 
-        $year = AcademicYear::where('school_id', $schoolId)->findOrFail($request->year_id);
-        $yearNum = (int) preg_replace('/[^0-9]/', '', $year->name) ?: date('Y');
+        $year        = AcademicYear::where('school_id', $schoolId)->findOrFail($request->year_id);
+        $yearNum     = (int) preg_replace('/[^0-9]/', '', $year->name) ?: date('Y');
+        $categoryIds = $request->school_category_ids;
 
         $standardDates = [
-            '1st_term' => [
-                'name'  => '১ম সাময়িক পরীক্ষা (1st Term Exam)',
-                'start' => "{$yearNum}-04-01",
-                'end'   => "{$yearNum}-04-15",
-            ],
-            'half_yearly' => [
-                'name'  => 'অর্ধ-বার্ষিক পরীক্ষা (Half Yearly Exam)',
-                'start' => "{$yearNum}-06-15",
-                'end'   => "{$yearNum}-06-30",
-            ],
-            '2nd_term' => [
-                'name'  => '২য় সাময়িক পরীক্ষা (2nd Term Exam)',
-                'start' => "{$yearNum}-08-15",
-                'end'   => "{$yearNum}-08-30",
-            ],
-            'pre_test' => [
-                'name'  => 'প্রাক-নির্বাচনী পরীক্ষা (Pre-Test Exam)',
-                'start' => "{$yearNum}-10-01",
-                'end'   => "{$yearNum}-10-15",
-            ],
-            'annual' => [
-                'name'  => 'বার্ষিক পরীক্ষা (Annual Exam)',
-                'start' => "{$yearNum}-11-20",
-                'end'   => "{$yearNum}-12-05",
-            ],
-            'test_exam' => [
-                'name'  => 'নির্বাচনী পরীক্ষা (Test Exam)',
-                'start' => "{$yearNum}-11-01",
-                'end'   => "{$yearNum}-11-15",
-            ],
+            '1st_term'   => ['name' => '১ম সাময়িক পরীক্ষা (1st Term Exam)',          'start' => "{$yearNum}-04-01", 'end' => "{$yearNum}-04-15"],
+            'half_yearly'=> ['name' => 'অর্ধ-বার্ষিক পরীক্ষা (Half Yearly Exam)',      'start' => "{$yearNum}-06-15", 'end' => "{$yearNum}-06-30"],
+            '2nd_term'   => ['name' => '২য় সাময়িক পরীক্ষা (2nd Term Exam)',           'start' => "{$yearNum}-08-15", 'end' => "{$yearNum}-08-30"],
+            'pre_test'   => ['name' => 'প্রাক-নির্বাচনী পরীক্ষা (Pre-Test Exam)',     'start' => "{$yearNum}-10-01", 'end' => "{$yearNum}-10-15"],
+            'annual'     => ['name' => 'বার্ষিক পরীক্ষা (Annual Exam)',               'start' => "{$yearNum}-11-20", 'end' => "{$yearNum}-12-05"],
+            'test_exam'  => ['name' => 'নির্বাচনী পরীক্ষা (Test Exam)',               'start' => "{$yearNum}-11-01", 'end' => "{$yearNum}-11-15"],
         ];
 
         $created = 0;
         $skipped = 0;
 
         foreach ($request->presets as $presetKey) {
-            if (!isset($standardDates[$presetKey])) {
-                continue;
-            }
+            if (!isset($standardDates[$presetKey])) continue;
 
-            $info = $standardDates[$presetKey];
+            $info     = $standardDates[$presetKey];
             $examName = $info['name'];
 
-            $exists = Exam::where('school_id', $schoolId)
+            // Check if exam with same name already exists for this year
+            $existingExam = Exam::where('school_id', $schoolId)
                 ->where('year_id', $request->year_id)
-                ->where('school_category_id', $request->school_category_id)
                 ->where('name', $examName)
-                ->exists();
+                ->first();
 
-            if ($exists) {
+            if ($existingExam) {
+                // Just add the new categories to the existing exam
+                $existingExam->categories()->syncWithoutDetaching($categoryIds);
                 $skipped++;
                 continue;
             }
 
-            Exam::create([
+            $exam = Exam::create([
                 'school_id'          => $schoolId,
-                'school_category_id' => $request->school_category_id,
+                'school_category_id' => $categoryIds[0],
                 'year_id'            => $request->year_id,
                 'name'               => $examName,
                 'status'             => 0,
@@ -367,12 +368,13 @@ class ExamController extends Controller
                 'is_published'       => 0,
             ]);
 
+            $exam->categories()->sync($categoryIds);
             $created++;
         }
 
-        $message = "{$created}টি স্ট্যান্ডার্ড পরীক্ষা সফলভাবে তৈরি হয়েছে!";
+        $message = "{$created}টি স্ট্যান্ডার্ড পরীক্ষা সফলভাবে তৈরি হয়েছে!";
         if ($skipped > 0) {
-            $message .= " ({$skipped}টি পরীক্ষা ইতিমধ্যে রয়েছে)";
+            $message .= " ({$skipped}টি বিদ্যমান পরীক্ষায় ক্যাটেগরি আপডেট হয়েছে)";
         }
 
         return back()->with([
@@ -381,7 +383,7 @@ class ExamController extends Controller
         ]);
     }
 
-    // 📌 Status Toggle
+    // Status Toggle
     public function toggleStatus($tenant, $examId)
     {
         $schoolId = $this->getSchoolId();
@@ -392,7 +394,6 @@ class ExamController extends Controller
 
         // If turning ON
         if ($exam->status == 0) {
-            // 🔥 Same year এর অন্য সব exam inactive
             Exam::where('school_id', $schoolId)
                 ->where('year_id', $exam->year_id)
                 ->where('id', '!=', $exam->id)
@@ -415,15 +416,14 @@ class ExamController extends Controller
 
     public function generateAdmitIndex(Request $request)
     {
-        $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
+        $school   = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
         $schoolId = $this->getSchoolId($request);
-        $classes = Classes::where('school_id', $schoolId)->get();
-        $exams = Exam::where('school_id', $schoolId)->get();
-        $schoolLogo = $school?->logo;
-        $students = null;
+        $classes  = Classes::where('school_id', $schoolId)->get();
+        $exams    = Exam::with('categories')->where('school_id', $schoolId)->get();
+        $schoolLogo    = $school?->logo;
+        $students      = null;
         $selected_exam = null;
-        $examRoutines = collect();
-
+        $examRoutines  = collect();
         $assignClasses = collect();
 
         if ($request->filled('class_id') && $request->filled('exam_id')) {
@@ -432,10 +432,9 @@ class ExamController extends Controller
                 ->with(['class', 'section', 'group', 'category'])
                 ->orderBy('roll', 'asc')
                 ->get();
-                
-            $selected_exam = Exam::find($request->exam_id);
 
-            // Load Exam Routine for this exam & class with subject subcategories
+            $selected_exam = Exam::with('categories')->find($request->exam_id);
+
             $examRoutines = ExamRoutine::where('school_id', $schoolId)
                 ->where('exam_id', $request->exam_id)
                 ->where('class_id', $request->class_id)
@@ -443,7 +442,6 @@ class ExamController extends Controller
                 ->orderBy('exam_date', 'asc')
                 ->get();
 
-            // Load AssignClass mapping (where class-subject subcategory/group is stored)
             $assignClasses = AssignClass::where('school_id', $schoolId)
                 ->where('class_id', $request->class_id)
                 ->with('subcategory')
@@ -453,7 +451,7 @@ class ExamController extends Controller
 
         return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines', 'school', 'assignClasses'));
     }
-    
+
     public function bulkAdmitCard(Request $request, $tenant)
     {
         $schoolId = $this->getSchoolId($request);
@@ -463,10 +461,9 @@ class ExamController extends Controller
             ->orderBy('roll', 'asc')
             ->get();
 
-        $exam = Exam::findOrFail($request->exam_id);
+        $exam   = Exam::with('categories')->findOrFail($request->exam_id);
         $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
 
-        // Load exam routine specifically for this exam & class with subject subcategories
         $examRoutines = ExamRoutine::where('school_id', $schoolId)
             ->where('exam_id', $request->exam_id)
             ->where('class_id', $request->class_id)
@@ -474,16 +471,14 @@ class ExamController extends Controller
             ->orderBy('exam_date', 'asc')
             ->get();
 
-        // Load AssignClass mapping (where class-subject subcategory/group is stored)
         $assignClasses = AssignClass::where('school_id', $schoolId)
             ->where('class_id', $request->class_id)
             ->with('subcategory')
             ->get()
             ->keyBy('subject_id');
-        
+
         $pdf = Pdf::loadView('school.exam.bulk_admit_card', compact('students', 'exam', 'school', 'examRoutines', 'assignClasses'));
-        
-        // Portrait mode — 3 cards stacked vertically per A4 page
+
         return $pdf->setPaper('a4', 'portrait')->download('bulk-admit-card.pdf');
     }
 
@@ -495,7 +490,6 @@ class ExamController extends Controller
                         ->where('school_id', $schoolId)
                         ->firstOrFail();
 
-            // রেজাল্ট পাবলিশ স্ট্যাটাস টগল
             $exam->is_published = $exam->is_published ? 0 : 1;
             $exam->save();
 
@@ -504,10 +498,10 @@ class ExamController extends Controller
                 'is_published' => (bool)$exam->is_published,
                 'message'      => $exam->is_published ? 'Result Published Successfully' : 'Result Unpublished Successfully'
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Something went wrong. Please try again.'
             ], 500);
         }

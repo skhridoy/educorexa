@@ -96,7 +96,9 @@ class SchoolWebsiteController extends Controller
         $query = Exam::where('school_id', $school->id)->where('is_published', 1);
 
         if ($request->filled('category_id')) {
-            $query->where('school_category_id', $request->category_id);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('school_category_id', $request->category_id);
+            });
         }
 
         if ($request->filled('academic_year_id')) {

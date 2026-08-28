@@ -2,6 +2,48 @@
 
 @section('customCSS')
     @include('school.others._modern_design_styles')
+    <style>
+        /* Force table layout on mobile instead of card layout */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .data-table-card .data-table thead {
+                display: table-header-group !important;
+            }
+            .data-table-card .data-table thead th {
+                white-space: nowrap;
+                font-size: 0.74rem !important;
+                padding: 10px 12px !important;
+            }
+            .data-table-card .data-table tbody {
+                display: table-row-group !important;
+            }
+            .data-table-card .data-table tbody tr {
+                display: table-row !important;
+                padding: 0 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
+            .data-table-card .data-table tbody td {
+                display: table-cell !important;
+                padding: 10px 12px !important;
+                text-align: left !important;
+                white-space: nowrap !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
+            .data-table-card .data-table tbody td.text-center {
+                text-align: center !important;
+            }
+            .data-table-card .data-table tbody td.text-end {
+                text-align: right !important;
+            }
+            .data-table-card .data-table tbody td::before {
+                display: none !important;
+                content: none !important;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -58,7 +100,7 @@
             </div>
 
             {{-- List Column --}}
-            <div class="col-lg-8 d-none d-lg-block">
+            <div class="col-lg-8">
                 <div class="data-table-card">
                     <div class="table-header p-3 border-bottom">
                         <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list me-2 text-indigo-600"></i> All Subjects</h5>
@@ -108,6 +150,17 @@
                             </tbody>
                         </table>
                     </div>
+
+                    @if($subjects->hasPages())
+                        <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="text-muted small">
+                                Showing {{ $subjects->firstItem() ?? 0 }} to {{ $subjects->lastItem() ?? 0 }} of {{ $subjects->total() }} subjects
+                            </div>
+                            <div>
+                                {{ $subjects->links() }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

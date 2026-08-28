@@ -744,7 +744,7 @@
                                     <option value="">-- Select Subject --</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" class="text-capitalize" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
-                                            {{ $subject->name }}
+                                            {{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}
                                         </option>
                                     @endforeach
                                 </select>

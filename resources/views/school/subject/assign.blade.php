@@ -543,7 +543,7 @@
                                 <select id="subject_id" name="subject_id" class="form-select" required>
                                     <option value="">Select Subject</option>
                                     @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                        <option value="{{ $subject->id }}">{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -576,13 +576,13 @@
                     <div class="filter-card mb-3">
                         <form id="filterForm" onsubmit="return false;">
                             <div class="row g-2 align-items-center">
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="search-icon-group">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                         <input type="text" name="search" id="searchInput" class="form-control form-control-sm" placeholder="Search by class or subject..." value="{{ request('search') }}">
                                     </div>
                                 </div>
-                                <div class="col-8 col-md-5">
+                                <div class="col-9 col-md-5">
                                     <select id="filterClassId" name="class_id" class="form-select form-select-sm">
                                         <option value="">All Classes</option>
                                         @foreach($classes as $class)
@@ -590,7 +590,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-4 col-md-1 text-end">
+                                <div class="col-3 col-md-1 text-end">
                                     <button type="button" id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm w-100" data-bs-toggle="tooltip" title="Reset Filters">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </button>

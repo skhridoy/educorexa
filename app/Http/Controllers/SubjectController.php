@@ -11,10 +11,28 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::where('school_id', auth()->user()->school_id)->get();
-        return view('school.subject.index', compact('subjects'));
+        $schoolId = auth()->user()->school_id;
+        $query = Subject::where('school_id', $schoolId);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $subjects = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+        $totalSubjectsCount = Subject::where('school_id', $schoolId)->count();
+
+        return view('school.subject.index', compact('subjects', 'totalSubjectsCount'));
     }
 
     public function store(Request $request)
@@ -55,7 +73,7 @@ class SubjectController extends Controller
     public function edit($tenant, $subject)
     {
         $schoolId = auth()->user()->school_id;
-        $subjects = Subject::where('school_id', $schoolId)->get();
+        $subjects = Subject::where('school_id', $schoolId)->orderBy('id', 'desc')->paginate(10)->withQueryString();
 
         $subject = Subject::where('id', $subject)
                             ->where('school_id', $schoolId)

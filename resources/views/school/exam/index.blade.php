@@ -274,20 +274,27 @@
                             @error('year_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        {{-- Category --}}
+                        {{-- Category (multi-select checkboxes) --}}
                         <div class="mb-3">
-                            <label for="school_category_id" class="form-label fw-700 text-secondary small">
+                            <label class="form-label fw-700 text-secondary small">
                                 <i class="fa-solid fa-tags me-1"></i>School Category <span class="text-danger">*</span>
+                                <small class="text-muted ms-1">(একাধিক সিলেক্ট করা যাবে)</small>
                             </label>
-                            <select class="form-select @error('school_category_id') is-invalid @enderror" name="school_category_id" required>
-                                <option value="" selected disabled>-- Select Category --</option>
+                            <div class="border rounded-3 p-2" style="max-height:120px; overflow-y:auto;">
                                 @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('school_category_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="school_category_ids[]"
+                                               value="{{ $cat->id }}"
+                                               id="cat_create_{{ $cat->id }}"
+                                               {{ (is_array(old('school_category_ids')) && in_array($cat->id, old('school_category_ids'))) ? 'checked' : '' }}>
+                                        <label class="form-check-label small" for="cat_create_{{ $cat->id }}">
+                                            {{ $cat->name }}
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
-                            @error('school_category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            @error('school_category_ids') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         {{-- Start & End Dates --}}
@@ -389,15 +396,15 @@
                                         <td class="text-center fw-bold text-muted small">{{ $loop->iteration }}</td>
                                         <td>
                                             <div class="fw-bold text-dark" style="font-size: 0.9rem;">{{ $exam->name }}</div>
-                                            <div class="d-flex align-items-center gap-2 mt-0.5">
+                                            <div class="d-flex align-items-center gap-2 mt-0.5 flex-wrap">
                                                 <span class="badge bg-soft-primary text-primary" style="font-size: 0.72rem; padding: 2px 6px;">
                                                     <i class="fa-solid fa-calendar-days me-1"></i>{{ $exam->academicYear->name ?? 'N/A' }}
                                                 </span>
-                                                @if($exam->category)
+                                                @foreach($exam->categories as $cat)
                                                     <span class="badge bg-soft-info text-info" style="font-size: 0.72rem; padding: 2px 6px;">
-                                                        <i class="fa-solid fa-tag me-1"></i>{{ $exam->category->name }}
+                                                        <i class="fa-solid fa-tag me-1"></i>{{ $cat->name }}
                                                     </span>
-                                                @endif
+                                                @endforeach
                                             </div>
                                         </td>
                                         <td>
@@ -489,11 +496,11 @@
                                 <div class="d-flex align-items-start justify-content-between mb-2">
                                     <div>
                                         <h6 class="fw-bold mb-0 text-dark">{{ $exam->name }}</h6>
-                                        <div class="d-flex align-items-center gap-1 mt-1">
+                                        <div class="d-flex align-items-center gap-1 mt-1 flex-wrap">
                                             <span class="badge bg-soft-primary text-primary" style="font-size: 0.7rem;">{{ $exam->academicYear->name ?? 'N/A' }}</span>
-                                            @if($exam->category)
-                                                <span class="badge bg-soft-info text-info" style="font-size: 0.7rem;">{{ $exam->category->name }}</span>
-                                            @endif
+                                            @foreach($exam->categories as $cat)
+                                                <span class="badge bg-soft-info text-info" style="font-size: 0.7rem;">{{ $cat->name }}</span>
+                                            @endforeach
                                         </div>
                                     </div>
                                     <div class="d-flex gap-1">
@@ -671,13 +678,21 @@
                     <div class="mb-3">
                         <label for="bulk_category_id" class="form-label fw-bold small text-secondary">
                             School Category <span class="text-danger">*</span>
+                            <small class="text-muted ms-1">(একাধিক সিলেক্ট করা যাবে)</small>
                         </label>
-                        <select name="school_category_id" id="bulk_category_id" class="form-select" required>
-                            <option value="" selected disabled>-- Select School Category --</option>
+                        <div class="border rounded-3 p-2" style="max-height:120px; overflow-y:auto;">
                             @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="school_category_ids[]"
+                                           value="{{ $cat->id }}"
+                                           id="bulk_cat_{{ $cat->id }}">
+                                    <label class="form-check-label small" for="bulk_cat_{{ $cat->id }}">
+                                        {{ $cat->name }}
+                                    </label>
+                                </div>
                             @endforeach
-                        </select>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -832,7 +847,6 @@
             });
         });
 
-        // Edit button click -> load AJAX modal
         $(document).on('click', '.editBtn', function(){
             let id = $(this).data('id');
             let editUrl = "{{ route('exams.edit', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'exam' => ':id']) }}".replace(':id', id);
@@ -840,6 +854,16 @@
             $.get(editUrl, function(data){
                 let startDate = data.start_date ? data.start_date.split('T')[0].split(' ')[0] : '';
                 let endDate = data.end_date ? data.end_date.split('T')[0].split(' ')[0] : '';
+                let selectedIds = data.selected_category_ids || [];
+
+                // Build category checkboxes
+                let catHtml = '';
+                @foreach($categories as $cat)
+                catHtml += `<div class="form-check">`;
+                catHtml += `<input class="form-check-input" type="checkbox" name="school_category_ids[]" value="{{ $cat->id }}" id="cat_edit_{{ $cat->id }}" ${selectedIds.includes({{ $cat->id }}) ? 'checked' : ''}>`;
+                catHtml += `<label class="form-check-label small" for="cat_edit_{{ $cat->id }}">{{ $cat->name }}</label>`;
+                catHtml += `</div>`;
+                @endforeach
 
                 let html = `
                     <div class="mb-3">
@@ -859,14 +883,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold small text-secondary">School Category</label>
-                        <select name="school_category_id" class="form-select" required>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}" ${data.school_category_id == {{ $cat->id }} ? 'selected' : ''}>
-                                    {{ $cat->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label class="form-label fw-bold small text-secondary">
+                            School Category <span class="text-danger">*</span>
+                            <small class="text-muted ms-1">(একাধিক সিলেক্ট করা যাবে)</small>
+                        </label>
+                        <div class="border rounded-3 p-2" style="max-height:120px; overflow-y:auto;">
+                            ${catHtml}
+                        </div>
                     </div>
 
                     <div class="row g-2 mb-3">
@@ -904,14 +927,16 @@
                 let listHtml = '';
                 if (exams.length > 0) {
                     exams.forEach(function(exam) {
-                        let catName = exam.category ? exam.category.name : 'All';
+                        let catNames = (exam.categories && exam.categories.length > 0)
+                            ? exam.categories.map(c => `<span class="badge bg-soft-info text-info">${c.name}</span>`).join(' ')
+                            : '<span class="badge bg-soft-secondary text-secondary">All</span>';
                         listHtml += `
                             <label class="clone-exam-item d-flex align-items-center justify-content-between gap-2 cursor-pointer mb-1">
                                 <div class="d-flex align-items-center gap-2">
                                     <input type="checkbox" name="exam_ids[]" value="${exam.id}" class="form-check-input clone-checkbox mt-0" checked>
                                     <div>
                                         <div class="fw-bold text-dark small">${exam.name}</div>
-                                        <div class="text-muted" style="font-size: 0.72rem;">Category: <span class="badge bg-soft-info text-info">${catName}</span></div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Category: ${catNames}</div>
                                     </div>
                                 </div>
                                 <span class="badge bg-soft-secondary text-secondary" style="font-size: 0.7rem;">

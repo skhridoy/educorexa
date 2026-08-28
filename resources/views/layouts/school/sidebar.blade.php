@@ -219,8 +219,9 @@
                             <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">Exams Routine</a></li>
                         @endif
                         @if($hasFeature('mark.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('marks.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks*') ? 'active' : '' }}">Marks Entry</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks') ? 'active' : '' }}">Result Report</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks') || Request::is('*/marks/*') && !Request::is('*/marks/view-marks*') && !Request::is('*/result-search*') ? 'active' : '' }}">Marks Entry</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks*') ? 'active' : '' }}">Result Report</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.result-search', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/result-search*') ? 'active' : '' }}">Result Search</a></li>
                         @endif
                     </ul>
                 </div>

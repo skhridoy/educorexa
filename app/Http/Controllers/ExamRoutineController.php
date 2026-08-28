@@ -47,13 +47,15 @@ class ExamRoutineController extends Controller
             $examsQuery->where('year_id', $selectedYearId);
         }
         if ($selectedCategoryId) {
-            $examsQuery->where('school_category_id', $selectedCategoryId);
+            $examsQuery->whereHas('categories', function ($q) use ($selectedCategoryId) {
+                $q->where('school_category_id', $selectedCategoryId);
+            });
         }
         $exams = $examsQuery->orderBy('name')->get();
 
         $selectedYear = $selectedYearId ? AcademicYear::find($selectedYearId) : null;
         $selectedCategory = $selectedCategoryId ? SchoolCategory::find($selectedCategoryId) : null;
-        $selectedExam = $selectedExamId ? Exam::with('category')->find($selectedExamId) : null;
+        $selectedExam = $selectedExamId ? Exam::with('categories')->find($selectedExamId) : null;
         $selectedClass = $selectedClassId ? Classes::with('subjects')->find($selectedClassId) : null;
 
         $routines = collect();
@@ -155,7 +157,9 @@ class ExamRoutineController extends Controller
             $examsQuery->where('year_id', $yearId);
         }
         if ($categoryId) {
-            $examsQuery->where('school_category_id', $categoryId);
+            $examsQuery->whereHas('categories', function ($q) use ($categoryId) {
+                $q->where('school_category_id', $categoryId);
+            });
         }
         $exams = $examsQuery->orderBy('name')->get(['id', 'name']);
 

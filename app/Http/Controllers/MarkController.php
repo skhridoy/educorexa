@@ -1866,4 +1866,351 @@ class MarkController extends Controller
             $fileName
         );
     }
+
+    // ═══════════════════════════════════════════════
+    //  RESULT SEARCH DASHBOARD PANEL
+    // ═══════════════════════════════════════════════
+
+    public function resultSearchIndex(Request $request, $tenant)
+    {
+        $schoolId = Auth::user()->school_id;
+        $classes = Classes::where('school_id', $schoolId)->orderBy('name', 'asc')->get();
+        $exams = Exam::where('school_id', $schoolId)->orderBy('id', 'desc')->get();
+        $academicYears = AcademicYear::where('school_id', $schoolId)->orderBy('id', 'desc')->get();
+        $layout = 'layouts.school';
+
+        return view('school.mark.result-search', compact('classes', 'exams', 'academicYears', 'layout', 'tenant'));
+    }
+
+    public function resultSearchQuery(Request $request, $tenant)
+    {
+        $schoolId = Auth::user()->school_id;
+        $searchQuery = trim($request->input('search_query', ''));
+        $selectedExamId = $request->input('exam_id');
+        $selectedClassId = $request->input('class_id');
+        $selectedYearId = $request->input('academic_year_id');
+
+        if (empty($searchQuery)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'অনুগ্রহ করে স্টুডেন্ট আইডি বা রোল নম্বর লিখুন।'
+            ], 422);
+        }
+
+        // 1. Find Student
+        $student = null;
+
+        // Try exact student_id
+        $student = Student::with(['class', 'section', 'academicYear', 'group'])
+            ->where('school_id', $schoolId)
+            ->where(function($q) use ($searchQuery) {
+                $q->where('student_id', $searchQuery)
+                  ->orWhere('student_id', 'like', "%{$searchQuery}%");
+            })
+            ->first();
+
+        // If not found by student_id and class is provided, try by roll
+        if (!$student && $selectedClassId) {
+            $studentQuery = Student::with(['class', 'section', 'academicYear', 'group'])
+                ->where('school_id', $schoolId)
+                ->where('class_id', $selectedClassId)
+                ->where('roll', $searchQuery);
+            if ($selectedYearId) {
+                $studentQuery->where('academic_year_id', $selectedYearId);
+            }
+            $student = $studentQuery->first();
+        }
+
+        // If still not found, check by primary ID or phone
+        if (!$student) {
+            $student = Student::with(['class', 'section', 'academicYear', 'group'])
+                ->where('school_id', $schoolId)
+                ->where(function($q) use ($searchQuery) {
+                    if (is_numeric($searchQuery)) {
+                        $q->where('id', (int)$searchQuery)
+                          ->orWhere('roll', (int)$searchQuery)
+                          ->orWhere('contact_number', $searchQuery);
+                    } else {
+                        $q->where('contact_number', $searchQuery)
+                          ->orWhere('name', 'like', "%{$searchQuery}%");
+                    }
+                })
+                ->first();
+        }
+
+        // If still not found, check student_sessions table for historical records
+        if (!$student) {
+            $sessionRecord = DB::table('student_sessions')
+                ->where(function($q) use ($searchQuery) {
+                    $q->where('old_student_id', $searchQuery)
+                      ->orWhere('old_roll', $searchQuery);
+                })
+                ->first();
+
+            if ($sessionRecord) {
+                $student = Student::with(['class', 'section', 'academicYear', 'group'])
+                    ->where('school_id', $schoolId)
+                    ->where('id', $sessionRecord->student_id)
+                    ->first();
+            }
+        }
+
+        if (!$student) {
+            return response()->json([
+                'status' => false,
+                'message' => 'কোনো শিক্ষার্থী পাওয়া যায়নি। সঠিক স্টুডেন্ট আইডি বা রোল নম্বর লিখুন।'
+            ], 404);
+        }
+
+        // 2. Find all distinct exams for which this student has marks
+        $studentMarks = Mark::where('student_id', $student->id)
+            ->where('school_id', $schoolId)
+            ->get();
+
+        if ($studentMarks->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'student' => [
+                    'id' => $student->id,
+                    'name' => $student->name,
+                    'student_id' => $student->student_id,
+                    'roll' => $student->roll,
+                    'class_name' => $student->class?->name ?? 'N/A',
+                    'section_name' => $student->section?->name ?? 'N/A',
+                    'group_name' => $student->group?->name ?? 'N/A',
+                    'academic_year' => $student->academicYear?->name ?? 'N/A',
+                    'photo' => $student->photo ? asset($student->photo) : null,
+                ],
+                'message' => 'শিক্ষার্থীর প্রোফাইল পাওয়া গেছে, কিন্তু কোনো পরীক্ষার নম্বর বা ফলাফল এন্ট্রি করা হয়নি।'
+            ], 404);
+        }
+
+        $distinctExamIds = $studentMarks->pluck('exam_id')->unique()->toArray();
+        $availableExams = Exam::whereIn('id', $distinctExamIds)
+            ->where('school_id', $schoolId)
+            ->get();
+
+        // 3. Resolve active Exam
+        $activeExam = null;
+        if ($selectedExamId && in_array($selectedExamId, $distinctExamIds)) {
+            $activeExam = $availableExams->firstWhere('id', $selectedExamId);
+        } else {
+            $activeExam = $availableExams->sortByDesc('id')->first();
+        }
+
+        if (!$activeExam) {
+            $activeExam = Exam::where('id', $distinctExamIds[0])->first();
+        }
+
+        // Determine class and year for this exam
+        $examMarkRecord = $studentMarks->where('exam_id', $activeExam->id)->first();
+        $targetClassId = $examMarkRecord?->class_id ?: ($selectedClassId ?: $student->class_id);
+        $targetYearId = $examMarkRecord?->academic_year_id ?: ($selectedYearId ?: ($activeExam->year_id ?: $student->academic_year_id));
+
+        $targetClass = Classes::find($targetClassId) ?: $student->class;
+        $targetYear = AcademicYear::find($targetYearId) ?: $student->academicYear;
+
+        // 4. Calculate Merit Position & Result Summary
+        $currentActiveYearId = AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->value('id');
+
+        if ($targetYearId == $currentActiveYearId) {
+            $allStudentsInClass = Student::where('class_id', $targetClassId)
+                ->where('school_id', $schoolId)
+                ->where('academic_year_id', $targetYearId)
+                ->get();
+        } else {
+            $studentIdsInSession = DB::table('student_sessions')
+                ->where('class_id', $targetClassId)
+                ->where('academic_year_id', $targetYearId)
+                ->pluck('student_id');
+            $allStudentsInClass = Student::whereIn('id', $studentIdsInSession)->get();
+            if ($allStudentsInClass->isEmpty()) {
+                $allStudentsInClass = collect([$student]);
+            }
+        }
+
+        $subjectIds = AssignClass::where('class_id', $targetClassId)
+            ->where('school_id', $schoolId)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectIds)->get();
+
+        $allMarksForClass = Mark::where([
+            'class_id'         => $targetClassId,
+            'exam_id'          => $activeExam->id,
+            'academic_year_id' => $targetYearId,
+            'school_id'        => $schoolId
+        ])->get();
+
+        $meritList = [];
+        $targetStudentSummary = null;
+        $targetStudentMarksData = [];
+
+        foreach ($allStudentsInClass as $st) {
+            $stSummary = $this->calculateStudentMarksheetData($st, $subjects, $allMarksForClass, $targetClassId);
+            $numericGpa = $stSummary['gpa'] ?? 0;
+            $failCount  = $stSummary['fail_count'] ?? 0;
+
+            if ($failCount > 0) {
+                $finalGrade = 'F';
+            } elseif ($numericGpa >= 5.0) {
+                $finalGrade = 'A+';
+            } elseif ($numericGpa >= 4.0) {
+                $finalGrade = 'A';
+            } elseif ($numericGpa >= 3.5) {
+                $finalGrade = 'A-';
+            } elseif ($numericGpa >= 3.0) {
+                $finalGrade = 'B';
+            } elseif ($numericGpa >= 2.0) {
+                $finalGrade = 'C';
+            } elseif ($numericGpa >= 1.0) {
+                $finalGrade = 'D';
+            } else {
+                $finalGrade = 'F';
+            }
+
+            $resEntry = [
+                'id'          => $st->id,
+                'total_marks' => $stSummary['total_marks'],
+                'numeric_gpa' => $numericGpa,
+                'gpa_text'    => $failCount > 0 ? '0.00' : number_format($numericGpa, 2),
+                'grade'       => $finalGrade,
+                'fail_count'  => $failCount,
+            ];
+
+            $meritList[] = $resEntry;
+            if ($st->id == $student->id) {
+                $targetStudentSummary = $resEntry;
+                $targetStudentMarksData = $stSummary['marks_data'];
+            }
+        }
+
+        // If target student not in class loop (e.g. edge case), compute directly
+        if (!$targetStudentSummary) {
+            $stSummary = $this->calculateStudentMarksheetData($student, $subjects, $allMarksForClass, $targetClassId);
+            $numericGpa = $stSummary['gpa'] ?? 0;
+            $failCount  = $stSummary['fail_count'] ?? 0;
+            $finalGrade = $failCount > 0 ? 'F' : ($numericGpa >= 5 ? 'A+' : ($numericGpa >= 4 ? 'A' : ($numericGpa >= 3.5 ? 'A-' : ($numericGpa >= 3 ? 'B' : ($numericGpa >= 2 ? 'C' : ($numericGpa >= 1 ? 'D' : 'F'))))));
+
+            $targetStudentSummary = [
+                'id'          => $student->id,
+                'total_marks' => $stSummary['total_marks'],
+                'numeric_gpa' => $numericGpa,
+                'gpa_text'    => $failCount > 0 ? '0.00' : number_format($numericGpa, 2),
+                'grade'       => $finalGrade,
+                'fail_count'  => $failCount,
+            ];
+            $targetStudentMarksData = $stSummary['marks_data'];
+            $meritList[] = $targetStudentSummary;
+        }
+
+        // Sort merit list
+        usort($meritList, function($a, $b) {
+            if ($a['fail_count'] !== $b['fail_count']) return $a['fail_count'] <=> $b['fail_count'];
+            if ($b['numeric_gpa'] != $a['numeric_gpa']) return $b['numeric_gpa'] <=> $a['numeric_gpa'];
+            return $b['total_marks'] <=> $a['total_marks'];
+        });
+
+        $meritRank = 0;
+        foreach ($meritList as $idx => $m) {
+            if ($m['id'] == $student->id) {
+                $meritRank = $idx + 1;
+                break;
+            }
+        }
+
+        // Suffix for merit position
+        $ordinalMerit = $meritRank > 0 ? $this->getOrdinalSuffix($meritRank) : 'N/A';
+
+        // Format subject marks data with codes
+        $subjectRows = [];
+        $totalMaxMarks = 0;
+        foreach ($targetStudentMarksData as $row) {
+            $subModel = $subjects->firstWhere('name', $row['subject_name']);
+            $subjectCode = $subModel?->code ?? '';
+            $totalMaxMarks += (float)($row['full_mark'] ?? 0);
+
+            $subjectRows[] = [
+                'subject_name'   => $row['subject_name'],
+                'subject_code'   => $subjectCode,
+                'full_mark'      => $row['full_mark'],
+                'cq'             => $row['cq'] ?? '-',
+                'mcq'            => $row['mcq'] ?? '-',
+                'practical'      => $row['practical'] ?? '-',
+                'marks'          => $row['marks'],
+                'grade'          => $row['grade'],
+                'point'          => $row['point'],
+                'status'         => $row['status'] ?? 'present',
+                'is_paired'      => $row['is_paired'] ?? false,
+                'is_first'       => $row['is_first'] ?? false,
+                'combined_marks' => $row['combined_marks'] ?? null,
+                'combined_full'  => $row['combined_full'] ?? null,
+            ];
+        }
+
+        // Marksheet Download URL
+        $marksheetUrl = route('marks.marksheet', [
+            'tenant'  => $tenant,
+            'student' => $student->id,
+            'class'   => $targetClassId,
+            'exam'    => $activeExam->id,
+            'year'    => $targetYearId,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'student' => [
+                'id'            => $student->id,
+                'name'          => $student->name,
+                'student_id'    => $student->student_id,
+                'roll'          => $student->roll,
+                'class_name'    => $targetClass?->name ?? 'N/A',
+                'section_name'  => $student->section?->name ?? 'N/A',
+                'group_name'    => $student->group?->name ?? 'General',
+                'academic_year' => $targetYear?->name ?? 'N/A',
+                'gender'        => ucfirst($student->gender ?? 'N/A'),
+                'blood_group'   => $student->blood_group ?? 'N/A',
+                'contact_number'=> $student->contact_number ?? 'N/A',
+                'fathers_name'  => $student->fathers_name ?? 'N/A',
+                'mothers_name'  => $student->mothers_name ?? 'N/A',
+                'photo'         => $student->photo ? asset($student->photo) : null,
+            ],
+            'exam' => [
+                'id'           => $activeExam->id,
+                'name'         => $activeExam->name,
+                'is_published' => (bool)$activeExam->is_published,
+                'year_name'    => $targetYear?->name ?? '',
+            ],
+            'available_exams' => $availableExams->map(function($e) use ($activeExam) {
+                return [
+                    'id'          => $e->id,
+                    'name'        => $e->name,
+                    'is_selected' => $e->id == $activeExam->id,
+                ];
+            })->values(),
+            'result_summary' => [
+                'total_marks'    => $targetStudentSummary['total_marks'],
+                'total_max'      => $totalMaxMarks,
+                'gpa'            => $targetStudentSummary['gpa_text'],
+                'grade'          => $targetStudentSummary['grade'],
+                'merit_position' => $ordinalMerit,
+                'merit_rank'     => $meritRank,
+                'fail_count'     => $targetStudentSummary['fail_count'],
+                'is_passed'      => $targetStudentSummary['fail_count'] === 0,
+            ],
+            'subject_rows'   => $subjectRows,
+            'marksheet_url'  => $marksheetUrl,
+        ]);
+    }
+
+    private function getOrdinalSuffix($number)
+    {
+        if (!in_array(($number % 100), [11, 12, 13])) {
+            switch ($number % 10) {
+                case 1:  return $number . 'st';
+                case 2:  return $number . 'nd';
+                case 3:  return $number . 'rd';
+            }
+        }
+        return $number . 'th';
+    }
 }
