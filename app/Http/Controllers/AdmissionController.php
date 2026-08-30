@@ -271,17 +271,7 @@ class AdmissionController extends Controller
             ?: AcademicYear::where('school_id', $schoolId)->where('is_active', 1)->firstOrFail();
 
         // ৪. ইউনিক স্টুডেন্ট আইডি (Student ID) জেনারেশন লজিক
-        $yearPart = substr($academicYear->name, -2);
-        $prefix = 'STD-' . $yearPart;
-
-        // ওই বছরের সর্বোচ্চ ৪ ডিজিটের সিরিয়াল নম্বরটি বের করা
-        $lastSerial = Student::where('school_id', $schoolId)
-            ->where('student_id', 'like', $prefix . '%')
-            ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
-            ->value('max_serial');
-
-        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
-        $studentId = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $studentId = Student::generateStudentId($schoolId, $academicYear);
         $admissionDate = now()->format('Y-m-d');
 
         $subCatId = $subCategoryId ?? $admission->school_sub_category_id;
@@ -435,7 +425,8 @@ class AdmissionController extends Controller
         $yearPart = substr($academicYear->name, -2);
         $prefix = 'STD-' . $yearPart;
 
-        $lastSerial = Student::where('student_id', 'like', $prefix . '%')
+        $lastSerial = Student::where('school_id', $schoolId)
+            ->where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
             ->value('max_serial');
 
@@ -448,10 +439,10 @@ class AdmissionController extends Controller
         // 5. DB Transaction to ensure everything succeeds or fails together
         DB::transaction(function () use ($admissions, $schoolId, $tenantSlug, $academicYear, $prefix, &$nextNumber, $admissionDate, $sectionId, $categoryId, $subCategoryId, &$classRolls, &$approvedCount) {
             foreach ($admissions as $admission) {
-                // Generate guaranteed unique Student ID
+                // Generate guaranteed unique Student ID for this school
                 do {
                     $studentId = $prefix . str_pad($nextNumber++, 4, '0', STR_PAD_LEFT);
-                } while (Student::where('student_id', $studentId)->exists() || User::where('email', $admission->email)->exists());
+                } while (Student::where('school_id', $schoolId)->where('student_id', $studentId)->exists());
 
                 // Handle Roll Number (Group-specific)
                 $classId = $admission->class_id;

@@ -315,7 +315,11 @@ class TeacherController extends Controller
                 $school = School::find($schoolId);
                 if ($school) {
                     $this->setMailConfig($school);
-                    Mail::to($createdTeacher->email)->send(new TeacherCredentialsMail($createdTeacher, $school, $defaultPassword));
+                    // Explicitly use smtp mailer so the freshly configured SMTP is always used
+                    // (avoids any cached 'log' mailer from .env MAIL_MAILER=log)
+                    Mail::mailer('smtp')
+                        ->to($createdTeacher->email)
+                        ->send(new TeacherCredentialsMail($createdTeacher, $school, $defaultPassword));
                 }
             } catch (\Exception $e) {
                 Log::error("Failed to send teacher credentials email to {$createdTeacher->email}: " . $e->getMessage());

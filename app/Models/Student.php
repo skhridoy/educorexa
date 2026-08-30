@@ -131,6 +131,29 @@ class Student extends Model
         'admission_id'
     ];
 
+    /**
+     * Generate unique student ID per school starting from STD-[year(2 digit)]1001
+     * e.g. STD-261001, STD-261002, etc.
+     */
+    public static function generateStudentId($schoolId, $academicYear = null): string
+    {
+        if ($academicYear && !empty($academicYear->name)) {
+            $yearPart = substr($academicYear->name, -2);
+        } else {
+            $yearPart = date('y');
+        }
+        $prefix = 'STD-' . $yearPart;
+
+        $lastSerial = self::where('school_id', $schoolId)
+            ->where('student_id', 'like', $prefix . '%')
+            ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
+            ->value('max_serial');
+
+        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
+
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
     // 🔹 স্টুডেন্ট কোন ক্যাটেগরির (Primary/High School) আন্ডারে
     public function category()
     {

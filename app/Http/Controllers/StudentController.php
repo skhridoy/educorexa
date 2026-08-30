@@ -457,14 +457,7 @@ class StudentController extends Controller
 
     // ইউনিক আইডি এবং রোল জেনারেশনের জন্য হেল্পার মেথড (কোড ক্লিন রাখার জন্য)
     private function generateUniqueStudentId($schoolId, $academicYear) {
-        $yearPart = substr($academicYear->name, -2);
-        $prefix = 'STD-' . $yearPart;
-        $lastSerial = Student::where('school_id', $schoolId)
-            ->where('student_id', 'like', $prefix . '%')
-            ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
-            ->value('max_serial');
-        $nextNumber = $lastSerial ? $lastSerial + 1 : 1001;
-        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return Student::generateStudentId($schoolId, $academicYear);
     }
 
     private function getNextRoll($schoolId, $classId, $academicYearId, $subCategoryId = null) {

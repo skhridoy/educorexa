@@ -20,6 +20,8 @@ trait SchoolMailConfig
         $fromAddress = $school->pro_email_address ?: ($school->mail_from_address ?: ($school->email ?: config('mail.from.address')));
         $fromName = $school->mail_from_name ?: ($school->name ?: config('mail.from.name'));
 
+        Config::set('mail.default', 'smtp');
+
         // If school has custom SMTP configured
         if ($school->mail_host) {
             $encryption = $school->mail_encryption;
@@ -29,20 +31,17 @@ trait SchoolMailConfig
                 $encryption = 'ssl';
             }
 
-            Config::set('mail.default', $school->mail_mailer ?? 'smtp');
             Config::set('mail.mailers.smtp.host', $school->mail_host);
             Config::set('mail.mailers.smtp.port', $school->mail_port ?? 587);
             Config::set('mail.mailers.smtp.encryption', $encryption ?? 'tls');
             Config::set('mail.mailers.smtp.username', $school->mail_username);
             Config::set('mail.mailers.smtp.password', $school->mail_password);
-            Config::set('mail.from.address', $fromAddress);
-            Config::set('mail.from.name', $fromName);
-
-            // Purge the mailer to apply new config
-            Mail::purge('smtp');
-        } else {
-            Config::set('mail.from.address', $fromAddress);
-            Config::set('mail.from.name', $fromName);
         }
+
+        Config::set('mail.from.address', $fromAddress);
+        Config::set('mail.from.name', $fromName);
+
+        // Purge the mailer to apply new config
+        Mail::purge('smtp');
     }
 }

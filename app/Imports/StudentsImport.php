@@ -38,8 +38,9 @@ class StudentsImport implements ToCollection, WithHeadingRow
         $yearPart = substr($academicYear->name, -2);
         $prefix   = 'STD-' . $yearPart;
 
-        // ───── Global max serial for student_id generation ─────
-        $lastSerial = Student::where('student_id', 'like', $prefix . '%')
+        // ───── School-scoped max serial for student_id generation (STD-[yy]1001+) ─────
+        $lastSerial = Student::where('school_id', $schoolId)
+            ->where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
             ->value('max_serial');
 
@@ -222,21 +223,34 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 }
             }
 
-            // ── 9. Generate guaranteed unique Student ID ──
+            // ── 9. Generate guaranteed unique Student ID for this school ──
             do {
                 $studentId = $prefix . str_pad($currentNextNumber, 4, '0', STR_PAD_LEFT);
                 $currentNextNumber++;
-            } while (Student::where('student_id', $studentId)->exists() || User::where('email', $studentId . '@gmail.com')->exists());
+            } while (Student::where('school_id', $schoolId)->where('student_id', $studentId)->exists());
+
+            $schoolSlug = Auth::user()?->school?->slug ?? ('s' . $schoolId);
+            $rawEmail = trim($row['email'] ?? '');
+            if (!empty($rawEmail) && !User::where('email', $rawEmail)->where('school_id', '!=', $schoolId)->exists()) {
+                $userEmail = $rawEmail;
+            } else {
+                $userEmail = strtolower($studentId . '.' . $schoolSlug . '@gmail.com');
+                $counter = 1;
+                while (User::where('email', $userEmail)->where('school_id', '!=', $schoolId)->exists()) {
+                    $userEmail = strtolower($studentId . '.' . $schoolSlug . $counter . '@gmail.com');
+                    $counter++;
+                }
+            }
 
             // ── 10. Save with transaction ──
             try {
                 DB::transaction(function () use (
                     $row, $schoolId, $academicYear, $class, $categoryId,
                     $subCategoryId, $sectionId, $studentId, $finalRoll,
-                    $name, $dob, $gender, $religion
+                    $name, $dob, $gender, $religion, $userEmail
                 ) {
                     $user = User::updateOrCreate(
-                        ['email' => $studentId . '@gmail.com'],
+                        ['email' => $userEmail],
                         [
                             'school_id' => $schoolId,
                             'name'      => $name,
