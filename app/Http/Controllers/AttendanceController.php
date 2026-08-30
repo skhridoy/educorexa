@@ -8,27 +8,43 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Attendance;
 use App\Models\Holiday;
+use App\Models\Section;
 use Illuminate\Support\Facades\DB;
 class AttendanceController extends Controller
 {
     public function index($tenant, Request $request)
     {
         $schoolId = auth()->user()->school_id;
-        $teacher = Teacher::where('email', auth()->user()->email)->first();
+        $teacher = Teacher::where('email', auth()->user()->email)->where('school_id', $schoolId)->first();
 
-        // যদি টিচার না পাওয়া যায় (যেমন অ্যাডমিন লগইন করলে)
-        if (!$teacher) {
-            return redirect()->back()->with('error', 'You can not take attendance. Please log in as a teacher.');
-        }
         $classId = $request->class_id;
         $sectionId = $request->section_id;
         $date = $request->date ?? now()->toDateString();
-        $assignedClasses = TeacherAssignSubject::with(['class','section'])
-            ->where('school_id', $schoolId)
-            ->where('teacher_id', $teacher->id)
-            ->get();
+
+        if ($teacher) {
+            // Logged in as a Teacher: fetch their assigned classes
+            $assignedClasses = TeacherAssignSubject::with(['class','section'])
+                ->where('school_id', $schoolId)
+                ->where('teacher_id', $teacher->id)
+                ->get();
+        } else {
+            // Logged in as Admin / Super Admin / Staff: full access to all school classes & sections
+            $sections = Section::with('class')
+                ->where('school_id', $schoolId)
+                ->get();
+
+            $assignedClasses = $sections->map(function($sec) {
+                return (object)[
+                    'class_id'   => $sec->class_id,
+                    'section_id' => $sec->id,
+                    'class'      => $sec->class,
+                    'section'    => $sec
+                ];
+            });
+        }
+
         $getAttendance = Attendance::with(['class', 'section', 'teacher'])
-            ->where('school_id', auth()->user()->school_id)
+            ->where('school_id', $schoolId)
             ->where('date', now()->toDateString())
             ->select('class_id', 'section_id', 'teacher_id', 'created_at')
             ->groupBy('class_id', 'section_id', 'teacher_id', 'created_at')
@@ -36,21 +52,26 @@ class AttendanceController extends Controller
 
         $students = collect();
         $existingAttendance = [];
-
         $attendanceInfo = null;
 
         if($request->class_id && $request->section_id){
             $attendanceInfo = Attendance::with(['teacher'])
-            ->where('class_id', $classId)
-            ->where('section_id', $sectionId)
-            ->where('date', $date)
-            ->first();
-            if($classId && $sectionId){
-                $students = Student::where('class_id', $classId)
-                    ->where('section_id',  $sectionId)
-                    ->paginate(20); 
+                ->where('school_id', $schoolId)
+                ->where('class_id', $classId)
+                ->where('section_id', $sectionId)
+                ->where('date', $date)
+                ->first();
 
-                $existingAttendance = Attendance::where('class_id', $classId)
+            if($classId && $sectionId){
+                $students = Student::where('school_id', $schoolId)
+                    ->where('class_id', $classId)
+                    ->where('section_id',  $sectionId)
+                    ->where('status', 'active')
+                    ->orderBy('roll', 'asc')
+                    ->paginate(50); 
+
+                $existingAttendance = Attendance::where('school_id', $schoolId)
+                    ->where('class_id', $classId)
                     ->where('section_id', $sectionId)
                     ->where('date', $date)
                     ->pluck('status', 'student_id')
@@ -69,7 +90,7 @@ class AttendanceController extends Controller
     public function store($tenant, Request $request)
     {
         $schoolId = auth()->user()->school_id;
-        $teacher = Teacher::where('email', auth()->user()->email)->first();
+        $teacher = Teacher::where('email', auth()->user()->email)->where('school_id', $schoolId)->first();
 
         // ব্লেড ফাইল থেকে আসা তারিখটি ধরুন, না থাকলে আজকের তারিখ
         $attendanceDate = $request->date ?? now()->toDateString(); 
@@ -89,7 +110,7 @@ class AttendanceController extends Controller
                     [
                         'class_id'   => $request->class_id,
                         'section_id' => $request->section_id,
-                        'teacher_id' => $teacher->id,
+                        'teacher_id' => $teacher ? $teacher->id : null,
                         'status'     => $status,
                     ]
                 );

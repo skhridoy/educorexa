@@ -279,7 +279,7 @@
                         <div class="row g-2 g-md-3 align-items-end">
                             <div class="col-6 col-md-3">
                                 <label class="filter-label mb-1">{{ __('Class') }}</label>
-                                <select name="class_id" class="form-select border-primary-soft shadow-none">
+                                <select name="class_id" id="filter-class-id" class="form-select border-primary-soft shadow-none" required>
                                     <option value="">{{ __('Select Class') }}</option>
                                     @foreach($assignedClasses->unique('class_id') as $item)
                                         <option value="{{$item->class_id}}" {{ request('class_id') == $item->class_id ? 'selected' : '' }}>
@@ -290,10 +290,16 @@
                             </div>
                             <div class="col-6 col-md-3">
                                 <label class="filter-label mb-1">{{ __('Section') }}</label>
-                                <select name="section_id" class="form-select border-primary-soft shadow-none">
+                                <select name="section_id" id="filter-section-id" class="form-select border-primary-soft shadow-none" required>
                                     <option value="">{{ __('Select Section') }}</option>
-                                    @foreach($assignedClasses->unique('section_id') as $item)
-                                        <option value="{{$item->section_id}}" {{ request('section_id') == $item->section_id ? 'selected' : '' }}>
+                                    @php
+                                        $selectedClassId = request('class_id');
+                                        $availableSections = $selectedClassId 
+                                            ? $assignedClasses->where('class_id', $selectedClassId)->unique('section_id')
+                                            : $assignedClasses->unique('section_id');
+                                    @endphp
+                                    @foreach($availableSections as $item)
+                                        <option value="{{$item->section_id}}" data-class-id="{{ $item->class_id }}" {{ request('section_id') == $item->section_id ? 'selected' : '' }}>
                                             {{$item->section->name ?? ''}}
                                         </option>
                                     @endforeach
@@ -475,6 +481,35 @@
 @section('customJs')
 <script>
     $(document).ready(function () {
+        const assignedClassesData = @json($assignedClasses);
+        const $classSelect = $('#filter-class-id');
+        const $sectionSelect = $('#filter-section-id');
+
+        $classSelect.on('change', function () {
+            const selectedClassId = $(this).val();
+            $sectionSelect.empty().append('<option value="">{{ __("Select Section") }}</option>');
+
+            if (selectedClassId) {
+                const uniqueSections = {};
+                assignedClassesData.forEach(item => {
+                    if (String(item.class_id) === String(selectedClassId) && item.section_id && !uniqueSections[item.section_id]) {
+                        uniqueSections[item.section_id] = true;
+                        const sectionName = (item.section && item.section.name) ? item.section.name : 'Section';
+                        $sectionSelect.append(`<option value="${item.section_id}">${sectionName}</option>`);
+                    }
+                });
+            } else {
+                const uniqueSections = {};
+                assignedClassesData.forEach(item => {
+                    if (item.section_id && !uniqueSections[item.section_id]) {
+                        uniqueSections[item.section_id] = true;
+                        const sectionName = (item.section && item.section.name) ? item.section.name : 'Section';
+                        $sectionSelect.append(`<option value="${item.section_id}">${sectionName}</option>`);
+                    }
+                });
+            }
+        });
+
         $('#attendanceForm').on('submit', function (e) {
             e.preventDefault();
             
