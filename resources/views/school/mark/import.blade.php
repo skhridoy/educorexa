@@ -208,15 +208,15 @@
                 <div>
                     <h1 class="import-hero-title">
                         <i class="fa-solid fa-file-arrow-up me-2" style="color:#a5b4fc;"></i>
-                        Mark Import
+                        {{ __('Mark Import') }}
                     </h1>
-                    <p class="import-hero-sub">CSV / Excel ফাইল দিয়ে এক বা একাধিক বিষয়ের মার্ক একসাথে submit করুন</p>
+                    <p class="import-hero-sub">{{ __('CSV / Excel ফাইল দিয়ে এক বা একাধিক বিষয়ের মার্ক একসাথে submit করুন') }}</p>
                 </div>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ route('marks.index', ['tenant' => auth()->user()?->school?->slug]) }}"
                        class="btn-tpl-download"
                        style="background:rgba(255,255,255,0.14);color:#fff!important;border:1px solid rgba(255,255,255,0.28);border-radius:20px;padding:6px 16px;font-size:0.75rem;backdrop-filter:blur(8px);">
-                        <i class="fa-solid fa-arrow-left"></i> Mark Entry
+                        <i class="fa-solid fa-arrow-left"></i> {{ __('Marks Entry') }}
                     </a>
                 </div>
             </div>
@@ -241,8 +241,8 @@
                                         <div class="d-flex align-items-center gap-2 gap-sm-3">
                                             <div class="mode-icon"><i class="fa-solid fa-book"></i></div>
                                             <div style="min-width:0; flex:1;">
-                                                <div class="mode-card-title fw-bold">Single Subject</div>
-                                                <div class="mode-card-sub text-muted">একটি বিষয়ের মার্ক</div>
+                                                <div class="mode-card-title fw-bold">{{ __('Single Subject') }}</div>
+                                                <div class="mode-card-sub text-muted">{{ __('Marks for one subject') }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -252,8 +252,8 @@
                                         <div class="d-flex align-items-center gap-2 gap-sm-3">
                                             <div class="mode-icon" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);"><i class="fa-solid fa-table-columns"></i></div>
                                             <div style="min-width:0; flex:1;">
-                                                <div class="mode-card-title fw-bold">Multi Subject</div>
-                                                <div class="mode-card-sub text-muted">একাধিক বিষয় একসাথে</div>
+                                                <div class="mode-card-title fw-bold">{{ __('Multi Subject') }}</div>
+                                                <div class="mode-card-sub text-muted">{{ __('Multiple subjects together') }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -267,9 +267,9 @@
                             <p class="form-section-label"><i class="fa-solid fa-sliders me-1"></i> Step 2 — পরীক্ষা ও শ্রেণি বেছে নিন</p>
                             <div class="row g-3">
                                 <div class="col-sm-6">
-                                    <label class="form-label fw-semibold" style="font-size:13px;">পরীক্ষা <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold" style="font-size:13px;">{{ __('Exam') }} <span class="text-danger">*</span></label>
                                     <select name="exam_id" id="exam_id" class="form-select form-select-sm" required>
-                                        <option value="">-- পরীক্ষা বেছে নিন --</option>
+                                        <option value="">{{ __('-- Select Exam --') }}</option>
                                         @foreach($exams as $exam)
                                             <option value="{{ $exam->id }}">{{ $exam->name }}</option>
                                         @endforeach
@@ -277,9 +277,9 @@
                                     @error('exam_id')<div class="text-danger" style="font-size:12px;">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-sm-6">
-                                    <label class="form-label fw-semibold" style="font-size:13px;">শ্রেণি <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold" style="font-size:13px;">{{ __('Class') }} <span class="text-danger">*</span></label>
                                     <select name="class_id" id="class_id" class="form-select form-select-sm" required>
-                                        <option value="">-- শ্রেণি বেছে নিন --</option>
+                                        <option value="">{{ __('-- Select Class --') }}</option>
                                         @foreach($classes as $class)
                                             <option value="{{ $class->id }}">{{ $class->name }}</option>
                                         @endforeach
@@ -293,7 +293,7 @@
                         <div class="mb-4" id="subject_row">
                             <p class="form-section-label"><i class="fa-solid fa-book-open me-1"></i> Step 3 — বিষয় বেছে নিন (Single Mode)</p>
                             <select name="subject_id" id="subject_id" class="form-select form-select-sm">
-                                <option value="">-- আগে শ্রেণি বেছে নিন --</option>
+                                <option value="">{{ __('Select Class first') }}</option>
                             </select>
                             @error('subject_id')<div class="text-danger" style="font-size:12px;">{{ $message }}</div>@enderror
                             <div class="text-muted mt-1" style="font-size:11.5px;">
@@ -314,8 +314,8 @@
                                 <div class="dz-icon" id="mark_dz_icon">
                                     <i class="fa-solid fa-file-excel"></i>
                                 </div>
-                                <p class="dz-title" id="mark_dz_label">Click or drag .xlsx / .csv file here</p>
-                                <p class="dz-sub">Supports .xlsx, .xls, .csv — max 5 MB</p>
+                                <p class="dz-title" id="mark_dz_label">{{ __('Click or drag .xlsx / .csv file here') }}</p>
+                                <p class="dz-sub">{{ __('Supports .xlsx, .xls, .csv — max 5 MB') }}</p>
                                 <input type="file" name="file" id="mark_file_input"
                                        accept=".xlsx,.xls,.csv" class="d-none" required
                                        onchange="previewMarkFile(this);">
@@ -328,17 +328,17 @@
                                     class="btn-tpl-download"
                                     onclick="downloadTemplate()">
                                 <i class="fa-solid fa-cloud-arrow-down"></i>
-                                <span>Template Download</span>
+                                <span>{{ __('Template Download') }}</span>
                             </button>
                             <div class="d-flex align-items-center gap-2">
                                 <a href="{{ route('marks.index', ['tenant' => auth()->user()?->school?->slug]) }}"
                                    class="btn-action-cancel">
                                     <i class="fa-solid fa-arrow-left"></i>
-                                    <span>Cancel</span>
+                                    <span>{{ __('Cancel') }}</span>
                                 </a>
                                 <button type="submit" id="mark_import_btn" class="btn-action-import">
                                     <i class="fa-solid fa-file-import"></i>
-                                    <span>Import Marks</span>
+                                    <span>{{ __('Import Marks') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -351,14 +351,14 @@
                 <div class="form-card h-100" style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);">
 
                     <h6 class="fw-bold mb-3" style="font-size:14px;color:#1e293b;">
-                        <i class="fa-solid fa-circle-question me-2 text-primary"></i>কীভাবে ব্যবহার করবেন?
+                        <i class="fa-solid fa-circle-question me-2 text-primary"></i>{{ __('How to use?') }}
                     </h6>
 
                     <div class="d-flex flex-column gap-3">
                         <!-- Single mode guide -->
                         <div id="guide_single">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="badge" style="background:#4f46e5;font-size:10px;">Single Subject Mode</span>
+                                <span class="badge" style="background:#4f46e5;font-size:10px;">{{ __('Single Subject Mode') }}</span>
                             </div>
                             <div style="background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;">
                                 <table class="table table-sm mb-0" style="font-size:12px;">
@@ -386,7 +386,7 @@
                         <!-- Multi mode guide -->
                         <div id="guide_multi" style="display:none;">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="badge" style="background:#0ea5e9;font-size:10px;">Multi Subject Mode</span>
+                                <span class="badge" style="background:#0ea5e9;font-size:10px;">{{ __('Multi Subject Mode') }}</span>
                             </div>
                             <div style="background:#fff;border-radius:10px;border:1px solid #e2e8f0;overflow:auto;">
                                 <table class="table table-sm mb-0" style="font-size:11px;min-width:440px;">
@@ -417,7 +417,7 @@
                         <div class="p-3 rounded-3" style="background:#fff;border:1px solid #e2e8f0;font-size:12px;">
                             <p class="fw-bold mb-2 text-dark" style="font-size:13px;">
                                 <i class="fa-solid fa-circle-exclamation me-1 text-amber-500" style="color:#f59e0b;"></i>
-                                গুরুত্বপূর্ণ তথ্য
+                                {{ __('Important Information') }}
                             </p>
                             <ul class="mb-0 ps-3" style="color:#475569;line-height:1.8;">
                                 <li>Student-দের <strong>roll</strong> দিয়ে match করা হয়</li>

@@ -10,8 +10,8 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-sitemap me-2"></i> Sub-Categories</h1>
-                <p class="page-subtitle">Manage groups, departments, and streams under main school categories.</p>
+                <h1 class="page-title"><i class="fa-solid fa-sitemap me-2"></i> {{ __('Sub-Categories') }}</h1>
+                <p class="page-subtitle">{{ __('Manage groups, departments, and streams under main school categories.') }}</p>
             </div>
         </div>
 
@@ -27,25 +27,25 @@
             <div class="col-lg-4">
                 <div class="form-card">
                     <h5 class="mb-4 fw-bold text-primary">
-                        <i class="fa-solid fa-plus me-2"></i> Add Sub-Category
+                        <i class="fa-solid fa-plus me-2"></i> {{ __('Add Sub-Category') }}
                     </h5>
                     <form action="{{ route('sub-categories.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Select Main Category <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">{{ __('Select Main Category') }} <span class="text-danger">*</span></label>
                             <select name="school_category_id" class="form-select" required>
-                                <option value="">Choose Category...</option>
+                                <option value="">{{ __('Choose Category...') }}</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Sub-Category Name <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">{{ __('Sub-Category Name') }} <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control" placeholder="e.g. Science, Arts, Commerce" required>
                         </div>
                         <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-check me-1"></i> Save Sub-Category
+                            <i class="fa-solid fa-check me-1"></i> {{ __('Save Sub-Category') }}
                         </button>
                     </form>
                 </div>
@@ -55,9 +55,9 @@
             <div class="col-lg-8">
                 <div class="data-table-card">
                     <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
-                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list me-2 text-indigo-600"></i> Sub-Categories List</h5>
+                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list me-2 text-indigo-600"></i> {{ __('Sub-Categories List') }}</h5>
                         <span class="badge bg-light text-muted border px-3 py-1" style="border-radius:10px;">
-                            {{ count($subCategories) }} Items
+                            {{ count($subCategories) }} {{ __('Items') }}
                         </span>
                     </div>
 
@@ -65,10 +65,10 @@
                         <table class="table data-table mb-0 align-middle">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-3 px-3"># ID</th>
-                                    <th class="py-3 px-3">Sub-Category</th>
-                                    <th class="py-3 px-3 text-center">Main Category</th>
-                                    <th class="py-3 px-3 text-end">Action</th>
+                                    <th class="py-3 px-3"># {{ __('ID') }}</th>
+                                    <th class="py-3 px-3">{{ __('Sub-Category') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('Main Category') }}</th>
+                                    <th class="py-3 px-3 text-end">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,7 +89,7 @@
                                         </span>
                                     </td>
                                     <td class="px-3 text-end">
-                                        <button class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                        <button class="btn btn-action btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </td>
@@ -98,7 +98,7 @@
                                 <tr>
                                     <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fa-2x mb-2 d-block"></i>
-                                        No Sub-categories found.
+                                        {{ __('No Sub-categories found.') }}
                                     </td>
                                 </tr>
                                 @endforelse

@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
         $middleware->alias([
             'identify.school' => \App\Http\Middleware\IdentifySchool::class,
             'auth' => \App\Http\Middleware\Authenticate::class,

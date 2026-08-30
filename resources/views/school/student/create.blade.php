@@ -3,6 +3,33 @@
 @section('customCSS')
     @include('school.others._modern_design_styles')
     <style>
+        /* ═══════════════════════════════════════
+           SolaimanLipi — বাংলা ফন্ট লোড
+        ═══════════════════════════════════════ */
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-bn {
+            font-family: 'SolaimanLipi', 'Noto Serif Bengali', serif !important;
+            font-size: 14px !important;
+        }
+        .bn-label-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: .3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
         .form-section-header {
             display: flex;
             align-items: center;
@@ -171,18 +198,18 @@
                     <i class="fa-solid fa-user-plus"></i>
                 </div>
                 <div>
-                    <h1 class="page-title fs-4 mb-1">New Student Admission</h1>
-                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">Register a new student into your school database</p>
+                    <h1 class="page-title fs-4 mb-1">{{ __('New Student Admission') }}</h1>
+                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">{{ __('Register a new student into your school database') }}</p>
                 </div>
             </div>
             <div class="header-actions">
                 <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-header-outline">
-                    <i class="fa-solid fa-arrow-left me-1.5"></i> Student List
+                    <i class="fa-solid fa-arrow-left me-1.5"></i> {{ __('Student List') }}
                 </a>
                 <a href="{{ route('students.importForm', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-header-solid">
-                    <i class="fa-solid fa-file-excel me-1.5"></i> Import Students
+                    <i class="fa-solid fa-file-excel me-1.5"></i> {{ __('Import Students') }}
                 </a>
             </div>
         </div>
@@ -192,7 +219,7 @@
             <div class="alert alert-danger alert-dismissible fade show mb-4 rounded-4 border-0 shadow-sm" style="background:#fef2f2; border-left:5px solid #ef4444 !important;">
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <i class="fa-solid fa-circle-exclamation text-danger fs-5"></i>
-                    <strong class="text-danger">ফরমটি সাবমিট করার সময় নিচের ভুলগুলো পাওয়া গেছে:</strong>
+                    <strong class="text-danger">{{ __('The following errors were found while submitting the form:') }}</strong>
                 </div>
                 <ul class="mb-0 ps-4 small text-danger">
                     @foreach($errors->all() as $error)
@@ -210,7 +237,7 @@
             <div class="form-card-wrapper">
                 <div class="form-section-header">
                     <div class="form-section-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <h5 class="form-section-title">Academic Information</h5>
+                    <h5 class="form-section-title">{{ __('Academic Information') }}</h5>
                 </div>
 
                 <div class="row g-3">
@@ -224,6 +251,14 @@
                             <span class="validation-status-icon" id="name_icon"></span>
                         </div>
                         @error('name') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="form-label fw-semibold">বাংলা নাম <span class="bn-label-tag">বাংলা</span></label>
+                        <input type="text" name="name_bn" id="name_bn"
+                               class="form-control font-bn"
+                               placeholder="শিক্ষার্থীর বাংলা নাম লিখুন"
+                               value="{{ old('name_bn') }}">
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-12">
@@ -278,8 +313,18 @@
                     </div>
 
                     <div class="col-lg-6 col-md-6 col-12">
+                        <label class="form-label fw-semibold">পূর্ববর্তী স্কুলের নাম <span class="bn-label-tag">বাংলা</span></label>
+                        <input type="text" name="previous_school_bn" class="form-control font-bn" placeholder="পূর্ববর্তী স্কুলের বাংলা নাম (ঐচ্ছিক)" value="{{ old('previous_school_bn') }}">
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-12">
                         <label class="form-label fw-semibold">Previous Class</label>
                         <input type="text" name="previous_class" class="form-control" placeholder="Optional previous class" value="{{ old('previous_class') }}">
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-12">
+                        <label class="form-label fw-semibold">পূর্ববর্তী শ্রেণি <span class="bn-label-tag">বাংলা</span></label>
+                        <input type="text" name="previous_class_bn" class="form-control font-bn" placeholder="পূর্ববর্তী শ্রেণি বাংলায় (ঐচ্ছিক)" value="{{ old('previous_class_bn') }}">
                     </div>
                 </div>
             </div>
@@ -288,7 +333,7 @@
             <div class="form-card-wrapper">
                 <div class="form-section-header">
                     <div class="form-section-icon"><i class="fa-solid fa-user me-1"></i></div>
-                    <h5 class="form-section-title">Personal & Guardian Details</h5>
+                    <h5 class="form-section-title">{{ __('Personal & Guardian Details') }}</h5>
                 </div>
 
                 <div class="row g-3">
@@ -298,8 +343,18 @@
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-12">
+                        <label class="form-label fw-semibold">পিতার নাম <span class="bn-label-tag">বাংলা</span></label>
+                        <input type="text" name="fathers_name_bn" class="form-control font-bn" placeholder="পিতার বাংলা নাম লিখুন" value="{{ old('fathers_name_bn') }}">
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12">
                         <label class="form-label fw-semibold">Mother's Name</label>
                         <input type="text" name="mother_name" class="form-control" placeholder="Mother's full name" value="{{ old('mother_name') }}">
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <label class="form-label fw-semibold">মাতার নাম <span class="bn-label-tag">বাংলা</span></label>
+                        <input type="text" name="mothers_name_bn" class="form-control font-bn" placeholder="মাতার বাংলা নাম লিখুন" value="{{ old('mothers_name_bn') }}">
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-12">
@@ -404,9 +459,14 @@
                         </select>
                     </div>
 
-                    <div class="col-lg-12 col-12">
+                    <div class="col-lg-6 col-12">
                         <label class="form-label fw-semibold">Address</label>
                         <textarea name="address" class="form-control" rows="2" placeholder="Present / permanent address">{{ old('address') }}</textarea>
+                    </div>
+
+                    <div class="col-lg-6 col-12">
+                        <label class="form-label fw-semibold">ঠিকানা <span class="bn-label-tag">বাংলা</span></label>
+                        <textarea name="address_bn" class="form-control font-bn" rows="2" placeholder="বর্তমান / স্থায়ী ঠিকানা বাংলায় লিখুন">{{ old('address_bn') }}</textarea>
                     </div>
                 </div>
             </div>

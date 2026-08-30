@@ -84,12 +84,12 @@
         <div class="page-header-card mb-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="page-header-content">
-                    <h1 class="page-title"><i class="fa-solid fa-calendar-week me-2"></i> Weekly Routine Chart</h1>
-                    <p class="page-subtitle">Institutional class schedule organized by weekly days.</p>
+                    <h1 class="page-title"><i class="fa-solid fa-calendar-week me-2"></i> {{ __('Weekly Routine Chart') }}</h1>
+                    <p class="page-subtitle">{{ __('Institutional class schedule organized by weekly days.') }}</p>
                 </div>
                 <div>
                     <a href="{{ route('routine.create') }}" class="btn btn-warning fw-bold px-4 py-2" style="border-radius:12px;">
-                        <i class="fa-solid fa-plus me-1"></i> Add New Routine
+                        <i class="fa-solid fa-plus me-1"></i> {{ __('Add New Routine') }}
                     </a>
                 </div>
             </div>
@@ -108,8 +108,8 @@
                 <table class="table data-table mb-0 align-middle">
                     <thead class="bg-light">
                         <tr>
-                            <th style="width: 160px;" class="py-3 px-3">Day</th>
-                            <th class="py-3 px-3">Class Schedule Details</th>
+                            <th style="width: 160px;" class="py-3 px-3">{{ __('Day') }}</th>
+                            <th class="py-3 px-3">{{ __('Class Schedule Details') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,10 +125,10 @@
                                             {{ substr($day, 0, 2) }}
                                         </div>
                                         <div>
-                                            <span class="fw-bold text-dark d-block" style="font-size:0.88rem;">{{ $day }}</span>
+                                            <span class="fw-bold text-dark d-block" style="font-size:0.88rem;">{{ __($day) }}</span>
                                             @if(strtolower($day) == strtolower($currentDay))
                                                 <span class="badge-completed" style="font-size:0.65rem; padding:1px 6px;">
-                                                    <span class="pulse-dot pulse-dot-green"></span> Today
+                                                    <span class="pulse-dot pulse-dot-green"></span> {{ __('Today') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -143,13 +143,13 @@
                                                         <i class="fa-regular fa-clock me-1"></i>{{ \Carbon\Carbon::parse($routine->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($routine->end_time)->format('h:i A') }}
                                                     </span>
                                                     <div class="d-flex gap-1 ms-2">
-                                                        <a href="{{ route('routine.edit', ['routine' => $routine->id, 'tenant' => auth()->user()->school->slug]) }}" class="text-primary me-1" title="Edit">
+                                                        <a href="{{ route('routine.edit', ['routine' => $routine->id, 'tenant' => auth()->user()->school->slug]) }}" class="text-primary me-1" title="{{ __('Edit') }}">
                                                             <i class="fa-regular fa-pen-to-square"></i>
                                                         </a>
-                                                        <form action="{{ route('routine.destroy', ['routine' => $routine->id, 'tenant' => auth()->user()->school->slug]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this routine?')">
+                                                        <form action="{{ route('routine.destroy', ['routine' => $routine->id, 'tenant' => auth()->user()->school->slug]) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Delete this routine?') }}')">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-link p-0 text-danger border-0" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                                                            <button type="submit" class="btn btn-link p-0 text-danger border-0" title="{{ __('Delete') }}"><i class="fa-solid fa-trash-can"></i></button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -167,13 +167,13 @@
                                                 @if($routine->room_number)
                                                     <div class="routine-meta-item">
                                                         <i class="fa-solid fa-door-open text-amber-600"></i>
-                                                        <span>Room: {{ $routine->room_number }}</span>
+                                                        <span>{{ __('Room:') }} {{ $routine->room_number }}</span>
                                                     </div>
                                                 @endif
                                             </div>
                                         @empty
                                             <div class="text-muted small py-2">
-                                                <i class="fa-regular fa-circle-xmark me-1"></i>No classes scheduled for {{ $day }}
+                                                <i class="fa-regular fa-circle-xmark me-1"></i>{{ __('No classes scheduled for') }} {{ __($day) }}
                                             </div>
                                         @endforelse
                                     </div>

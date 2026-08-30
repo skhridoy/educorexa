@@ -103,20 +103,20 @@
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-3 border-bottom">
             <div>
                 <h5 class="mb-1 fw-bold text-dark">
-                    <i class="bi bi-gear-fill text-primary me-2"></i>অনলাইন অ্যাডমিশন কন্ট্রোল ও সেটিংস
+                    <i class="bi bi-gear-fill text-primary me-2"></i>{{ __('Online Admission Control & Settings') }}
                 </h5>
                 <p class="text-muted small mb-0">
-                    ভর্তি খোলা/বন্ধ করা, ভর্তির নির্ধারিত শিক্ষাবর্ষ (Session), সময়সীমা ও মেসেজ কাস্টমাইজ করুন।
+                    {{ __('Customize admission open/close status, session, deadline, and notice messages.') }}
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="badge bg-indigo-100 text-primary border border-primary-subtle px-3 py-2 fw-bold" style="border-radius:20px; font-size:0.82rem;">
-                    <i class="bi bi-calendar-event me-1"></i>ভর্তি সেশন: {{ $currentYearName }}
+                    <i class="bi bi-calendar-event me-1"></i>{{ __('Admission Session:') }} {{ $currentYearName }}
                 </span>
                 @if($isAdmissionOpen)
-                    <span class="status-pill-open"><i class="bi bi-door-open-fill me-1"></i>ভর্তি খোলা রয়েছে (OPEN)</span>
+                    <span class="status-pill-open"><i class="bi bi-door-open-fill me-1"></i>{{ __('Admission Open (OPEN)') }}</span>
                 @else
-                    <span class="status-pill-closed"><i class="bi bi-door-closed-fill me-1"></i>ভর্তি বন্ধ রয়েছে (CLOSED)</span>
+                    <span class="status-pill-closed"><i class="bi bi-door-closed-fill me-1"></i>{{ __('Admission Closed (CLOSED)') }}</span>
                 @endif
             </div>
         </div>
@@ -126,13 +126,13 @@
             <div class="row g-3">
                 {{-- Row 1: Status, Session, Deadline --}}
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold text-secondary small">ভর্তি স্ট্যাটাস (Status)</label>
+                    <label class="form-label fw-semibold text-secondary small">{{ __('Admission Status') }}</label>
                     <select name="is_admission_open" class="form-select fw-bold">
                         <option value="1" {{ $isAdmissionOpen ? 'selected' : '' }} class="text-success">
-                            🟢 Admission Open (খোলা)
+                            🟢 {{ __('Admission Open') }}
                         </option>
                         <option value="0" {{ !$isAdmissionOpen ? 'selected' : '' }} class="text-danger">
-                            🔴 Admission Closed (বন্ধ)
+                            🔴 {{ __('Admission Closed') }}
                         </option>
                     </select>
                 </div>
@@ -140,36 +140,36 @@
                 <div class="col-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <label class="form-label fw-semibold text-secondary small mb-0">
-                            ভর্তির শিক্ষাবর্ষ (Admission Session)
+                            {{ __('Admission Session') }}
                         </label>
-                        <a href="{{ route('academic-year.index', ['tenant' => auth()->user()->school->slug]) }}" class="small text-primary text-decoration-none fw-bold" title="নতুন সেশন তৈরি করুন" target="_blank">
-                            <i class="bi bi-plus-circle-fill me-1"></i>নতুন সেশন
+                        <a href="{{ route('academic-year.index', ['tenant' => auth()->user()->school->slug]) }}" class="small text-primary text-decoration-none fw-bold" title="{{ __('Create New Session') }}" target="_blank">
+                            <i class="bi bi-plus-circle-fill me-1"></i>{{ __('New Session') }}
                         </a>
                     </div>
                     <select name="admission_academic_year_id" class="form-select fw-bold">
-                        <option value="">-- স্বয়ংক্রিয় (রানিং একটিভ সেশন) --</option>
+                        <option value="">{{ __('-- Automatic (Running Active Session) --') }}</option>
                         @foreach($academicYears as $year)
                             <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>
-                                সেশন: {{ $year->name }} @if($year->is_active) (রানিং একটিভ) @endif
+                                {{ __('Session:') }} {{ $year->name }} @if($year->is_active) {{ __('(Running Active)') }} @endif
                             </option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="col-md-5">
-                    <label class="form-label fw-semibold text-secondary small">ভর্তি শেষের তারিখ/সময় (Deadline)</label>
+                    <label class="form-label fw-semibold text-secondary small">{{ __('Admission Deadline') }}</label>
                     <input type="datetime-local" name="admission_close_date" class="form-control" value="{{ $closeDate }}" />
                 </div>
 
                 {{-- Row 2: Message & Save --}}
                 <div class="col-md-9">
-                    <label class="form-label fw-semibold text-secondary small">ভর্তি বন্ধ হলে দেখানোর বার্তা (Notice Message)</label>
-                    <input type="text" name="admission_closed_message" class="form-control" value="{{ $closedMsg }}" placeholder="যেমন: অনলাইন ভর্তি কার্যক্রম বর্তমানে বন্ধ রয়েছে।" />
+                    <label class="form-label fw-semibold text-secondary small">{{ __('Notice Message When Closed') }}</label>
+                    <input type="text" name="admission_closed_message" class="form-control" value="{{ $closedMsg }}" placeholder="{{ __('e.g., Online admission is currently closed.') }}" />
                 </div>
 
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
-                        <i class="bi bi-save me-1"></i>সেটিংস সেভ করুন
+                        <i class="bi bi-save me-1"></i>{{ __('Save Settings') }}
                     </button>
                 </div>
             </div>
@@ -181,7 +181,7 @@
     ══════════════════════════════════════════════ --}}
     <div class="admission-card">
         <div class="card-header-main text-center">
-            <i class="bi bi-clipboard-data"></i> Online Admissions Overview &amp; History
+            <i class="bi bi-clipboard-data"></i> {{ __('Online Admissions Overview & History') }}
         </div>
         <div class="card-body">
             
@@ -192,7 +192,7 @@
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0"><i class="bi bi-search text-primary"></i></span>
-                        <input type="text" id="phoneSearchInput" class="form-control border-0 bg-light" placeholder="ফোন নম্বর বা নাম দিয়ে খুঁজুন..." style="font-size: 14px;">
+                        <input type="text" id="phoneSearchInput" class="form-control border-0 bg-light" placeholder="{{ __('Search by phone or name...') }}" style="font-size: 14px;">
                     </div>
                 </div>
 
@@ -200,10 +200,10 @@
                 <div class="col-md-3">
                     <div class="d-flex align-items-center gap-2">
                         <label for="classFilter" class="form-label mb-0 fw-semibold text-secondary" style="white-space: nowrap; font-size: 14px;">
-                            <i class="bi bi-funnel text-primary"></i> Class:
+                            <i class="bi bi-funnel text-primary"></i> {{ __('Class:') }}
                         </label>
                         <select id="classFilter" class="form-select border-0 bg-light" style="border-radius: 8px; font-size: 14px;">
-                            <option value="">All Classes</option>
+                            <option value="">{{ __('All Classes') }}</option>
                             @php
                                 $uniqueClasses = $admissions->pluck('class')->unique('id')->filter();
                             @endphp
@@ -217,10 +217,10 @@
                 {{-- Status Filter --}}
                 <div class="col-md-2">
                     <select id="statusFilter" class="form-select border-0 bg-light" style="border-radius: 8px; font-size: 14px;">
-                        <option value="">All Status</option>
-                        <option value="pending" selected>Pending</option>
-                        <option value="approved">Approved (History)</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="">{{ __('All Status') }}</option>
+                        <option value="pending" selected>{{ __('Pending') }}</option>
+                        <option value="approved">{{ __('Approved (History)') }}</option>
+                        <option value="rejected">{{ __('Rejected') }}</option>
                     </select>
                 </div>
                 
@@ -230,18 +230,11 @@
                         <div class="form-check select-all-wrapper me-2" style="display:none;">
                             <input class="form-check-input" type="checkbox" id="selectAllPending" style="width: 18px; height: 18px; cursor: pointer; border: 2px solid #cbd5e1;">
                             <label class="form-check-label fw-semibold text-secondary" for="selectAllPending" style="font-size: 13px; cursor: pointer; user-select: none;">
-                                Select All
+                                {{ __('Select All') }}
                             </label>
                         </div>
                         
-                        <button type="button" id="bulkApproveBtn" class="btn text-white fw-bold disabled" style="background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 20px; padding: 6px 18px; font-size: 13px; box-shadow: 0 4px 6px rgba(16,185,129,0.2);" data-bs-toggle="modal" data-bs-target="#bulkApproveModal" disabled>
-                            <i class="bi bi-check-all me-1"></i> Bulk Approve <span class="badge bg-white text-success rounded-circle ms-1" id="selectedCountBadge">0</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-4" id="admissionsContainer">
+                        <button type="button" id="bulkApproveBtn" class="btn text-white fw-bold disabled" style="background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 20px; padding: 6px 18px; font-size: 13px; box-shadow: 0 4px 6px rgba(1            <div class="row g-4" id="admissionsContainer">
                 @forelse($admissions as $admission)
                 <div class="col-md-4 admission-card-item" 
                      data-class-id="{{ $admission->class_id }}" 
@@ -261,17 +254,17 @@
                             <img src="{{ $admission->photo ? asset($admission->photo) : asset('images/avatar.png') }}" class="rounded-circle me-3" style="width: 42px; height: 42px; object-fit: cover; border: 2px solid rgba(255,255,255,0.4);">
                             <div>
                                 <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">#{{ $admission->admission_number }}</h6>
-                                <small class="text-white-50" style="font-size: 0.72rem;">Ref ID: {{ $admission->id }}</small>
+                                <small class="text-white-50" style="font-size: 0.72rem;">{{ __('Ref ID:') }} {{ $admission->id }}</small>
                             </div>
                         </div>
                         <div class="card-body" style="padding: 18px; color: #374151;">
-                            <p class="mb-1"><strong style="color: #0f172a;">Name:</strong> {{ $admission->name }}</p>
-                            <p class="mb-1"><strong style="color: #0f172a;">Year:</strong> {{ $admission->academicYear->name ?? 'N/A' }}</p>
-                            <p class="mb-1"><strong style="color: #0f172a;">Class:</strong> {{ $admission->class->name ?? 'N/A' }}</p>
-                            <p class="mb-2"><strong style="color: #0f172a;">Contact:</strong> {{ $admission->contact_number }}</p>
+                            <p class="mb-1"><strong style="color: #0f172a;">{{ __('Name:') }}</strong> {{ $admission->name }}</p>
+                            <p class="mb-1"><strong style="color: #0f172a;">{{ __('Year:') }}</strong> {{ $admission->academicYear->name ?? 'N/A' }}</p>
+                            <p class="mb-1"><strong style="color: #0f172a;">{{ __('Class:') }}</strong> {{ $admission->class->name ?? 'N/A' }}</p>
+                            <p class="mb-2"><strong style="color: #0f172a;">{{ __('Contact:') }}</strong> {{ $admission->contact_number }}</p>
                             
                             @if($admission->status === 'rejected' && $admission->admin_note)
-                                <p class="mb-2 text-danger small"><strong class="text-danger">Note:</strong> {{ $admission->admin_note }}</p>
+                                <p class="mb-2 text-danger small"><strong class="text-danger">{{ __('Note:') }}</strong> {{ $admission->admin_note }}</p>
                             @endif
 
                             <div class="d-flex align-items-center justify-content-between mt-2">
@@ -281,9 +274,9 @@
                                     @else bg-success @endif
                                     rounded-pill px-3 py-1" style="font-size: 0.75rem;">
                                     @if($admission->status === 'approved')
-                                        <i class="bi bi-check-circle me-1"></i>Approved (History)
+                                        <i class="bi bi-check-circle me-1"></i>{{ __('Approved (History)') }}
                                     @else
-                                        {{ ucfirst($admission->status) }}
+                                        {{ __($admission->status) }}
                                     @endif
                                 </span>
                                 <small class="text-muted" style="font-size: 0.72rem;">{{ $admission->created_at ? $admission->created_at->format('d M, Y') : '' }}</small>
@@ -302,7 +295,7 @@
                                     data-admission-class="{{ $admission->class->name ?? '' }}"
                                     data-approve-url="{{ route('admissions.approve', ['tenant' => auth()->user()->school->slug, 'admission' => $admission->id]) }}"
                                     style="background-color: #10b981; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight:600;">
-                                <i class="bi bi-check-circle me-1"></i>Approve
+                                <i class="bi bi-check-circle me-1"></i>{{ __('Approve') }}
                             </button>
                             @endif
 
@@ -317,7 +310,7 @@
                                         class="btn btn-sm text-white border-0"
                                         onclick="confirmReject({{ $admission->id }})"
                                         style="background-color: #f59e0b; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight:600;">
-                                    <i class="bi bi-x-circle me-1"></i>Reject
+                                    <i class="bi bi-x-circle me-1"></i>{{ __('Reject') }}
                                 </button>
                             </form>
                             @endif
@@ -332,7 +325,7 @@
                                         class="btn btn-sm text-white border-0"
                                         onclick="confirmDelete({{ $admission->id }})"
                                         style="background-color: #ef4444; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight:600;">
-                                    <i class="bi bi-trash me-1"></i>Delete
+                                    <i class="bi bi-trash me-1"></i>{{ __('Delete') }}
                                 </button>
                             </form>
 
@@ -349,7 +342,7 @@
                 @empty
                 <div class="col-12 text-center py-5 text-muted">
                     <i class="bi bi-inbox fa-3x mb-2 d-block text-secondary"></i>
-                    No admission applications found.
+                    {{ __('No admission applications found.') }}
                 </div>
                 @endforelse
             </div>
@@ -363,7 +356,7 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem; overflow: hidden;">
             <div class="modal-header border-0" style="background: linear-gradient(135deg, #10b981, #059669); padding: 1.25rem 1.5rem;">
                 <h5 class="modal-title text-white fw-bold" id="approveModalLabel">
-                    <i class="bi bi-person-check-fill me-2"></i>Approve Admission
+                    <i class="bi bi-person-check-fill me-2"></i>{{ __('Approve Admission') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -373,16 +366,16 @@
                 <div class="modal-body p-4">
                     <div class="alert alert-info border-0 py-2 px-3 mb-4" style="background: #eff6ff; border-radius: 8px; font-size: 13px;">
                         <i class="bi bi-info-circle me-1"></i>
-                        শিক্ষার্থী <strong id="modal-student-name"></strong> (<span id="modal-student-class"></span>) কে ভর্তি করতে নিচের তথ্য পূরণ করুন। (অ্যাডমিশন ডাটা হিস্ট্রি হিসেবে সংরক্ষিত থাকবে)
+                        {{ __('Please fill in the information below to admit student') }} <strong id="modal-student-name"></strong> (<span id="modal-student-class"></span>). ({{ __('Admission data will remain as history') }})
                     </div>
 
                     {{-- Section --}}
                     <div class="mb-3">
                         <label for="approve_section_id" class="form-label fw-semibold">
-                            <i class="bi bi-diagram-3 me-1 text-primary"></i>শাখা (Section) <span class="text-danger">*</span>
+                            <i class="bi bi-diagram-3 me-1 text-primary"></i>{{ __('Section') }} <span class="text-danger">*</span>
                         </label>
                         <select name="section_id" id="approve_section_id" class="form-select" required>
-                            <option value="">-- Section নির্বাচন করুন --</option>
+                            <option value="">{{ __('-- Select Section --') }}</option>
                             @foreach($sections as $section)
                                 <option value="{{ $section->id }}">{{ $section->name }}</option>
                             @endforeach
@@ -392,10 +385,10 @@
                     {{-- Category --}}
                     <div class="mb-3">
                         <label for="approve_category_id" class="form-label fw-semibold">
-                            <i class="bi bi-tag me-1 text-warning"></i>ক্যাটেগরি (Category)
+                            <i class="bi bi-tag me-1 text-warning"></i>{{ __('Category') }}
                         </label>
                         <select name="school_category_id" id="approve_category_id" class="form-select">
-                            <option value="">-- Category নির্বাচন করুন (ঐচ্ছিক) --</option>
+                            <option value="">{{ __('-- Select Category (Optional) --') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
@@ -405,10 +398,10 @@
                     {{-- Sub-Category --}}
                     <div class="mb-3">
                         <label for="approve_sub_category_id" class="form-label fw-semibold">
-                            <i class="bi bi-tags me-1 text-info"></i>সাব ক্যাটেগরি (Sub-Category)
+                            <i class="bi bi-tags me-1 text-info"></i>{{ __('Sub Category') }}
                         </label>
                         <select name="school_sub_category_id" id="approve_sub_category_id" class="form-select">
-                            <option value="">-- Sub-Category নির্বাচন করুন (ঐচ্ছিক) --</option>
+                            <option value="">{{ __('-- Select Sub-Category (Optional) --') }}</option>
                             @foreach($subCategories as $sub)
                                 <option value="{{ $sub->id }}" data-category="{{ $sub->school_category_id }}">{{ $sub->name }}</option>
                             @endforeach
@@ -417,10 +410,10 @@
                 </div>
                 <div class="modal-footer border-0 px-4 pb-4">
                     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>বাতিল
+                        <i class="bi bi-x-circle me-1"></i>{{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn text-white rounded-pill px-4 fw-semibold" style="background: linear-gradient(135deg, #10b981, #059669);">
-                        <i class="bi bi-check-circle me-1"></i>ভর্তি নিশ্চিত করুন
+                        <i class="bi bi-check-circle me-1"></i>{{ __('Confirm Admission') }}
                     </button>
                 </div>
             </form>
@@ -434,7 +427,7 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem; overflow: hidden;">
             <div class="modal-header border-0" style="background: linear-gradient(135deg, #10b981, #059669); padding: 1.25rem 1.5rem;">
                 <h5 class="modal-title text-white fw-bold" id="bulkApproveModalLabel">
-                    <i class="bi bi-people-fill me-2"></i>Bulk Approve Admissions
+                    <i class="bi bi-people-fill me-2"></i>{{ __('Bulk Approve Admissions') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -446,22 +439,22 @@
                 <div class="modal-body p-4">
                     <div class="alert alert-info border-0 py-2 px-3 mb-4" style="background: #eff6ff; border-radius: 8px; font-size: 13px;">
                         <i class="bi bi-info-circle me-1"></i>
-                        আপনি মোট <strong id="bulk-selected-count">0</strong> জন শিক্ষার্থীকে একসাথে ভর্তি করতে যাচ্ছেন। (অ্যাডমিশন ডাটা হিস্ট্রি হিসেবে থাকবে)
+                        {{ __('You are about to bulk approve') }} <strong id="bulk-selected-count">0</strong> {{ __('students.') }} ({{ __('Admission data will remain as history') }})
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-secondary" style="font-size: 13px;">
-                            <i class="bi bi-person-lines-fill me-1 text-primary"></i> নির্বাচিত শিক্ষার্থী সমূহ:
+                            <i class="bi bi-person-lines-fill me-1 text-primary"></i> {{ __('Selected Students:') }}
                         </label>
                         <div id="bulk-selected-students-list" class="p-2 border bg-light" style="max-height: 120px; overflow-y: auto; border-radius: 8px; font-size: 13px;"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="bulk_section_id" class="form-label fw-semibold">
-                            <i class="bi bi-diagram-3 me-1 text-primary"></i>শাখা (Section) <span class="text-danger">*</span>
+                            <i class="bi bi-diagram-3 me-1 text-primary"></i>{{ __('Section') }} <span class="text-danger">*</span>
                         </label>
                         <select name="section_id" id="bulk_section_id" class="form-select" required>
-                            <option value="">-- Section নির্বাচন করুন --</option>
+                            <option value="">{{ __('-- Select Section --') }}</option>
                             @foreach($sections as $section)
                                 <option value="{{ $section->id }}">{{ $section->name }}</option>
                             @endforeach
@@ -470,10 +463,10 @@
 
                     <div class="mb-3">
                         <label for="bulk_category_id" class="form-label fw-semibold">
-                            <i class="bi bi-tag me-1 text-warning"></i>ক্যাটেগরি (Category)
+                            <i class="bi bi-tag me-1 text-warning"></i>{{ __('Category') }}
                         </label>
                         <select name="school_category_id" id="bulk_category_id" class="form-select">
-                            <option value="">-- Category নির্বাচন করুন (ঐচ্ছিক) --</option>
+                            <option value="">{{ __('-- Select Category (Optional) --') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
@@ -482,10 +475,10 @@
 
                     <div class="mb-3">
                         <label for="bulk_sub_category_id" class="form-label fw-semibold">
-                            <i class="bi bi-tags me-1 text-info"></i>সাব ক্যাটেগরি (Sub-Category)
+                            <i class="bi bi-tags me-1 text-info"></i>{{ __('Sub Category') }}
                         </label>
                         <select name="school_sub_category_id" id="bulk_sub_category_id" class="form-select">
-                            <option value="">-- Sub-Category নির্বাচন করুন (ঐচ্ছিক) --</option>
+                            <option value="">{{ __('-- Select Sub-Category (Optional) --') }}</option>
                             @foreach($subCategories as $sub)
                                 <option value="{{ $sub->id }}" data-category="{{ $sub->school_category_id }}">{{ $sub->name }}</option>
                             @endforeach
@@ -494,10 +487,10 @@
                 </div>
                 <div class="modal-footer border-0 px-4 pb-4">
                     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>বাতিল
+                        <i class="bi bi-x-circle me-1"></i>{{ __('Cancel') }}
                     </button>
                     <button type="submit" class="btn text-white rounded-pill px-4 fw-semibold" style="background: linear-gradient(135deg, #10b981, #059669);">
-                        <i class="bi bi-check-all me-1"></i>সব ভর্তি নিশ্চিত করুন
+                        <i class="bi bi-check-all me-1"></i>{{ __('Confirm Bulk Admission') }}
                     </button>
                 </div>
             </form>
@@ -691,14 +684,14 @@
 
     function confirmDelete(id) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "This admission record will be permanently deleted!",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('This admission record will be permanently deleted!') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Delete!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, Delete!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('delete-form-' + id).submit();
@@ -708,16 +701,16 @@
 
     function confirmReject(id) {
         Swal.fire({
-            title: 'Reject Admission?',
-            text: 'You may add a rejection note (optional):',
+            title: "{{ __('Reject Admission?') }}",
+            text: "{{ __('You may add a rejection note (optional):') }}",
             input: 'textarea',
-            inputPlaceholder: 'Enter rejection reason (optional)...',
+            inputPlaceholder: "{{ __('Enter rejection reason (optional)...') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#f59e0b',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, Reject!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, Reject!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('reject-note-' + id).value = result.value || '';

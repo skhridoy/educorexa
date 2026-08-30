@@ -113,18 +113,18 @@
                     <i class="fa-solid fa-file-excel"></i>
                 </div>
                 <div>
-                    <h1 class="page-title fs-4 mb-1">Student Bulk Import</h1>
-                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">Upload an Excel or CSV file to import students into your school records</p>
+                    <h1 class="page-title fs-4 mb-1">{{ __('Student Bulk Import') }}</h1>
+                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">{{ __('Upload an Excel or CSV file to import students into your school records') }}</p>
                 </div>
             </div>
             <div class="header-actions">
                 <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-header-outline">
-                    <i class="fa-solid fa-download me-1.5"></i> Download Template
+                    <i class="fa-solid fa-download me-1.5"></i> {{ __('Download Template') }}
                 </a>
                 <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-header-solid">
-                    <i class="fa-solid fa-user-graduate me-1.5"></i> Student List
+                    <i class="fa-solid fa-user-graduate me-1.5"></i> {{ __('Student List') }}
                 </a>
             </div>
         </div>
@@ -142,8 +142,8 @@
                     <div id="stu_standalone_dz_icon" class="modal-dz-icon">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                     </div>
-                    <p class="modal-dz-title" id="stu_standalone_label">Click or drag Excel/CSV file here to upload</p>
-                    <p class="modal-dz-sub">Supports .xlsx, .xls, .csv files up to 5 MB</p>
+                    <p class="modal-dz-title" id="stu_standalone_label">{{ __('Click or drag Excel/CSV file here to upload') }}</p>
+                    <p class="modal-dz-sub">{{ __('Supports .xlsx, .xls, .csv files up to 5 MB') }}</p>
                     <input type="file" name="file" id="stu_standalone_file"
                            accept=".xlsx,.xls,.csv" class="d-none" required
                            onchange="previewStandaloneStuFile(this);">
@@ -152,7 +152,7 @@
                 {{-- Column Guide --}}
                 <div class="mt-4 p-3 rounded-3 small" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <p class="fw-bold mb-2 text-dark">
-                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>Required Columns Guide:
+                        <i class="fa-solid fa-circle-info me-1 text-primary"></i>{{ __('Required Columns Guide:') }}
                     </p>
                     <div class="d-flex flex-wrap gap-2 mb-2">
                         @foreach(['class_code *','name *','group / sub_category','section','roll','fathers_name','mothers_name','contact_number','date_of_birth','gender','religion','blood_group','address'] as $col)
@@ -173,9 +173,9 @@
 
                 <div class="mt-4 d-flex justify-content-end gap-2">
                     <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}"
-                       class="btn btn-light rounded-pill px-4">Cancel</a>
+                       class="btn btn-light rounded-pill px-4">{{ __('Cancel') }}</a>
                     <button type="submit" id="stu_import_submit_btn" class="btn btn-primary-modern rounded-pill px-5">
-                        <i class="fa-solid fa-file-import me-1"></i> Start Import
+                        <i class="fa-solid fa-file-import me-1"></i> {{ __('Start Import') }}
                     </button>
                 </div>
             </form>
@@ -190,8 +190,8 @@
                     <i class="fa-solid fa-triangle-exclamation text-white" style="font-size:15px;"></i>
                 </div>
                 <div>
-                    <h6 class="mb-0 fw-bold text-danger">Import সমস্যা রিপোর্ট</h6>
-                    <small class="text-muted">{{ count(session('import_errors')) }}টি row-এ সমস্যা পাওয়া গেছে</small>
+                    <h6 class="mb-0 fw-bold text-danger">{{ __('Import Issue Report') }}</h6>
+                    <small class="text-muted">{{ count(session('import_errors')) }} {{ __('rows had issues') }}</small>
                 </div>
             </div>
 
@@ -200,7 +200,7 @@
                     <thead style="background:#fef2f2;position:sticky;top:0;z-index:1;">
                         <tr>
                             <th style="width:50px;color:#dc2626;padding:8px 12px;">#</th>
-                            <th style="color:#dc2626;padding:8px 12px;">সমস্যার বিবরণ</th>
+                            <th style="color:#dc2626;padding:8px 12px;">{{ __('Issue Details') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -219,8 +219,8 @@
                  style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;">
                 <i class="fa-solid fa-circle-check"></i>
                 <span>
-                    {{ session('import_success_count') }} জন student সফলভাবে import হয়েছে।
-                    {{ session('import_skip_count', 0) }} টি row skip করা হয়েছে।
+                    {{ session('import_success_count') }} {{ __('students imported successfully.') }}
+                    {{ session('import_skip_count', 0) }} {{ __('rows skipped.') }}
                 </span>
             </div>
             @endif
@@ -244,7 +244,7 @@
         const ext = file.name.split('.').pop().toLowerCase();
 
         if (!allowed.includes(ext)) {
-            label.textContent = '❌ Invalid file format! Please select .xlsx, .xls or .csv';
+            label.textContent = "❌ {{ __('Invalid file format! Please select .xlsx, .xls or .csv') }}";
             label.style.color = '#ef4444';
             return;
         }
@@ -261,7 +261,7 @@
     @if(session('success'))
         Swal.fire({
             icon: 'success',
-            title: 'সফল!',
+            title: "{{ __('Success') }}",
             text: '{{ session('success') }}',
         });
     @endif
@@ -269,16 +269,16 @@
     @if(session('warning'))
         Swal.fire({
             icon: 'warning',
-            title: 'আংশিক সফল',
+            title: "{{ __('Partially Successful') }}",
             text: '{{ session('warning') }}',
-            footer: 'নিচের টেবিলে সমস্যার বিবরণ দেখুন।',
+            footer: "{{ __('See details in table below') }}",
         });
     @endif
 
     @if(session('error') && !session('import_errors'))
         Swal.fire({
             icon: 'error',
-            title: 'Error!',
+            title: "{{ __('Error!') }}",
             text: '{{ session('error') }}',
         });
     @endif

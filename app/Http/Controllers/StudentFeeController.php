@@ -52,74 +52,171 @@ class StudentFeeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fee_head_id' => 'required',
-            'month'       => 'required',
-            // ক্যাটেগরি এবং ক্লাস এখন রিকোয়ার্ড করা যেতে পারে নির্দিষ্ট ফি-র জন্য
-            'school_category_id' => 'nullable', 
+            'fee_head_id'            => 'required',
+            'month'                  => 'required',
+            'school_category_id'     => 'nullable',
+            'school_sub_category_id' => 'nullable',
+            'class_id'               => 'nullable',
         ]);
 
         $schoolId = auth()->user()->school_id;
 
-        // ফি সেটআপ খোঁজা (ক্যাটেগরি বা ক্লাস ফিল্টার থাকলে সেটা ব্যবহার করা)
-        $feeQuery = FeeAmount::where('school_id', $schoolId)
-                             ->where('fee_head_id', $request->fee_head_id);
+        // ১. ওই স্কুলের ফি হেডের জন্য কোনো অ্যামাউন্ট কনফিগারেশন আছে কিনা চেক করা
+        $feeAmountsQuery = FeeAmount::where('school_id', $schoolId)
+            ->where('fee_head_id', $request->fee_head_id);
 
-        if ($request->filled('class_id')) {
-            $feeQuery->where('class_id', $request->class_id);
+        if ($request->filled('school_category_id')) {
+            $feeAmountsQuery->where('school_category_id', $request->school_category_id);
         }
 
-        $feeSetups = $feeQuery->get();
+        if ($request->filled('school_sub_category_id')) {
+            $feeAmountsQuery->where('school_sub_category_id', $request->school_sub_category_id);
+        }
+
+        if ($request->filled('class_id')) {
+            $feeAmountsQuery->where('class_id', $request->class_id);
+        }
+
+        $feeSetups = $feeAmountsQuery->get();
 
         if ($feeSetups->isEmpty()) {
-            return back()->with('error', 'এই ফি হেডের জন্য কোনো অ্যামাউন্ট সেট করা নেই!');
+            return back()->with('error', 'এই ফি হেডের জন্য নির্বাচিত ফিল্টারে কোনো ফি স্ট্রাকচার/অ্যামাউন্ট সেট করা নেই! প্রথমে "Setup Fee Amounts" থেকে ফি সেট করুন।');
+        }
+
+        // ২. ডিউ ডেট গণনা
+        try {
+            $dueDate = \Carbon\Carbon::parse('01-' . $request->month)->endOfMonth()->toDateString();
+        } catch (\Exception $e) {
+            $dueDate = now()->endOfMonth()->toDateString();
+        }
+
+        // ৩. ফি কনফিগারেশনগুলোকে দ্রুত লুকআপের জন্য ইন্ডেক্স করা
+        // Priority 1: class_id + sub_category_id
+        // Priority 2 (fallback): class_id + general (null sub_category)
+        $subCategoryFeeMap = [];
+        $generalClassFeeMap = [];
+
+        foreach ($feeSetups as $setup) {
+            if ($setup->school_sub_category_id) {
+                $subCategoryFeeMap[$setup->class_id][$setup->school_sub_category_id] = $setup;
+            } else {
+                $generalClassFeeMap[$setup->class_id] = $setup;
+            }
+        }
+
+        $allConfiguredClassIds = $feeSetups->pluck('class_id')->unique()->toArray();
+
+        // ৪. উপযুক্ত সক্রিয় শিক্ষার্থীদের নিয়ে আসা
+        $studentQuery = Student::where('school_id', $schoolId)
+            ->where(function ($q) {
+                $q->where('status', 'active')
+                  ->orWhereNull('status');
+            })
+            ->whereIn('class_id', $allConfiguredClassIds);
+
+        // ক্যাটেগরি ফিল্টার (স্টুডেন্ট অথবা তার ক্লাসের ক্যাটেগরি চেক করা)
+        if ($request->filled('school_category_id')) {
+            $categoryId = $request->school_category_id;
+            $studentQuery->where(function ($q) use ($categoryId) {
+                $q->where('school_category_id', $categoryId)
+                  ->orWhereHas('class', function ($cq) use ($categoryId) {
+                      $cq->where('school_category_id', $categoryId);
+                  });
+            });
+        }
+
+        // সাব-ক্যাটেগরি (গ্রুপ) ফিল্টার
+        if ($request->filled('school_sub_category_id')) {
+            $studentQuery->where('school_sub_category_id', $request->school_sub_category_id);
+        }
+
+        // ক্লাস ফিল্টার
+        if ($request->filled('class_id')) {
+            $studentQuery->where('class_id', $request->class_id);
+        }
+
+        // ডুপ্লিকেট জেনারেশন রোধ: যে শিক্ষার্থীদের ইতিমধ্যে এই মাসে এই ফি আছে তাদের বাদ দেওয়া
+        $students = $studentQuery->whereNotExists(function ($query) use ($request) {
+                $query->select(DB::raw(1))
+                    ->from('student_fees')
+                    ->whereColumn('student_fees.student_id', 'students.id')
+                    ->where('student_fees.fee_head_id', $request->fee_head_id)
+                    ->where('student_fees.month', $request->month);
+            })
+            ->with(['class'])
+            ->get();
+
+        if ($students->isEmpty()) {
+            return back()->with('error', 'নির্বাচিত মাস (' . $request->month . ') এর জন্য ফি ইতোমধ্যে তৈরি করা হয়েছে অথবা উপযুক্ত কোনো শিক্ষার্থী পাওয়া যায়নি।');
         }
 
         $count = 0;
-        
-        DB::transaction(function () use ($feeSetups, $request, $schoolId, &$count) {
-            foreach ($feeSetups as $setup) {
-                
-                // স্টুডেন্ট কোয়েরিতে ক্যাটেগরি এবং সাব-ক্যাটেগরি লজিক যুক্ত করা
-                $studentQuery = Student::where('school_id', $schoolId)
-                    ->where('class_id', $setup->class_id);
+        $now = now();
+        $records = [];
 
-                // যদি ইউজার নির্দিষ্ট ক্যাটেগরি সিলেক্ট করে (যেমন শুধু প্রাইমারি স্টুডেন্টদের ফি হবে)
-                if ($request->filled('school_category_id')) {
-                    $studentQuery->where('school_category_id', $request->school_category_id);
+        try {
+            DB::beginTransaction();
+
+            foreach ($students as $student) {
+                $classId = $student->class_id;
+                $subCatId = $student->school_sub_category_id;
+
+                // নির্দিষ্ট সাব-ক্যাটেগরি ফি খুঁজুন, না পেলে জেনারেল ক্লাস ফি ব্যবহার করুন
+                $applicableSetup = null;
+                if ($subCatId && isset($subCategoryFeeMap[$classId][$subCatId])) {
+                    $applicableSetup = $subCategoryFeeMap[$classId][$subCatId];
+                } elseif (isset($generalClassFeeMap[$classId])) {
+                    $applicableSetup = $generalClassFeeMap[$classId];
+                } elseif (isset($subCategoryFeeMap[$classId])) {
+                    $applicableSetup = reset($subCategoryFeeMap[$classId]);
                 }
-                
-                // যদি ইউজার নির্দিষ্ট সাব-ক্যাটেগরি সিলেক্ট করে (যেমন শুধু সায়েন্সের ফি হবে)
-                if ($request->filled('school_sub_category_id')) {
-                    $studentQuery->where('school_sub_category_id', $request->school_sub_category_id);
+
+                if (!$applicableSetup) {
+                    continue;
                 }
 
-                $students = $studentQuery->whereNotExists(function ($query) use ($request) {
-                        $query->select(DB::raw(1))
-                            ->from('student_fees')
-                            ->whereColumn('student_fees.student_id', 'students.id')
-                            ->where('student_fees.fee_head_id', $request->fee_head_id)
-                            ->where('student_fees.month', $request->month);
-                    })
-                    ->get();
+                $categoryId = $student->school_category_id ?? $student->class?->school_category_id ?? $applicableSetup->school_category_id;
 
-                foreach ($students as $student) {
-                    StudentFee::create([
-                        'school_id'   => $schoolId,
-                        'student_id'  => $student->id,
-                        'school_category_id' => $student->school_category_id,
-                        'school_sub_category_id' => $student->school_sub_category_id,
-                        'fee_head_id' => $request->fee_head_id,
-                        'amount'      => $setup->amount,
-                        'month'       => $request->month,
-                        'status'      => 'unpaid',
-                        'due_date'    => now()->endOfMonth()->toDateString(),
-                    ]);
-                    $count++;
+                $records[] = [
+                    'school_id'              => $schoolId,
+                    'student_id'             => $student->id,
+                    'school_category_id'     => $categoryId,
+                    'school_sub_category_id' => $student->school_sub_category_id ?? $applicableSetup->school_sub_category_id,
+                    'fee_head_id'            => $request->fee_head_id,
+                    'amount'                 => $applicableSetup->amount,
+                    'month'                  => $request->month,
+                    'status'                 => 'unpaid',
+                    'due_date'               => $dueDate,
+                    'fee_type_limit'         => 'global',
+                    'created_at'             => $now,
+                    'updated_at'             => $now,
+                ];
+
+                $count++;
+
+                // Chunked insert for efficiency
+                if (count($records) >= 250) {
+                    StudentFee::insert($records);
+                    $records = [];
                 }
             }
-        });
 
-        return redirect()->back()->with('success', $count . ' Students Fee Invoice Generated successfully');
+            if (!empty($records)) {
+                StudentFee::insert($records);
+            }
+
+            DB::commit();
+
+            if ($count === 0) {
+                return back()->with('error', 'কোনো শিক্ষার্থীর জন্য ফি নির্ধারণ করা যায়নি। অনুগ্রহ করে ফি সেটআপ পরীক্ষা করুন।');
+            }
+
+            return redirect()->back()->with('success', $count . ' জন শিক্ষার্থীর ফি বিল সফলভাবে তৈরি হয়েছে।');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'ফি তৈরিতে ত্রুটি হয়েছে: ' . $e->getMessage());
+        }
     }
 
     public function destroy($tenant, $id)

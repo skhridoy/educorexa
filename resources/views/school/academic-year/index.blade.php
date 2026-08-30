@@ -10,8 +10,8 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-calendar-days me-2"></i> Academic Years Management</h1>
-                <p class="page-subtitle">Set up and manage academic year calendars and session statuses.</p>
+                <h1 class="page-title"><i class="fa-solid fa-calendar-days me-2"></i> {{ __('Academic Years Management') }}</h1>
+                <p class="page-subtitle">{{ __('Set up and manage academic year calendars and session statuses.') }}</p>
             </div>
         </div>
 
@@ -27,24 +27,24 @@
             <div class="col-lg-4">
                 <div class="form-card">
                     <h5 class="mb-4 fw-bold text-primary">
-                        <i class="fa-solid fa-plus me-2"></i> Create Academic Year
+                        <i class="fa-solid fa-plus me-2"></i> {{ __('Create Academic Year') }}
                     </h5>
                     <form action="{{ route('academic-year.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold">Academic Year Title <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label fw-semibold">{{ __('Academic Year Title') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="e.g. 2026-2027 or 2026" required>
                         </div>
                         <div class="mb-3">
-                            <label for="start_date" class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
+                            <label for="start_date" class="form-label fw-semibold">{{ __('Start Date') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="start_date" name="start_date" required>
                         </div>
                         <div class="mb-3">
-                            <label for="end_date" class="form-label fw-semibold">End Date <span class="text-danger">*</span></label>
+                            <label for="end_date" class="form-label fw-semibold">{{ __('End Date') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="end_date" name="end_date" required>
                         </div>
                         <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-check me-1"></i> Create Session
+                            <i class="fa-solid fa-check me-1"></i> {{ __('Create Session') }}
                         </button>
                     </form>
                 </div>
@@ -54,9 +54,9 @@
             <div class="col-lg-8">
                 <div class="data-table-card">
                     <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
-                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-indigo-600"></i> All Academic Years</h5>
+                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-indigo-600"></i> {{ __('All Academic Years') }}</h5>
                         <span class="badge bg-light text-muted border px-3 py-1" style="border-radius:10px;">
-                            {{ count($academicYears) }} Sessions
+                            {{ count($academicYears) }} {{ __('Sessions') }}
                         </span>
                     </div>
 
@@ -64,11 +64,11 @@
                         <table class="table data-table mb-0 align-middle">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-3 px-3">Session Name</th>
-                                    <th class="py-3 px-3 text-center">Start Date</th>
-                                    <th class="py-3 px-3 text-center">End Date</th>
-                                    <th class="py-3 px-3 text-center">Status</th>
-                                    <th class="py-3 px-3 text-end">Action</th>
+                                    <th class="py-3 px-3">{{ __('Session Name') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('Start Date') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('End Date') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('Status') }}</th>
+                                    <th class="py-3 px-3 text-end">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -96,15 +96,15 @@
                                         @if($academicYear->is_active)
                                             <form action="{{ route('academic-year.toggleInactive', ['academic_year' => $academicYear->id]) }}" method="POST" class="d-inline">
                                                 @csrf
-                                                <button type="submit" class="badge-completed border-0 cursor-pointer" title="Click to make Inactive">
-                                                    <span class="pulse-dot pulse-dot-green"></span> Active
+                                                <button type="submit" class="badge-completed border-0 cursor-pointer" title="{{ __('Click to make Inactive') }}">
+                                                    <span class="pulse-dot pulse-dot-green"></span> {{ __('Active') }}
                                                 </button>
                                             </form>
                                         @else
                                             <form action="{{ route('academic-year.toggleActive', ['academic_year' => $academicYear->id]) }}" method="POST" class="d-inline">
                                                 @csrf
-                                                <button type="submit" class="badge-pending border-0 cursor-pointer" title="Click to make Active">
-                                                    <span class="pulse-dot pulse-dot-amber"></span> Inactive
+                                                <button type="submit" class="badge-pending border-0 cursor-pointer" title="{{ __('Click to make Active') }}">
+                                                    <span class="pulse-dot pulse-dot-amber"></span> {{ __('Inactive') }}
                                                 </button>
                                             </form>
                                         @endif
@@ -114,7 +114,7 @@
                                             <form action="{{ route('academic-year.destroy', ['academic_year' => $academicYear->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -125,7 +125,7 @@
                                 <tr>
                                     <td colspan="5" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fa-2x mb-2 d-block"></i>
-                                        No Academic Years found.
+                                        {{ __('No Academic Years found.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -143,14 +143,14 @@
 <script>
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this academic year?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to delete this academic year?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}"
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();
@@ -159,3 +159,4 @@
     }
 </script>
 @endsection
+

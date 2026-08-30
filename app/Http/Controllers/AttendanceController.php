@@ -337,4 +337,145 @@ class AttendanceController extends Controller
             'studentLogs'
         ));
     }
+
+    /**
+     * Display ID Card QR Attendance Scanner Page.
+     */
+    public function qrScan($tenant, Request $request)
+    {
+        $schoolId = auth()->user()->school_id;
+        $today = now()->toDateString();
+
+        $totalStudents = Student::where('school_id', $schoolId)->where('status', 'active')->count();
+        $presentCountToday = Attendance::where('school_id', $schoolId)->where('date', $today)->where('status', 'present')->count();
+        $attendanceRate = $totalStudents > 0 ? round(($presentCountToday / $totalStudents) * 100, 1) : 0;
+
+        // Recent today's logs
+        $recentLogs = Attendance::with(['student.class', 'student.section'])
+            ->where('school_id', $schoolId)
+            ->where('date', $today)
+            ->where('status', 'present')
+            ->latest('updated_at')
+            ->take(15)
+            ->get();
+
+        return view('school.attendance.qr_scan', compact(
+            'totalStudents',
+            'presentCountToday',
+            'attendanceRate',
+            'today',
+            'recentLogs'
+        ));
+    }
+
+    /**
+     * Process QR code scan and mark student present.
+     */
+    public function recordQrAttendance($tenant, Request $request)
+    {
+        $schoolId = auth()->user()->school_id;
+        $today = $request->date ?? now()->toDateString();
+        $rawCode = trim($request->qr_code_data ?? '');
+
+        if (empty($rawCode)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'কিউআর কোডের তথ্য পাওয়া যায়নি!'
+            ], 400);
+        }
+
+        // Identify Teacher if logged in user is a teacher
+        $teacher = Teacher::where('email', auth()->user()->email)->where('school_id', $schoolId)->first();
+
+        // 1. Direct match by student_id or id
+        $student = Student::with(['class', 'section', 'academicYear'])
+            ->where('school_id', $schoolId)
+            ->where(function($q) use ($rawCode) {
+                $q->where('student_id', $rawCode)
+                  ->orWhere('id', $rawCode);
+            })->first();
+
+        // 2. Extract STD-XXXX pattern via regex
+        if (!$student && preg_match('/(STD-[A-Za-z0-9_-]+)/i', $rawCode, $matches)) {
+            $extractedId = $matches[1];
+            $student = Student::with(['class', 'section', 'academicYear'])
+                ->where('school_id', $schoolId)
+                ->where('student_id', $extractedId)
+                ->first();
+        }
+
+        // 3. Extract from "ID: XXXX" format
+        if (!$student && preg_match('/ID:\s*([^\|\n\r]+)/i', $rawCode, $matches)) {
+            $parsedId = trim($matches[1]);
+            $student = Student::with(['class', 'section', 'academicYear'])
+                ->where('school_id', $schoolId)
+                ->where(function($q) use ($parsedId) {
+                    $q->where('student_id', $parsedId)
+                      ->orWhere('id', $parsedId);
+                })->first();
+        }
+
+        // If not found
+        if (!$student) {
+            return response()->json([
+                'success' => false,
+                'student_id' => $rawCode,
+                'message' => "❌ শিক্ষার্থী পাওয়া যায়নি! (ID: {$rawCode})",
+            ], 404);
+        }
+
+        // Check if attendance already recorded today
+        $existing = Attendance::where('school_id', $schoolId)
+            ->where('student_id', $student->id)
+            ->where('date', $today)
+            ->first();
+
+        $alreadyMarked = false;
+
+        if ($existing && $existing->status === 'present') {
+            $alreadyMarked = true;
+            $message = "⚠️ [{$student->student_id}] {$student->name} এর আজকের হাজিরা ইতিমধ্যে নেওয়া হয়েছে!";
+        } else {
+            Attendance::updateOrCreate(
+                [
+                    'school_id'  => $schoolId,
+                    'student_id' => $student->id,
+                    'date'       => $today,
+                ],
+                [
+                    'class_id'   => $student->class_id,
+                    'section_id' => $student->section_id,
+                    'teacher_id' => $teacher ? $teacher->id : null,
+                    'status'     => 'present',
+                ]
+            );
+            $message = "✅ [{$student->student_id}] {$student->name} - হাজিরা সফলভাবে নিশ্চিত করা হয়েছে!";
+        }
+
+        $totalPresentToday = Attendance::where('school_id', $schoolId)->where('date', $today)->where('status', 'present')->count();
+        $totalActiveStudents = Student::where('school_id', $schoolId)->where('status', 'active')->count();
+        $rate = $totalActiveStudents > 0 ? round(($totalPresentToday / $totalActiveStudents) * 100, 1) : 0;
+
+        return response()->json([
+            'success' => true,
+            'already_marked' => $alreadyMarked,
+            'message' => $message,
+            'student' => [
+                'id'           => $student->id,
+                'student_id'   => $student->student_id,
+                'name'         => $student->name,
+                'roll'         => $student->roll ?? 'N/A',
+                'class_name'   => $student->class ? $student->class->name : 'N/A',
+                'section_name' => $student->section ? $student->section->name : 'N/A',
+                'photo'        => $student->photo ? asset($student->photo) : asset('assets/images/profile.webp'),
+                'status'       => 'present',
+                'time'         => now()->format('h:i:s A'),
+            ],
+            'stats' => [
+                'today_present'   => $totalPresentToday,
+                'total_students'  => $totalActiveStudents,
+                'attendance_rate' => $rate
+            ]
+        ]);
+    }
 }

@@ -500,23 +500,23 @@
             {{-- Page Header --}}
             <div class="page-header-card mb-4">
                 <div class="page-header-content">
-                    <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Subject Assignment</h1>
-                    <p class="page-subtitle">Update subject marks and details for the selected class.</p>
+                    <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i> {{ __('Edit Subject Assignment') }}</h1>
+                    <p class="page-subtitle">{{ __('Update subject marks and details for the selected class.') }}</p>
                 </div>
             </div>
 
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="form-card sticky-top" style="top: 90px;">
-                        <h5 class="mb-4 fw-bold text-primary"><i class="fa-solid fa-pencil me-2"></i> Update Assignment</h5>
+                        <h5 class="mb-4 fw-bold text-primary"><i class="fa-solid fa-pencil me-2"></i> {{ __('Update Assignment') }}</h5>
                         <form id="assignSubjectForm" action="{{ route('subjects.assign.update', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}" method="POST">
                             @csrf
                             @method('PUT')
 
                             <div class="mb-3">
-                                <label for="class_id" class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
+                                <label for="class_id" class="form-label fw-semibold">{{ __('Class') }} <span class="text-danger">*</span></label>
                                 <select id="class_id" name="class_id" class="form-select" required>
-                                    <option value="">Select Class</option>
+                                    <option value="">{{ __('Select Class') }}</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}" data-category-id="{{ $class->school_category_id }}" data-category-name="{{ $class->category?->name }}" {{ old('class_id', $assignment->class_id) == $class->id ? 'selected' : '' }}>
                                             {{ $class->name }} @if($class->category) ({{ $class->category->name }}) @endif
@@ -529,18 +529,18 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="category_display" class="form-label fw-semibold">Category</label>
+                                <label for="category_display" class="form-label fw-semibold">{{ __('Category') }}</label>
                                 <input type="text" id="category_display" class="form-control" readonly 
-                                    placeholder="Category will show based on class"
+                                    placeholder="{{ __('Category will show based on class') }}"
                                     value="{{ $assignment->class->category?->name ?? '' }}">
                                 <input type="hidden" name="school_category_id" id="school_category_id" 
                                     value="{{ old('school_category_id', $assignment->school_category_id) }}">
                             </div>
 
                             <div class="mb-3">
-                                <label for="school_sub_category_id" class="form-label fw-semibold">Sub Category</label>
+                                <label for="school_sub_category_id" class="form-label fw-semibold">{{ __('Sub Category') }}</label>
                                 <select id="school_sub_category_id" name="school_sub_category_id" class="form-select" {{ !isset($assignment->school_sub_category_id) ? 'disabled' : '' }}>
-                                    <option value="">Select Sub Category</option>
+                                    <option value="">{{ __('Select Sub Category') }}</option>
                                     @if(isset($assignment->class) && $assignment->class->school_category_id)
                                         @foreach($assignment->class->category?->subcategories ?? [] as $sub)
                                             <option value="{{ $sub->id }}" {{ old('school_sub_category_id', $assignment->school_sub_category_id) == $sub->id ? 'selected' : '' }}>
@@ -552,9 +552,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="subject_id" class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
+                                <label for="subject_id" class="form-label fw-semibold">{{ __('Subject') }} <span class="text-danger">*</span></label>
                                 <select id="subject_id" name="subject_id" class="form-select" required>
-                                    <option value="">Select Subject</option>
+                                    <option value="">{{ __('Select Subject') }}</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" {{ old('subject_id', $assignment->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
                                     @endforeach
@@ -565,16 +565,16 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="full_mark" class="form-label fw-semibold">Full Mark <span class="text-danger">*</span></label>
-                                <input type="number" id="full_mark" name="full_mark" class="form-control" placeholder="Enter full mark" value="{{ old('full_mark', $assignment->full_mark) }}" required>
+                                <label for="full_mark" class="form-label fw-semibold">{{ __('Full Mark') }} <span class="text-danger">*</span></label>
+                                <input type="number" id="full_mark" name="full_mark" class="form-control" placeholder="{{ __('Enter full mark') }}" value="{{ old('full_mark', $assignment->full_mark) }}" required>
                                 @error('full_mark')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="pass_mark" class="form-label fw-semibold">Pass Marks <span class="text-danger">*</span></label>
-                                <input type="number" id="pass_mark" name="pass_mark" class="form-control" placeholder="Pass Marks" value="{{ old('pass_mark', $assignment->pass_mark) }}" required>
+                                <label for="pass_mark" class="form-label fw-semibold">{{ __('Pass Marks') }} <span class="text-danger">*</span></label>
+                                <input type="number" id="pass_mark" name="pass_mark" class="form-control" placeholder="{{ __('Pass Marks') }}" value="{{ old('pass_mark', $assignment->pass_mark) }}" required>
                                 @error('pass_mark')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
@@ -582,10 +582,10 @@
 
                             <div class="d-flex gap-2 pt-2">
                                 <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-1.5 px-3 fw-bold" style="font-size: 0.84rem; border-radius: 8px;">
-                                    <i class="fa-solid fa-check me-1"></i> Update Assignment
+                                    <i class="fa-solid fa-check me-1"></i> {{ __('Update Assignment') }}
                                 </button>
                                 <a href="{{ route('subjects.assign', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" class="btn btn-outline-secondary py-1.5 px-3" style="font-size: 0.84rem; border-radius: 8px;">
-                                    Cancel
+                                    {{ __('Cancel') }}
                                 </a>
                             </div>
                         </form>
@@ -598,22 +598,22 @@
                     <div class="filter-card mb-3">
                         <form id="filterForm" onsubmit="return false;">
                             <div class="row g-2 align-items-center">
-                                <div class="col-md-6">
+                                <div class="col-12 col-md-6">
                                     <div class="search-icon-group">
                                         <i class="fa-solid fa-magnifying-glass"></i>
-                                        <input type="text" name="search" id="searchInput" class="form-control form-control-sm" placeholder="Search by class or subject..." value="{{ request('search') }}">
+                                        <input type="text" name="search" id="searchInput" class="form-control form-control-sm" placeholder="{{ __('Search by class or subject...') }}" value="{{ request('search') }}">
                                     </div>
                                 </div>
-                                <div class="col-8 col-md-5">
+                                <div class="col-9 col-md-5">
                                     <select id="filterClassId" name="class_id" class="form-select form-select-sm">
-                                        <option value="">All Classes</option>
+                                        <option value="">{{ __('All Classes') }}</option>
                                         @foreach($classes as $class)
                                             <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-4 col-md-1 text-end">
-                                    <button type="button" id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm w-100" data-bs-toggle="tooltip" title="Reset Filters">
+                                <div class="col-3 col-md-1 text-end">
+                                    <button type="button" id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm w-100" data-bs-toggle="tooltip" title="{{ __('Reset Filters') }}">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </button>
                                 </div>
@@ -624,10 +624,10 @@
                     {{-- Class-wise Cards Header --}}
                     <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                         <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-primary"></i> Class-wise Subject Mapping
+                            <i class="fa-solid fa-layer-group text-primary"></i> {{ __('Class-wise Subject Mapping') }}
                         </h6>
                         <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
-                            {{ $totalAssignmentsCount ?? ($groupedAssignments->count() ? $groupedAssignments->flatten()->count() : 0) }} Total Mappings
+                            {{ $totalAssignmentsCount ?? ($groupedAssignments->count() ? $groupedAssignments->flatten()->count() : 0) }} {{ __('Total Mappings') }}
                         </span>
                     </div>
 

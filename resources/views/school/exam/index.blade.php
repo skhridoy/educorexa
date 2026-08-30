@@ -178,15 +178,15 @@
             <div class="page-header-content">
                 <div class="d-flex align-items-start align-items-md-center justify-content-between flex-wrap gap-2">
                     <div>
-                        <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i>Exams Management</h1>
-                        <p class="mb-0 opacity-85">Create, schedule and manage examinations &amp; result publishing</p>
+                        <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i>{{ __('Exams Management') }}</h1>
+                        <p class="mb-0 opacity-85">{{ __('Create, schedule and manage examinations & result publishing') }}</p>
                     </div>
                     <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 flex-wrap">
                         <button type="button" class="btn btn-sm btn-light fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#cloneExamModal" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
-                            <i class="fa-solid fa-copy me-1 text-primary"></i> Copy from Previous Year
+                            <i class="fa-solid fa-copy me-1 text-primary"></i> {{ __('Copy from Previous Year') }}
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-light fw-bold" data-bs-toggle="modal" data-bs-target="#bulkGenerateModal" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px; background: rgba(255,255,255,0.12);">
-                            <i class="fa-solid fa-wand-magic-sparkles me-1 text-warning"></i> Auto-Generate Standard Exams
+                            <i class="fa-solid fa-wand-magic-sparkles me-1 text-warning"></i> {{ __('Auto-Generate Standard Exams') }}
                         </button>
                     </div>
                 </div>
@@ -197,21 +197,21 @@
                         <div class="exam-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
                         <div>
                             <div class="exam-stat-val">{{ $allExamsCount ?? count($exams) }}</div>
-                            <div class="exam-stat-lbl">Total Exams</div>
+                            <div class="exam-stat-lbl">{{ __('Total Exams') }}</div>
                         </div>
                     </div>
                     <div class="exam-stat-card">
                         <div class="exam-stat-icon" style="background:rgba(34,197,94,0.3);"><i class="fa-solid fa-circle-check"></i></div>
                         <div>
                             <div class="exam-stat-val">{{ $activeExamsCount ?? 0 }}</div>
-                            <div class="exam-stat-lbl">Active Exams</div>
+                            <div class="exam-stat-lbl">{{ __('Active Exams') }}</div>
                         </div>
                     </div>
                     <div class="exam-stat-card">
                         <div class="exam-stat-icon" style="background:rgba(251,191,36,0.3);"><i class="fa-solid fa-square-poll-vertical"></i></div>
                         <div>
                             <div class="exam-stat-val">{{ $publishedCount ?? 0 }}</div>
-                            <div class="exam-stat-lbl">Results Published</div>
+                            <div class="exam-stat-lbl">{{ __('Results Published') }}</div>
                         </div>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                         <div class="btn-act btn-act-edit" style="width:32px; height:32px; border-radius:8px;">
                             <i class="fa-solid fa-plus"></i>
                         </div>
-                        <h5 class="fw-800 mb-0 text-dark" style="font-size:1rem;">Create New Exam</h5>
+                        <h5 class="fw-800 mb-0 text-dark" style="font-size:1rem;">{{ __('Create New Exam') }}</h5>
                     </div>
 
                     <form action="{{ route('exams.store', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" method="POST">
@@ -235,8 +235,8 @@
                         {{-- Exam Name --}}
                         <div class="mb-3">
                             <label for="name" class="form-label fw-700 text-secondary small d-flex align-items-center justify-content-between">
-                                <span><i class="fa-solid fa-pen text-indigo-500 me-1"></i>Exam Name <span class="text-danger">*</span></span>
-                                <span class="text-muted" style="font-size: 0.7rem;">Quick Suggestions:</span>
+                                <span><i class="fa-solid fa-pen text-indigo-500 me-1"></i>{{ __('Exam Name') }} <span class="text-danger">*</span></span>
+                                <span class="text-muted" style="font-size: 0.7rem;">{{ __('Quick Suggestions:') }}</span>
                             </label>
                             <input type="text"
                                    class="form-control @error('name') is-invalid @enderror"
@@ -261,13 +261,13 @@
                         {{-- Academic Year --}}
                         <div class="mb-3">
                             <label for="year_id" class="form-label fw-700 text-secondary small">
-                                <i class="fa-solid fa-calendar-days me-1"></i>Academic Year <span class="text-danger">*</span>
+                                <i class="fa-solid fa-calendar-days me-1"></i>{{ __('Academic Year') }} <span class="text-danger">*</span>
                             </label>
                             <select class="form-select @error('year_id') is-invalid @enderror" id="year_id" name="year_id" required>
-                                <option value="" selected disabled>-- Select Year --</option>
+                                <option value="" selected disabled>{{ __('-- Select Year --') }}</option>
                                 @foreach ($years as $year)
                                     <option value="{{ $year->id }}" {{ old('year_id') == $year->id ? 'selected' : '' }}>
-                                        {{ $year->name }} @if($year->is_active) (Active) @endif
+                                        {{ $year->name }} @if($year->is_active) ({{ __('Active') }}) @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -277,7 +277,7 @@
                         {{-- Category (multi-select checkboxes) --}}
                         <div class="mb-3">
                             <label class="form-label fw-700 text-secondary small">
-                                <i class="fa-solid fa-tags me-1"></i>School Category <span class="text-danger">*</span>
+                                <i class="fa-solid fa-tags me-1"></i>{{ __('School Category') }} <span class="text-danger">*</span>
                                 <small class="text-muted ms-1">(একাধিক সিলেক্ট করা যাবে)</small>
                             </label>
                             <div class="border rounded-3 p-2" style="max-height:120px; overflow-y:auto;">
@@ -301,7 +301,7 @@
                         <div class="row g-2 mb-4">
                             <div class="col-6">
                                 <label for="start_date" class="form-label fw-700 text-secondary small">
-                                    <i class="fa-regular fa-clock text-success me-1"></i>Start Date <span class="text-danger">*</span>
+                                    <i class="fa-regular fa-clock text-success me-1"></i>{{ __('Start Date') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="date"
                                        class="form-control @error('start_date') is-invalid @enderror"
@@ -313,7 +313,7 @@
                             </div>
                             <div class="col-6">
                                 <label for="end_date" class="form-label fw-700 text-secondary small">
-                                    <i class="fa-regular fa-circle-check text-danger me-1"></i>End Date <span class="text-danger">*</span>
+                                    <i class="fa-regular fa-circle-check text-danger me-1"></i>{{ __('End Date') }} <span class="text-danger">*</span>
                                 </label>
                                 <input type="date"
                                        class="form-control @error('end_date') is-invalid @enderror"
@@ -326,7 +326,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold shadow-sm" style="border-radius: 8px; font-size: 0.85rem;">
-                            <i class="fa-solid fa-plus-circle me-1"></i> Create Exam
+                            <i class="fa-solid fa-plus-circle me-1"></i> {{ __('Create Exam') }}
                         </button>
                     </form>
                 </div>
@@ -341,12 +341,12 @@
                             <div class="col-md-4">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search exam name..." value="{{ request('search') }}">
+                                    <input type="text" name="search" class="form-control border-start-0" placeholder="{{ __('Search exam name...') }}" value="{{ request('search') }}">
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">
                                 <select name="year_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="">All Academic Years</option>
+                                    <option value="">{{ __('All Academic Years') }}</option>
                                     @foreach ($years as $year)
                                         <option value="{{ $year->id }}" {{ request('year_id') == $year->id ? 'selected' : '' }}>
                                             {{ $year->name }}
@@ -356,7 +356,7 @@
                             </div>
                             <div class="col-6 col-md-3">
                                 <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="">All Categories</option>
+                                    <option value="">{{ __('All Categories') }}</option>
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
                                             {{ $cat->name }}
@@ -365,7 +365,7 @@
                                 </select>
                             </div>
                             <div class="col-12 col-md-2 d-flex gap-1">
-                                <button type="submit" class="btn btn-primary btn-sm flex-grow-1" style="border-radius:6px;">Filter</button>
+                                <button type="submit" class="btn btn-primary btn-sm flex-grow-1" style="border-radius:6px;">{{ __('Filter') }}</button>
                                 <a href="{{ route('exams.index', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" class="btn btn-outline-secondary btn-sm" title="Reset" style="border-radius:6px;">
                                     <i class="fa-solid fa-rotate-left"></i>
                                 </a>
@@ -382,12 +382,12 @@
                             <thead>
                                 <tr>
                                     <th style="width: 45px;" class="text-center">#</th>
-                                    <th>Exam Details</th>
-                                    <th>Duration</th>
-                                    <th class="text-center">Time Status</th>
-                                    <th class="text-center">Active State</th>
-                                    <th class="text-center">Result</th>
-                                    <th class="text-end pe-3" style="width: 90px;">Action</th>
+                                    <th>{{ __('Exam Details') }}</th>
+                                    <th>{{ __('Duration') }}</th>
+                                    <th class="text-center">{{ __('Time Status') }}</th>
+                                    <th class="text-center">{{ __('Active State') }}</th>
+                                    <th class="text-center">{{ __('Result') }}</th>
+                                    <th class="text-end pe-3" style="width: 90px;">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -423,10 +423,10 @@
                                                     default    => 'badge-inactive',
                                                 };
                                                 $stateText = match($state) {
-                                                    'ongoing'  => 'Ongoing',
-                                                    'upcoming' => 'Upcoming',
-                                                    'finished' => 'Finished',
-                                                    default    => 'Inactive',
+                                                    'ongoing'  => __('Ongoing'),
+                                                    'upcoming' => __('Upcoming'),
+                                                    'finished' => __('Finished'),
+                                                    default    => __('Inactive'),
                                                 };
                                             @endphp
                                             <span class="badge-status {{ $badgeClass }}">
@@ -480,7 +480,7 @@
                                         <td colspan="7" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fa-solid fa-folder-open fa-2x mb-2 text-secondary opacity-50"></i>
-                                                <p class="mb-0">No exams found for the selected criteria.</p>
+                                                <p class="mb-0">{{ __('No exams found for the selected criteria.') }}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -518,13 +518,13 @@
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between pt-2 border-top">
                                     <div>
-                                        <span class="small text-muted me-1">Active:</span>
+                                        <span class="small text-muted me-1">{{ __('Active:') }}</span>
                                         <div class="form-check form-switch d-inline-block">
                                             <input class="form-check-input statusToggle" type="checkbox" data-id="{{ $exam->id }}" {{ $exam->status == 1 ? 'checked' : '' }}>
                                         </div>
                                     </div>
                                     <div>
-                                        <span class="small text-muted me-1">Publish:</span>
+                                        <span class="small text-muted me-1">{{ __('Publish:') }}</span>
                                         <div class="form-check form-switch d-inline-block">
                                             <input class="form-check-input resultToggle" type="checkbox" data-id="{{ $exam->id }}" {{ $exam->is_published ? 'checked' : '' }}>
                                         </div>
@@ -533,7 +533,7 @@
                             </div>
                         @empty
                             <div class="text-center py-4 text-muted">
-                                No exams found.
+                                {{ __('No exams found.') }}
                             </div>
                         @endforelse
                     </div>
@@ -556,7 +556,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden; box-shadow:0 20px 50px rgba(0,0,0,0.15);">
             <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e293b, #334155); padding: 16px 20px;">
-                <h5 class="modal-title fw-bold" id="editExamModalLabel"><i class="fa-solid fa-pen-to-square me-2" style="color:#818cf8;"></i> Edit Exam</h5>
+                <h5 class="modal-title fw-bold" id="editExamModalLabel"><i class="fa-solid fa-pen-to-square me-2" style="color:#818cf8;"></i> {{ __('Edit Exam') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editForm" method="POST">
@@ -566,8 +566,8 @@
                     <!-- Dynamic fields loaded by AJAX -->
                 </div>
                 <div class="modal-footer bg-light p-2.5 border-0">
-                    <button type="button" class="btn btn-outline-secondary px-3 py-1.5 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 0.84rem;">Cancel</button>
-                    <button type="submit" class="btn btn-primary-gradient px-3 py-1.5 fw-bold" style="border-radius: 8px; font-size: 0.84rem;">Save Changes</button>
+                    <button type="button" class="btn btn-outline-secondary px-3 py-1.5 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 0.84rem;">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary-gradient px-3 py-1.5 fw-bold" style="border-radius: 8px; font-size: 0.84rem;">{{ __('Save Changes') }}</button>
                 </div>
             </form>
         </div>

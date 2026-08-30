@@ -262,7 +262,7 @@ class StudentController extends Controller
             if (method_exists($user, 'assignRole')) {
                     $user->assignRole('student');
                 }
-            // ২. স্টুডেন্ট তৈরি (school_category_id সহ)
+            // ২. স্টুডেন্ট তৈরি (school_category_id ও বাংলা ফিল্ড সহ)
             $student = Student::create([
                 'user_id'                => $user->id,
                 'school_id'              => $schoolId,
@@ -274,18 +274,24 @@ class StudentController extends Controller
                 'student_id'             => $this->generateUniqueStudentId($schoolId, $academicYear),
                 'roll'                   => $this->getNextRoll($schoolId, $validated['class_id'], $academicYear->id, $request->school_sub_category_id),
                 'name'                   => $validated['name'],
+                'name_bn'                => $request->name_bn,
                 'fathers_name'           => $request->fathers_name ?? $request->father_name,
+                'fathers_name_bn'        => $request->fathers_name_bn,
                 'mothers_name'           => $request->mothers_name ?? $request->mother_name,
+                'mothers_name_bn'        => $request->mothers_name_bn,
                 'father_nid'             => $request->father_nid,
                 'mother_nid'             => $request->mother_nid,
                 'student_birth_nid'      => $request->student_birth_nid,
                 'previous_school'        => $request->previous_school,
+                'previous_school_bn'     => $request->previous_school_bn,
                 'previous_class'         => $request->previous_class,
+                'previous_class_bn'      => $request->previous_class_bn,
                 'date_of_birth'          => $request->date_of_birth,
                 'gender'                 => $request->gender ? strtolower($request->gender) : null,
                 'contact_number'         => $request->contact_number ?? $request->phone,
                 'admission_date'         => $request->admission_date,
                 'address'                => $request->address,
+                'address_bn'             => $request->address_bn,
                 'religion'               => $request->religion,
                 'blood_group'            => $request->blood_group,
                 'photo'                  => $photoPath,
@@ -351,14 +357,17 @@ class StudentController extends Controller
 
         $validated = $request->validate([
             'name'                   => 'required|string|max:255',
+            'name_bn'                => 'nullable|string|max:255',
             'email'                  => 'required|email|unique:users,email,' . $userId,
             'class_id'               => 'nullable|exists:classes,id',
             'section_id'             => 'nullable|exists:sections,id',
             'school_category_id'     => 'nullable',
             'school_sub_category_id' => 'nullable',
             'fathers_name'           => 'nullable|string|max:255',
+            'fathers_name_bn'        => 'nullable|string|max:255',
             'father_name'            => 'nullable|string|max:255',
             'mothers_name'           => 'nullable|string|max:255',
+            'mothers_name_bn'        => 'nullable|string|max:255',
             'mother_name'            => 'nullable|string|max:255',
             'father_nid'             => 'nullable|string|max:20',
             'mother_nid'             => 'nullable|string|max:20',
@@ -370,9 +379,12 @@ class StudentController extends Controller
             'religion'               => 'nullable|string|max:50',
             'blood_group'            => 'nullable|string|max:10',
             'previous_school'        => 'nullable|string|max:255',
+            'previous_school_bn'     => 'nullable|string|max:255',
             'previous_class'         => 'nullable|string|max:255',
+            'previous_class_bn'      => 'nullable|string|max:255',
             'admission_date'         => 'nullable|date',
             'address'                => 'nullable|string|max:500',
+            'address_bn'             => 'nullable|string|max:500',
             'photo'                  => 'nullable|image|max:2048',
         ]);
 
@@ -409,12 +421,15 @@ class StudentController extends Controller
 
             $student->update([
                 'name'                   => $validated['name'],
+                'name_bn'                => $request->has('name_bn') ? $request->name_bn : $student->name_bn,
                 'class_id'               => $request->filled('class_id') ? $request->class_id : $student->class_id,
                 'school_category_id'     => $request->filled('school_category_id') ? $request->school_category_id : $student->school_category_id,
                 'school_sub_category_id' => $request->filled('school_sub_category_id') ? $request->school_sub_category_id : $student->school_sub_category_id,
                 'section_id'             => $request->filled('section_id') ? $request->section_id : $student->section_id,
                 'fathers_name'           => $request->fathers_name ?? $request->father_name ?? $student->fathers_name,
+                'fathers_name_bn'        => $request->has('fathers_name_bn') ? $request->fathers_name_bn : $student->fathers_name_bn,
                 'mothers_name'           => $request->mothers_name ?? $request->mother_name ?? $student->mothers_name,
+                'mothers_name_bn'        => $request->has('mothers_name_bn') ? $request->mothers_name_bn : $student->mothers_name_bn,
                 'father_nid'             => $request->has('father_nid') ? $request->father_nid : $student->father_nid,
                 'mother_nid'             => $request->has('mother_nid') ? $request->mother_nid : $student->mother_nid,
                 'student_birth_nid'      => $request->has('student_birth_nid') ? $request->student_birth_nid : $student->student_birth_nid,
@@ -422,9 +437,12 @@ class StudentController extends Controller
                 'gender'                 => $request->gender ? strtolower($request->gender) : $student->gender,
                 'contact_number'         => $request->contact_number ?? $request->phone ?? $student->contact_number,
                 'previous_school'        => $request->has('previous_school') ? $request->previous_school : $student->previous_school,
+                'previous_school_bn'     => $request->has('previous_school_bn') ? $request->previous_school_bn : $student->previous_school_bn,
                 'previous_class'         => $request->has('previous_class') ? $request->previous_class : $student->previous_class,
+                'previous_class_bn'      => $request->has('previous_class_bn') ? $request->previous_class_bn : $student->previous_class_bn,
                 'admission_date'         => $request->admission_date ?? $student->admission_date,
                 'address'                => $request->has('address') ? $request->address : $student->address,
+                'address_bn'             => $request->has('address_bn') ? $request->address_bn : $student->address_bn,
                 'religion'               => $request->religion ?? $student->religion,
                 'blood_group'            => $request->blood_group ?? $student->blood_group,
                 'photo'                  => $photoPath,

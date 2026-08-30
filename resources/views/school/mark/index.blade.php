@@ -288,13 +288,13 @@
         <div class="entry-hero mb-4">
             <div class="entry-hero-content d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h1 class="entry-hero-title"><i class="fa-solid fa-file-signature me-2"></i>Marks Entry</h1>
-                    <p class="entry-hero-subtitle">Record and manage student academic performance</p>
-                    <div class="entry-hero-pill"><i class="fa-solid fa-bolt"></i> Auto-saves on every input</div>
+                    <h1 class="entry-hero-title"><i class="fa-solid fa-file-signature me-2"></i>{{ __('Marks Entry') }}</h1>
+                    <p class="entry-hero-subtitle">{{ __('Record and manage student academic performance') }}</p>
+                    <div class="entry-hero-pill"><i class="fa-solid fa-bolt"></i> {{ __('Auto-saves on every input') }}</div>
                 </div>
                 <a href="{{ route('marks.import.form', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-hero-import">
-                    <i class="fa-solid fa-file-arrow-up"></i> Import Marks
+                    <i class="fa-solid fa-file-arrow-up"></i> {{ __('Import Marks') }}
                 </a>
             </div>
         </div>
@@ -304,32 +304,32 @@
             <form method="GET" action="{{ route('marks.index', ['tenant' => auth()->user()->school->slug]) }}">
                 <div class="row align-items-end g-2">
                     <div class="col-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-file-pen"></i> Exam</label>
+                        <label class="filter-label"><i class="fa-solid fa-file-pen"></i> {{ __('Exam Name') }}</label>
                         <select name="exam_id" class="form-select">
-                            <option value="">Select Exam</option>
+                            <option value="">{{ __('Select Exam') }}</option>
                             @foreach($exams as $exam)
                                 <option value="{{ $exam->id }}" {{ $examId == $exam->id ? 'selected' : '' }}>{{ $exam->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-chalkboard"></i> Class</label>
+                        <label class="filter-label"><i class="fa-solid fa-chalkboard"></i> {{ __('Class') }}</label>
                         <select name="class_id" id="class_id" class="form-select">
-                            <option value="">Select Class</option>
+                            <option value="">{{ __('Select Class') }}</option>
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}" {{ $classId == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-book-open"></i> Subject</label>
+                        <label class="filter-label"><i class="fa-solid fa-book-open"></i> {{ __('Subject') }}</label>
                         <select id="subject_id" name="subject_id" class="form-select">
-                            <option value="">Select Subject</option>
+                            <option value="">{{ __('Select Subject') }}</option>
                         </select>
                     </div>
                     <div class="col-6 col-md-3">
                         <button type="submit" class="btn-load-students">
-                            <i class="fa-solid fa-arrows-rotate"></i> Load Students
+                            <i class="fa-solid fa-arrows-rotate"></i> {{ __('Load Students') }}
                         </button>
                     </div>
                 </div>
@@ -354,7 +354,7 @@
                 @endif
             @endforeach
             @if($students->count())
-                <span class="filter-tag green"><i class="fa-solid fa-users" style="font-size:0.65rem;"></i> {{ $students->count() }} Students</span>
+                <span class="filter-tag green"><i class="fa-solid fa-users" style="font-size:0.65rem;"></i> {{ $students->count() }} {{ __('Students') }}</span>
             @endif
         </div>
         @endif
@@ -369,9 +369,9 @@
                 @else
                     <div class="entry-empty-card">
                         <div class="entry-empty-icon"><i class="fa-solid fa-user-group"></i></div>
-                        <h5 class="fw-bold mb-2" style="color:#1e293b;">No Students to Display</h5>
+                        <h5 class="fw-bold mb-2" style="color:#1e293b;">{{ __('No Students to Display') }}</h5>
                         <p class="text-muted mb-0" style="font-size:0.88rem;">
-                            Please select an exam, class, and subject above to begin marks entry.
+                            {{ __('Please select an exam, class, and subject above to begin marks entry.') }}
                         </p>
                     </div>
                 @endif
@@ -383,10 +383,10 @@
 
                     <div class="sidebar-card-header">
                         <h6 class="sidebar-card-header-title">
-                            <i class="fa-solid fa-circle-check"></i> Submitted Subjects
+                            <i class="fa-solid fa-circle-check"></i> {{ __('Submitted Subjects') }}
                         </h6>
                         @if($submittedSubjects->count() > 0)
-                            <span class="sidebar-count-badge">{{ $submittedSubjects->count() }} done</span>
+                            <span class="sidebar-count-badge">{{ $submittedSubjects->count() }} {{ __('done') }}</span>
                         @endif
                     </div>
 
@@ -394,12 +394,12 @@
                         @if(!$classId || !$examId)
                             <div class="sidebar-empty">
                                 <div class="sidebar-empty-icon"><i class="fa-solid fa-filter"></i></div>
-                                <p class="sidebar-empty-text">Select an <strong>Exam</strong> and <strong>Class</strong> to see submitted subjects</p>
+                                <p class="sidebar-empty-text">{{ __('Select an Exam and Class to see submitted subjects') }}</p>
                             </div>
                         @elseif($submittedSubjects->isEmpty())
                             <div class="sidebar-empty">
                                 <div class="sidebar-empty-icon"><i class="fa-solid fa-inbox"></i></div>
-                                <p class="sidebar-empty-text">No marks submitted yet for this exam and class</p>
+                                <p class="sidebar-empty-text">{{ __('No marks submitted yet for this exam and class') }}</p>
                             </div>
                         @else
                             @foreach($submittedSubjects as $sub)
@@ -415,7 +415,7 @@
                                         <div class="sub-item-meta">
                                             <span class="sub-meta-tag entries-tag">
                                                 <i class="fa-solid fa-users" style="font-size:0.55rem;"></i>
-                                                {{ $sub['total_entries'] }} entries
+                                                {{ $sub['total_entries'] }} {{ __('entries') }}
                                             </span>
                                             @if($sub['full_mark'])
                                                 <span class="sub-meta-tag fm-tag">FM: {{ $sub['full_mark'] }}</span>
@@ -436,14 +436,14 @@
                         @endphp
                         <div class="sidebar-footer">
                             <div class="sidebar-progress">
-                                <span class="sidebar-progress-label"><i class="fa-solid fa-chart-pie" style="font-size:0.65rem;"></i> Progress</span>
+                                <span class="sidebar-progress-label"><i class="fa-solid fa-chart-pie" style="font-size:0.65rem;"></i> {{ __('Progress') }}</span>
                                 <span class="sidebar-progress-pct">{{ $progressPercent }}%</span>
                             </div>
                             <div class="progress-bar-track">
                                 <div class="progress-bar-fill" style="width:{{ $progressPercent }}%;"></div>
                             </div>
                             <div style="font-size:0.68rem;color:#94a3b8;margin-top:5px;text-align:center;">
-                                {{ $submittedCount }} of {{ $totalSubjects }} subjects submitted
+                                {{ $submittedCount }} {{ __('of') }} {{ $totalSubjects }} {{ __('subjects submitted') }}
                             </div>
                         </div>
                     @endif

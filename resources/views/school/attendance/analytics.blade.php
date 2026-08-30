@@ -550,12 +550,12 @@
             <div class="page-header-content">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div>
-                        <h1 class="page-title"><i class="fa-solid fa-chart-line me-2" style="color:#818cf8;"></i>Attendance Analytics & Daily Overview</h1>
-                        <p class="mb-0 opacity-85">Real-time attendance monitoring, class-wise stats & trend insights</p>
+                        <h1 class="page-title"><i class="fa-solid fa-chart-line me-2" style="color:#818cf8;"></i>{{ __('Attendance Analytics & Daily Overview') }}</h1>
+                        <p class="mb-0 opacity-85">{{ __('Real-time attendance monitoring, class-wise stats & trend insights') }}</p>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <a href="{{ route('attendances.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-light btn-sm fw-bold shadow-sm px-3 py-2" style="border-radius:10px;">
-                            <i class="fa-solid fa-clipboard-user me-1 text-indigo-600"></i> Take Attendance
+                            <i class="fa-solid fa-clipboard-user me-1 text-indigo-600"></i> {{ __('Take Attendance') }}
                         </a>
                     </div>
                 </div>
@@ -567,8 +567,8 @@
                         <div class="analytics-stat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                         <div>
                             <div class="analytics-stat-val">{{ number_format($totalStudents) }}</div>
-                            <div class="analytics-stat-lbl">Total Students</div>
-                            <div class="analytics-stat-sub"><i class="fa-solid fa-school me-1"></i>Active</div>
+                            <div class="analytics-stat-lbl">{{ __('Total Students') }}</div>
+                            <div class="analytics-stat-sub"><i class="fa-solid fa-school me-1"></i>{{ __('Active') }}</div>
                         </div>
                     </div>
 
@@ -577,7 +577,7 @@
                         <div class="analytics-stat-icon" style="background:rgba(34,197,94,0.3); color:#4ade80;"><i class="fa-solid fa-circle-check"></i></div>
                         <div>
                             <div class="analytics-stat-val">{{ number_format($presentCount) }}</div>
-                            <div class="analytics-stat-lbl">Present ({{ $presentPercentage }}%)</div>
+                            <div class="analytics-stat-lbl">{{ __('Present') }} ({{ $presentPercentage }}%)</div>
                             <div class="analytics-stat-sub"><i class="fa-regular fa-calendar me-1"></i>On {{ \Carbon\Carbon::parse($selectedDate)->format('d M') }}</div>
                         </div>
                     </div>
@@ -587,7 +587,7 @@
                         <div class="analytics-stat-icon" style="background:rgba(239,68,68,0.3); color:#f87171;"><i class="fa-solid fa-circle-xmark"></i></div>
                         <div>
                             <div class="analytics-stat-val">{{ number_format($absentCount) }}</div>
-                            <div class="analytics-stat-lbl">Absent ({{ $absentPercentage }}%)</div>
+                            <div class="analytics-stat-lbl">{{ __('Absent') }} ({{ $absentPercentage }}%)</div>
                             <div class="analytics-stat-sub"><i class="fa-regular fa-calendar me-1"></i>On {{ \Carbon\Carbon::parse($selectedDate)->format('d M') }}</div>
                         </div>
                     </div>
@@ -597,8 +597,8 @@
                         <div class="analytics-stat-icon" style="background:rgba(99,102,241,0.3); color:#a5b4fc;"><i class="fa-solid fa-list-check"></i></div>
                         <div>
                             <div class="analytics-stat-val">{{ $completedClassesCount }} / {{ $totalClassesCount }}</div>
-                            <div class="analytics-stat-lbl">Classes Done</div>
-                            <div class="analytics-stat-sub"><i class="fa-solid fa-clock-rotate-left me-1"></i>Submitted</div>
+                            <div class="analytics-stat-lbl">{{ __('Classes Done') }}</div>
+                            <div class="analytics-stat-sub"><i class="fa-solid fa-clock-rotate-left me-1"></i>{{ __('Submitted') }}</div>
                         </div>
                     </div>
                 </div>
@@ -612,7 +612,7 @@
                     {{-- Date Filter --}}
                     <div class="col-6 col-md-3">
                         <label class="form-label fw-bold text-secondary mb-1" style="font-size:0.73rem; text-transform:uppercase; letter-spacing:0.4px;">
-                            <i class="fa-regular fa-calendar me-1 text-primary"></i>Select Date
+                            <i class="fa-regular fa-calendar me-1 text-primary"></i>{{ __('Select Date') }}
                         </label>
                         <input type="date" name="date" class="form-control bg-light fw-semibold" value="{{ $selectedDate }}" onchange="this.form.submit()">
                     </div>
@@ -620,10 +620,10 @@
                     {{-- Class Filter --}}
                     <div class="col-6 col-md-3">
                         <label class="form-label fw-bold text-secondary mb-1" style="font-size:0.73rem; text-transform:uppercase; letter-spacing:0.4px;">
-                            <i class="fa-solid fa-school me-1 text-indigo-500"></i>Class
+                            <i class="fa-solid fa-school me-1 text-indigo-500"></i>{{ __('Class') }}
                         </label>
                         <select name="class_id" class="form-select bg-light fw-semibold" onchange="this.form.submit()">
-                            <option value="">All Classes</option>
+                            <option value="">{{ __('All Classes') }}</option>
                             @foreach($classes as $c)
                                 <option value="{{ $c->id }}" {{ $classId == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                             @endforeach
@@ -633,10 +633,10 @@
                     {{-- Section Filter --}}
                     <div class="col-6 col-md-3 analytics-filter-section-col">
                         <label class="form-label fw-bold text-secondary mb-1" style="font-size:0.73rem; text-transform:uppercase; letter-spacing:0.4px;">
-                            <i class="fa-solid fa-layer-group me-1 text-purple-500"></i>Section
+                            <i class="fa-solid fa-layer-group me-1 text-purple-500"></i>{{ __('Section') }}
                         </label>
                         <select name="section_id" class="form-select bg-light fw-semibold" onchange="this.form.submit()">
-                            <option value="">All Sections</option>
+                            <option value="">{{ __('All Sections') }}</option>
                             @foreach($sections as $s)
                                 <option value="{{ $s->id }}" {{ $sectionId == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
                             @endforeach
@@ -648,13 +648,13 @@
                         <div class="d-flex align-items-center gap-1 w-100 analytics-filter-btn-group">
                             <a href="{{ route('attendance.analytics', ['tenant' => auth()->user()?->school?->slug, 'date' => now()->toDateString()]) }}" 
                                class="btn btn-sm {{ $selectedDate == now()->toDateString() ? 'btn-primary' : 'btn-outline-secondary' }} fw-bold flex-fill py-2 text-center" 
-                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;">Today</a>
+                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;">{{ __('Today') }}</a>
                             <a href="{{ route('attendance.analytics', ['tenant' => auth()->user()?->school?->slug, 'date' => now()->subDay()->toDateString()]) }}" 
                                class="btn btn-sm {{ $selectedDate == now()->subDay()->toDateString() ? 'btn-primary' : 'btn-outline-secondary' }} fw-bold flex-fill py-2 text-center" 
-                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;">Yesterday</a>
+                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;">{{ __('Yesterday') }}</a>
                             <a href="{{ route('attendance.analytics', ['tenant' => auth()->user()?->school?->slug]) }}" 
                                class="btn btn-sm btn-outline-secondary py-2 px-3 text-center" 
-                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;" title="Reset Filters"><i class="fa-solid fa-rotate-left"></i></a>
+                               style="border-radius:10px; font-size:0.8rem; height:42px; display:inline-flex; align-items:center; justify-content:center;" title="{{ __('Reset Filters') }}"><i class="fa-solid fa-rotate-left"></i></a>
                         </div>
                     </div>
                 </div>
@@ -668,10 +668,10 @@
                 <div class="chart-card h-100">
                     <div class="chart-header">
                         <h5 class="chart-title">
-                            <i class="fa-solid fa-chart-line text-indigo-600"></i> Attendance Rate Trend (Last 7 Days)
+                            <i class="fa-solid fa-chart-line text-indigo-600"></i> {{ __('Attendance Rate Trend (Last 7 Days)') }}
                         </h5>
                         <span class="border px-3 py-1 fw-bold" style="border-radius:10px; font-size:0.75rem;">
-                            <i class="fa-regular fa-clock me-1"></i>Last 7 Days
+                            <i class="fa-regular fa-clock me-1"></i>{{ __('Last 7 Days') }}
                         </span>
                     </div>
                     <div class="chart-container-box">
@@ -685,7 +685,7 @@
                 <div class="chart-card h-100">
                     <div class="chart-header">
                         <h5 class="chart-title">
-                            <i class="fa-solid fa-chart-pie text-emerald-600"></i> Present vs Absent Breakdown
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i> {{ __('Present vs Absent Breakdown') }}
                         </h5>
                         <span class="border px-2 py-1 fw-bold" style="border-radius:10px; font-size:0.7rem;">
                             <i class="fa-regular fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($selectedDate)->format('d M, Y') }}
@@ -695,7 +695,7 @@
                         <canvas id="attendanceDoughnutChart"></canvas>
                         <div class="doughnut-center-stat">
                             <div class="doughnut-center-val">{{ $presentPercentage }}%</div>
-                            <div class="doughnut-center-lbl">Present Rate</div>
+                            <div class="doughnut-center-lbl">{{ __('Present Rate') }}</div>
                         </div>
                     </div>
                 </div>
@@ -710,20 +710,20 @@
                 <div class="data-table-card h-100">
                     <div class="table-header d-flex align-items-center justify-content-between p-2 px-3 border-bottom">
                         <h5 class="table-title mb-0 fw-bold text-dark" style="font-size:0.85rem;">
-                            <i class="fa-solid fa-school me-2 text-indigo-600"></i>Class &amp; Section Status
+                            <i class="fa-solid fa-school me-2 text-indigo-600"></i>{{ __('Class & Section Status') }}
                         </h5>
                         <span class="badge bg-light text-muted border px-2 py-1" style="border-radius:8px; font-size:0.68rem;">
-                            {{ count($classBreakdown) }} Classes
+                            {{ count($classBreakdown) }} {{ __('Classes') }}
                         </span>
                     </div>
                     <div class="table-responsive">
                         <table class="table data-table mb-0 align-middle" style="font-size:0.75rem;">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Class / Section</th>
+                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('Class / Section') }}</th>
                                     <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">P&nbsp;/&nbsp;A</th>
-                                    <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Rate</th>
-                                    <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Status</th>
+                                    <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('Rate') }}</th>
+                                    <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -750,16 +750,16 @@
                                     </td>
                                     <td class="text-center px-2 py-2">
                                         @if($row['is_completed'])
-                                            <span class="badge-completed" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-green"></span> Done</span>
+                                            <span class="badge-completed" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-green"></span> {{ __('Done') }}</span>
                                         @else
-                                            <span class="badge-pending" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-amber"></span> Pending</span>
+                                            <span class="badge-pending" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-amber"></span> {{ __('Pending') }}</span>
                                         @endif
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="4" class="text-center py-4 text-muted" style="font-size:0.78rem;">
-                                        No classes found for selected filters.
+                                        {{ __('No classes found for selected filters.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -778,7 +778,7 @@
                         <div class="row g-1 align-items-center">
                             <div class="col-12 col-sm-5">
                                 <h5 class="table-title mb-0 fw-bold text-dark" style="font-size:0.85rem;">
-                                    <i class="fa-solid fa-list-ul me-2 text-indigo-600"></i>Student Attendance Logs
+                                    <i class="fa-solid fa-list-ul me-2 text-indigo-600"></i>{{ __('Student Attendance Logs') }}
                                 </h5>
                                 <small class="text-muted" style="font-size:0.68rem;">{{ \Carbon\Carbon::parse($selectedDate)->format('d M, Y') }}</small>
                             </div>
@@ -789,12 +789,12 @@
                                     <input type="hidden" name="section_id" value="{{ $sectionId }}">
                                     <div class="d-flex gap-1" style="height:32px;">
                                         <select name="status" class="form-select form-select-sm bg-light" style="width:110px; flex-shrink:0; border-radius:8px; border:1.5px solid #cbd5e1; font-size:0.75rem; height:32px; padding:0 8px;" onchange="this.form.submit()">
-                                            <option value="">All Statuses</option>
-                                            <option value="present" {{ $statusFilter == 'present' ? 'selected' : '' }}>Present</option>
-                                            <option value="absent" {{ $statusFilter == 'absent' ? 'selected' : '' }}>Absent</option>
+                                            <option value="">{{ __('All Statuses') }}</option>
+                                            <option value="present" {{ $statusFilter == 'present' ? 'selected' : '' }}>{{ __('Present') }}</option>
+                                            <option value="absent" {{ $statusFilter == 'absent' ? 'selected' : '' }}>{{ __('Absent') }}</option>
                                         </select>
                                         <div class="input-group flex-grow-1" style="height:32px; flex-wrap:nowrap;">
-                                            <input type="text" name="search" class="form-control bg-light" placeholder="Search name/roll..." value="{{ $search }}" style="border-radius:8px 0 0 8px; border:1.5px solid #cbd5e1; border-right:0; font-size:0.75rem; height:32px; line-height:1; box-shadow:none;">
+                                            <input type="text" name="search" class="form-control bg-light" placeholder="{{ __('Search name/roll...') }}" value="{{ $search }}" style="border-radius:8px 0 0 8px; border:1.5px solid #cbd5e1; border-right:0; font-size:0.75rem; height:32px; line-height:1; box-shadow:none;">
                                             <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="border-radius:0 8px 8px 0; height:32px; width:36px; padding:0; flex-shrink:0; line-height:1;"><i class="fa-solid fa-magnifying-glass" style="font-size:0.7rem;"></i></button>
                                         </div>
                                     </div>
@@ -808,11 +808,11 @@
                         <table class="table data-table mb-0 align-middle" style="font-size:0.75rem;">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Student</th>
-                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">ID &amp; Roll</th>
-                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Class</th>
+                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('Student') }}</th>
+                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('ID & Roll') }}</th>
+                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('Class') }}</th>
                                     <th class="py-2 px-2 text-center text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">Status</th>
-                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">By</th>
+                                    <th class="py-2 px-2 text-secondary" style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;">{{ __('By') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -835,9 +835,9 @@
                                     </td>
                                     <td class="text-center px-2 py-2">
                                         @if($log->status == 'present')
-                                            <span class="badge-status-present" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-green"></span> Present</span>
+                                            <span class="badge-status-present" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-green"></span> {{ __('Present') }}</span>
                                         @else
-                                            <span class="badge-status-absent" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-red"></span> Absent</span>
+                                            <span class="badge-status-absent" style="font-size:0.62rem; padding:2px 7px;"><span class="pulse-dot pulse-dot-red"></span> {{ __('Absent') }}</span>
                                         @endif
                                     </td>
                                     <td class="px-2 py-2">
@@ -851,8 +851,8 @@
                                         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
                                             <i class="fa-solid fa-folder-open fa-lg text-muted"></i>
                                             <div>
-                                                <h6 class="fw-bold text-dark mb-1" style="font-size:0.82rem;">No Attendance Logs Found</h6>
-                                                <p class="text-muted mb-0" style="font-size:0.75rem;">Select a date with submitted attendance or adjust filters.</p>
+                                                <h6 class="fw-bold text-dark mb-1" style="font-size:0.82rem;">{{ __('No Attendance Logs Found') }}</h6>
+                                                <p class="text-muted mb-0" style="font-size:0.75rem;">{{ __('Select a date with submitted attendance or adjust filters.') }}</p>
                                             </div>
                                         </div>
                                     </td>

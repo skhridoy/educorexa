@@ -180,8 +180,8 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-book-open me-2"></i> Subjects Management</h1>
-                <p class="page-subtitle">Create and manage institutional subjects, course codes, and types.</p>
+                <h1 class="page-title"><i class="fa-solid fa-book-open me-2"></i> {{ __('Subjects Management') }}</h1>
+                <p class="page-subtitle">{{ __('Create and manage institutional subjects, course codes, and types.') }}</p>
             </div>
         </div>
 
@@ -197,32 +197,32 @@
             <div class="col-lg-4">
                 <div class="form-card">
                     <h5 class="mb-4 fw-bold text-primary">
-                        <i class="fa-solid fa-plus me-2"></i> Create Subject
+                        <i class="fa-solid fa-plus me-2"></i> {{ __('Create Subject') }}
                     </h5>
                     <form action="{{ route('subjects.store', ['tenant' => auth()->user()?->school?->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold">Subject Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label fw-semibold">{{ __('Subject Name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Mathematics, English" required>
                         </div>
                         <div class="mb-3">
-                            <label for="code" class="form-label fw-semibold">Subject Code</label>
+                            <label for="code" class="form-label fw-semibold">{{ __('Subject Code') }}</label>
                             <input type="text" class="form-control" id="code" name="code" placeholder="e.g., MATH101, ENG101">
                         </div>
                         <div class="mb-3">
-                            <label for="type" class="form-label fw-semibold">Subject Type</label>
+                            <label for="type" class="form-label fw-semibold">{{ __('Subject Type') }}</label>
                             <select class="form-select" id="type" name="type">
-                                <option value="" selected>Select Type</option>
-                                <option value="theory">Theory</option>
-                                <option value="practical">Practical</option>
+                                <option value="" selected>{{ __('Select Type') }}</option>
+                                <option value="theory">{{ __('Theory') }}</option>
+                                <option value="practical">{{ __('Practical') }}</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label fw-semibold">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Optional notes..."></textarea>
+                            <label for="description" class="form-label fw-semibold">{{ __('Description') }}</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="{{ __('Optional notes...') }}"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-check me-1"></i> Create Subject
+                            <i class="fa-solid fa-check me-1"></i> {{ __('Create Subject') }}
                         </button>
                     </form>
                 </div>
@@ -235,10 +235,10 @@
                         {{-- Title Row: Left is Title, Right is Total Count --}}
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <h6 class="table-title mb-0 fw-bold d-flex align-items-center gap-2" style="font-size: 0.95rem;">
-                                <i class="fa-solid fa-list-ul text-primary"></i> Subject List
+                                <i class="fa-solid fa-list-ul text-primary"></i> {{ __('Subject List') }}
                             </h6>
                             <span class="badge bg-primary-subtle text-primary border-0 px-2.5 py-1 fw-bold" style="border-radius: 6px; font-size: 0.76rem;">
-                                Total: {{ $totalSubjectsCount ?? $subjects->total() }} Subjects
+                                {{ __('Total:') }} {{ $totalSubjectsCount ?? $subjects->total() }} {{ __('Subjects') }}
                             </span>
                         </div>
 
@@ -249,22 +249,22 @@
                                 <input type="text" 
                                        name="search" 
                                        class="form-control form-control-sm mini-input" 
-                                       placeholder="Search subject or code..." 
+                                       placeholder="{{ __('Search subject or code...') }}" 
                                        value="{{ request('search') }}">
                             </div>
                             <div class="mini-type-box">
                                 <select name="type" class="form-select form-select-sm mini-select" onchange="this.form.submit()">
-                                    <option value="">All Types</option>
-                                    <option value="theory" {{ request('type') == 'theory' ? 'selected' : '' }}>Theory</option>
-                                    <option value="practical" {{ request('type') == 'practical' ? 'selected' : '' }}>Practical</option>
+                                    <option value="">{{ __('All Types') }}</option>
+                                    <option value="theory" {{ request('type') == 'theory' ? 'selected' : '' }}>{{ __('Theory') }}</option>
+                                    <option value="practical" {{ request('type') == 'practical' ? 'selected' : '' }}>{{ __('Practical') }}</option>
                                 </select>
                             </div>
                             <div class="mini-btn-box">
                                 <button type="submit" class="btn btn-sm btn-mini-filter">
-                                    <i class="fa-solid fa-filter"></i> Filter
+                                    <i class="fa-solid fa-filter"></i> {{ __('Filter') }}
                                 </button>
                                 @if(request()->hasAny(['search', 'type']))
-                                    <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-mini-reset" title="Clear Filters">
+                                    <a href="{{ route('subjects.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-mini-reset" title="{{ __('Clear Filters') }}">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </a>
                                 @endif
@@ -276,11 +276,11 @@
                         <table class="table data-table mb-0 align-middle">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-2.5 px-3">Subject</th>
-                                    <th class="py-2.5 px-3 text-center">Code</th>
-                                    <th class="py-2.5 px-3 text-center">Type</th>
-                                    <th class="py-2.5 px-3">Description</th>
-                                    <th class="py-2.5 px-3 text-end">Actions</th>
+                                    <th class="py-2.5 px-3">{{ __('Subject') }}</th>
+                                    <th class="py-2.5 px-3 text-center">{{ __('Code') }}</th>
+                                    <th class="py-2.5 px-3 text-center">{{ __('Type') }}</th>
+                                    <th class="py-2.5 px-3">{{ __('Description') }}</th>
+                                    <th class="py-2.5 px-3 text-end">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -302,11 +302,11 @@
                                     <td class="text-center px-3">
                                         @if($subject->type == 'practical')
                                             <span class="badge-pending" style="text-transform:capitalize; font-size:0.75rem; padding: 3px 8px;">
-                                                <i class="fa-solid fa-flask me-1"></i>Practical
+                                                <i class="fa-solid fa-flask me-1"></i>{{ __('Practical') }}
                                             </span>
                                         @else
                                             <span class="badge-completed" style="text-transform:capitalize; font-size:0.75rem; padding: 3px 8px;">
-                                                <i class="fa-solid fa-pen-nib me-1"></i>{{ $subject->type ?? 'Theory' }}
+                                                <i class="fa-solid fa-pen-nib me-1"></i>{{ $subject->type ? __($subject->type) : __('Theory') }}
                                             </span>
                                         @endif
                                     </td>
@@ -315,13 +315,13 @@
                                     </td>
                                     <td class="px-3 text-end">
                                         <div class="d-flex justify-content-end gap-1">
-                                            <a href="{{ route('subjects.edit', ['tenant' => auth()->user()?->school?->slug, 'subject' => $subject->id]) }}" class="btn btn-action btn-sm btn-outline-warning" title="Edit">
+                                            <a href="{{ route('subjects.edit', ['tenant' => auth()->user()?->school?->slug, 'subject' => $subject->id]) }}" class="btn btn-action btn-sm btn-outline-warning" title="{{ __('Edit') }}">
                                                 <i class="fa-regular fa-pen-to-square"></i>
                                             </a>
                                             <form action="{{ route('subjects.destroy', ['tenant' => auth()->user()?->school?->slug, 'subject' => $subject->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -332,7 +332,7 @@
                                 <tr>
                                     <td colspan="5" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
-                                        No subjects found.
+                                        {{ __('No subjects found.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -343,7 +343,7 @@
                     @if($subjects->hasPages())
                         <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="text-muted small">
-                                Showing {{ $subjects->firstItem() ?? 0 }} to {{ $subjects->lastItem() ?? 0 }} of {{ $subjects->total() }} subjects
+                                {{ __('Showing') }} {{ $subjects->firstItem() ?? 0 }} {{ __('to') }} {{ $subjects->lastItem() ?? 0 }} {{ __('of') }} {{ $subjects->total() }} {{ __('results') }}
                             </div>
                             <div>
                                 {{ $subjects->links() }}
@@ -361,14 +361,14 @@
 <script>
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this subject?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to delete this subject?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();

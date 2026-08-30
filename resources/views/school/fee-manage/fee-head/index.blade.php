@@ -21,11 +21,11 @@
         {{-- Modern Header --}}
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">Fee Management</h3>
+                <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">{{ __('Fee Management') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Fee Heads</li>
+                        <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">{{ __('Dashboard') }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ __('Fee Heads') }}</li>
                     </ol>
                 </nav>
             </div>
@@ -36,27 +36,27 @@
             <div class="col-md-4">
                 <div class="schools-panel h-100">
                     <div class="panel-header">
-                        <h6 class="panel-title mb-0">Create Fee Head</h6>
+                        <h6 class="panel-title mb-0">{{ __('Create Fee Head') }}</h6>
                     </div>
                     <div class="p-4">
                         <form action="{{ route('fee-heads.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="name" class="form-label fw-600">Fee Head Name</label>
+                                <label for="name" class="form-label fw-600">{{ __('Fee Head Name') }}</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Admission Fee" required>
                                 <small class="text-muted">Give a clear name for the fee category.</small>
                             </div>
                             <div class="mb-4">
-                                <label for="type" class="form-label fw-600">Billing Type</label>
+                                <label for="type" class="form-label fw-600">{{ __('Billing Type') }}</label>
                                 <select class="form-select" id="type" name="type" required>
-                                    <option value="" disabled selected>Select billing frequency</option>
-                                    <option value="monthly">Monthly (Every Month)</option>
-                                    <option value="once">Once (One-time payment)</option>
-                                    <option value="recurring">Recurring (Periodic)</option>
+                                    <option value="" disabled selected>{{ __('Select billing frequency') }}</option>
+                                    <option value="monthly">{{ __('Monthly (Every Month)') }}</option>
+                                    <option value="once">{{ __('Once (One-time payment)') }}</option>
+                                    <option value="recurring">{{ __('Recurring (Periodic)') }}</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
-                                <i class="fa-solid fa-plus me-2"></i> Create Head
+                                <i class="fa-solid fa-plus me-2"></i> {{ __('Create Head') }}
                             </button>
                         </form>
                     </div>
@@ -67,17 +67,17 @@
             <div class="col-md-8">
                 <div class="schools-panel h-100">
                     <div class="panel-header d-flex justify-content-between align-items-center">
-                        <h6 class="panel-title mb-0">Defined Fee Heads</h6>
-                        <span class="badge bg-soft-primary text-primary">{{ $feeHeads->count() }} Total</span>
+                        <h6 class="panel-title mb-0">{{ __('Defined Fee Heads') }}</h6>
+                        <span class="badge bg-soft-primary text-primary">{{ $feeHeads->count() }} {{ __('Total') }}</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-light">
                                 <tr>
                                     <th class="ps-4">#</th>
-                                    <th>Name</th>
-                                    <th>Billing Type</th>
-                                    <th class="text-center pe-4">Action</th>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Billing Type') }}</th>
+                                    <th class="text-center pe-4">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

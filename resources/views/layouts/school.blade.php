@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,15 +21,15 @@
                     $user = auth()->user();
                     // রোলের নামগুলো সুন্দর করে দেখানো
                     $roleTitle = match($user->role) {
-                        'school_admin', 'school_staff' => 'Admin',
-                        'teacher' => 'Teacher',
-                        'student' => 'Student',
-                        default => 'Dashboard'
+                        'school_admin', 'school_staff' => __('Admin'),
+                        'teacher' => __('Teacher'),
+                        'student' => __('Student'),
+                        default => __('Dashboard')
                     };
                 @endphp
-                {{ $roleTitle }} Dashboard | {{ $currentSchool->name ?? 'EduCorexa' }}
+                {{ $roleTitle }} {{ __('Dashboard') }} | {{ $currentSchool->name ?? 'EduCorexa' }}
             @else
-                Dashboard | {{ $currentSchool->name ?? 'EduCorexa' }}
+                {{ __('Dashboard') }} | {{ $currentSchool->name ?? 'EduCorexa' }}
             @endauth
         @endif
     </title>
@@ -38,6 +38,25 @@
     @include('layouts._css')
     @include('school.others._modern_design_styles')
     <style>
+        /* ═══════════════════════════════════════
+           SolaimanLipi Font & Bangla Locale Support
+        ═══════════════════════════════════════ */
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @if(app()->getLocale() === 'bn')
+            body, .sidebar, .navbar, .page-content, .card, .btn, input, select, textarea, .form-control, .form-select, h1, h2, h3, h4, h5, h6, p, span, a, div {
+                font-family: 'SolaimanLipi', 'Outfit', sans-serif !important;
+            }
+        @endif
+
+        .font-bn {
+            font-family: 'SolaimanLipi', serif !important;
+        }
         :root {
             --bg-color: #f9fafb;
             --card-bg: #ffffff;

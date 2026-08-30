@@ -26,10 +26,10 @@
     <div class="container-fluid">
         @php
             $hour = date('H');
-            if ($hour >= 5 && $hour < 12)      { $greeting = "Good Morning";   $faIcon = "fa-sun";     $greetColor = "#f59e0b"; }
-            elseif ($hour >= 12 && $hour < 17) { $greeting = "Good Afternoon"; $faIcon = "fa-cloud-sun"; $greetColor = "#f97316"; }
-            elseif ($hour >= 17 && $hour < 21) { $greeting = "Good Evening";   $faIcon = "fa-sunset";  $greetColor = "#8b5cf6"; }
-            else                               { $greeting = "Good Night";     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
+            if ($hour >= 5 && $hour < 12)      { $greeting = __('Good Morning');   $faIcon = "fa-sun";     $greetColor = "#f59e0b"; }
+            elseif ($hour >= 12 && $hour < 17) { $greeting = __('Good Afternoon'); $faIcon = "fa-cloud-sun"; $greetColor = "#f97316"; }
+            elseif ($hour >= 17 && $hour < 21) { $greeting = __('Good Evening');   $faIcon = "fa-sunset";  $greetColor = "#8b5cf6"; }
+            else                               { $greeting = __('Good Night');     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
         @endphp
         
         {{-- ===== WELCOME HERO CARD ===== --}}
@@ -48,7 +48,7 @@
                         </h2>
                     </div>
                     <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
-                        EduCorexa: আপনার স্কুলের গুরুত্বপূর্ণ তথ্যসমূহ এক নজরে দেখে নিন।
+                        {{ __('EduCorexa: Take a quick look at your school summary.') }}
                     </p>
                     <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
                         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
@@ -74,7 +74,7 @@
                     <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f3e8ff; color: #9333ea;">
                         <i class="fa-solid fa-chalkboard-user"></i>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Teachers</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Teachers') }}</div>
                     <div class="h5 fw-bolder mb-0">{{ $totalTeachers }}</div>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                     <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #fff7ed; color: #f97316;">
                         <i class="fa-solid fa-user-graduate"></i>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Students</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Students') }}</div>
                     <div class="h5 fw-bolder mb-0">{{ $totalStudents }}</div>
                 </div>
             </div>
@@ -96,7 +96,7 @@
                     <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f0fdf4; color: #16a34a;">
                         <i class="fa-solid fa-hand-holding-dollar"></i>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Collected</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Collected') }}</div>
                     <div class="h5 fw-bolder mb-0">৳{{ number_format($currentCollected, 0) }}</div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #eff6ff; color: #3b82f6;">
                         <i class="fa-solid fa-calendar-check"></i>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Expected</div>
+                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Expected') }}</div>
                     <div class="h5 fw-bolder mb-0">৳{{ number_format($currentTotal, 0) }}</div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
                 <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;">
                     <i class="fa-solid fa-bolt text-white" style="font-size:13px;"></i>
                 </div>
-                <h6 class="fw-bold text-dark mb-0" style="font-size:13px;text-transform:uppercase;letter-spacing:.6px;">Quick Actions</h6>
+                <h6 class="fw-bold text-dark mb-0" style="font-size:13px;text-transform:uppercase;letter-spacing:.6px;">{{ __('Quick Actions') }}</h6>
             </div>
             <div class="row g-3">
 
@@ -135,9 +135,9 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;backdrop-filter:blur(4px);">
                             <i class="fa-solid fa-hand-holding-dollar text-white" style="font-size:18px;"></i>
                         </div>
-                        <div class="text-white fw-bold" style="font-size:12px;line-height:1.3;">Collect<br>Payment</div>
+                        <div class="text-white fw-bold" style="font-size:12px;line-height:1.3;">{{ __('Collect Payment') }}</div>
                         <div style="background:rgba(255,255,255,0.2);border-radius:50px;padding:2px 10px;margin-top:8px;display:inline-block;">
-                            <span class="text-white" style="font-size:10px;font-weight:600;">Fee Collection</span>
+                            <span class="text-white" style="font-size:10px;font-weight:600;">{{ __('Fee Collection') }}</span>
                         </div>
                     </a>
                 </div>
@@ -152,7 +152,7 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
                             <i class="fa-solid fa-user-plus" style="color:#4f46e5;font-size:17px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Add<br>Student</div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Add Student') }}</div>
                     </a>
                 </div>
 
@@ -166,7 +166,7 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
                             <i class="fa-solid fa-chalkboard-user" style="color:#7c3aed;font-size:17px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Add<br>Teacher</div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Add Teacher') }}</div>
                     </a>
                 </div>
 
@@ -180,7 +180,7 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:#fffbeb;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
                             <i class="fa-solid fa-users" style="color:#f59e0b;font-size:17px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Student<br>List</div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Student List') }}</div>
                     </a>
                 </div>
 
@@ -194,7 +194,7 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
                             <i class="fa-solid fa-clipboard-check" style="color:#ec4899;font-size:17px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">Take<br>Attendance</div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Take Attendance') }}</div>
                     </a>
                 </div>
 
@@ -208,7 +208,7 @@
                         <div style="width:44px;height:44px;border-radius:12px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
                             <i class="fa-solid fa-gear" style="color:#64748b;font-size:17px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">School<br>Settings</div>
+                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('School Settings') }}</div>
                     </a>
                 </div>
 
@@ -228,8 +228,8 @@
                                     <i class="fa-solid fa-file-invoice-dollar text-white" style="font-size: 16px;"></i>
                                 </div>
                                 <div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 16px; font-family: 'Outfit', sans-serif;">Unpaid Student Fees</h5>
-                                    <p class="text-muted mb-0" style="font-size: 12px;">তালিকা ফিল্টার করে বকেয়া ফি চেক করুন</p>
+                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 16px; font-family: 'Outfit', sans-serif;">{{ __('Unpaid Student Fees') }}</h5>
+                                    <p class="text-muted mb-0" style="font-size: 12px;">{{ __('Filter list to check unpaid fees') }}</p>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
@@ -249,7 +249,7 @@
                         <div id="unpaidListContainer">
                             <div class="text-center py-5">
                                 <div class="spinner-grow text-primary" role="status"></div>
-                                <p class="mt-2 text-muted small">তালিকা লোড হচ্ছে...</p>
+                                <p class="mt-2 text-muted small">{{ __('Loading unpaid list...') }}</p>
                             </div>
                         </div>
                     </div>
@@ -260,12 +260,12 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Attendance Overview</h5>
+                        <h5 class="card-title mb-4">{{ __('Attendance Overview') }}</h5>
                         <div style="height: 300px; position: relative;" class="d-flex align-items-center justify-content-center">
                             <canvas id="attendancePieChart"></canvas>
                             <div class="position-absolute text-center">
                                 <h2 class="fw-bolder mb-0 text-primary">{{ $presentCount }}</h2>
-                                <p class="small text-muted mb-0">Present Today</p>
+                                <p class="small text-muted mb-0">{{ __('Present Today') }}</p>
                             </div>
                         </div>
                     </div>
@@ -280,8 +280,8 @@
                     <div class="card-body p-4">
                         <div class="d-md-flex justify-content-between align-items-center mb-4">
                             <div>
-                                <h5 class="card-title mb-1">Class-wise Collection</h5>
-                                <p class="text-muted small">প্রতিটি ক্লাসের বর্তমান মাসের মোট সংগ্রহ।</p>
+                                <h5 class="card-title mb-1">{{ __('Class-wise Collection') }}</h5>
+                                <p class="text-muted small">{{ __('Total collection for current month by class.') }}</p>
                             </div>
                             <select id="feeMonthFilter" class="form-select form-select-sm border-0 bg-light rounded-pill px-3" style="width: auto;">
                                 @for ($m=1; $m<=12; $m++)
@@ -300,14 +300,14 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Attendance Logs</h5>
+                        <h5 class="card-title mb-4">{{ __('Attendance Logs') }}</h5>
                         <div class="table-responsive">
                             <table class="table table-hover border-0">
                                 <thead class="bg-light border-0">
                                     <tr>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">Teacher</th>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">Class</th>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">Status</th>
+                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Teacher') }}</th>
+                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Class') }}</th>
+                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Status') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="border-0">
@@ -326,7 +326,7 @@
                                     <tr>
                                         <td colspan="3" class="text-center py-5 text-muted small">
                                             <i class="fa-solid fa-info-circle mb-2 d-block fs-4 opacity-50"></i>
-                                            No logs found for today
+                                            {{ __('No logs found for today') }}
                                         </td>
                                     </tr>
                                     @endif
@@ -349,7 +349,7 @@ $(document).ready(function() {
         $('#unpaidListContainer').html(`
             <div class="text-center py-5">
                 <div class="spinner-grow text-primary" role="status"></div>
-                <p class="mt-2 text-muted">বকেয়া তালিকা লোড হচ্ছে...</p>
+                <p class="mt-2 text-muted">{{ __('Loading unpaid list...') }}</p>
             </div>
         `);
 
@@ -386,7 +386,7 @@ $(document).ready(function() {
     new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-            labels: ['Present', 'Absent'],
+            labels: ["{{ __('Present') }}", "{{ __('Absent') }}"],
             datasets: [{
                 data: [{{ $presentCount }}, {{ $absentCount }}],
                 backgroundColor: ['#10b981', '#ef4444'],
@@ -422,7 +422,7 @@ $(document).ready(function() {
         data: {
             labels: {!! json_encode($classNames) !!},
             datasets: [{
-                label: 'Collection (৳)',
+                label: "{{ __('Collection (৳)') }}",
                 data: {!! json_encode($classFees) !!},
                 backgroundColor: gradient,
                 borderRadius: 8,

@@ -2,11 +2,11 @@
     <table class="table align-middle mb-0" style="font-size: 13.5px;">
         <thead style="background: #fafbfc; border-bottom: 2px solid #f1f5f9;">
             <tr>
-                <th class="ps-4 py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">Student ID</th>
-                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">Student Name</th>
-                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">Class</th>
-                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">Due Amount</th>
-                <th class="py-3 fw-bold text-uppercase text-center pe-4" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">Action</th>
+                <th class="ps-4 py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">{{ __('Student ID') }}</th>
+                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">{{ __('Student Name') }}</th>
+                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">{{ __('Class') }}</th>
+                <th class="py-3 fw-bold text-uppercase" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">{{ __('Due Amount') }}</th>
+                <th class="py-3 fw-bold text-uppercase text-center pe-4" style="font-size: 11px; color: #64748b; letter-spacing: .5px;">{{ __('Action') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -18,8 +18,10 @@
                     </span>
                 </td>
                 <td class="py-3">
-                    <div class="fw-bold text-dark" style="font-size: 13.5px;">{{ $invoice->student->name }}</div>
-                    <div style="font-size: 11px; color: #94a3b8;">{{ $invoice->feeHead->name ?? 'General Fee' }}</div>
+                    <div class="fw-bold text-dark" style="font-size: 13.5px;">
+                        {{ (app()->getLocale() === 'bn' && $invoice->student->name_bn) ? $invoice->student->name_bn : $invoice->student->name }}
+                    </div>
+                    <div style="font-size: 11px; color: #94a3b8;">{{ $invoice->feeHead->name ?? __('General Fee') }}</div>
                 </td>
                 <td class="py-3">
                     <span style="background: #f5f3ff; color: #7c3aed; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 50px;">
@@ -36,8 +38,8 @@
                         <a href="{{ route('payment.index', ['tenant' => auth()->user()->school->slug, 'student_id' => $invoice->student->student_id]) }}"
                            class="btn btn-sm d-inline-flex align-items-center gap-1"
                            style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 8px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; box-shadow: 0 2px 8px rgba(16,185,129,0.3); text-decoration: none;"
-                           title="Collect Payment">
-                            <i class="fa-solid fa-hand-holding-dollar" style="font-size: 11px;"></i> Collect
+                           title="{{ __('Collect Payment') }}">
+                            <i class="fa-solid fa-hand-holding-dollar" style="font-size: 11px;"></i> {{ __('Collect') }}
                         </a>
                         <button class="btn btn-sm btn-send-reminder d-inline-flex align-items-center justify-content-center"
                                 data-id="{{ $invoice->id }}"
@@ -56,8 +58,8 @@
                     <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #dcfce7, #f0fdf4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: 0 4px 14px rgba(16,185,129,0.15);">
                         <i class="fa-solid fa-circle-check" style="font-size: 26px; color: #10b981;"></i>
                     </div>
-                    <h6 class="fw-bold text-dark mb-1" style="font-size: 15px;">All Dues Cleared!</h6>
-                    <p class="text-muted small mb-0" style="font-size: 12.5px;">এই মাসের সকল বকেয়া সফলভাবে পরিশোধিত হয়েছে।</p>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 15px;">{{ __('All Dues Cleared!') }}</h6>
+                    <p class="text-muted small mb-0" style="font-size: 12.5px;">{{ __('All dues for this month have been paid successfully.') }}</p>
                 </td>
             </tr>
             @endforelse
@@ -69,7 +71,7 @@
 @if($unpaidList->total() > 0)
 <div class="pt-3 pb-2 px-3 d-flex flex-wrap justify-content-between align-items-center unpaid-pagination-wrapper gap-2" style="border-top: 1.5px solid #f1f5f9;">
     <div style="font-size: 12px; color: #64748b; font-weight: 500;">
-        Showing <span class="fw-bold text-dark">{{ $unpaidList->firstItem() ?? 0 }}</span> to <span class="fw-bold text-dark">{{ $unpaidList->lastItem() ?? 0 }}</span> of <span class="fw-bold text-dark">{{ $unpaidList->total() }}</span> results
+        {{ __('Showing') }} <span class="fw-bold text-dark">{{ $unpaidList->firstItem() ?? 0 }}</span> {{ __('to') }} <span class="fw-bold text-dark">{{ $unpaidList->lastItem() ?? 0 }}</span> {{ __('of') }} <span class="fw-bold text-dark">{{ $unpaidList->total() }}</span> {{ __('results') }}
     </div>
     <div id="unpaidPaginationLinks">
         {!! $unpaidList->links('pagination::bootstrap-4') !!}

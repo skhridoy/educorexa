@@ -166,19 +166,19 @@
     <div class="edu-header-glass">
         <div class="container-fluid">
             <ul class="edu-bc">
-                <li><a href="{{ route('school.dashboard', ['tenant' => $tenant]) }}">Dashboard</a></li>
-                <li class="active">Roles & Permissions</li>
+                <li><a href="{{ route('school.dashboard', ['tenant' => $tenant]) }}">{{ __('Dashboard') }}</a></li>
+                <li class="active">{{ __('Roles & Permissions') }}</li>
             </ul>
             <div class="d-flex align-items-center justify-content-between">
                 <div>
                     <h2 style="font-weight: 800; color: #1e293b; letter-spacing: -0.03em; margin: 0;">
-                        <span style="background: linear-gradient(135deg, #4f46e5, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Access Control</span> Center
+                        <span style="background: linear-gradient(135deg, #4f46e5, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ __('Access Control') }}</span> {{ __('Center') }}
                     </h2>
-                    <p style="color: #64748b; margin-top: 4px; font-size: 0.95rem;">Configure institutional roles, hierarchical permissions, and security scope.</p>
+                    <p style="color: #64748b; margin-top: 4px; font-size: 0.95rem;">{{ __('Configure institutional roles, hierarchical permissions, and security scope.') }}</p>
                 </div>
                 <a href="{{ route('school.roles.create', ['tenant' => $tenant]) }}" class="btn-edu-primary">
                     <i data-feather="plus-circle" style="width:20px;"></i>
-                    <span>Define New Role</span>
+                    <span>{{ __('Define New Role') }}</span>
                 </a>
             </div>
         </div>
@@ -193,7 +193,7 @@
                         <i data-feather="shield"></i>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Total Defined Roles</div>
+                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">{{ __('Total Defined Roles') }}</div>
                         <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">{{ $roles->count() }}</div>
                     </div>
                 </div>
@@ -204,7 +204,7 @@
                         <i data-feather="users"></i>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Protected Systems</div>
+                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">{{ __('Protected Systems') }}</div>
                         <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">{{ $roles->whereNull('school_id')->count() }}</div>
                     </div>
                 </div>
@@ -215,8 +215,8 @@
                         <i data-feather="lock"></i>
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Institutional Scope</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">Global</div>
+                        <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">{{ __('Institutional Scope') }}</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">{{ __('Global') }}</div>
                     </div>
                 </div>
             </div>
@@ -236,10 +236,10 @@
                 <table class="table edu-table mb-0">
                     <thead>
                         <tr>
-                            <th class="ps-4">Identity & Origin</th>
-                            <th>Active Capabilities</th>
-                            <th>Target Group</th>
-                            <th class="pe-4 text-end">Action</th>
+                            <th class="ps-4">{{ __('Identity & Origin') }}</th>
+                            <th>{{ __('Active Capabilities') }}</th>
+                            <th>{{ __('Target Group') }}</th>
+                            <th class="pe-4 text-end">{{ __('Action') }}</th>
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
@@ -252,14 +252,14 @@
                                     </div>
                                     <div>
                                         <div class="fw-bold text-dark" style="font-size: 1rem;">{{ $role->display_name ?? $role->name }}</div>
-                                        <div class="text-muted" style="font-size: 0.75rem;">Created: {{ $role->created_at->format('d M, Y') }}</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">{{ __('Created:') }} {{ $role->created_at->format('d M, Y') }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="perm-badge">{{ $role->permissions->count() }}</span>
-                                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Permissions mapped</span>
+                                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">{{ __('Permissions mapped') }}</span>
                                 </div>
                             </td>
                             <td>
@@ -280,14 +280,14 @@
                                         <a href="{{ route('school.roles.edit', ['tenant' => $tenant, 'role' => $role->id]) }}" class="action-btn" title="Modify Configuration">
                                             <i data-feather="edit-3" style="width:16px;"></i>
                                         </a>
-                                        <form action="{{ route('school.roles.destroy', ['tenant' => $tenant, 'role' => $role->id]) }}" method="POST" onsubmit="return confirm('Attention: Deleting this role will affect all assigned staff. Continue?')">
+                                        <form action="{{ route('school.roles.destroy', ['tenant' => $tenant, 'role' => $role->id]) }}" method="POST" onsubmit="return confirm('{{ __(\'Attention: Deleting this role will affect all assigned staff. Continue?\') }}')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="action-btn delete" title="Terminate Role">
                                                 <i data-feather="trash-2" style="width:16px;"></i>
                                             </button>
                                         </form>
                                     @else
-                                        <span class="role-badge badge-system">Protected Default</span>
+                                        <span class="role-badge badge-system">{{ __('Protected Default') }}</span>
                                     @endif
                                 </div>
                             </td>
@@ -297,11 +297,11 @@
                             <td colspan="4">
                                 <div class="empty-state">
                                     <div class="empty-icon"><i data-feather="shield-off"></i></div>
-                                    <h4 style="font-weight: 800; color: #1e293b;">No Roles Defined</h4>
-                                    <p class="text-muted mx-auto" style="max-width: 400px;">Start by defining access levels for your staff and faculty members to manage institutional workflow.</p>
+                                    <h4 style="font-weight: 800; color: #1e293b;">{{ __('No Roles Defined') }}</h4>
+                                    <p class="text-muted mx-auto" style="max-width: 400px;">{{ __('Start by defining access levels for your staff and faculty members to manage institutional workflow.') }}</p>
                                     <a href="{{ route('school.roles.create', ['tenant' => $tenant]) }}" class="btn-edu-primary mt-4">
                                         <i data-feather="plus"></i>
-                                        <span>Create First Role</span>
+                                        <span>{{ __('Create First Role') }}</span>
                                     </a>
                                 </div>
                             </td>

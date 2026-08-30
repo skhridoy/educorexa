@@ -59,8 +59,14 @@ Route::domain(config('app.main_domain'))->group(function () {
 
     Route::post('/main-newsletter-subscribe', [NewsletterController::class, 'mainSubscribe'])->name('main.newsletter.subscribe');   
 
-
-    // --- Unified Auth Routes ---
+    // Language Switcher Route
+    Route::get('/set-locale/{lang}', function ($lang) {
+        if (in_array($lang, ['en', 'bn'])) {
+            session(['locale' => $lang]);
+            cookie()->queue(cookie()->forever('locale', $lang));
+        }
+        return redirect()->back();
+    })->name('set.locale');
     Route::controller(AuthController::class)->group(function () {
         Route::get('/login', 'mainLoginForm')->name('login.form'); 
         Route::post('/login', 'mainLogin')->name('login');        
@@ -201,6 +207,15 @@ Route::domain('{tenant}.' . config('app.main_domain'))
     ->middleware(['identify.school'])
     ->scopeBindings()
     ->group(function () {
+
+            // Language Switcher for School Tenant
+            Route::get('/set-locale/{lang}', function ($tenant, $lang) {
+                if (in_array($lang, ['en', 'bn'])) {
+                    session(['locale' => $lang]);
+                    cookie()->queue(cookie()->forever('locale', $lang));
+                }
+                return redirect()->back();
+            })->name('school.set.locale');
 
             Route::get('exam-routine/subjects-by-class/{classId}', [ExamRoutineController::class, 'subjectsByClass'])->name('exam.routine.subjects.by.class');
             Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
@@ -483,6 +498,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 });
                 Route::middleware(['auth', 'permission:attendance.manage', 'school_package:attendance.manage'])->group(function () {
                     // Route::get('students/search-ajax', [AttendanceController::class, 'searchAjax'])->name('students.search_ajax');
+                    Route::get('/attendance/qr-scan', [AttendanceController::class, 'qrScan'])->name('attendance.qr.scan');
+                    Route::post('/attendance/qr-scan/record', [AttendanceController::class, 'recordQrAttendance'])->name('attendance.qr.record');
                     Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('student.attendance.report');
                     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendances.index');
                     Route::post('/attendance-save', [AttendanceController::class, 'store'])->name('attendances.store');

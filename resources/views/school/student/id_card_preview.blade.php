@@ -80,11 +80,11 @@
 @section('content')
 <div class="page-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="page-title">ID Cards Preview ({{ $students->count() }} Students)</h3>
+        <h3 class="page-title">{{ __('ID Cards Preview') }} ({{ $students->count() }} {{ __('Students') }})</h3>
         <a href="{{ route('students.idcard.print', ['tenant' => auth()->user()->school->slug, 'class_id' => $class_id]) }}" 
            class="btn btn-danger btn-icon-text" target="_blank">
             <i class="btn-icon-prepend" data-feather="printer"></i> 
-            Print All ID Cards
+            {{ __('Print All ID Cards') }}
         </a>
     </div>
 
@@ -107,35 +107,35 @@
                         </div>
                         
                         <div class="row-info">
-                            <span class="label">Class</span>
+                            <span class="label">{{ __('Class') }}</span>
                             <span class="val">: {{ $student->class->name }}</span>
 
-                            <span class="label">Roll No</span>
+                            <span class="label">{{ __('Roll No') }}</span>
                             <span class="val">: {{ $student->roll }}</span>
                         </div>
                         <div class="row-info">
-                            <span class="label">Student ID</span>
+                            <span class="label">{{ __('Student ID') }}</span>
                             <span class="val">: {{ $student->student_id }}</span>
                         </div>
 
                         <div class="row-info">
-                            <span class="label">Guardians</span>
+                            <span class="label">{{ __('Guardians') }}</span>
                             <span class="val">: {{ $student->fathers_name }}</span>
                         </div>
 
                         <div class="row-info">
-                            <span class="label">Blood Group</span>
+                            <span class="label">{{ __('Blood Group') }}</span>
                             <span class="val">: {{ $student->blood_group }}</span>
                         </div>
 
                         <div class="row-info">
-                            <span class="label">Emergency</span>
+                            <span class="label">{{ __('Emergency') }}</span>
                             <span class="val">: {{ $student->contact_number }}</span>
                         </div>
                     </div>
                     <div class="front-signature">
                         <img src="{{ asset('assets/images/signature.png') }}" alt="Sign">
-                        <p>Principal</p>
+                        <p>{{ __('Principal') }}</p>
                     </div>
                     <div class="bottom-bar"></div>
                 </div>
@@ -145,8 +145,7 @@
                     <div class="back-top-bar" style="width: 100%; height: 25px; background: linear-gradient(90deg, #6a1b9a, #ad1457);"></div>
 
                     <div class="back-header" style="margin: 12px auto; width: 85%; background: rgba(106, 27, 154, 0.3); color: #6a1b9a; text-align: center; font-size: 9px; font-weight: bold; padding: 4px 0; border-radius: 3px;">
-                        TERMS AND CONDITIONS
-                    
+                        {{ __('TERMS AND CONDITIONS') }}
                     </div>
 
                     <div class="terms-text" style="padding: 0 15px; font-size: 9px; color: #343232; line-height: 1;">

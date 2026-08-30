@@ -29,11 +29,11 @@
     {{-- Modern Header --}}
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
-            <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">Fee Structures</h3>
+            <h3 class="fw-bold text-dark mb-1" style="font-family:'Outfit', sans-serif;">{{ __('Fee Structures') }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Setup Fee Amounts</li>
+                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Setup Fee Amounts') }}</li>
                 </ol>
             </nav>
         </div>
@@ -44,15 +44,15 @@
         <div class="col-md-5">
             <div class="schools-panel h-100">
                 <div class="panel-header">
-                    <h6 class="panel-title mb-0">Define Category-wise Fees</h6>
+                    <h6 class="panel-title mb-0">{{ __('Define Category-wise Fees') }}</h6>
                 </div>
                 <div class="p-4">
                     <form action="{{ route('fee-amounts.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label fw-600">Select Fee Head</label>
+                            <label class="form-label fw-600">{{ __('Select Fee Head') }}</label>
                             <select name="fee_head_id" class="form-select" required>
-                                <option value="" disabled selected>Choose a Fee Head...</option>
+                                <option value="" disabled selected>{{ __('Choose a Fee Head...') }}</option>
                                 @foreach($feeHeads as $head)
                                     <option value="{{ $head->id }}">{{ $head->name }}</option>
                                 @endforeach
@@ -61,32 +61,32 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-600">Category</label>
+                                <label class="form-label fw-600">{{ __('Category') }}</label>
                                 <select id="setup_category_id" name="school_category_id" class="form-select" required>
-                                    <option value="">Select Category</option>
+                                    <option value="">{{ __('Select Category') }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-600">Sub-Category</label>
+                                <label class="form-label fw-600">{{ __('Sub-Category') }}</label>
                                 <select id="setup_sub_category_id" name="school_sub_category_id" class="form-select">
-                                    <option value="">None/All</option>
+                                    <option value="">{{ __('None/All') }}</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0 text-muted small fw-bold">Class-wise Amounts:</h6>
+                            <h6 class="mb-0 text-muted small fw-bold">{{ __('Class-wise Amounts:') }}</h6>
                         </div>
                         <div class="border rounded bg-light overflow-hidden">
                             <div class="table-responsive" style="max-height: 350px;">
                                 <table class="table table-sm table-borderless align-middle mb-0">
                                     <thead class="bg-white border-bottom sticky-top">
                                         <tr>
-                                            <th class="ps-3 py-2">Class Name</th>
-                                            <th class="pe-3 py-2 text-end" width="140">Amount (৳)</th>
+                                            <th class="ps-3 py-2">{{ __('Class Name') }}</th>
+                                            <th class="pe-3 py-2 text-end" width="140">{{ __('Amount (৳)') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="class_amount_body" class="bg-white">
@@ -102,7 +102,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary mt-4 w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-save me-2"></i> Save Fee Structure
+                            <i class="fa-solid fa-save me-2"></i> {{ __('Save Fee Structure') }}
                         </button>
                     </form>
                 </div>
@@ -113,7 +113,7 @@
         <div class="col-md-7">
             <div class="schools-panel h-100">
                 <div class="panel-header d-flex justify-content-between align-items-center">
-                    <h6 class="panel-title mb-0">Current Fee Configurations</h6>
+                    <h6 class="panel-title mb-0">{{ __('Current Fee Configurations') }}</h6>
                     <div class="search-box">
                         {{-- Optional search can go here --}}
                     </div>
@@ -122,10 +122,10 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
-                                <th class="ps-4">Fee Head</th>
-                                <th>Category / Target</th>
-                                <th class="text-end">Amount</th>
-                                <th class="text-center pe-4">Action</th>
+                                <th class="ps-4">{{ __('Fee Head') }}</th>
+                                <th>{{ __('Category / Target') }}</th>
+                                <th class="text-end">{{ __('Amount') }}</th>
+                                <th class="text-center pe-4">{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>

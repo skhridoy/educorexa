@@ -259,8 +259,8 @@
             <div class="page-header-content">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
-                        <h1 class="page-title"><i class="fa-solid fa-clipboard-user me-2"></i> Take Attendance</h1>
-                        <p class="page-subtitle">Record daily student attendance for your assigned classes.</p>
+                        <h1 class="page-title"><i class="fa-solid fa-clipboard-user me-2"></i> {{ __('Take Attendance') }}</h1>
+                        <p class="page-subtitle">{{ __('Record daily student attendance for your assigned classes.') }}</p>
                     </div>
                     <div class="text-md-end">
                         <div class="badge bg-primary-gradient px-4 py-2 rounded-pill shadow-sm fs-6">
@@ -278,9 +278,9 @@
                     <form method="GET">
                         <div class="row g-2 g-md-3 align-items-end">
                             <div class="col-6 col-md-3">
-                                <label class="filter-label mb-1">Class</label>
+                                <label class="filter-label mb-1">{{ __('Class') }}</label>
                                 <select name="class_id" class="form-select border-primary-soft shadow-none">
-                                    <option value="">Select Class</option>
+                                    <option value="">{{ __('Select Class') }}</option>
                                     @foreach($assignedClasses->unique('class_id') as $item)
                                         <option value="{{$item->class_id}}" {{ request('class_id') == $item->class_id ? 'selected' : '' }}>
                                             {{$item->class->name ?? ''}}
@@ -289,9 +289,9 @@
                                 </select>
                             </div>
                             <div class="col-6 col-md-3">
-                                <label class="filter-label mb-1">Section</label>
+                                <label class="filter-label mb-1">{{ __('Section') }}</label>
                                 <select name="section_id" class="form-select border-primary-soft shadow-none">
-                                    <option value="">Select Section</option>
+                                    <option value="">{{ __('Select Section') }}</option>
                                     @foreach($assignedClasses->unique('section_id') as $item)
                                         <option value="{{$item->section_id}}" {{ request('section_id') == $item->section_id ? 'selected' : '' }}>
                                             {{$item->section->name ?? ''}}
@@ -300,12 +300,12 @@
                                 </select>
                             </div>
                             <div class="col-12 col-md-3">
-                                <label class="filter-label mb-1">Date</label>
+                                <label class="filter-label mb-1">{{ __('Date') }}</label>
                                 <input type="date" name="date" class="form-control shadow-none" value="{{ request('date') ?? date('Y-m-d') }}">
                             </div>
                             <div class="col-12 col-md-3">
                                 <button type="submit" class="btn btn-primary-gradient w-100 py-3 shadow-sm mt-2 mt-md-0">
-                                    <i class="fa-solid fa-magnifying-glass me-2"></i> Load Students
+                                    <i class="fa-solid fa-magnifying-glass me-2"></i> {{ __('Load Students') }}
                                 </button>
                             </div>
                         </div>
@@ -319,10 +319,10 @@
                                 <i class="fa-solid fa-check-double"></i>
                             </div>
                             <div class="ms-3">
-                                <div class="status-alert-title">Attendance already recorded for this session</div>
+                                <div class="status-alert-title">{{ __('Attendance already recorded for this session') }}</div>
                                 <div class="status-alert-subtitle">
-                                    Last updated by <span class="fw-bold text-primary">{{ $attendanceInfo->teacher->name ?? 'System' }}</span> 
-                                    at <span class="text-dark fw-medium">{{ $attendanceInfo->created_at->format('h:i A') }}</span>
+                                    {{ __('Last updated by') }} <span class="fw-bold text-primary">{{ $attendanceInfo->teacher->name ?? 'System' }}</span> 
+                                    {{ __('at') }} <span class="text-dark fw-medium">{{ $attendanceInfo->created_at->format('h:i A') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -333,8 +333,8 @@
                 @if($students->count() > 0)
                     <div class="data-table-card shadow-sm border-0">
                         <div class="table-header d-flex justify-content-between align-items-center p-3">
-                            <h6 class="table-title mb-0"><i class="fa-solid fa-user-graduate me-2"></i> {{ $students->total() }} Students Found</h6>
-                            <div class="d-none d-md-block text-muted small fw-bold">Select Status</div>
+                            <h6 class="table-title mb-0"><i class="fa-solid fa-user-graduate me-2"></i> {{ $students->total() }} {{ __('Students Found') }}</h6>
+                            <div class="d-none d-md-block text-muted small fw-bold">{{ __('Select Status') }}</div>
                         </div>
                         
                         <form id="attendanceForm" action="{{ route('attendances.store', ['tenant' => request()->route('tenant')]) }}" method="POST">
@@ -347,9 +347,9 @@
                                 <table class="table data-table mb-0">
                                     <thead>
                                         <tr class="bg-light">
-                                            <th class="ps-4" width="60">Roll</th>
-                                            <th>Student Information</th>
-                                            <th class="text-end pe-4">Attendance Status</th>
+                                            <th class="ps-4" width="60">{{ __('Roll') }}</th>
+                                            <th>{{ __('Student Information') }}</th>
+                                            <th class="text-end pe-4">{{ __('Attendance Status') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -392,11 +392,11 @@
                                                     <div class="attendance-toggle-group shadow-sm">
                                                         <label class="attendance-option">
                                                             <input type="radio" name="attendance[{{$student->id}}]" value="present" {{ $status == 'present' ? 'checked' : '' }}>
-                                                            <span class="attendance-label label-present">Present</span>
+                                                            <span class="attendance-label label-present">{{ __('Present') }}</span>
                                                         </label>
                                                         <label class="attendance-option">
                                                             <input type="radio" name="attendance[{{$student->id}}]" value="absent" {{ $status == 'absent' ? 'checked' : '' }}>
-                                                            <span class="attendance-label label-absent">Absent</span>
+                                                            <span class="attendance-label label-absent">{{ __('Absent') }}</span>
                                                         </label>
                                                     </div>
                                                 </td>
@@ -411,7 +411,7 @@
                                     {{ $students->withQueryString()->links() }}
                                 </div>
                                 <button type="submit" class="btn btn-primary-gradient px-5 py-3 fw-bold shadow-lg">
-                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Records
+                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>{{ __('Save Records') }}
                                 </button>
                             </div>
                         </form>
@@ -421,8 +421,8 @@
                         <div class="mb-3">
                             <i class="fa-solid fa-users-slash fs-1 opacity-25"></i>
                         </div>
-                        <h5 class="fw-bold text-dark">No students found</h5>
-                        <p class="text-muted small">Try checking another section or verify enrollment for this class.</p>
+                        <h5 class="fw-bold text-dark">{{ __('No students found') }}</h5>
+                        <p class="text-muted small">{{ __('Try checking another section or verify enrollment for this class.') }}</p>
                     </div>
                 @endif
             </div>
@@ -431,7 +431,7 @@
             <div class="col-lg-4">
                 <div class="schools-panel mb-4 shadow-sm">
                     <div class="panel-header bg-navy text-white">
-                        <h6 class="panel-title mb-0 text-white"><i class="fa-solid fa-history me-2"></i> Recent Sessions</h6>
+                        <h6 class="panel-title mb-0 text-white"><i class="fa-solid fa-history me-2"></i> {{ __('Recent Sessions') }}</h6>
                     </div>
                     <div class="p-0">
                         <div class="completed-list">
@@ -442,12 +442,12 @@
                                         <small class="badge bg-soft-success text-success">{{ $completed->created_at->format('h:i A') }}</small>
                                     </div>
                                     <div class="d-flex align-items-center small text-muted">
-                                        <i class="fa-solid fa-user-tie me-2 opacity-50"></i> {{ $completed->teacher->name ?? 'System' }}
+                                        <i class="fa-solid fa-user-tie me-2 opacity-50"></i> {{ $completed->teacher->name ?? __('Teacher') }}
                                     </div>
                                 </div>
                             @empty
                                 <div class="p-4 text-center">
-                                    <p class="text-muted small mb-0">No attendance records found for today yet.</p>
+                                    <p class="text-muted small mb-0">{{ __('No attendance records found for today yet.') }}</p>
                                 </div>
                             @endforelse
                         </div>
@@ -461,9 +461,9 @@
                             <div class="bg-white bg-opacity-20 rounded-circle p-2">
                                 <i class="fa-solid fa-lightbulb text-warning"></i>
                             </div>
-                            <h6 class="mb-0 fw-bold">Quick Tip</h6>
+                            <h6 class="mb-0 fw-bold">{{ __('Quick Tip') }}</h6>
                         </div>
-                        <p class="small mb-0 opacity-75">By default, all students are marked as **Present**. You only need to toggle those who are **Absent** to save time.</p>
+                        <p class="small mb-0 opacity-75">{{ __('By default, all students are marked as **Present**. You only need to toggle those who are **Absent** to save time.') }}</p>
                     </div>
                 </div>
             </div>
@@ -482,7 +482,7 @@
             let submitBtn = form.find('button[type="submit"]');
             let originalBtnHtml = submitBtn.html();
             
-            submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> Synchronizing...');
+            submitBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin me-2"></i> {{ __("Processing...") }}');
 
             $.ajax({
                 url: form.attr('action'),
@@ -493,7 +493,7 @@
                     if(res.success) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Success!',
+                            title: "{{ __('Success') }}",
                             text: res.message,
                             confirmButtonColor: '#4f46e5',
                             timer: 2000,
@@ -505,13 +505,13 @@
                 },
                 error: function (xhr) {
                     submitBtn.prop('disabled', false).html(originalBtnHtml);
-                    let errorMsg = "Failed to save attendance!";
+                    let errorMsg = "{{ __('Failed to save attendance!') }}";
                     if(xhr.responseJSON && xhr.responseJSON.message) {
                         errorMsg = xhr.responseJSON.message;
                     }
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
+                        title: "{{ __('Error') }}",
                         text: errorMsg,
                         confirmButtonColor: '#ef4444'
                     });

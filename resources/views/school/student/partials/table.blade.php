@@ -1,3 +1,23 @@
+{{-- সোলায়মানলিপি ফন্ট লোড --}}
+<style>
+@font-face {
+    font-family: 'SolaimanLipi';
+    src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+.font-bn {
+    font-family: 'SolaimanLipi', 'Noto Serif Bengali', serif !important;
+}
+.student-name-bn {
+    font-family: 'SolaimanLipi', 'Noto Serif Bengali', serif;
+    font-size: 11.5px;
+    color: #7c3aed;
+    margin-top: 2px;
+    line-height: 1.3;
+    display: block;
+}
+</style>
 @if($students->count() > 0)
     {{-- DESKTOP VIEW: Clean Table (Visible on Tablets & Laptops >= md) --}}
     <div class="table-responsive d-none d-md-block">
@@ -20,6 +40,9 @@
                                  alt="{{ $student->name }}" class="student-avatar-ring">
                             <div>
                                 <div class="fw-bold text-dark">{{ $student->name }}</div>
+                                @if($student->name_bn)
+                                    <span class="student-name-bn">{{ $student->name_bn }}</span>
+                                @endif
                                 <div class="small">
                                     @if($student->status == 'active')
                                         <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-0.5" style="font-size:10px;">Active</span>
@@ -85,6 +108,9 @@
                                  alt="{{ $student->name }}" class="student-avatar-ring flex-shrink-0">
                             <div class="min-w-0" style="min-width: 0;">
                                 <h6 class="fw-bold mb-0 text-dark text-truncate" style="font-size:14.5px;">{{ $student->name }}</h6>
+                                @if($student->name_bn)
+                                    <span class="student-name-bn">{{ $student->name_bn }}</span>
+                                @endif
                                 <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-0.5 mt-0.5" style="font-size:10px;">
                                     {{ $student->status == 'active' ? 'Active' : 'Inactive' }}
                                 </span>
@@ -229,7 +255,10 @@
 
                     {{-- Name & Quick Badges --}}
                     <div class="flex-grow-1 pb-1">
-                        <h4 class="fw-bold text-white mb-1" style="text-shadow:0 1px 4px rgba(0,0,0,0.2);letter-spacing:-.3px;">{{ $student->name }}</h4>
+                        <h4 class="fw-bold text-white mb-0" style="text-shadow:0 1px 4px rgba(0,0,0,0.2);letter-spacing:-.3px;">{{ $student->name }}</h4>
+                        @if($student->name_bn)
+                            <div class="font-bn" style="color:rgba(255,255,255,0.85);font-size:14px;margin-bottom:4px;">{{ $student->name_bn }}</div>
+                        @endif
                         <div class="d-flex flex-wrap gap-2 mt-1">
                             <span style="background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.25);">
                                 <i class="fa-solid fa-id-badge me-1 opacity-75"></i>{{ $student->student_id }}
@@ -382,6 +411,9 @@
                                         <div style="background:#f0fdf4;border-radius:10px;padding:10px 14px;border-left:3px solid #10b981;">
                                             <div style="font-size:10px;color:#6ee7b7;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Father's Name</div>
                                             <div class="fw-semibold text-dark" style="font-size:13px;margin-top:2px;">{{ $student->fathers_name ?? 'N/A' }}</div>
+                                            @if($student->fathers_name_bn)
+                                                <div class="font-bn" style="color:#059669;font-size:13px;margin-top:1px;">{{ $student->fathers_name_bn }}</div>
+                                            @endif
                                             @if($student->father_nid)
                                             <div style="font-size:11px;color:#64748b;margin-top:2px;"><i class="fa-solid fa-id-card me-1 opacity-60"></i>NID: {{ $student->father_nid }}</div>
                                             @endif
@@ -392,6 +424,9 @@
                                         <div style="background:#fdf4ff;border-radius:10px;padding:10px 14px;border-left:3px solid #a855f7;">
                                             <div style="font-size:10px;color:#d8b4fe;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Mother's Name</div>
                                             <div class="fw-semibold text-dark" style="font-size:13px;margin-top:2px;">{{ $student->mothers_name ?? 'N/A' }}</div>
+                                            @if($student->mothers_name_bn)
+                                                <div class="font-bn" style="color:#9333ea;font-size:13px;margin-top:1px;">{{ $student->mothers_name_bn }}</div>
+                                            @endif
                                             @if($student->mother_nid)
                                             <div style="font-size:11px;color:#64748b;margin-top:2px;"><i class="fa-solid fa-id-card me-1 opacity-60"></i>NID: {{ $student->mother_nid }}</div>
                                             @endif
@@ -455,6 +490,9 @@
                                                 <i class="fa-solid fa-location-dot me-1"></i>Present / Permanent Address
                                             </div>
                                             <div class="fw-semibold text-dark" style="font-size:13px;">{{ $student->address ?? 'N/A' }}</div>
+                                            @if($student->address_bn)
+                                                <div class="font-bn" style="color:#7c3aed;font-size:13px;margin-top:3px;">{{ $student->address_bn }}</div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

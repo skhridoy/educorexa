@@ -211,15 +211,15 @@
     <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin mb-4">
         <div>
             <h4 class="mb-1 fw-bold text-primary">
-                <i class="fa-solid fa-images me-2"></i> স্লাইডার ম্যানেজমেন্ট
+                <i class="fa-solid fa-images me-2"></i> {{ __('Slider Management') }}
             </h4>
-            <p class="text-muted fs-14 mb-0">ওয়েবসাইটের প্রধান হিরো স্লাইডার ও ব্যানারসমূহ পরিচালনা ও সাজিয়ে রাখুন</p>
+            <p class="text-muted fs-14 mb-0">{{ __('ওয়েবসাইটের প্রধান হিরো স্লাইডার ও ব্যানারসমূহ পরিচালনা ও সাজিয়ে রাখুন') }}</p>
         </div>
         <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">ড্যাশবোর্ড</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">স্লাইডার</li>
+                    <li class="breadcrumb-item"><a href="{{ route('school.dashboard', ['tenant' => auth()->user()->school->slug]) }}">{{ __('Dashboard') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('Sliders') }}</li>
                 </ol>
             </nav>
         </div>
@@ -230,7 +230,7 @@
         <div class="col-12 col-sm-6 col-md-4 stretch-card">
             <div class="stat-card d-flex align-items-center justify-content-between w-100">
                 <div>
-                    <h6 class="text-muted mb-1 fs-13">মোট স্লাইডার</h6>
+                    <h6 class="text-muted mb-1 fs-13">{{ __('Total Sliders') }}</h6>
                     <h3 class="fw-bold mb-0 text-primary">{{ $totalCount ?? 0 }}</h3>
                 </div>
                 <div class="stat-icon bg-primary text-white">
@@ -241,7 +241,7 @@
         <div class="col-12 col-sm-6 col-md-4 stretch-card">
             <div class="stat-card d-flex align-items-center justify-content-between w-100">
                 <div>
-                    <h6 class="text-muted mb-1 fs-13">সক্রিয় স্লাইডার</h6>
+                    <h6 class="text-muted mb-1 fs-13">{{ __('Active Sliders') }}</h6>
                     <h3 class="fw-bold mb-0 text-success">{{ $activeCount ?? 0 }}</h3>
                 </div>
                 <div class="stat-icon bg-success text-white">
@@ -252,7 +252,7 @@
         <div class="col-12 col-sm-6 col-md-4 stretch-card">
             <div class="stat-card d-flex align-items-center justify-content-between w-100">
                 <div>
-                    <h6 class="text-muted mb-1 fs-13">নিষ্ক্রিয় স্লাইডার</h6>
+                    <h6 class="text-muted mb-1 fs-13">{{ __('Inactive Sliders') }}</h6>
                     <h3 class="fw-bold mb-0 text-secondary">{{ $inactiveCount ?? 0 }}</h3>
                 </div>
                 <div class="stat-icon bg-secondary text-white">
@@ -269,7 +269,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
                         <h6 class="card-title mb-0 fw-bold fs-16">
-                            <i class="fa-solid fa-plus-circle text-primary me-2"></i>নতুন স্লাইডার যুক্ত করুন
+                            <i class="fa-solid fa-plus-circle text-primary me-2"></i>{{ __('Add New Slider') }}
                         </h6>
                     </div>
 
@@ -279,36 +279,35 @@
 
                         {{-- ইমেজ আপলোড বক্স --}}
                         <div class="mb-3">
-                            <label class="form-label fw-medium">ইমেজ (প্রয়োজনীয়) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-medium">{{ __('Image') }} <span class="text-danger">*</span></label>
                             <div class="upload-preview-box" id="uploadBox" onclick="document.getElementById('sliderImageInput').click();">
                                 <div id="uploadPlaceholder">
                                     <i class="fa-solid fa-cloud-arrow-up fs-2 text-primary mb-2"></i>
-                                    <p class="mb-1 text-dark fw-medium">ছবি নির্বাচন করতে ক্লিক করুন</p>
-                                    <small class="text-muted d-block">JPG, PNG, WEBP (কাস্টম ক্রপ করার সুবিধা সহ)</small>
+                                    <p class="mb-1 text-dark fw-medium">{{ __('Click to choose image') }}</p>
+                                    <small class="text-muted d-block">JPG, PNG, WEBP</small>
                                 </div>
                                 <img id="imagePreview" src="#" alt="Preview" class="preview-img-holder">
                             </div>
                             <input type="file" name="image" id="sliderImageInput" class="d-none" accept="image/*" onchange="initCropperForInput(this, 'imagePreview', 'uploadPlaceholder', 'croppedImageInput')">
-                            <small class="text-muted mt-1 d-block"><i class="fa-solid fa-crop-simple me-1 text-primary"></i>ছবি সিলেক্ট করলে ক্রপার পপআপ ওপেন হবে।</small>
                             @error('image') <span class="text-danger fs-12">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- টাইটেল --}}
                         <div class="mb-3">
-                            <label class="form-label fw-medium">টাইটেল (ঐচ্ছিক)</label>
+                            <label class="form-label fw-medium">{{ __('Title (Optional)') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-heading text-muted"></i></span>
-                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" placeholder="স্লাইডার শিরোনাম লিখুন" value="{{ old('title') }}">
+                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}">
                             </div>
                             @error('title') <span class="text-danger fs-12">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- সাব-টাইটেল --}}
                         <div class="mb-3">
-                            <label class="form-label fw-medium">সাব-টাইটেল / বিবরণ (ঐচ্ছিক)</label>
+                            <label class="form-label fw-medium">{{ __('Subtitle / Description (Optional)') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fa-solid fa-align-left text-muted"></i></span>
-                                <input type="text" name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" placeholder="স্কুলের সংক্ষিপ্ত স্লোগান বা বিবরণ" value="{{ old('subtitle') }}">
+                                <input type="text" name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" value="{{ old('subtitle') }}">
                             </div>
                             @error('subtitle') <span class="text-danger fs-12">{{ $message }}</span> @enderror
                         </div>
@@ -316,22 +315,22 @@
                         <div class="row">
                             {{-- সিরিয়াল নম্বর --}}
                             <div class="col-6 mb-3">
-                                <label class="form-label fw-medium">সিরিয়াল (Order)</label>
+                                <label class="form-label fw-medium">{{ __('Serial (Order)') }}</label>
                                 <input type="number" name="order_by" class="form-control" value="{{ old('order_by', 0) }}" min="0">
                             </div>
 
                             {{-- স্ট্যাটাস --}}
                             <div class="col-6 mb-3">
-                                <label class="form-label fw-medium">স্ট্যাটাস</label>
+                                <label class="form-label fw-medium">{{ __('Status') }}</label>
                                 <select name="status" class="form-select">
-                                    <option value="1" selected>সক্রিয় (Active)</option>
-                                    <option value="0">নিষ্ক্রিয় (Inactive)</option>
+                                    <option value="1" selected>{{ __('Active') }}</option>
+                                    <option value="0">{{ __('Inactive') }}</option>
                                 </select>
                             </div>
                         </div>
 
                         <button type="submit" class="btn btn-gradient-primary w-100 py-2 mt-2 fw-medium">
-                            <i class="fa-solid fa-paper-plane me-1"></i> স্লাইডার সেভ করুন
+                            <i class="fa-solid fa-paper-plane me-1"></i> {{ __('Save Slider') }}
                         </button>
                     </form>
                 </div>
@@ -344,9 +343,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
                         <h6 class="card-title mb-0 fw-bold fs-16">
-                            <i class="fa-solid fa-list text-primary me-2"></i>বর্তমান স্লাইডারসমূহ
+                            <i class="fa-solid fa-list text-primary me-2"></i>{{ __('Current Sliders') }}
                         </h6>
-                        <span class="badge bg-primary rounded-pill px-3 py-2">মোট {{ count($sliders) }} টি স্লাইডার</span>
                     </div>
 
                     @if($sliders->isEmpty())

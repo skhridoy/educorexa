@@ -67,8 +67,8 @@
                         <i class="fa-solid fa-graduation-cap"></i>
                     </div>
                     <div>
-                        <h1 class="page-title">Student Promotion</h1>
-                        <p class="page-subtitle">শিক্ষার্থী উত্তীর্ণকরণ প্রক্রিয়া</p>
+                        <h1 class="page-title">{{ __('Student Promotion') }}</h1>
+                        <p class="page-subtitle">{{ __('Student promotion process') }}</p>
                     </div>
                 </div>
             </div>
@@ -106,9 +106,9 @@
                         <div class="row">
                             {{-- বর্তমান ক্লাস --}}
                             <div class="col-md-3 mb-3">
-                                <label class="form-label fw-bold">বর্তমান ক্লাস (From Class)</label>
+                                <label class="form-label fw-bold">{{ __('From Class') }}</label>
                                 <select name="current_class_id" class="form-select @error('current_class_id') is-invalid @enderror" required>
-                                    <option value="">ক্লাস নির্বাচন করুন</option>
+                                    <option value="">{{ __('-- Select Class --') }}</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}" {{ old('current_class_id') == $class->id ? 'selected' : '' }}>
                                             {{ $class->name }}
@@ -120,9 +120,9 @@
 
                             {{-- ফলাফলের ভিত্তি --}}
                             <div class="col-md-3 mb-3">
-                                <label class="form-label fw-bold">ফলাফলের ভিত্তি (Exam)</label>
+                                <label class="form-label fw-bold">{{ __('Basis of Result (Exam)') }}</label>
                                 <select name="exam_id" class="form-select @error('exam_id') is-invalid @enderror" required>
-                                    <option value="">পরীক্ষা নির্বাচন করুন</option>
+                                    <option value="">{{ __('-- Select Exam --') }}</option>
                                     @foreach($examTypes as $exam)
                                         <option value="{{ $exam->id }}" {{ old('exam_id') == $exam->id ? 'selected' : '' }}>
                                             {{ $exam->name }}
@@ -134,9 +134,9 @@
 
                             {{-- পরবর্তী ক্লাস --}}
                             <div class="col-md-3 mb-3">
-                                <label class="form-label fw-bold">পরবর্তী ক্লাস (To Class)</label>
+                                <label class="form-label fw-bold">{{ __('To Class') }}</label>
                                 <select name="next_class_id" class="form-select @error('next_class_id') is-invalid @enderror" required>
-                                    <option value="">পরবর্তী ক্লাস নির্বাচন করুন</option>
+                                    <option value="">{{ __('-- Select Class --') }}</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}" {{ old('next_class_id') == $class->id ? 'selected' : '' }}>
                                             {{ $class->name }}
@@ -148,9 +148,9 @@
 
                             {{-- পরবর্তী সেশন --}}
                             <div class="col-md-3 mb-3">
-                                <label class="form-label fw-bold">পরবর্তী সেশন (Next Session)</label>
+                                <label class="form-label fw-bold">{{ __('Next Session') }}</label>
                                 <select name="next_academic_year_id" class="form-select @error('next_academic_year_id') is-invalid @enderror" required>
-                                    <option value="">শিক্ষাবর্ষ নির্বাচন করুন</option>
+                                    <option value="">{{ __('-- Select Year --') }}</option>
                                     @foreach($academicYears as $year)
                                         <option value="{{ $year->id }}" {{ old('next_academic_year_id') == $year->id ? 'selected' : '' }}>
                                             {{ $year->name }}
@@ -162,8 +162,8 @@
                         </div>
 
                         <div class="mt-4 d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary" onclick="return confirm('আপনি কি নিশ্চিত? এই ছাত্রছাত্রীদের বর্তমান বছরের ডাটা সেভ হবে এবং তারা নতুন ক্লাসে উন্নীত হবে।')">
-                                <i class="me-1 icon-md" data-feather="check-circle"></i> প্রমোশন নিশ্চিত করুন
+                            <button type="submit" class="btn btn-primary" onclick="return confirm('{{ __('Are you sure?') }}')">
+                                <i class="me-1 icon-md" data-feather="check-circle"></i> {{ __('Confirm Promotion') }}
                             </button>
                         </div>
                     </form>

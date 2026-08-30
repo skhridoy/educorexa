@@ -280,18 +280,18 @@
                     <i class="fa-solid fa-user-graduate"></i>
                 </div>
                 <div>
-                    <h1 class="page-title fs-4 mb-1">Students Management</h1>
-                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">Manage and view all students in your school</p>
+                    <h1 class="page-title fs-4 mb-1">{{ __('Students Management') }}</h1>
+                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">{{ __('Manage and view all students in your school') }}</p>
                 </div>
             </div>
             <div class="header-actions">
                 <button type="button" class="btn-header-outline"
                     data-bs-toggle="modal" data-bs-target="#studentImportModal">
-                    <i class="fa-solid fa-file-excel me-1.5"></i> Import / Export
+                    <i class="fa-solid fa-file-excel me-1.5"></i> {{ __('Import / Export') }}
                 </button>
                 <a href="{{ route('students.create', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn-header-solid">
-                    <i class="fa-solid fa-plus me-1.5"></i> Add Student
+                    <i class="fa-solid fa-plus me-1.5"></i> {{ __('Add Student') }}
                 </a>
             </div>
         </div>
@@ -317,8 +317,8 @@
                                 <i class="fa-solid fa-file-excel"></i>
                             </div>
                             <div>
-                                <h5 class="modal-title fw-bold mb-0" id="studentImportModalLabel">Student Import / Export</h5>
-                                <small class="text-muted">Upload Excel file to import multiple students</small>
+                                <h5 class="modal-title fw-bold mb-0" id="studentImportModalLabel">{{ __('Student Import / Export') }}</h5>
+                                <small class="text-muted">{{ __('Upload Excel file to import multiple students') }}</small>
                             </div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -330,13 +330,13 @@
                                 <button class="nav-link active fw-semibold px-4 py-2 rounded-3" id="stu-import-tab"
                                     data-bs-toggle="pill" data-bs-target="#stuImportTabPane" type="button" role="tab"
                                     style="font-size:13.5px;">
-                                    <i class="fa-solid fa-file-import me-2"></i>Import Excel
+                                    <i class="fa-solid fa-file-import me-2"></i>{{ __('Import Excel') }}
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <a href="{{ route('students.downloadTemplate', ['tenant' => auth()->user()?->school?->slug]) }}" 
                                    class="nav-link fw-semibold px-4 py-2 rounded-3 text-success" style="font-size:13.5px;">
-                                    <i class="fa-solid fa-download me-2"></i>Download Template
+                                    <i class="fa-solid fa-download me-2"></i>{{ __('Download Template') }}
                                 </a>
                             </li>
                         </ul>
@@ -346,8 +346,8 @@
                         <div class="tab-content" id="studentImportTabContent">
                             <div class="tab-pane fade show active" id="stuImportTabPane" role="tabpanel">
                                 <form method="POST"
-                                      action="{{ route('students.import', ['tenant' => auth()->user()?->school?->slug]) }}"
-                                      enctype="multipart/form-data" id="modal_student_import_form">
+                                       action="{{ route('students.import', ['tenant' => auth()->user()?->school?->slug]) }}"
+                                       enctype="multipart/form-data" id="modal_student_import_form">
                                     @csrf
                                     <div id="modal_stu_dropzone"
                                          class="modal-dropzone"
@@ -357,7 +357,7 @@
                                         <div id="modal_stu_dz_icon" class="modal-dz-icon">
                                             <i class="fa-solid fa-cloud-arrow-up"></i>
                                         </div>
-                                        <p class="modal-dz-title" id="modal_stu_file_label">Click or drag Excel/CSV file here</p>
+                                        <p class="modal-dz-title" id="modal_stu_file_label">{{ __('Click or drag Excel/CSV file here') }}</p>
                                         <p class="modal-dz-sub">.xlsx &nbsp;•&nbsp; .xls &nbsp;•&nbsp; .csv &nbsp;—&nbsp; Max 5 MB</p>
                                         <input type="file" name="file" id="modal_stu_file"
                                                accept=".xlsx,.xls,.csv" class="d-none" required
@@ -369,12 +369,12 @@
                     </div>
 
                     <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                         <button type="button" id="modal_stu_import_submit_btn"
                                 class="btn fw-semibold rounded-pill px-5"
                                 style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;box-shadow:0 4px 14px rgba(79,70,229,0.3);display:none;"
                                 onclick="document.getElementById('modal_student_import_form').submit();">
-                            <i class="fa-solid fa-file-import me-2"></i> Start Import
+                            <i class="fa-solid fa-file-import me-2"></i> {{ __('Start Import') }}
                         </button>
                     </div>
                 </div>
@@ -386,24 +386,24 @@
             <form action="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}" method="GET" id="searchForm">
                 <div class="row g-3 align-items-end">
                     <div class="col-lg-3 col-md-3 col-12">
-                        <label class="filter-label">Search Student</label>
+                        <label class="filter-label">{{ __('Search Student') }}</label>
                         <div class="input-group search-input-wrapper">
                             <span class="input-group-text bg-transparent border-end-0">
                                 <i class="fa-solid fa-magnifying-glass text-muted"></i>
                             </span>
                             <input type="text" name="search" id="searchInput" class="form-control border-start-0 pe-4" 
-                                   placeholder="Name, Roll, ID, Contact..." value="{{ request('search') }}">
+                                   placeholder="{{ __('Name, Roll, ID, Contact...') }}" value="{{ request('search') }}">
                             @if(request('search'))
-                                <button type="button" class="clear-search-btn" onclick="clearSearchField()" title="Clear Search">
+                                <button type="button" class="clear-search-btn" onclick="clearSearchField()" title="{{ __('Clear Search') }}">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             @endif
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-3 col-6">
-                        <label class="filter-label">Class</label>
+                        <label class="filter-label">{{ __('Class') }}</label>
                         <select name="class_id" class="form-select" onchange="this.form.submit()">
-                            <option value="">All Classes</option>
+                            <option value="">{{ __('All Classes') }}</option>
                             @foreach($classes ?? [] as $class)
                                 <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>
                                     {{ $class->name }}
@@ -412,9 +412,9 @@
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-2 col-6">
-                        <label class="filter-label">Section</label>
+                        <label class="filter-label">{{ __('Section') }}</label>
                         <select name="section_id" class="form-select" onchange="this.form.submit()">
-                            <option value="">All Sections</option>
+                            <option value="">{{ __('All Sections') }}</option>
                             @foreach($sections ?? [] as $sec)
                                 <option value="{{ $sec->id }}" {{ request('section_id') == $sec->id ? 'selected' : '' }}>
                                     {{ $sec->name }}
@@ -423,22 +423,22 @@
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-2 col-6">
-                        <label class="filter-label">Sort By</label>
+                        <label class="filter-label">{{ __('Sort By') }}</label>
                         <select name="sort" class="form-select" onchange="this.form.submit()">
-                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                            <option value="roll_asc" {{ request('sort') == 'roll_asc' ? 'selected' : '' }}>Roll No</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('Newest First') }}</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>{{ __('Oldest First') }}</option>
+                            <option value="roll_asc" {{ request('sort') == 'roll_asc' ? 'selected' : '' }}>{{ __('Roll No') }}</option>
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('Name (A-Z)') }}</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-2 col-6">
                         <div class="d-flex gap-2 w-100">
                             <button type="submit" class="btn btn-primary-modern flex-fill py-2 px-3 text-nowrap rounded-3">
-                                <i class="fa-solid fa-filter me-1"></i> Filter
+                                <i class="fa-solid fa-filter me-1"></i> {{ __('Filter') }}
                             </button>
                             @if(request()->hasAny(['search', 'class_id', 'section_id', 'sort']))
                                 <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}" 
-                                   class="btn btn-light border py-2 px-3 rounded-3 text-danger flex-shrink-0" title="Reset Filters">
+                                   class="btn btn-light border py-2 px-3 rounded-3 text-danger flex-shrink-0" title="{{ __('Reset Filters') }}">
                                     <i class="fa-solid fa-rotate-left"></i>
                                 </a>
                             @endif
@@ -450,29 +450,29 @@
             {{-- Active Filter Badges --}}
             @if(request()->hasAny(['search', 'class_id', 'section_id', 'sort']))
                 <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top">
-                    <span class="small text-muted me-1"><i class="fa-solid fa-sliders me-1"></i>Active Filters:</span>
+                    <span class="small text-muted me-1"><i class="fa-solid fa-sliders me-1"></i>{{ __('Active Filters:') }}</span>
                     @if(request('search'))
                         <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium">
-                            Search: "{{ request('search') }}"
+                            {{ __('Search:') }} "{{ request('search') }}"
                             <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="ms-1 text-primary"><i class="fa-solid fa-xmark"></i></a>
                         </span>
                     @endif
                     @if(request('class_id'))
                         @php $activeClass = ($classes ?? collect())->firstWhere('id', request('class_id')); @endphp
                         <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium">
-                            Class: {{ $activeClass?->name ?? 'Selected' }}
+                            {{ __('Class:') }} {{ $activeClass?->name ?? 'Selected' }}
                             <a href="{{ request()->fullUrlWithQuery(['class_id' => null]) }}" class="ms-1 text-success"><i class="fa-solid fa-xmark"></i></a>
                         </span>
                     @endif
                     @if(request('section_id'))
                         @php $activeSec = ($sections ?? collect())->firstWhere('id', request('section_id')); @endphp
                         <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2 fw-medium">
-                            Section: {{ $activeSec?->name ?? 'Selected' }}
+                            {{ __('Section:') }} {{ $activeSec?->name ?? 'Selected' }}
                             <a href="{{ request()->fullUrlWithQuery(['section_id' => null]) }}" class="ms-1 text-info"><i class="fa-solid fa-xmark"></i></a>
                         </span>
                     @endif
                     <a href="{{ route('students.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="small text-danger ms-auto fw-semibold">
-                        Clear All
+                        {{ __('Clear All') }}
                     </a>
                 </div>
             @endif
@@ -482,16 +482,16 @@
         <div class="data-table-card">
             <div class="table-header px-4 py-3 border-bottom d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
-                    <h5 class="table-title mb-0"><i class="fa-solid fa-user-graduate me-2 text-primary"></i> Active Students Directory</h5>
+                    <h5 class="table-title mb-0"><i class="fa-solid fa-user-graduate me-2 text-primary"></i> {{ __('Active Students Directory') }}</h5>
                     <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 fw-bold" style="font-size:12px;">
-                        {{ $activeStudents ?? 0 }} Total Active
+                        {{ $activeStudents ?? 0 }} {{ __('Total Active') }}
                     </span>
                 </div>
             </div>
 
             <div id="loadingSpinner" class="text-center py-5" style="display:none;">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="text-muted mt-2">Loading students...</p>
+                <p class="text-muted mt-2">{{ __('Loading students...') }}</p>
             </div>
 
             <div id="studentTable">

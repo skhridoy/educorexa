@@ -1,8 +1,35 @@
-﻿@extends('layouts.school')
+@extends('layouts.school')
 
 @section('customCSS')
     @include('school.others._modern_design_styles')
     <style>
+        /* ═══════════════════════════════════════
+           SolaimanLipi — বাংলা ফন্ট লোড
+        ═══════════════════════════════════════ */
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-bn {
+            font-family: 'SolaimanLipi', 'Noto Serif Bengali', serif !important;
+            font-size: 14px !important;
+        }
+        .bn-label-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: .3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
         .form-card-wrapper {
             background: #ffffff;
             border: 1px solid #f1f5f9;
@@ -124,7 +151,7 @@
                         <i class="fa-solid fa-id-badge me-1 opacity-75"></i>{{ $student->student_id }}
                     </span>
                     <span style="background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);color:#e0d9ff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.2);">
-                        <i class="fa-solid fa-graduation-cap me-1 opacity-75"></i>{{ $student->class?->name ?? 'N/A' }} â€” {{ $student->section?->name ?? '' }}
+                        <i class="fa-solid fa-graduation-cap me-1 opacity-75"></i>{{ $student->class?->name ?? 'N/A' }} — {{ $student->section?->name ?? '' }}
                     </span>
                     <span style="background:{{ $student->status == 'active' ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)' }};color:{{ $student->status == 'active' ? '#d1fae5' : '#fef3c7' }};font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid {{ $student->status == 'active' ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)' }};">
                         <i class="fa-solid fa-circle me-1" style="font-size:7px;vertical-align:middle;"></i>{{ ucfirst($student->status ?? 'active') }}
@@ -135,13 +162,13 @@
                 <a href="{{ route('students.index', ['tenant' => $tenant]) }}"
                    style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 20px;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;"
                    onmouseover="this.style.background='rgba(255,255,255,0.28)'" onmouseout="this.style.background='rgba(255,255,255,0.18)'">
-                    <i class="fa-solid fa-arrow-left"></i> Back to List
+                    <i class="fa-solid fa-arrow-left"></i> {{ __('Back to List') }}
                 </a>
             </div>
         </div>
     </div>
 
-    {{-- â•â• FORM â•â• --}}
+    {{-- ════ FORM ════ --}}
     <form method="POST" action="{{ route('students.update', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" enctype="multipart/form-data" id="studentEditForm">
         @csrf
         @method('PUT')
@@ -153,8 +180,8 @@
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <div>
-                    <div class="form-section-title">Academic Information</div>
-                    <div class="form-section-subtitle">Class, section, category and admission details</div>
+                    <div class="form-section-title">{{ __('Academic Information') }}</div>
+                    <div class="form-section-subtitle">{{ __('Class, section, category and admission details') }}</div>
                 </div>
             </div>
             <div class="row g-3">
@@ -167,6 +194,16 @@
                                value="{{ old('name', $student->name) }}" required>
                         <i class="fa-solid fa-check field-icon @error('name') invalid @else {{ old('name', $student->name) ? 'valid' : '' }} @enderror"></i>
                         @error('name') <div class="invalid-feedback" style="font-size:11px;">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="name_bn">বাংলা নাম <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" name="name_bn" id="name_bn"
+                               class="form-control edu-input font-bn"
+                               placeholder="শিক্ষার্থীর বাংলা নাম লিখুন"
+                               value="{{ old('name_bn', $student->name_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('name_bn', $student->name_bn) ? 'valid' : '' }}"></i>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -215,12 +252,30 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="previous_school_bn">পূর্ববর্তী স্কুল <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" class="form-control edu-input font-bn" id="previous_school_bn" name="previous_school_bn"
+                               placeholder="পূর্ববর্তী স্কুলের বাংলা নাম"
+                               value="{{ old('previous_school_bn', $student->previous_school_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('previous_school_bn', $student->previous_school_bn) ? 'valid' : '' }}"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <label class="form-label" for="previous_class">Previous Class</label>
                     <div class="input-icon-wrapper">
                         <input type="text" name="previous_class" class="form-control edu-input" id="previous_class"
                                placeholder="Previous class name"
                                value="{{ old('previous_class', $student->previous_class) }}">
                         <i class="fa-solid fa-check field-icon {{ old('previous_class', $student->previous_class) ? 'valid' : '' }}"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="previous_class_bn">পূর্ববর্তী শ্রেণি <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" class="form-control edu-input font-bn" id="previous_class_bn" name="previous_class_bn"
+                               placeholder="পূর্ববর্তী শ্রেণি বাংলায়"
+                               value="{{ old('previous_class_bn', $student->previous_class_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('previous_class_bn', $student->previous_class_bn) ? 'valid' : '' }}"></i>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -241,8 +296,8 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <div>
-                    <div class="form-section-title">Personal & Guardian Information</div>
-                    <div class="form-section-subtitle">Parent details, date of birth, gender and religion</div>
+                    <div class="form-section-title">{{ __('Personal & Guardian Information') }}</div>
+                    <div class="form-section-subtitle">{{ __('Parent details, date of birth, gender and religion') }}</div>
                 </div>
             </div>
             <div class="row g-3">
@@ -256,12 +311,30 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="fathers_name_bn">পিতার নাম <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" name="fathers_name_bn" class="form-control edu-input font-bn" id="fathers_name_bn"
+                               placeholder="পিতার বাংলা নাম"
+                               value="{{ old('fathers_name_bn', $student->fathers_name_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('fathers_name_bn', $student->fathers_name_bn) ? 'valid' : '' }}"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <label class="form-label" for="mothers_name">Mother's Name</label>
                     <div class="input-icon-wrapper">
                         <input type="text" name="mothers_name" class="form-control edu-input" id="mothers_name"
                                placeholder="Mother's full name"
                                value="{{ old('mothers_name', $student->mothers_name) }}">
                         <i class="fa-solid fa-check field-icon {{ old('mothers_name', $student->mothers_name) ? 'valid' : '' }}"></i>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="mothers_name_bn">মাতার নাম <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" name="mothers_name_bn" class="form-control edu-input font-bn" id="mothers_name_bn"
+                               placeholder="মাতার বাংলা নাম"
+                               value="{{ old('mothers_name_bn', $student->mothers_name_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('mothers_name_bn', $student->mothers_name_bn) ? 'valid' : '' }}"></i>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -336,13 +409,13 @@
                     <i class="fa-solid fa-address-book"></i>
                 </div>
                 <div>
-                    <div class="form-section-title">Contact & Address</div>
-                    <div class="form-section-subtitle">Phone number and present address</div>
+                    <div class="form-section-title">{{ __('Contact & Address') }}</div>
+                    <div class="form-section-subtitle">{{ __('Phone number and present address') }}</div>
                 </div>
             </div>
             <div class="row g-3">
                 <div class="col-lg-3 col-md-6">
-                    <label class="form-label" for="contact_number">Contact Number</label>
+                    <label class="form-label" for="contact_number">{{ __('Contact Number') }}</label>
                     <div class="input-icon-wrapper">
                         <input type="text" class="form-control edu-input" id="contact_number" name="contact_number"
                                placeholder="11 digit phone (01XXXXXXXXX)"
@@ -351,13 +424,22 @@
                     </div>
                     <div class="text-danger" id="phone_error" style="font-size:11px;display:none;"></div>
                 </div>
-                <div class="col-lg-6 col-md-6">
-                    <label class="form-label" for="address">Present / Permanent Address</label>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label" for="address">{{ __('Present / Permanent Address') }}</label>
                     <div class="input-icon-wrapper">
                         <input type="text" name="address" class="form-control edu-input" id="address"
                                placeholder="Enter full address"
                                value="{{ old('address', $student->address) }}">
                         <i class="fa-solid fa-check field-icon {{ old('address', $student->address) ? 'valid' : '' }}"></i>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label" for="address_bn">ঠিকানা <span class="bn-label-tag">বাংলা</span></label>
+                    <div class="input-icon-wrapper">
+                        <input type="text" name="address_bn" class="form-control edu-input font-bn" id="address_bn"
+                               placeholder="বর্তমান / স্থায়ী ঠিকানা বাংলায়"
+                               value="{{ old('address_bn', $student->address_bn) }}">
+                        <i class="fa-solid fa-check field-icon {{ old('address_bn', $student->address_bn) ? 'valid' : '' }}"></i>
                     </div>
                 </div>
             </div>
@@ -370,13 +452,13 @@
                     <i class="fa-solid fa-circle-user"></i>
                 </div>
                 <div>
-                    <div class="form-section-title">Account & Photo</div>
-                    <div class="form-section-subtitle">Email address and profile picture</div>
+                    <div class="form-section-title">{{ __('Account & Photo') }}</div>
+                    <div class="form-section-subtitle">{{ __('Account credentials and profile photo') }}</div>
                 </div>
             </div>
             <div class="row g-3 align-items-center">
                 <div class="col-lg-4 col-md-6">
-                    <label class="form-label" for="email">Email Address</label>
+                    <label class="form-label" for="email">{{ __('Email Address') }}</label>
                     <div class="input-icon-wrapper">
                         <input type="email" name="email" class="form-control edu-input" id="email"
                                placeholder="student@example.com"
@@ -385,14 +467,14 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <label class="form-label" for="photo">Update Photo</label>
+                    <label class="form-label" for="photo">{{ __('Upload Photo') }}</label>
                     <input type="file" class="form-control edu-input" id="photo" name="photo" accept="image/*" style="padding:7px 14px !important;">
                     <div class="mt-1" style="font-size:11px;color:#94a3b8;">
-                        <i class="fa-solid fa-circle-info me-1"></i>JPG, PNG â€” max 2MB. Leave empty to keep current.
+                        <i class="fa-solid fa-circle-info me-1"></i>JPG, PNG — max 2MB. Leave empty to keep current.
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-12 text-center">
-                    <label class="form-label d-block">Current Photo</label>
+                    <label class="form-label d-block">{{ __('Current Photo') }}</label>
                     <img id="photoPreview"
                          src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}"
                          alt="Student Photo" class="avatar-preview-ring">
@@ -403,13 +485,13 @@
         {{-- Submit Row --}}
         <div class="d-flex align-items-center justify-content-between gap-3 pb-4">
             <a href="{{ route('students.index', ['tenant' => $tenant]) }}" class="btn-cancel">
-                <i class="fa-solid fa-xmark" style="font-size:12px;"></i> Cancel
+                <i class="fa-solid fa-xmark" style="font-size:12px;"></i> {{ __('Cancel') }}
             </a>
             <button type="submit" class="btn-save">
                 <span style="width:24px;height:24px;background:rgba(255,255,255,0.2);border-radius:7px;display:inline-flex;align-items:center;justify-content:center;">
                     <i class="fa-regular fa-floppy-disk" style="font-size:12px;"></i>
                 </span>
-                Update Student
+                {{ __('Update Student') }}
             </button>
         </div>
     </form>

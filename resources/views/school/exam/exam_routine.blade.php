@@ -156,10 +156,10 @@
             <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 position-relative" style="z-index: 2;">
                 <div>
                     <h1 class="routine-hero-title">
-                        <i class="fa-solid fa-calendar-days me-2 text-indigo-400"></i>পরীক্ষার রুটিন ব্যবস্থাপনা
+                        <i class="fa-solid fa-calendar-days me-2 text-indigo-400"></i>{{ __('Exam Routine Management') }}
                     </h1>
                     <p class="routine-hero-subtitle">
-                        শিক্ষাবর্ষ, ক্যাটেগরি ও শ্রেণি নির্বাচন করে শ্রেণিভিত্তিক বিষয় ও পরীক্ষার সময়সূচি তৈরি করুন
+                        {{ __('Create subject & exam schedules class-wise by selecting academic year, category & class') }}
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-3">
                         @if($selectedYear)
@@ -180,7 +180,7 @@
                     <div class="d-flex gap-2 align-items-center">
                         <a href="{{ route('exam.bulk_admit_card', ['tenant' => $tenant, 'exam_id' => $selectedExam->id, 'class_id' => $selectedClass->id]) }}" 
                            target="_blank" class="btn btn-sm btn-light fw-bold" style="border-radius: 10px; padding: 8px 16px;">
-                            <i class="fa-solid fa-id-card me-1 text-primary"></i> এডমিট কার্ড দেখুন
+                            <i class="fa-solid fa-id-card me-1 text-primary"></i> {{ __('View Admit Card') }}
                         </a>
                     </div>
                 @endif
@@ -218,15 +218,15 @@
         {{-- ══ FILTER CARD ══ --}}
         <div class="filter-card mb-4">
             <h6 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
-                <i class="fa-solid fa-sliders text-indigo-600"></i> রুটিন নির্বাচন ফিল্টার
+                <i class="fa-solid fa-sliders text-indigo-600"></i> {{ __('Routine Filter') }}
             </h6>
             <form action="{{ request()->url() }}" method="GET" id="filter-form">
                 <div class="row g-3 align-items-end">
                     {{-- Academic Year --}}
                     <div class="col-12 col-sm-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-calendar-days me-1 text-primary"></i> শিক্ষাবর্ষ (সাল) <span class="text-danger">*</span></label>
+                        <label class="filter-label"><i class="fa-solid fa-calendar-days me-1 text-primary"></i> {{ __('Academic Year') }} <span class="text-danger">*</span></label>
                         <select name="academic_year_id" class="form-select" id="year-select" required>
-                            <option value="">-- সাল নির্বাচন করুন --</option>
+                            <option value="">{{ __('-- Select Year --') }}</option>
                             @foreach($years as $year)
                                 <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>
                                     {{ $year->name }}
@@ -237,9 +237,9 @@
 
                     {{-- Category --}}
                     <div class="col-12 col-sm-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-layer-group me-1 text-info"></i> ক্যাটেগরি (শাখা)</label>
+                        <label class="filter-label"><i class="fa-solid fa-layer-group me-1 text-info"></i> {{ __('School Category') }}</label>
                         <select name="school_category_id" class="form-select" id="category-select">
-                            <option value="">-- সকল ক্যাটেগরি --</option>
+                            <option value="">{{ __('All Categories') }}</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ $selectedCategoryId == $cat->id ? 'selected' : '' }}>
                                     {{ $cat->name }}
@@ -250,9 +250,9 @@
 
                     {{-- Exam Name --}}
                     <div class="col-12 col-sm-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-file-pen me-1 text-warning"></i> পরীক্ষার নাম <span class="text-danger">*</span></label>
+                        <label class="filter-label"><i class="fa-solid fa-file-pen me-1 text-warning"></i> {{ __('Exam Name') }} <span class="text-danger">*</span></label>
                         <select name="exam_id" class="form-select" id="exam-select" required>
-                            <option value="">-- পরীক্ষা নির্বাচন করুন --</option>
+                            <option value="">{{ __('-- Select Exam --') }}</option>
                             @foreach($exams as $exam)
                                 <option value="{{ $exam->id }}" {{ $selectedExamId == $exam->id ? 'selected' : '' }}>
                                     {{ $exam->name }} {{ $exam->category ? '('.$exam->category->name.')' : '' }}
@@ -263,9 +263,9 @@
 
                     {{-- Class --}}
                     <div class="col-12 col-sm-6 col-md-3">
-                        <label class="filter-label"><i class="fa-solid fa-chalkboard me-1 text-success"></i> শ্রেণি (ক্লাস) <span class="text-danger">*</span></label>
+                        <label class="filter-label"><i class="fa-solid fa-chalkboard me-1 text-success"></i> {{ __('Class') }} <span class="text-danger">*</span></label>
                         <select name="class_id" class="form-select" id="class-select" required>
-                            <option value="">-- শ্রেণি নির্বাচন করুন --</option>
+                            <option value="">{{ __('-- Select Class --') }}</option>
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}" {{ $selectedClassId == $class->id ? 'selected' : '' }}>
                                     {{ $class->name }}
@@ -277,7 +277,7 @@
                     {{-- Submit Button --}}
                     <div class="col-12 text-end mt-3">
                         <button type="submit" class="btn btn-primary px-4 fw-bold" style="border-radius: 10px; padding: 10px 24px;">
-                            <i class="fa-solid fa-magnifying-glass me-1"></i> রুটিন লোড করুন
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> {{ __('Filter') }}
                         </button>
                     </div>
                 </div>
@@ -368,11 +368,11 @@
                             <thead>
                                 <tr>
                                     <th style="width: 50px;">#</th>
-                                    <th style="min-width: 220px;">বিষয় (Subject) <span class="text-danger">*</span></th>
-                                    <th style="min-width: 170px;">পরীক্ষার তারিখ <span class="text-danger">*</span></th>
-                                    <th style="min-width: 130px;">শুরু সময় (ঐচ্ছিক)</th>
-                                    <th style="min-width: 130px;">শেষ সময় (ঐচ্ছিক)</th>
-                                    <th style="width: 70px; text-align: center;">অ্যাকশন</th>
+                                    <th style="min-width: 220px;">{{ __('Subject') }} <span class="text-danger">*</span></th>
+                                    <th style="min-width: 170px;">{{ __('Exam Date') }} <span class="text-danger">*</span></th>
+                                    <th style="min-width: 130px;">{{ __('Start Date') }}</th>
+                                    <th style="min-width: 130px;">{{ __('End Date') }}</th>
+                                    <th style="width: 70px; text-align: center;">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="routine-rows">
@@ -468,7 +468,7 @@
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2">
                         <small class="text-muted"><i class="fa-solid fa-info-circle me-1"></i> সংরক্ষণ করার পর পূর্বের রুটিন স্বয়ংক্রিয়ভাবে আপডেট হয়ে যাবে।</small>
                         <button type="submit" class="btn btn-primary px-4 fw-bold" style="border-radius: 10px; padding: 10px 28px;">
-                            <i class="fa-solid fa-floppy-disk me-2"></i> রুটিন সংরক্ষণ করুন
+                            <i class="fa-solid fa-floppy-disk me-2"></i> {{ __('Save Changes') }}
                         </button>
                     </div>
                 </form>

@@ -2,6 +2,8 @@
 @php
     $user = auth()->user();
     $unreadNotifications = auth()->check() ? $user->unreadNotifications : collect();
+    $school = $currentSchool ?? $user?->school;
+    $tenant = $school?->slug ?? $user?->school?->slug ?? request()->route('tenant') ?? '';
     
     // ইউজার রোল অনুযায়ী ফোল্ডার পাথ নির্ধারণ
     $folder = ($user && $user->role === 'super_admin') ? 'super_admin' : 'employees';
@@ -23,6 +25,8 @@
             $userPhoto = asset($user->student->photo);
         }
     }
+
+    $currentLocale = app()->getLocale();
 @endphp
 {{-- ফটো লজিক শেষ --}}
 
@@ -42,15 +46,52 @@
                 <div class="input-group-text">
                     <i data-feather="search" style="width:16px;height:16px;"></i>
                 </div>
-                <input type="text" class="form-control" id="navbarForm" placeholder="Search schools, settings...">
+                <input type="text" class="form-control" id="navbarForm" placeholder="{{ __('Search schools, settings...') }}">
             </div>
         </form>
     </div>
 
     {{-- Right: Actions + Profile --}}
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-2 gap-md-3">
         
-        {{-- Theme Switcher (আগের হেডারের ফিচারটি রাখা হলো) --}}
+        {{-- Language Switcher (বাংলা ↔ English) --}}
+        <div class="dropdown">
+            <button class="btn btn-sm d-flex align-items-center gap-1.5 px-2.5 py-1.5 rounded-pill"
+                    style="background: rgba(79, 70, 229, 0.08); border: 1px solid rgba(79, 70, 229, 0.2); color: #4f46e5; font-weight: 600; font-size: 12px; transition: all .2s;"
+                    data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('Language') }}">
+                <i class="fa-solid fa-globe"></i>
+                <span class="d-none d-sm-inline">{{ $currentLocale === 'bn' ? 'বাংলা' : 'EN' }}</span>
+                <i data-feather="chevron-down" style="width:12px;height:12px;"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2" style="border-radius: 12px; min-width: 140px; margin-top: 8px;">
+                <li>
+                    @php
+                        $enRoute = $tenant ? route('school.set.locale', ['tenant' => $tenant, 'lang' => 'en']) : route('set.locale', ['lang' => 'en']);
+                    @endphp
+                    <a class="dropdown-item d-flex align-items-center justify-content-between py-1.5 px-3 {{ $currentLocale === 'en' ? 'active fw-bold' : '' }}"
+                       href="{{ $enRoute }}">
+                        <span>🇬🇧 English</span>
+                        @if($currentLocale === 'en')
+                            <i class="fa-solid fa-check text-primary" style="font-size: 11px;"></i>
+                        @endif
+                    </a>
+                </li>
+                <li>
+                    @php
+                        $bnRoute = $tenant ? route('school.set.locale', ['tenant' => $tenant, 'lang' => 'bn']) : route('set.locale', ['lang' => 'bn']);
+                    @endphp
+                    <a class="dropdown-item d-flex align-items-center justify-content-between py-1.5 px-3 {{ $currentLocale === 'bn' ? 'active fw-bold font-bn' : 'font-bn' }}"
+                       href="{{ $bnRoute }}">
+                        <span>🇧🇩 বাংলা</span>
+                        @if($currentLocale === 'bn')
+                            <i class="fa-solid fa-check text-primary" style="font-size: 11px;"></i>
+                        @endif
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        {{-- Theme Switcher --}}
         <div class="nav-item d-md-flex align-items-center">
             <label class="theme-switch">
                 <input type="checkbox" id="theme-switcher" onclick="toggleTheme()">
@@ -77,9 +118,9 @@
                  style="width:340px;border-radius:16px;overflow:hidden;margin-top:8px;">
                 <div class="p-3 border-bottom" style="background:#fafbff;">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-bold">Notifications</h6>
+                        <h6 class="mb-0 fw-bold">{{ __('Notifications') }}</h6>
                         @if($unreadNotifications->count() > 0)
-                            <span class="badge bg-primary rounded-pill">{{ $unreadNotifications->count() }} New</span>
+                            <span class="badge bg-primary rounded-pill">{{ $unreadNotifications->count() }} {{ __('New') }}</span>
                         @endif
                     </div>
                 </div>
@@ -91,7 +132,7 @@
                             </div>
                             <div>
                                 <p class="mb-0 text-dark fw-bold" style="font-size:0.82rem;">
-                                    {{ $notification->data['message'] ?? 'New notification' }}
+                                    {{ $notification->data['message'] ?? __('New notification') }}
                                 </p>
                                 <p class="mb-0 text-muted" style="font-size:0.75rem;">
                                     {{ $notification->created_at->diffForHumans() }}
@@ -100,7 +141,7 @@
                         </div>
                     @empty
                         <div class="p-4 text-center">
-                            <p class="mb-0 text-muted small">All caught up!</p>
+                            <p class="mb-0 text-muted small">{{ __('All caught up!') }}</p>
                         </div>
                     @endforelse
                 </div>
@@ -117,7 +158,7 @@
                 <div class="d-none d-md-block text-start">
                     <div class="edu-user-name" style="font-size:0.82rem;font-weight:700;line-height:1.1;">{{ $user->name }}</div>
                     <div class="edu-user-role" style="font-size:10px;font-weight:700;text-transform:uppercase;">
-                        {{ str_replace('_', ' ', $user->role) }}
+                        {{ __(ucwords(str_replace('_', ' ', $user->role))) }}
                     </div>
                 </div>
                 <i data-feather="chevron-down" style="width:14px;height:14px;color:#94a3b8;"></i>
@@ -136,21 +177,19 @@
                 <div class="p-2">
                     <a href="{{ ($user->role === 'super_admin') ? route('profile') : route('user.profile') }}"
                        class="dropdown-item d-flex align-items-center gap-2 py-2">
-                        <i data-feather="user" style="width:16px;height:16px;"></i> My Profile
+                        <i data-feather="user" style="width:16px;height:16px;"></i> {{ __('My Profile') }}
                     </a>
                 </div>
 
                 <div class="p-2 border-top">
                     @php
-                        $school = $currentSchool ?? $user?->school;
-                        $tenant = $school?->slug ?? $user?->school?->slug ?? request()->route('tenant') ?? '';
                         $logoutRoute = ($user && ($user->role === 'super_admin' || $user->role === 'HR' || $user->role === 'Marketing')) 
                                         ? route('logout') 
                                         : ($tenant ? route('school.logout', ['tenant' => $tenant]) : route('logout'));
                     @endphp
                     <a href="javascript:;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                        class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger">
-                       <i data-feather="log-out" style="width:16px;height:16px;"></i> Log Out
+                       <i data-feather="log-out" style="width:16px;height:16px;"></i> {{ __('Log Out') }}
                     </a>
                     <form id="logout-form" action="{{ $logoutRoute }}" method="POST" class="d-none">
                         @csrf

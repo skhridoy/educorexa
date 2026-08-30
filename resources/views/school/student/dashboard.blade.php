@@ -9,10 +9,10 @@
     <div class="container-fluid">
         @php
             $hour = date('H');
-            if ($hour >= 5 && $hour < 12)      { $greeting = "Good Morning";   $faIcon = "fa-sun";     $greetColor = "#f59e0b"; }
-            elseif ($hour >= 12 && $hour < 17) { $greeting = "Good Afternoon"; $faIcon = "fa-cloud-sun"; $greetColor = "#f97316"; }
-            elseif ($hour >= 17 && $hour < 21) { $greeting = "Good Evening";   $faIcon = "fa-sunset";  $greetColor = "#8b5cf6"; }
-            else                               { $greeting = "Good Night";     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
+            if ($hour >= 5 && $hour < 12)      { $greeting = __("Good Morning");   $faIcon = "fa-sun";     $greetColor = "#f59e0b"; }
+            elseif ($hour >= 12 && $hour < 17) { $greeting = __("Good Afternoon"); $faIcon = "fa-cloud-sun"; $greetColor = "#f97316"; }
+            elseif ($hour >= 17 && $hour < 21) { $greeting = __("Good Evening");   $faIcon = "fa-sunset";  $greetColor = "#8b5cf6"; }
+            else                               { $greeting = __("Good Night");     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
         @endphp
 
         {{-- ===== WELCOME HERO CARD ===== --}}
@@ -28,11 +28,11 @@
                         </h2>
                     </div>
                     <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
-                        Class : {{ $student->class->name }} | Section : {{ $student->section->name }} | Roll : {{ $student->roll }}
+                        {{ __('Class') }} : {{ $student->class->name }} | {{ __('Section') }} : {{ $student->section->name }} | {{ __('Roll') }} : {{ $student->roll }}
                     </p>
                     <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
                         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-calendar-days me-1"></i> Student ID: {{ $student->student_id }}
+                            <i class="fa-regular fa-calendar-days me-1"></i> {{ __('Student ID') }}: {{ $student->student_id }}
                         </span>
                         <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
                             <i class="fa-regular fa-clock me-1"></i> {{ now()->format('h:i A') }}
@@ -54,11 +54,11 @@
                         <div class="icon-wrap" style="background:rgba(13, 110, 253, 0.1); color:#0d6efd;">
                             <i class="fa-solid fa-user-check"></i>
                         </div>
-                        <span class="stat-badge" style="background:rgba(13, 110, 253, 0.1); color:#0d6efd;">Attendance</span>
+                        <span class="stat-badge" style="background:rgba(13, 110, 253, 0.1); color:#0d6efd;">{{ __('Attendance') }}</span>
                     </div>
-                    <div class="stat-label">This Month's Attendance</div>
+                    <div class="stat-label">{{ __("This Month's Attendance") }}</div>
                     <div class="stat-value">{{ $attendancePercentage }}%</div>
-                    <div class="mt-2 text-muted small">{{ $presentDays }}/{{ $totalDays }} days present</div>
+                    <div class="mt-2 text-muted small">{{ $presentDays }}/{{ $totalDays }} {{ __('days present') }}</div>
                 </div>
             </div>
 
@@ -68,11 +68,11 @@
                         <div class="icon-wrap" style="background:rgba(220, 53, 69, 0.1); color:#dc3545;">
                             <i class="fa-solid fa-file-invoice-dollar"></i>
                         </div>
-                        <span class="stat-badge" style="background:rgba(220, 53, 69, 0.1); color:#dc3545;">Fees</span>
+                        <span class="stat-badge" style="background:rgba(220, 53, 69, 0.1); color:#dc3545;">{{ __('Fees') }}</span>
                     </div>
-                    <div class="stat-label">Total Due Fee</div>
+                    <div class="stat-label">{{ __('Total Due Fee') }}</div>
                     <div class="stat-value text-danger">৳ {{ number_format($totalDue) }}</div>
-                    <div class="mt-2 text-muted small">{{ $unpaidFees->count() }} unpaid fees</div>
+                    <div class="mt-2 text-muted small">{{ $unpaidFees->count() }} {{ __('unpaid fees') }}</div>
                 </div>
             </div>
 
@@ -82,11 +82,11 @@
                         <div class="icon-wrap" style="background:rgba(25, 135, 84, 0.1); color:#198754;">
                             <i class="fa-solid fa-book-open"></i>
                         </div>
-                        <span class="stat-badge" style="background:rgba(25, 135, 84, 0.1); color:#198754;">Homework</span>
+                        <span class="stat-badge" style="background:rgba(25, 135, 84, 0.1); color:#198754;">{{ __('Homework') }}</span>
                     </div>
-                    <div class="stat-label">Upcoming Assignments</div>
+                    <div class="stat-label">{{ __('Upcoming Assignments') }}</div>
                     <div class="stat-value text-success">{{ $diaries->count() }}</div>
-                    <div class="mt-2 text-muted small">Home Work & Class Work</div>
+                    <div class="mt-2 text-muted small">{{ __('Home Work & Class Work') }}</div>
                 </div>
             </div>
         </div>
@@ -95,21 +95,21 @@
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
                     <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-book-open me-2 text-primary"></i>আজকের ডায়েরি / বাড়ির কাজ</h5>
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-book-open me-2 text-primary"></i>{{ __("Today's Diary / Homework") }}</h5>
                     </div>
                     <div class="card-body">
                         @forelse($diaries as $diary)
                             <div class="p-3 mb-3 border-start border-4 border-primary rounded-3 shadow-sm" style="background: var(--card-bg);">
                                 <div class="d-flex justify-content-between">
                                     <h6 class="fw-bold mb-1 text-primary">{{ $diary->subject->name }}</h6>
-                                    <small class="text-muted"><i class="far fa-user me-1"></i> {{ $diary->teacher->name ?? 'শিক্ষক' }}</small>
+                                    <small class="text-muted"><i class="far fa-user me-1"></i> {{ $diary->teacher->name ?? __('Teacher') }}</small>
                                 </div>
                                 <p class="mb-0 opacity-75">{{ $diary->lesson_description }}</p>
                             </div>
                         @empty
                             <div class="text-center py-5">
                                 <i class="fa-solid fa-clipboard-check fa-4x mb-3 opacity-25"></i>
-                                <p class="text-muted">আজকের জন্য কোনো বাড়ির কাজ দেওয়া হয়নি।</p>
+                                <p class="text-muted">{{ __('No homework assigned for today.') }}</p>
                             </div>
                         @endforelse
                     </div>
@@ -119,15 +119,15 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-white border-0 py-3">
-                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-file-invoice-dollar me-2 text-danger"></i>Unpaid Fee's List</h5>
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-file-invoice-dollar me-2 text-danger"></i>{{ __("Unpaid Fee's List") }}</h5>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table edu-table align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="ps-3">Fee Name</th>
-                                        <th class="text-end pe-3">Amount</th>
+                                        <th class="ps-3">{{ __('Fee Name') }}</th>
+                                        <th class="text-end pe-3">{{ __('Amount') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -143,7 +143,7 @@
                                         <tr>
                                             <td colspan="2" class="text-center py-5 text-success">
                                                 <i class="fa-solid fa-circle-check fa-2x mb-2 d-block"></i>
-                                                আপনার কোনো বকেয়া নেই!
+                                                {{ __('You have no dues!') }}
                                             </td>
                                         </tr>
                                     @endforelse
@@ -153,24 +153,26 @@
                     </div>
                     @if($totalDue > 0)
                     <div class="card-footer border-0 bg-transparent py-3 px-3">
-                        <a href="#" class="btn btn-danger w-100 rounded-pill py-2 shadow-sm fw-bold">Pay Now</a>
+                        <a href="#" class="btn btn-danger w-100 rounded-pill py-2 shadow-sm fw-bold">{{ __('Pay Now') }}</a>
                     </div>
                     @endif
                 </div>
             </div>
+        </div>
+
         {{-- ===== WEEKLY ROUTINE SECTION (TABLE CHART) ===== --}}
         <div class="row mt-4">
             <div class="col-12">
                 <div class="schools-panel">
                     <div class="panel-header">
-                        <h6 class="panel-title"><i class="fa-solid fa-table-columns me-2 text-primary"></i>My Class Weekly Routine Chart</h6>
+                        <h6 class="panel-title"><i class="fa-solid fa-table-columns me-2 text-primary"></i>{{ __('My Class Weekly Routine Chart') }}</h6>
                     </div>
                     <div class="table-responsive">
                         <table class="table routine-chart-table mb-0">
                             <thead>
                                 <tr>
-                                    <th style="width: 120px;">Day</th>
-                                    <th>Periods & Subjects</th>
+                                    <th style="width: 120px;">{{ __('Day') }}</th>
+                                    <th>{{ __('Periods & Subjects') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -181,9 +183,9 @@
                                 @foreach($days as $day)
                                     <tr class="{{ strtolower($day) == strtolower($today) ? 'chart-today' : '' }}">
                                         <td class="chart-day-cell">
-                                            <span class="fw-bold">{{ $day }}</span>
+                                            <span class="fw-bold">{{ __($day) }}</span>
                                             @if(strtolower($day) == strtolower($today))
-                                                <span class="badge bg-primary ms-1" style="font-size: 8px;">Today</span>
+                                                <span class="badge bg-primary ms-1" style="font-size: 8px;">{{ __('Today') }}</span>
                                             @endif
                                         </td>
                                         <td class="chart-content-cell">
@@ -195,7 +197,7 @@
                                                         <div class="teacher-info"><i class="fa-solid fa-chalkboard-user me-1"></i> {{ $r->teacher->name }}</div>
                                                     </div>
                                                 @empty
-                                                    <span class="text-muted small italic">No classes scheduled</span>
+                                                    <span class="text-muted small italic">{{ __('No classes scheduled') }}</span>
                                                 @endforelse
                                             </div>
                                         </td>

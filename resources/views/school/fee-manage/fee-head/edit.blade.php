@@ -7,25 +7,25 @@
                 <div class="card">
                     <div class="card-body">
                         
-                        <h6 class="card-title">Update Fee Head</h6>
+                        <h6 class="card-title">{{ __('Update Fee Head') }}</h6>
                         <form action="{{ route('fee-heads.update', ['tenant' => auth()->user()->school->slug, 'fee_head' => $fee_head->id]) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
+                                <label for="name" class="form-label">{{ __('Name') }}</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="Ex: Admission Fee" value="{{ $fee_head->name }}" required>
                             </div>
                             <div class="mb-3">
-                                <label for="type" class="form-label">Fee Type</label>
+                                <label for="type" class="form-label">{{ __('Fee Type') }}</label>
                                 <select class="form-control" id="type" name="type">
-                                    <option value="" default selected>Select Type</option>
-                                    <option value="monthly" {{ $fee_head->type == 'monthly' ? 'selected' : '' }}>Monthly</option>
-                                    <option value="once" {{ $fee_head->type == 'once' ? 'selected' : '' }}>Once</option>
-                                    <option value="recurring" {{ $fee_head->type == 'recurring' ? 'selected' : '' }}>Recurring</option>
+                                    <option value="" default selected>{{ __('Select Type') }}</option>
+                                    <option value="monthly" {{ $fee_head->type == 'monthly' ? 'selected' : '' }}>{{ __('Monthly') }}</option>
+                                    <option value="once" {{ $fee_head->type == 'once' ? 'selected' : '' }}>{{ __('Once') }}</option>
+                                    <option value="recurring" {{ $fee_head->type == 'recurring' ? 'selected' : '' }}>{{ __('Recurring') }}</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-end">Update</button>
-                            <a href="{{ route('fee-heads.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary btn-end">Cancel</a>
+                            <button type="submit" class="btn btn-primary btn-end">{{ __('Update') }}</button>
+                            <a href="{{ route('fee-heads.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-secondary btn-end">{{ __('Cancel') }}</a>
                         </form>
                     </div>
                 </div>
@@ -33,15 +33,15 @@
             <div class="col-md-8 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h6 class="card-title">Fee Head List</h6>
+                        <h6 class="card-title">{{ __('Fee Head List') }}</h6>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Fee Type</th>
-                                        <th>Description</th>
-                                        <th width="150">Action</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Fee Type') }}</th>
+                                        <th>{{ __('Description') }}</th>
+                                        <th width="150">{{ __('Action') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

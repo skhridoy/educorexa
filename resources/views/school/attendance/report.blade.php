@@ -9,12 +9,12 @@
     <div class="container-fluid">
         {{-- Search Section --}}
         <div class="filter-section mb-4">
-            <h5 class="mb-3 fw-bold text-primary"><i class="fa-solid fa-magnifying-glass me-2"></i> Attendance Report Search</h5>
+            <h5 class="mb-3 fw-bold text-primary"><i class="fa-solid fa-magnifying-glass me-2"></i> {{ __('Attendance Report Search') }}</h5>
             <form action="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" method="GET" class="row g-3">
                 <div class="col-md-7">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-id-card text-muted"></i></span>
-                        <input type="text" name="student_id" class="form-control border-start-0 ps-0" placeholder="Enter Student ID (e.g. STD-26011)" value="{{ request('student_id') }}" required>
+                        <input type="text" name="student_id" class="form-control border-start-0 ps-0" placeholder="{{ __('Enter Student ID (e.g. STD-26011)') }}" value="{{ request('student_id') }}" required>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -26,7 +26,7 @@
                 </div>
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-primary-gradient w-100">
-                        <i class="fa-solid fa-file-invoice me-2"></i> View Report
+                        <i class="fa-solid fa-file-invoice me-2"></i> {{ __('View Report') }}
                     </button>
                 </div>
             </form>
@@ -45,15 +45,15 @@
                     <div class="card-body p-4">
                         <div class="row g-3 mb-4">
                             <div class="col-4">
-                                <small class="text-muted d-block mb-1">Class</small>
+                                <small class="text-muted d-block mb-1">{{ __('Class') }}</small>
                                 <div class="fw-bold text-dark">{{ $student->class->name ?? 'N/A' }}</div>
                             </div>
                             <div class="col-4 text-center">
-                                <small class="text-muted d-block mb-1">Section</small>
+                                <small class="text-muted d-block mb-1">{{ __('Section') }}</small>
                                 <div class="fw-bold text-dark">{{ $student->section->name ?? 'N/A' }}</div>
                             </div>
                             <div class="col-4 text-end">
-                                <small class="text-muted d-block mb-1">Roll</small>
+                                <small class="text-muted d-block mb-1">{{ __('Roll') }}</small>
                                 <div class="fw-bold text-primary">#{{ $student->roll ?? 'N/A' }}</div>
                             </div>
                         </div>
@@ -69,20 +69,20 @@
                             <div class="col-6">
                                 <div class="stat-card-mini">
                                     <h3 class="text-success fw-bold mb-0">{{ $pCount }}</h3>
-                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 9px;">Present</small>
+                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 9px;">{{ __('Present') }}</small>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="stat-card-mini">
                                     <h3 class="text-danger fw-bold mb-0">{{ $aCount }}</h3>
-                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 9px;">Absent</small>
+                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 9px;">{{ __('Absent') }}</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="attendance-progress">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <small class="fw-bold text-dark">Attendance Rate</small>
+                                <small class="fw-bold text-dark">{{ __('Attendance Rate') }}</small>
                                 <small class="fw-bold text-primary">{{ $rate }}%</small>
                             </div>
                             <div class="progress rounded-pill" style="height: 10px; background: #e2e8f0;">
@@ -107,7 +107,7 @@
                             <div class="card-body p-3">
                                 <table class="calendar-table-modern">
                                     <thead>
-                                        <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+                                        <tr><th>{{ __('Sun') }}</th><th>{{ __('Mon') }}</th><th>{{ __('Tue') }}</th><th>{{ __('Wed') }}</th><th>{{ __('Thu') }}</th><th>{{ __('Fri') }}</th><th>{{ __('Sat') }}</th></tr>
                                     </thead>
                                     <tbody>
                                         @php
@@ -138,7 +138,7 @@
                                                 @else
                                                     <td class="{{ ($isFriday || $isSpecialHoliday) ? 'day-off' : '' }} {{ $status == 'P' ? 'day-present' : ($status == 'A' ? 'day-absent' : '') }}">
                                                         @if($isFriday || $isSpecialHoliday)
-                                                            <span class="off-label">OFF</span>
+                                                            <span class="off-label">{{ __('OFF') }}</span>
                                                         @endif
                                                         {{ $d++ }}
                                                     </td>
@@ -159,7 +159,7 @@
         @elseif(request('student_id'))
             <div class="text-center py-5">
                 <i class="fa-solid fa-face-frown fs-1 text-muted mb-3"></i>
-                <h5 class="text-muted">Student not found. Please verify the ID.</h5>
+                <h5 class="text-muted">{{ __('Student not found. Please verify the ID.') }}</h5>
             </div>
         @endif
     </div>

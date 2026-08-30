@@ -11,12 +11,12 @@
         <div class="page-header-card mb-4">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="page-header-content">
-                    <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Routine Entry</h1>
-                    <p class="page-subtitle">Update class schedule period, assigned teacher, or room number.</p>
+                    <h1 class="page-title"><i class="fa-solid fa-pen-to-square me-2"></i> {{ __('Edit Routine Entry') }}</h1>
+                    <p class="page-subtitle">{{ __('Update class schedule period, assigned teacher, or room number.') }}</p>
                 </div>
                 <div>
                     <a href="{{ route('routine.index') }}" class="btn btn-outline-light px-4 py-2" style="border-radius:12px;">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Routine List
+                        <i class="fa-solid fa-arrow-left me-1"></i> {{ __('Back to Routine List') }}
                     </a>
                 </div>
             </div>
@@ -28,9 +28,9 @@
                 @method('PUT')
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Academic Year <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Academic Year') }} <span class="text-danger">*</span></label>
                         <select name="academic_year_id" class="form-select select2" required>
-                            <option value="">Select Year</option>
+                            <option value="">{{ __('Select Year') }}</option>
                             @foreach($academicYears as $year)
                                 <option value="{{ $year->id }}" {{ $routine->academic_year_id == $year->id ? 'selected' : '' }}>{{ $year->name }}</option>
                             @endforeach
@@ -38,9 +38,9 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Class <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Class') }} <span class="text-danger">*</span></label>
                         <select name="class_id" id="class_id" class="form-select select2" required>
-                            <option value="">Select Class</option>
+                            <option value="">{{ __('Select Class') }}</option>
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}" {{ $routine->class_id == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                             @endforeach
@@ -48,9 +48,9 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Section <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Section') }} <span class="text-danger">*</span></label>
                         <select name="section_id" id="section_id" class="form-select select2" required>
-                            <option value="">Select Section</option>
+                            <option value="">{{ __('Select Section') }}</option>
                             @foreach($sections as $section)
                                 <option value="{{ $section->id }}" {{ $routine->section_id == $section->id ? 'selected' : '' }}>{{ $section->name }}</option>
                             @endforeach
@@ -58,9 +58,9 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Subject') }} <span class="text-danger">*</span></label>
                         <select name="subject_id" id="subject_id" class="form-select select2" required>
-                            <option value="">Select Subject</option>
+                            <option value="">{{ __('Select Subject') }}</option>
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}" {{ $routine->subject_id == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
                             @endforeach
@@ -68,9 +68,9 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Teacher <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Teacher') }} <span class="text-danger">*</span></label>
                         <select name="teacher_id" class="form-select select2" required>
-                            <option value="">Select Teacher</option>
+                            <option value="">{{ __('Select Teacher') }}</option>
                             @foreach($teachers as $teacher)
                                 <option value="{{ $teacher->id }}" {{ $routine->teacher_id == $teacher->id ? 'selected' : '' }}>{{ $teacher->name }}</option>
                             @endforeach
@@ -78,33 +78,33 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Day <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Day') }} <span class="text-danger">*</span></label>
                         <select name="day" class="form-select" required>
-                            <option value="">Select Day</option>
+                            <option value="">{{ __('Select Day') }}</option>
                             @foreach(['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as $day)
-                                <option value="{{ $day }}" {{ $routine->day == $day ? 'selected' : '' }}>{{ $day }}</option>
+                                <option value="{{ $day }}" {{ $routine->day == $day ? 'selected' : '' }}>{{ __($day) }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('Start Time') }} <span class="text-danger">*</span></label>
                         <input type="time" name="start_time" class="form-control" value="{{ $routine->start_time }}" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">{{ __('End Time') }} <span class="text-danger">*</span></label>
                         <input type="time" name="end_time" class="form-control" value="{{ $routine->end_time }}" required>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Room Number</label>
+                        <label class="form-label fw-semibold">{{ __('Room Number') }}</label>
                         <input type="text" name="room_number" class="form-control" value="{{ $routine->room_number }}" placeholder="e.g. 101">
                     </div>
 
                     <div class="col-md-12 mt-4 text-end">
                         <button type="submit" class="btn btn-primary-gradient px-5 py-2 fw-bold" style="border-radius:10px;">
-                            <i class="fa-solid fa-check me-1"></i> Update Routine
+                            <i class="fa-solid fa-check me-1"></i> {{ __('Update Routine') }}
                         </button>
                     </div>
                 </div>
@@ -126,7 +126,7 @@ $(document).ready(function() {
                 dataType: "json",
                 success:function(data) {
                     $('#subject_id').empty();
-                    $('#subject_id').append('<option value="">Select Subject</option>');
+                    $('#subject_id').append('<option value="">{{ __("Select Subject") }}</option>');
                     $.each(data, function(key, value) {
                         $('#subject_id').append('<option value="'+ value.id +'">'+ value.name +'</option>');
                     });
@@ -134,7 +134,7 @@ $(document).ready(function() {
             });
         } else {
             $('#subject_id').empty();
-            $('#subject_id').append('<option value="">Select Class First</option>');
+            $('#subject_id').append('<option value="">{{ __("Select Class First") }}</option>');
         }
     });
 });

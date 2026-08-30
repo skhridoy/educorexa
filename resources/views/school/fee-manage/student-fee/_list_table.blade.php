@@ -2,11 +2,11 @@
     <table class="table table-hover align-middle mb-0">
         <thead class="bg-light">
             <tr>
-                <th class="ps-3 fw-bold">Roll</th>
-                <th class="fw-bold">Student Name</th>
-                <th class="fw-bold">Class</th>
-                <th class="fw-bold text-end">Amount</th>
-                <th class="fw-bold text-center pe-3">Status</th>
+                <th class="ps-3 fw-bold">{{ __('Roll') }}</th>
+                <th class="fw-bold">{{ __('Student Name') }}</th>
+                <th class="fw-bold">{{ __('Class') }}</th>
+                <th class="fw-bold text-end">{{ __('Amount') }}</th>
+                <th class="fw-bold text-center pe-3">{{ __('Status') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -21,9 +21,9 @@
                 <td class="text-end fw-bold text-dark">৳ {{ number_format($fee->amount, 2) }}</td>
                 <td class="text-center pe-3">
                     @if($fee->isPaid())
-                        <span class="badge bg-soft-success text-success px-3">Paid</span>
+                        <span class="badge bg-soft-success text-success px-3">{{ __('Paid') }}</span>
                     @else
-                        <span class="badge bg-soft-danger text-danger px-3">Unpaid</span>
+                        <span class="badge bg-soft-danger text-danger px-3">{{ __('Unpaid') }}</span>
                     @endif
                 </td>
             </tr>

@@ -76,10 +76,10 @@
 
     <div class="edu-sidebar-body">
         <ul class="edu-nav">
-            <li class="edu-nav-category">Main</li>
+            <li class="edu-nav-category">{{ __('Main') }}</li>
             <li class="edu-nav-item">
                 <a href="{{ $dashboardRoute }}" class="edu-nav-link {{ Request::is('*/dashboard*') ? 'active' : '' }}">
-                    <i data-feather="grid"></i> <span>Dashboard</span>
+                    <i data-feather="grid"></i> <span>{{ __('Dashboard') }}</span>
                 </a>
             </li>
 
@@ -88,7 +88,7 @@
             @endphp
 
             @if($anyModule)
-                <li class="edu-nav-category">Modules</li>
+                <li class="edu-nav-category">{{ __('Modules') }}</li>
             @endif
 
             {{-- 1. Academic Section --}}
@@ -99,32 +99,32 @@
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') || Request::is('*/categories*') || Request::is('*/sub-categories*') ? 'active' : '' }}" 
                    data-bs-toggle="collapse" href="#academicMenu">
-                    <i data-feather="layers"></i> <span>Academic</span>
+                    <i data-feather="layers"></i> <span>{{ __('Academic') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/academic*') || Request::is('*/classes*') || Request::is('*/sections*') || Request::is('*/subjects*') || Request::is('*/routine*') || Request::is('*/categories*') || Request::is('*/sub-categories*') ? 'show' : '' }}" id="academicMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('academic-year.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('academic-year.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/academic-year*') ? 'active' : '' }}">Academic Years</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('academic-year.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/academic-year*') ? 'active' : '' }}">{{ __('Academic Years') }}</a></li>
                         @endif
                         @if($hasFeature('category.manage') || $hasFeature('class.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/categories*') ? 'active' : '' }}">Categories</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/categories*') ? 'active' : '' }}">{{ __('Categories') }}</a></li>
                         @endif
                         @if($hasFeature('sub-category.manage') || $hasFeature('class.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('sub-categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sub-categories*') ? 'active' : '' }}">Sub Categories</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('sub-categories.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sub-categories*') ? 'active' : '' }}">{{ __('Sub Categories') }}</a></li>
                         @endif
                         @if($hasFeature('class.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('classes.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/classes*') ? 'active' : '' }}">Classes</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('classes.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/classes*') ? 'active' : '' }}">{{ __('Classes') }}</a></li>
                         @endif
                         @if($hasFeature('section.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('sections.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sections*') ? 'active' : '' }}">Sections</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('sections.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/sections*') ? 'active' : '' }}">{{ __('Sections') }}</a></li>
                         @endif
                         @if($hasFeature('subject.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('subjects.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/subjects') ? 'active' : '' }}">Subjects List</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('subjects.assign', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/subjects-assign*') ? 'active' : '' }}">Assign Subjects</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('subjects.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/subjects') ? 'active' : '' }}">{{ __('Subjects List') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('subjects.assign', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/subjects-assign*') ? 'active' : '' }}">{{ __('Assign Subjects') }}</a></li>
                         @endif
                         @if($hasFeature('class.routine'))
-                            <li class="edu-sub-item"><a href="{{ route('routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/routine*') ? 'active' : '' }}">Class Routine</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/routine*') ? 'active' : '' }}">{{ __('Class Routine') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -138,25 +138,25 @@
             @if($hasGroupAccess($studentPerms))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/students*') || Request::is('*/admissions*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#studentMenu">
-                    <i data-feather="users"></i> <span>Students</span>
+                    <i data-feather="users"></i> <span>{{ __('Students') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/students*') || Request::is('*/admissions*') ? 'show' : '' }}" id="studentMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('admission.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('admissions.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admissions*') ? 'active' : '' }}">Admissions</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('admissions.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admissions*') ? 'active' : '' }}">{{ __('Admissions') }}</a></li>
                         @endif
                         @if($hasFeature('student.index') || $hasFeature('student.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('students.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/students') || Request::is('*/students/*') ? 'active' : '' }}">Student List</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('students.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/students') || Request::is('*/students/*') ? 'active' : '' }}">{{ __('Student List') }}</a></li>
                         @endif
                         @if($hasFeature('student.create'))
-                            <li class="edu-sub-item"><a href="{{ route('students.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/students/create*') ? 'active' : '' }}">Add Student</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('students.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/students/create*') ? 'active' : '' }}">{{ __('Add Student') }}</a></li>
                         @endif
                         @if($hasFeature('student.idcard'))
-                            <li class="edu-sub-item"><a href="{{ route('students.idcard.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/id-cards*') ? 'active' : '' }}">ID Cards</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('students.idcard.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/id-cards*') ? 'active' : '' }}">{{ __('ID Cards') }}</a></li>
                         @endif
                         @if($hasFeature('student.promotion'))
-                            <li class="edu-sub-item"><a href="{{ route('students.promotion', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/promotion*') ? 'active' : '' }}">Promotion</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('students.promotion', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/promotion*') ? 'active' : '' }}">{{ __('Promotion') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -170,19 +170,19 @@
             @if($hasGroupAccess($staffPerms))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/teachers*') || Request::is('*/staff*') || Request::is('*/teacher-assign*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#staffMenu">
-                    <i data-feather="user-check"></i> <span>Staff & HR</span>
+                    <i data-feather="user-check"></i> <span>{{ __('Staff & HR') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/teachers*') || Request::is('*/staff*') || Request::is('*/teacher-assign*') ? 'show' : '' }}" id="staffMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('teacher.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('teachers.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers') ? 'active' : '' }}">Teachers List</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('teachers.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers/create*') ? 'active' : '' }}">Add Teacher</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('teacher.assign', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teacher-assign*') ? 'active' : '' }}">Assign Teachers</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('teachers.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers') ? 'active' : '' }}">{{ __('Teachers List') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('teachers.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teachers/create*') ? 'active' : '' }}">{{ __('Add Teacher') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('teacher.assign', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/teacher-assign*') ? 'active' : '' }}">{{ __('Assign Teachers') }}</a></li>
                         @endif
                         @if($hasFeature('employee.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('staff.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff') ? 'active' : '' }}">Staff List</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('staff.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff/create*') ? 'active' : '' }}">Add Staff</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('staff.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff') ? 'active' : '' }}">{{ __('Staff List') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('staff.create', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/staff/create*') ? 'active' : '' }}">{{ __('Add Staff') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -196,32 +196,33 @@
             @if($hasGroupAccess($examPerms))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/attendance*') || Request::is('*/exam*') || Request::is('*/mark*') || Request::is('*/holiday*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#examMenu">
-                    <i data-feather="edit-3"></i> <span>Attendance & Exams</span>
+                    <i data-feather="edit-3"></i> <span>{{ __('Attendance & Exams') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/attendance*') || Request::is('*/exam*') || Request::is('*/mark*') || Request::is('*/holiday*') ? 'show' : '' }}" id="examMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('attendance.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('attendances.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance') ? 'active' : '' }}">Daily Attendance</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('attendances.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance') ? 'active' : '' }}">{{ __('Daily Attendance') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('attendance.qr.scan', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/qr-scan*') ? 'active' : '' }}"><i class="fa-solid fa-qrcode me-1 text-primary"></i> {{ __('ID Card QR Attendance') }}</a></li>
                         @endif
                         @if($hasFeature('attendance.analytics') || $hasFeature('attendance.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('attendance.analytics', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/analytics*') ? 'active' : '' }}">Attendance Analytics</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('attendance.analytics', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/analytics*') ? 'active' : '' }}">{{ __('Attendance Analytics') }}</a></li>
                         @endif
                         @if($hasFeature('attendance.manage') || $hasFeature('attendance.report'))
-                            <li class="edu-sub-item"><a href="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/report*') ? 'active' : '' }}">Attendance Report</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/report*') ? 'active' : '' }}">{{ __('Attendance Report') }}</a></li>
                         @endif
                         @if($hasFeature('holiday.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('holidays.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/holidays*') ? 'active' : '' }}">Holidays Setup</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('holidays.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/holidays*') ? 'active' : '' }}">{{ __('Holidays Setup') }}</a></li>
                         @endif
                         @if($hasFeature('exam.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') ? 'active' : '' }}">Exams List</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">Admit Cards</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">Exams Routine</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') ? 'active' : '' }}">{{ __('Exams List') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Admit Cards') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">{{ __('Exams Routine') }}</a></li>
                         @endif
                         @if($hasFeature('mark.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('marks.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks') || Request::is('*/marks/*') && !Request::is('*/marks/view-marks*') && !Request::is('*/result-search*') ? 'active' : '' }}">Marks Entry</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks*') ? 'active' : '' }}">Result Report</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('marks.result-search', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/result-search*') ? 'active' : '' }}">Result Search</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks') || Request::is('*/marks/*') && !Request::is('*/marks/view-marks*') && !Request::is('*/result-search*') ? 'active' : '' }}">{{ __('Marks Entry') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.view-marks', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/marks/view-marks*') ? 'active' : '' }}">{{ __('Result Report') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('marks.result-search', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/result-search*') ? 'active' : '' }}">{{ __('Result Search') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -235,18 +236,18 @@
             @if($hasGroupAccess($financePerms))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/fee*') || Request::is('*/payment*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#feeMenu">
-                    <i data-feather="dollar-sign"></i> <span>Finance</span>
+                    <i data-feather="dollar-sign"></i> <span>{{ __('Finance') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/fee*') || Request::is('*/payment*') ? 'show' : '' }}" id="feeMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('fee.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('fee-heads.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Fee Heads</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('fee-amounts.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Fee Structure</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('student-fees.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Fees Generation</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('fee-heads.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fee Heads') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('fee-amounts.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fee Structure') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('student-fees.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fees Generation') }}</a></li>
                         @endif
                         @if($hasFeature('fee.collect'))
-                            <li class="edu-sub-item"><a href="{{ route('payment.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Collect Payment</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('payment.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Collect Payment') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -260,19 +261,19 @@
             @if($hasGroupAccess($commPerms))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/notices*') || Request::is('*/message*') || Request::is('*/newsletter*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#commMenu">
-                    <i data-feather="mail"></i> <span>Communication</span>
+                    <i data-feather="mail"></i> <span>{{ __('Communication') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/notices*') || Request::is('*/message*') || Request::is('*/newsletter*') ? 'show' : '' }}" id="commMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('notice.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('notices.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/notices*') ? 'active' : '' }}">Notices</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('notices.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/notices*') ? 'active' : '' }}">{{ __('Notices') }}</a></li>
                         @endif
                         @if($hasFeature('message.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('admin.message.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/message*') ? 'active' : '' }}">Website Messages</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('admin.message.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/message*') ? 'active' : '' }}">{{ __('Website Messages') }}</a></li>
                         @endif
                         @if($hasFeature('newsletter.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('admin.newsletter.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/newsletter*') ? 'active' : '' }}">Newsletter Subscribers</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('admin.newsletter.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/newsletter*') ? 'active' : '' }}">{{ __('Newsletter Subscribers') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -281,38 +282,38 @@
 
             <li class="edu-nav-item">
                 <a href="{{ route('school.support.index', ['tenant' => $tenant]) }}" class="edu-nav-link {{ Request::is('*/support*') ? 'active' : '' }}">
-                    <i data-feather="help-circle"></i> <span>Support Center</span>
+                    <i data-feather="help-circle"></i> <span>{{ __('Support Center') }}</span>
                 </a>
             </li>
 
             @if($user->hasRole('school_admin') || $user->role === 'school_admin' || $user->hasRole('super_admin') || $user->role === 'super_admin')
             <li class="edu-nav-item">
                 <a href="{{ route('school.review.create', ['tenant' => $tenant]) }}" class="edu-nav-link {{ Request::is('*/review*') ? 'active' : '' }}">
-                    <i data-feather="star"></i> <span>Review</span>
+                    <i data-feather="star"></i> <span>{{ __('Review') }}</span>
                 </a>
             </li>
             @endif
 
-            <li class="edu-nav-category">Settings</li>
+            <li class="edu-nav-category">{{ __('Settings') }}</li>
             
             @if($user->hasRole('school_admin') || $user->role === 'school_admin' || $hasFeature('system.settings'))
             <li class="edu-nav-item">
                 <a class="edu-nav-link edu-has-submenu {{ Request::is('*/school-settings*') || Request::is('*/sliders*') || Request::is('*/about-settings*') || Request::is('*/settings/footer*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#settingMenu">
-                    <i data-feather="settings"></i> <span>Settings</span>
+                    <i data-feather="settings"></i> <span>{{ __('Settings') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
                 <div class="collapse {{ Request::is('*/school-settings*') || Request::is('*/sliders*') || Request::is('*/about-settings*') || Request::is('*/settings/footer*') ? 'show' : '' }}" id="settingMenu">
                     <ul class="edu-sub-nav">
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">General Settings</a></li>
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">API Setup</a></li>
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">Communication Settings</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('API Setup') }}</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">{{ __('Communication Settings') }}</a></li>
                         @if($user->hasRole('school_admin'))
-                            <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">Role & Permissions</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">{{ __('Role & Permissions') }}</a></li>
                         @endif
                         @if($hasFeature('system.settings'))
-                            <li class="edu-sub-item"><a href="{{ route('sliders.index', ['tenant' => $tenant]) }}" class="edu-sub-link">Sliders</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('about.index', ['tenant' => $tenant]) }}" class="edu-sub-link">About Section</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('footer.edit', ['tenant' => $tenant]) }}" class="edu-sub-link">Footer Settings</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('sliders.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Sliders') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('about.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('About Section') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('footer.edit', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Footer Settings') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -337,17 +338,17 @@
                         <div class="mb-2">
                             <i class="fa-solid fa-rocket fa-2x opacity-75"></i>
                         </div>
-                        <h6 class="fw-bold mb-1" style="font-size:13px;">Upgrade to Premium</h6>
-                        <p class="mb-2" style="font-size:11px; opacity:0.8;">আনলক করুন সকল প্রিমিয়াম ফিচার ও আনলিমিটেড সুবিধা।</p>
+                        <h6 class="fw-bold mb-1" style="font-size:13px;">{{ __('Upgrade to Premium') }}</h6>
+                        <p class="mb-2" style="font-size:11px; opacity:0.8;">{{ __('Unlock all premium features and unlimited benefits.') }}</p>
                         <div class="mb-2" style="font-size:10px; opacity:0.7;">
                             <span class="badge" style="background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:20px;">
-                                বর্তমান: {{ $packageName }}
+                                {{ __('Current') }}: {{ $packageName }}
                             </span>
                         </div>
                         <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" 
                            class="btn w-100 rounded-pill py-2 fw-bold" 
                            style="background:#fff; color:#4f46e5; font-size:12px; margin-top:4px;">
-                            <i class="fa-solid fa-arrow-up me-1"></i> Upgrade Now
+                            <i class="fa-solid fa-arrow-up me-1"></i> {{ __('Upgrade Now') }}
                         </a>
                     </div>
                 </div>
@@ -358,11 +359,11 @@
                         <div class="mb-2">
                             <i class="fa-solid fa-crown fa-2x" style="opacity:0.85; color:#fcd34d;"></i>
                         </div>
-                        <h6 class="fw-bold mb-1" style="font-size:13px; color:#fcd34d;">Premium Active</h6>
-                        <p class="mb-2" style="font-size:11px; opacity:0.85;">আপনি {{ $packageName }} প্যাকেজে আছেন।</p>
+                        <h6 class="fw-bold mb-1" style="font-size:13px; color:#fcd34d;">{{ __('Premium Active') }}</h6>
+                        <p class="mb-2" style="font-size:11px; opacity:0.85;">{{ __('You are on :package package.', ['package' => $packageName]) }}</p>
                         <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:6px 10px; font-size:10px;">
                             <i class="fa-solid fa-check-circle me-1" style="color:#fcd34d;"></i>
-                            সকল প্রিমিয়াম ফিচার সক্রিয়
+                            {{ __('All premium features are active') }}
                         </div>
                     </div>
                 </div>

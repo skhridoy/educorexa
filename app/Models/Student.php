@@ -102,10 +102,15 @@ class Student extends Model
         'student_id',
         'roll',
         'name',
+        'name_bn',           // বাংলা নাম
         'previous_school',
+        'previous_school_bn', // বাংলা পূর্ববর্তী স্কুল
         'previous_class',
+        'previous_class_bn',  // বাংলা পূর্ববর্তী শ্রেণি
         'fathers_name',
+        'fathers_name_bn',    // পিতার বাংলা নাম
         'mothers_name',
+        'mothers_name_bn',    // মাতার বাংলা নাম
         'father_nid',
         'mother_nid',
         'student_birth_nid',
@@ -119,6 +124,7 @@ class Student extends Model
         'admission_date',
         'blood_group',
         'address',
+        'address_bn',         // বাংলা ঠিকানা
         'admin_note',
         'created_by',
         'school_sub_category_id',

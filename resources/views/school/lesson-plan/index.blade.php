@@ -6,7 +6,7 @@
         <div class="col-md-5 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h6 class="card-title">Create Daily Diary</h6>
+                    <h6 class="card-title">{{ __('Create Daily Diary') }}</h6>
 
                     {{-- মেসেজ দেখানোর সঠিক জায়গা --}}
                     @if(session('success'))
@@ -20,19 +20,19 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Date</label>
+                                <label class="form-label">{{ __('Date') }}</label>
                                 <input type="date" name="date" class="form-control" value="{{ date('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Submission Date (Optional)</label>
+                                <label class="form-label">{{ __('Submission Date (Optional)') }}</label>
                                 <input type="date" name="submission_date" class="form-control">
                             </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Class</label>
+                            <label class="form-label">{{ __('Class') }}</label>
                             <select name="class_id" id="class_id" class="form-control" required>
-                                <option value="">Select Class</option>
+                                <option value="">{{ __('Select Class') }}</option>
                                 @foreach($classes as $class)
                                     <option value="{{ $class->id }}">{{ $class->name }}</option>
                                 @endforeach
@@ -40,9 +40,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Section</label>
+                            <label class="form-label">{{ __('Section') }}</label>
                             <select name="section_id" id="section_id" class="form-control" required>
-                                <option value="">Select Section</option>
+                                <option value="">{{ __('Select Section') }}</option>
                                 {{-- যদি সেকশন কন্ট্রোলার থেকে আসে তবে এখানে লুপ হবে, অথবা AJAX দিয়ে লোড হবে --}}
                                 @isset($sections)
                                     @foreach($sections as $section)
@@ -53,23 +53,23 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Subject</label>
+                            <label class="form-label">{{ __('Subject') }}</label>
                             <select name="subject_id" id="subject_id" class="form-control" required>
-                                <option value="">Select Subject</option>
+                                <option value="">{{ __('Select Subject') }}</option>
                             </select>
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Today's Lesson</label>
-                            <textarea name="lesson_description" class="form-control" rows="3" placeholder="What was taught today?" required></textarea>
+                            <label class="form-label">{{ __('Today\'s Lesson') }}</label>
+                            <textarea name="lesson_description" class="form-control" rows="3" placeholder="{{ __('What was taught today?') }}" required></textarea>
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label text-danger">Homework</label>
-                            <textarea name="homework" class="form-control" rows="3" placeholder="Tomorrow's lesson/homework..."></textarea>
+                            <label class="form-label text-danger">{{ __('Homework') }}</label>
+                            <textarea name="homework" class="form-control" rows="3" placeholder="{{ __('Tomorrow\'s lesson/homework...') }}"></textarea>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100">Save Diary</button>
+                        <button type="submit" class="btn btn-primary w-100">{{ __('Save Diary') }}</button>
                     </form>
                 </div>
             </div>
@@ -102,17 +102,17 @@
         <div class="col-md-7 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h6 class="card-title">Today's Entries ({{ date('d M, Y') }})</h6>
+                    <h6 class="card-title">{{ __('Today\'s Entries') }} ({{ date('d M, Y') }})</h6>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Class</th>
-                                    <th>Subject</th>
-                                    <th>Lesson</th>
-                                    <th>Homework</th>
-                                    <th>Submission Date</th>
-                                    <th>Action</th>
+                                    <th>{{ __('Class') }}</th>
+                                    <th>{{ __('Subject') }}</th>
+                                    <th>{{ __('Lesson') }}</th>
+                                    <th>{{ __('Homework') }}</th>
+                                    <th>{{ __('Submission Date') }}</th>
+                                    <th>{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -137,7 +137,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">No entries found for today.</td>
+                                    <td colspan="6" class="text-center">{{ __('No entries found for today.') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>

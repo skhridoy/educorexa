@@ -10,8 +10,8 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-shapes me-2"></i> Class Sections</h1>
-                <p class="page-subtitle">Manage class sections (Section A, B, Rose, Sunshine, etc.).</p>
+                <h1 class="page-title"><i class="fa-solid fa-shapes me-2"></i> {{ __('Class Sections') }}</h1>
+                <p class="page-subtitle">{{ __('Manage class sections (Section A, B, Rose, Sunshine, etc.).') }}</p>
             </div>
         </div>
 
@@ -27,20 +27,20 @@
             <div class="col-lg-4">
                 <div class="form-card">
                     <h5 class="mb-4 fw-bold text-primary">
-                        <i class="fa-solid fa-plus me-2"></i> Create Section
+                        <i class="fa-solid fa-plus me-2"></i> {{ __('Create Section') }}
                     </h5>
                     <form action="{{ route('sections.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold">Section Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label fw-semibold">{{ __('Section Name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="e.g. A, B, Science, Rose" required>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label fw-semibold">Description</label>
-                            <input type="text" class="form-control" id="description" name="description" placeholder="Enter description (optional)">
+                            <label for="description" class="form-label fw-semibold">{{ __('Description') }}</label>
+                            <input type="text" class="form-control" id="description" name="description" placeholder="{{ __('Enter description (optional)') }}">
                         </div>
                         <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-check me-1"></i> Create Section
+                            <i class="fa-solid fa-check me-1"></i> {{ __('Create Section') }}
                         </button>
                     </form>
                 </div>
@@ -50,9 +50,9 @@
             <div class="col-lg-8">
                 <div class="data-table-card">
                     <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
-                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list me-2 text-indigo-600"></i> Sections List</h5>
+                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list me-2 text-indigo-600"></i> {{ __('Sections List') }}</h5>
                         <span class="badge bg-light text-muted border px-3 py-1" style="border-radius:10px;">
-                            {{ count($sections) }} Sections
+                            {{ count($sections) }} {{ __('Sections') }}
                         </span>
                     </div>
 
@@ -60,10 +60,10 @@
                         <table class="table data-table mb-0 align-middle">
                             <thead class="bg-light">
                                 <tr>
-                                    <th class="py-3 px-3"># ID</th>
-                                    <th class="py-3 px-3">Section Name</th>
-                                    <th class="py-3 px-3">Description</th>
-                                    <th class="py-3 px-3 text-end">Action</th>
+                                    <th class="py-3 px-3"># {{ __('ID') }}</th>
+                                    <th class="py-3 px-3">{{ __('Section Name') }}</th>
+                                    <th class="py-3 px-3">{{ __('Description') }}</th>
+                                    <th class="py-3 px-3 text-end">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +75,7 @@
                                             <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:700;font-size:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                                 {{ substr($section->name, 0, 1) }}
                                             </div>
-                                            <span class="fw-bold text-dark" style="font-size:0.88rem;">Section {{ $section->name }}</span>
+                                            <span class="fw-bold text-dark" style="font-size:0.88rem;">{{ __('Section') }} {{ $section->name }}</span>
                                         </div>
                                     </td>
                                     <td class="px-3">
@@ -83,13 +83,13 @@
                                     </td>
                                     <td class="px-3 text-end">
                                         <div class="d-flex justify-content-end gap-1">
-                                            <a href="{{ route('sections.edit', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" class="btn btn-action btn-sm btn-outline-warning" title="Edit">
+                                            <a href="{{ route('sections.edit', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" class="btn btn-action btn-sm btn-outline-warning" title="{{ __('Edit') }}">
                                                 <i class="fa-regular fa-pen-to-square"></i>
                                             </a>
                                             <form action="{{ route('sections.destroy', ['tenant' => auth()->user()->school->slug,'section' => $section->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -100,7 +100,7 @@
                                 <tr>
                                     <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fa-2x mb-2 d-block"></i>
-                                        No sections found.
+                                        {{ __('No sections found.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -118,14 +118,14 @@
 <script>
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this section?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to delete this section?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}"
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();

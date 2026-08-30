@@ -4,13 +4,16 @@ namespace App\Imports;
 
 use App\Models\Teacher;
 use App\Models\Subject;
+use App\Models\School;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Mail\TeacherCredentialsMail;
+use App\Traits\SchoolMailConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -18,16 +21,28 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class TeacherImport implements ToModel, WithHeadingRow, SkipsOnError, WithBatchInserts, WithChunkReading
 {
-    use SkipsErrors;
+    use SkipsErrors, SchoolMailConfig;
 
+    protected ?School $school = null;
     protected int $schoolId;
     public int $importedCount = 0;
     public int $skippedCount  = 0;
     public array $skippedRows  = [];
 
-    public function __construct(int $schoolId)
+    public function __construct($schoolOrId)
     {
-        $this->schoolId = $schoolId;
+        if ($schoolOrId instanceof School) {
+            $this->school = $schoolOrId;
+            $this->schoolId = $schoolOrId->id;
+        } else {
+            $this->schoolId = (int) $schoolOrId;
+            $this->school = School::find($this->schoolId);
+        }
+
+        // Configure school dynamic SMTP & From address
+        if ($this->school) {
+            $this->setMailConfig($this->school);
+        }
     }
 
     /**
@@ -98,8 +113,10 @@ class TeacherImport implements ToModel, WithHeadingRow, SkipsOnError, WithBatchI
             }
         }
 
-        DB::transaction(function () use ($row, $subject, $teacherId, $dob, $joiningDate, $email) {
-            $teacher = Teacher::create([
+        $createdTeacher = null;
+
+        DB::transaction(function () use ($row, $subject, $teacherId, $dob, $joiningDate, $email, &$createdTeacher) {
+            $createdTeacher = Teacher::create([
                 'school_id'     => $this->schoolId,
                 'teacher_id'    => $teacherId,
                 'name'          => trim($row['name']),
@@ -129,6 +146,15 @@ class TeacherImport implements ToModel, WithHeadingRow, SkipsOnError, WithBatchI
                 $user->assignRole('teacher');
             }
         });
+
+        // Send Welcome & Login Credentials Email
+        if ($createdTeacher && !empty($createdTeacher->email) && $this->school) {
+            try {
+                Mail::to($createdTeacher->email)->send(new TeacherCredentialsMail($createdTeacher, $this->school, '12345678'));
+            } catch (\Exception $e) {
+                Log::error("Failed to send imported teacher credentials email to {$createdTeacher->email}: " . $e->getMessage());
+            }
+        }
 
         $this->importedCount++;
         return null; // Model already created inside transaction

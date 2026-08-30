@@ -15,14 +15,14 @@
                         <i class="fa-solid fa-users-gear"></i>
                     </div>
                     <div>
-                        <h1 class="page-title">Staff Management</h1>
-                        <p class="page-subtitle">Oversee and manage your institution's non-teaching personnel</p>
+                        <h1 class="page-title">{{ __('Staff Management') }}</h1>
+                        <p class="page-subtitle">{{ __('Oversee and manage your institution\'s non-teaching personnel') }}</p>
                     </div>
                 </div>
             </div>
             <div class="header-actions">
                 <a href="{{ route('staff.create', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-primary-modern shadow-sm">
-                    <i class="fa-solid fa-user-plus me-2"></i> Add New Staff
+                    <i class="fa-solid fa-user-plus me-2"></i> {{ __('Add New Staff') }}
                 </a>
             </div>
         </div>
@@ -35,7 +35,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small mb-1">Total Staff</h6>
+                        <h6 class="text-muted small mb-1">{{ __('Total Staff') }}</h6>
                         <h4 class="fw-bold mb-0">{{ count($staffs) }}</h4>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                         <i class="fa-solid fa-user-check"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small mb-1">Active Roles</h6>
+                        <h6 class="text-muted small mb-1">{{ __('Active Roles') }}</h6>
                         <h4 class="fw-bold mb-0">{{ $staffs->pluck('roles')->flatten()->unique('id')->count() }}</h4>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                         <i class="fa-solid fa-calendar-day"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small mb-1">New This Month</h6>
+                        <h6 class="text-muted small mb-1">{{ __('New This Month') }}</h6>
                         <h4 class="fw-bold mb-0">{{ $staffs->where('created_at', '>=', now()->startOfMonth())->count() }}</h4>
                     </div>
                 </div>
@@ -68,8 +68,8 @@
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted small mb-1">System Roles</h6>
-                        <h4 class="fw-bold mb-0">Staff</h4>
+                        <h6 class="text-muted small mb-1">{{ __('System Roles') }}</h6>
+                        <h4 class="fw-bold mb-0">{{ __('Staff') }}</h4>
                     </div>
                 </div>
             </div>
@@ -85,19 +85,19 @@
                                 <i class="fa-solid fa-magnifying-glass text-muted"></i>
                             </span>
                             <input type="text" name="search" class="form-control border-0 bg-light" 
-                                   placeholder="Search by name, email or ID..." value="{{ request('search') }}">
+                                   placeholder="{{ __('Search by name, email or ID...') }}" value="{{ request('search') }}">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <select name="sort" class="form-select border-0 bg-light">
-                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Sort: Newest First</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Sort: Oldest First</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Sort: Name (A-Z)</option>
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('Sort: Newest First') }}</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>{{ __('Sort: Oldest First') }}</option>
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('Sort: Name (A-Z)') }}</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary w-100 shadow-sm">
-                            <i class="fa-solid fa-sliders me-2"></i> Filter
+                            <i class="fa-solid fa-sliders me-2"></i> {{ __('Filter') }}
                         </button>
                     </div>
                 </div>
@@ -107,18 +107,18 @@
         {{-- Data Table Card --}}
         <div class="data-table-card glass-card border-0 shadow-sm overflow-hidden">
             <div class="table-header px-4 py-3 bg-white bg-opacity-50 border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-primary"></i> Staff Directory</h5>
+                <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-primary"></i> {{ __('Staff Directory') }}</h5>
             </div>
 
             <div class="table-responsive">
                 <table class="table edu-table mb-0 align-middle">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4 py-3 text-uppercase small fw-bold">Member Information</th>
-                            <th class="py-3 text-uppercase small fw-bold">Assigned Role</th>
-                            <th class="py-3 text-uppercase small fw-bold">Email Status</th>
-                            <th class="py-3 text-uppercase small fw-bold">Joining Date</th>
-                            <th class="text-center pe-4 py-3 text-uppercase small fw-bold">Actions</th>
+                            <th class="ps-4 py-3 text-uppercase small fw-bold">{{ __('Member Information') }}</th>
+                            <th class="py-3 text-uppercase small fw-bold">{{ __('Assigned Role') }}</th>
+                            <th class="py-3 text-uppercase small fw-bold">{{ __('Email Status') }}</th>
+                            <th class="py-3 text-uppercase small fw-bold">{{ __('Joining Date') }}</th>
+                            <th class="text-center pe-4 py-3 text-uppercase small fw-bold">{{ __('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -148,7 +148,7 @@
                             <td class="py-3">
                                 <div class="d-flex flex-column">
                                     <span class="text-dark small"><i class="fa-regular fa-envelope me-1 text-muted"></i> {{ $staff->email }}</span>
-                                    <span class="badge bg-success bg-opacity-10 text-success border-0 small mt-1" style="width: fit-content; font-size: 10px;">Verified</span>
+                                    <span class="badge bg-success bg-opacity-10 text-success border-0 small mt-1" style="width: fit-content; font-size: 10px;">{{ __('Verified') }}</span>
                                 </div>
                             </td>
                             <td class="py-3">
@@ -180,10 +180,10 @@
                                     <div class="empty-icon-box mb-4">
                                         <i class="fa-solid fa-users-viewfinder fa-3x text-muted opacity-20"></i>
                                     </div>
-                                    <h5 class="text-dark fw-bold">No Staff Found</h5>
-                                    <p class="text-muted mb-4">Start building your team by adding staff members.</p>
+                                    <h5 class="text-dark fw-bold">{{ __('No Staff Found') }}</h5>
+                                    <p class="text-muted mb-4">{{ __('Start building your team by adding staff members.') }}</p>
                                     <a href="{{ route('staff.create', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-primary rounded-pill shadow-sm">
-                                        <i class="fa-solid fa-plus me-2"></i> Add First Member
+                                        <i class="fa-solid fa-plus me-2"></i> {{ __('Add First Member') }}
                                     </a>
                                 </div>
                             </td>
@@ -201,14 +201,14 @@
 <script>
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to remove this staff member?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to remove this staff member?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, remove it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, remove it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();

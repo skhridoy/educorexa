@@ -16,13 +16,18 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Imports\TeacherImport;
+use App\Models\School;
+use App\Mail\TeacherCredentialsMail;
+use App\Traits\SchoolMailConfig;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TeacherController extends Controller
 {
+    use SchoolMailConfig;
     /**
      * Display a listing of the resource.
      */
@@ -260,44 +265,59 @@ class TeacherController extends Controller
 
         $defaultPassword = $request->password ?? '12345678';
 
-        DB::transaction(function () use ($request, $subjects, $schoolId, $teacherId, $photoPath, $defaultPassword) {
+        $createdTeacher = null;
 
-        // 1️⃣ Create Teacher Profile
-        $teacher = Teacher::create([
-            'school_id' => $schoolId,
-            'teacher_id' => $teacherId,
-            'name' => $request->name,
-            'subject_id' => $subjects->id,
-            'father_name' => $request->father_name,
-            'mother_name' => $request->mother_name,
-            'nid' => $request->nid,
-            'date_of_birth' => $request->date_of_birth,
-            'gender' => $request->gender,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'blood_group' => $request->blood_group,
-            'joining_date' => $request->joining_date,
-            'qualification' => $request->qualification,
-            'address' => $request->address,
-            'photo' => $photoPath
-        ]);
+        DB::transaction(function () use ($request, $subjects, $schoolId, $teacherId, $photoPath, $defaultPassword, &$createdTeacher) {
 
-        // 2️⃣ Create User for Login
-        $user = User::create([
-            'school_id' => $schoolId,
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($defaultPassword),
-            'role' => 'teacher',
-        ]);
+            // 1️⃣ Create Teacher Profile
+            $createdTeacher = Teacher::create([
+                'school_id' => $schoolId,
+                'teacher_id' => $teacherId,
+                'name' => $request->name,
+                'subject_id' => $subjects->id,
+                'father_name' => $request->father_name,
+                'mother_name' => $request->mother_name,
+                'nid' => $request->nid,
+                'date_of_birth' => $request->date_of_birth,
+                'gender' => $request->gender,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'blood_group' => $request->blood_group,
+                'joining_date' => $request->joining_date,
+                'qualification' => $request->qualification,
+                'address' => $request->address,
+                'photo' => $photoPath
+            ]);
 
-        $user->assignRole('teacher'); 
+            // 2️⃣ Create User for Login
+            $user = User::create([
+                'school_id' => $schoolId,
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'password'  => Hash::make($defaultPassword),
+                'role' => 'teacher',
+            ]);
 
-    });
+            $user->assignRole('teacher'); 
 
-    return redirect() 
-        ->back()
-        ->with('success', 'Teacher registered and permissions assigned successfully!');
+        });
+
+        // 3️⃣ Send credentials email from School's Official Email & SMTP
+        if ($createdTeacher && !empty($createdTeacher->email)) {
+            try {
+                $school = School::find($schoolId);
+                if ($school) {
+                    $this->setMailConfig($school);
+                    Mail::to($createdTeacher->email)->send(new TeacherCredentialsMail($createdTeacher, $school, $defaultPassword));
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to send teacher credentials email to {$createdTeacher->email}: " . $e->getMessage());
+            }
+        }
+
+        return redirect() 
+            ->back()
+            ->with('success', 'Teacher registered and permissions assigned successfully! Login credentials have been sent via email.');
     }
 
     /**
@@ -438,8 +458,8 @@ class TeacherController extends Controller
             'excel_file.max'      => 'ফাইলের সর্বোচ্চ সাইজ ৫ MB।',
         ]);
 
-        $schoolId = auth()->user()->school_id;
-        $importer = new TeacherImport($schoolId);
+        $school = School::find(auth()->user()->school_id);
+        $importer = new TeacherImport($school);
 
         try {
             Excel::import($importer, $request->file('excel_file'));

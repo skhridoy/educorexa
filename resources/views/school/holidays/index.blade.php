@@ -7,18 +7,18 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h6 class="card-title text-primary">Add New Holiday</h6>
+                    <h6 class="card-title text-primary">{{ __('Add New Holiday') }}</h6>
                     <form action="{{ route('holidays.store', ['tenant' => $tenant]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label">Holiday Title</label>
-                            <input type="text" name="title" class="form-control" placeholder="e.g. Eid-ul-Fitr" required>
+                            <label class="form-label">{{ __('Holiday Title') }}</label>
+                            <input type="text" name="title" class="form-control" placeholder="{{ __('e.g. Eid-ul-Fitr') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Date</label>
+                            <label class="form-label">{{ __('Date') }}</label>
                             <input type="date" name="date" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 shadow-sm">Save Holiday</button>
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm">{{ __('Save Holiday') }}</button>
                     </form>
                 </div>
             </div>
@@ -28,16 +28,16 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h6 class="card-title">Holiday List</h6>
+                    <h6 class="card-title">{{ __('Holiday List') }}</h6>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Title</th>
-                                    <th>Date</th>
-                                    <th>Day</th>
-                                    <th>Action</th>
+                                    <th>{{ __('Title') }}</th>
+                                    <th>{{ __('Date') }}</th>
+                                    <th>{{ __('Day') }}</th>
+                                    <th>{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,12 +46,12 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $holiday->title }}</td>
                                     <td>{{ date('d M, Y', strtotime($holiday->date)) }}</td>
-                                    <td>{{ date('l', strtotime($holiday->date)) }}</td>
+                                    <td>{{ __(date('l', strtotime($holiday->date))) }}</td>
                                     <td>
                                         <form action="{{ route('holidays.destroy', [$tenant, $holiday->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger shadow-sm" onclick="return confirm('Are you sure?')">
+                                            <button type="submit" class="btn btn-sm btn-danger shadow-sm" onclick="return confirm('{{ __('Are you sure?') }}')">
                                                 <i data-feather="trash-2" class="icon-sm"></i>
                                             </button>
                                         </form>
@@ -59,7 +59,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">No holidays found.</td>
+                                    <td colspan="5" class="text-center text-muted">{{ __('No holidays found.') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>

@@ -10,8 +10,8 @@
         {{-- Page Header --}}
         <div class="page-header-card mb-4">
             <div class="page-header-content">
-                <h1 class="page-title"><i class="fa-solid fa-graduation-cap me-2"></i> Classes Management</h1>
-                <p class="page-subtitle">Create, organize, and assign categories to school classes.</p>
+                <h1 class="page-title"><i class="fa-solid fa-graduation-cap me-2"></i> {{ __('Classes Management') }}</h1>
+                <p class="page-subtitle">{{ __('Create, organize, and assign categories to school classes.') }}</p>
             </div>
         </div>
 
@@ -27,26 +27,26 @@
             <div class="col-lg-4">
                 <div class="form-card">
                     <h5 class="mb-4 fw-bold text-primary" id="form-title">
-                        <i class="fa-solid fa-plus me-2"></i> Create Class
+                        <i class="fa-solid fa-plus me-2"></i> {{ __('Create Class') }}
                     </h5>
                     <form id="class-form" action="{{ route('classes.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div id="method-field"></div>
 
                         <div class="mb-3">
-                            <label for="name" class="form-label fw-semibold">Class Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label fw-semibold">{{ __('Class Name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Class One, Grade 10" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="code" class="form-label fw-semibold">Class Code</label>
+                            <label for="code" class="form-label fw-semibold">{{ __('Class Code') }}</label>
                             <input type="text" class="form-control" id="code" name="code" placeholder="e.g., 101, A1">
                         </div>
 
                         <div class="mb-3">
-                            <label for="school_category_id" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                            <label for="school_category_id" class="form-label fw-semibold">{{ __('Category') }} <span class="text-danger">*</span></label>
                             <select id="school_category_id" name="school_category_id" class="form-select" required>
-                                <option value="">Select Category</option>
+                                <option value="">{{ __('Select Category') }}</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                 @endforeach
@@ -54,16 +54,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label fw-semibold">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="Optional notes..."></textarea>
+                            <label for="description" class="form-label fw-semibold">{{ __('Description') }}</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="{{ __('Optional notes...') }}"></textarea>
                         </div>
 
                         <div class="d-flex gap-2 pt-2">
                             <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-2 fw-bold" id="submit-btn">
-                                <i class="fa-solid fa-check me-1"></i> Create Class
+                                <i class="fa-solid fa-check me-1"></i> {{ __('Create Class') }}
                             </button>
                             <button type="button" class="btn btn-outline-secondary d-none py-2 px-3" id="cancel-btn" onclick="resetForm()">
-                                <i class="fa-solid fa-xmark me-1"></i> Cancel
+                                <i class="fa-solid fa-xmark me-1"></i> {{ __('Cancel') }}
                             </button>
                         </div>
                     </form>
@@ -74,9 +74,9 @@
             <div class="col-lg-8">
                 <div class="data-table-card">
                     <div class="table-header d-flex align-items-center justify-content-between p-3 border-bottom">
-                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-indigo-600"></i> Classes List</h5>
+                        <h5 class="table-title mb-0 fw-bold"><i class="fa-solid fa-list-ul me-2 text-indigo-600"></i> {{ __('Classes List') }}</h5>
                         <span class="badge bg-light text-muted border px-3 py-1" style="border-radius:10px;">
-                            {{ count($classes) }} Classes
+                            {{ count($classes) }} {{ __('Classes') }}
                         </span>
                     </div>
 
@@ -85,11 +85,11 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th class="py-3 px-3">#</th>
-                                    <th class="py-3 px-3">Class Name</th>
-                                    <th class="py-3 px-3 text-center">Code</th>
-                                    <th class="py-3 px-3 text-center">Category</th>
-                                    <th class="py-3 px-3">Description</th>
-                                    <th class="py-3 px-3 text-end">Actions</th>
+                                    <th class="py-3 px-3">{{ __('Class Name') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('Code') }}</th>
+                                    <th class="py-3 px-3 text-center">{{ __('Category') }}</th>
+                                    <th class="py-3 px-3">{{ __('Description') }}</th>
+                                    <th class="py-3 px-3 text-end">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -119,14 +119,14 @@
                                     </td>
                                     <td class="px-3 text-end">
                                         <div class="d-flex justify-content-end gap-1">
-                                            <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="Edit"
+                                            <button type="button" class="btn btn-action btn-sm btn-outline-warning" title="{{ __('Edit') }}"
                                                 onclick="editClass('{{ $class->id }}', '{{ $class->name }}', '{{ $class->code }}', '{{ $class->school_category_id }}', '{{ $class->description }}')">
                                                 <i class="fa-regular fa-pen-to-square"></i>
                                             </button>
                                             <form action="{{ route('classes.destroy', ['tenant' => auth()->user()->school->slug, 'class' => $class->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="Delete">
+                                                <button type="button" onclick="confirmDelete(this)" class="btn btn-action btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -137,7 +137,7 @@
                                 <tr>
                                     <td colspan="6" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fa-2x mb-2 d-block"></i>
-                                        No classes found.
+                                        {{ __('No classes found.') }}
                                     </td>
                                 </tr>
                                 @endforelse
@@ -160,8 +160,8 @@
 @section('customJs')
 <script>
     function editClass(id, name, code, categoryId, description) {
-        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen-to-square me-2"></i> Update Class: ' + name;
-        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check me-1"></i> Update Class';
+        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-pen-to-square me-2"></i> {{ __("Update Class") }}: ' + name;
+        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check me-1"></i> {{ __("Update Class") }}';
         document.getElementById('cancel-btn').classList.remove('d-none');
 
         const form = document.getElementById('class-form');
@@ -179,8 +179,8 @@
     }
 
     function resetForm() {
-        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-plus me-2"></i> Create Class';
-        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check me-1"></i> Create Class';
+        document.getElementById('form-title').innerHTML = '<i class="fa-solid fa-plus me-2"></i> {{ __("Create Class") }}';
+        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-check me-1"></i> {{ __("Create Class") }}';
         document.getElementById('cancel-btn').classList.add('d-none');
 
         const form = document.getElementById('class-form');
@@ -191,14 +191,14 @@
 
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this class?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to delete this class?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();

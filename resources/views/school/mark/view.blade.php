@@ -830,9 +830,9 @@
                 <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
                     <div>
                         <h1 class="mark-hero-title">
-                            <i class="fa-solid fa-list-check me-2"></i>Result Management Panel
+                            <i class="fa-solid fa-list-check me-2"></i>{{ __('Result Management Panel') }}
                         </h1>
-                        <p class="mark-hero-subtitle">View & analyze academic results by session, exam & class — select subject to edit marks</p>
+                        <p class="mark-hero-subtitle">{{ __('View & analyze academic results by session, exam & class — select subject to edit marks') }}</p>
                         @php
                             $activeYearId     = \App\Models\AcademicYear::where('school_id', auth()->user()->school_id)->where('is_active', 1)->value('id');
                             $isHistorical     = $selectedYearId && $selectedYearId != $activeYearId;
@@ -845,9 +845,9 @@
                                 <i class="fa-solid fa-calendar-days"></i>
                                 {{ $selectedYearName }}
                                 @if($isHistorical)
-                                    <span style="margin-left:4px; background:rgba(251,191,36,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">Past Session</span>
+                                    <span style="margin-left:4px; background:rgba(251,191,36,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">{{ __('Past Session') }}</span>
                                 @else
-                                    <span style="margin-left:4px; background:rgba(52,211,153,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">Current</span>
+                                    <span style="margin-left:4px; background:rgba(52,211,153,0.25); padding:1px 6px; border-radius:6px; font-size:0.72rem;">{{ __('Current') }}</span>
                                 @endif
                             </div>
                             @if($selectedExamObj)
@@ -861,15 +861,15 @@
                                 </div>
                             @endif
                             <div class="mark-hero-badge">
-                                <i class="fa-solid fa-bolt"></i> Auto-saves on input
+                                <i class="fa-solid fa-bolt"></i> {{ __('Auto-saves on input') }}
                             </div>
                         </div>
                     </div>
                     @if($selectedSubjectId)
                         <div class="editing-badge">
                             <i class="fa-solid fa-pencil"></i>
-                            Editing: {{ $selectedSubject?->name ?? 'Subject' }}
-                            &nbsp;·&nbsp; Full Mark: <strong>{{ $fullMark }}</strong>
+                            {{ __('Editing:') }} {{ $selectedSubject?->name ?? 'Subject' }}
+                            &nbsp;·&nbsp; {{ __('Full Mark:') }} <strong>{{ $fullMark }}</strong>
                         </div>
                     @endif
                 </div>
@@ -884,11 +884,11 @@
                     <a href="{{ request()->fullUrlWithQuery(['subject_id' => '']) }}"
                        class="tab-btn {{ !$selectedSubjectId ? 'active' : '' }}">
                         <i class="fa-solid fa-table me-1"></i>
-                        <span>Full Report</span>
+                        <span>{{ __('Full Report') }}</span>
                     </a>
                     <span class="tab-btn {{ $selectedSubjectId ? 'active' : '' }}" style="cursor:default;">
                         <i class="fa-solid fa-pencil me-1"></i>
-                        <span>Edit Mode</span>
+                        <span>{{ __('Edit Mode') }}</span>
                     </span>
                 </div>
             </div>
@@ -901,7 +901,7 @@
                     <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
                             <i class="fa-solid fa-calendar-days me-1 text-indigo-500"></i>
-                            Academic Year
+                            {{ __('Academic Year') }}
                         </label>
                         <select name="academic_year_id" class="form-select">
                             @foreach($academicYears as $year)
@@ -913,10 +913,10 @@
                     </div>
                     <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
-                            <i class="fa-solid fa-chalkboard me-1"></i> Class
+                            <i class="fa-solid fa-chalkboard me-1"></i> {{ __('Class') }}
                         </label>
                         <select name="class_id" id="classSelect" class="form-select" required>
-                            <option value="">Select Class</option>
+                            <option value="">{{ __('Select Class') }}</option>
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}" {{ $selectedClassId == $class->id ? 'selected' : '' }}>
                                     {{ $class->name }}
@@ -926,10 +926,10 @@
                     </div>
                     <div class="col-6 col-md-3 col-lg-2">
                         <label class="filter-label">
-                            <i class="fa-solid fa-file-pen me-1"></i> Exam
+                            <i class="fa-solid fa-file-pen me-1"></i> {{ __('Exam') }}
                         </label>
                         <select name="exam_id" class="form-select" required>
-                            <option value="">Select Exam</option>
+                            <option value="">{{ __('Select Exam') }}</option>
                             @foreach($examTypes as $exam)
                                 <option value="{{ $exam->id }}" {{ $selectedExamId == $exam->id ? 'selected' : '' }}>
                                     {{ $exam->name }}
@@ -940,10 +940,10 @@
                     <div class="col-6 col-md-3 col-lg-3">
                         <label class="filter-label">
                             <i class="fa-solid fa-book-open me-1"></i>
-                            Subject <small class="text-muted fw-normal" style="text-transform:none;letter-spacing:0">(optional)</small>
+                            {{ __('Subject') }} <small class="text-muted fw-normal" style="text-transform:none;letter-spacing:0">(optional)</small>
                         </label>
                         <select name="subject_id" id="subjectSelect" class="form-select">
-                            <option value="">All Subjects (Full Report)</option>
+                            <option value="">{{ __('All Subjects (Full Report)') }}</option>
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}" {{ $selectedSubjectId == $subject->id ? 'selected' : '' }}>
                                     {{ $subject->name }}
@@ -953,7 +953,7 @@
                     </div>
                     <div class="col-12 col-lg-3">
                         <button type="submit" class="btn-show-results w-100">
-                            <i class="fa-solid fa-magnifying-glass me-1"></i> Show Results
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> {{ __('Show Results') }}
                         </button>
                     </div>
                 </div>
@@ -977,23 +977,23 @@
             <div class="stats-bar mb-3">
                 <div class="stat-card">
                     <div class="num">{{ $totalStudents }}</div>
-                    <div class="lbl">Total</div>
+                    <div class="lbl">{{ __('Total') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num text-success">{{ $enteredCount }}</div>
-                    <div class="lbl">Entered</div>
+                    <div class="lbl">{{ __('Entered') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num text-warning">{{ $pendingCount }}</div>
-                    <div class="lbl">Pending</div>
+                    <div class="lbl">{{ __('Pending') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num text-danger">{{ $absentCount }}</div>
-                    <div class="lbl">Absent</div>
+                    <div class="lbl">{{ __('Absent') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num" style="color:#6366f1;">{{ $avgMark }}</div>
-                    <div class="lbl">Avg Mark</div>
+                    <div class="lbl">{{ __('Avg Mark') }}</div>
                 </div>
             </div>
 
@@ -1005,7 +1005,7 @@
                     </h5>
                     <div class="autosave-note">
                         <i class="fa-solid fa-cloud-arrow-up" style="color:#22c55e;"></i>
-                        Auto-saves on change
+                        {{ __('Auto-saves on change') }}
                     </div>
                 </div>
 
@@ -1015,12 +1015,12 @@
                         <thead>
                             <tr>
                                 <th style="width:40px;">#</th>
-                                <th>Roll</th>
-                                <th>Student ID</th>
-                                <th class="text-start">Student Name</th>
-                                <th>Attendance</th>
-                                <th>Mark <small class="opacity-60" style="font-weight:400;font-size:0.6rem;">(/ {{ $fullMark }})</small></th>
-                                <th>Grade</th>
+                                <th>{{ __('Roll') }}</th>
+                                <th>{{ __('Student ID') }}</th>
+                                <th class="text-start">{{ __('Student Name') }}</th>
+                                <th>{{ __('Attendance') }}</th>
+                                <th>{{ __('Mark') }} <small class="opacity-60" style="font-weight:400;font-size:0.6rem;">(/ {{ $fullMark }})</small></th>
+                                <th>{{ __('Grade') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1072,7 +1072,7 @@
                                                 data-student="{{ $student->id }}"
                                                 onclick="setStatus({{ $student->id }}, 'present', this)">
                                             <i class="fa-solid fa-check me-1 st-icon"></i>
-                                            <span class="st-text">Present</span>
+                                            <span class="st-text">{{ __('Present') }}</span>
                                         </button>
                                         <button type="button"
                                                 class="st-btn {{ $status == 'absent' ? 'active-absent' : '' }}"
@@ -1080,7 +1080,7 @@
                                                 data-student="{{ $student->id }}"
                                                 onclick="setStatus({{ $student->id }}, 'absent', this)">
                                             <i class="fa-solid fa-xmark me-1 st-icon"></i>
-                                            <span class="st-text">Absent</span>
+                                            <span class="st-text">{{ __('Absent') }}</span>
                                         </button>
                                     </div>
                                     <input type="hidden" class="status-hidden" id="status-{{ $student->id }}" value="{{ $status }}">
@@ -1154,30 +1154,30 @@
             <div class="stats-bar mb-3">
                 <div class="stat-card">
                     <div class="num">{{ $totalRec }}</div>
-                    <div class="lbl">Total</div>
+                    <div class="lbl">{{ __('Total') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num text-success">{{ $passCount }}</div>
-                    <div class="lbl">Passed</div>
+                    <div class="lbl">{{ __('Passed') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num text-danger">{{ $failCount }}</div>
-                    <div class="lbl">Failed</div>
+                    <div class="lbl">{{ __('Failed') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num" style="color:#6366f1;">{{ $passRate }}%</div>
-                    <div class="lbl">Pass Rate</div>
+                    <div class="lbl">{{ __('Pass Rate') }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="num" style="color:#f59e0b;">{{ $avgGpa }}</div>
-                    <div class="lbl">Avg GPA</div>
+                    <div class="lbl">{{ __('Avg GPA') }}</div>
                 </div>
             </div>
 
             <div class="data-table-card">
                 <div class="section-header-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h5 class="sec-title mb-0 d-flex align-items-center flex-wrap gap-2">
-                        <span><i class="fa-solid fa-table me-1" style="color:#6366f1;"></i> Result Sheet</span>
+                        <span><i class="fa-solid fa-table me-1" style="color:#6366f1;"></i> {{ __('Result Sheet') }}</span>
                         @if($selectedExamObj ?? false)
                             <span class="badge" style="background:#eff6ff; color:#3b82f6; font-size:0.72rem; padding:4px 10px; border-radius:8px; font-weight:700;">{{ $selectedExamObj->name }}</span>
                         @endif
@@ -1191,25 +1191,25 @@
                         <a href="{{ route('marks.bulk-marksheet', ['tenant' => auth()->user()->school->slug, 'class' => $selectedClassId, 'exam' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-download-pdf" title="Download All Marksheets in one PDF">
                             <i class="fa-solid fa-file-pdf"></i>
-                            <span>Marksheets</span>
+                            <span>{{ __('Marksheets') }}</span>
                         </a>
                         <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-summary-all-pdf" title="Download All Classes Result Summary in one PDF">
                             <i class="fa-solid fa-list-check"></i>
-                            <span>All Summary</span>
+                            <span>{{ __('All Summary') }}</span>
                         </a>
                         <a href="{{ route('marks.result-summary', ['tenant' => auth()->user()->school->slug, 'exam_id' => $selectedExamId, 'class_id' => $selectedClassId, 'academic_year_id' => $selectedYearId]) }}"
                            class="btn-summary-class-pdf" title="Download This Class Result Summary in PDF">
                             <i class="fa-solid fa-file-lines"></i>
-                            <span>Class Summary</span>
+                            <span>{{ __('Class Summary') }}</span>
                         </a>
                         <a href="{{ route('marks.download-sheet', array_merge(['tenant' => auth()->user()->school->slug], request()->all())) }}"
                            class="btn-download-csv" title="Download CSV Result Sheet">
                             <i class="fa-solid fa-file-csv"></i>
-                            <span>CSV</span>
+                            <span>{{ __('CSV') }}</span>
                         </a>
                         <span class="badge records-badge py-2 px-3" style="font-size:0.75rem; border-radius:8px;">
-                            {{ $paginatedResults->total() }} Records
+                            {{ $paginatedResults->total() }} {{ __('Records') }}
                         </span>
                     </div>
                 </div>
@@ -1220,16 +1220,16 @@
                         <thead>
                             <tr>
                                 <th style="width:40px;">#</th>
-                                <th>Roll</th>
-                                <th>Student ID</th>
-                                <th class="text-start">Student Name</th>
+                                <th>{{ __('Roll') }}</th>
+                                <th>{{ __('Student ID') }}</th>
+                                <th class="text-start">{{ __('Student Name') }}</th>
                                 @foreach($subjects as $subject)
                                     <th>{{ $subject->name }}<br><small class="opacity-50" style="font-size:0.6rem;">(M | G)</small></th>
                                 @endforeach
-                                <th>Total</th>
-                                <th>GPA</th>
-                                <th>Merit</th>
-                                <th>Action</th>
+                                <th>{{ __('Total') }}</th>
+                                <th>{{ __('GPA') }}</th>
+                                <th>{{ __('Merit') }}</th>
+                                <th>{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1300,9 +1300,9 @@
                 <div class="empty-icon-wrap">
                     <i class="fa-solid fa-circle-exclamation"></i>
                 </div>
-                <h5 class="fw-700" style="color:#1e293b; margin-bottom:8px;">No Marks Found</h5>
+                <h5 class="fw-700" style="color:#1e293b; margin-bottom:8px;">{{ __('No Marks Found') }}</h5>
                 <p class="text-muted" style="font-size:0.9rem; margin:0;">
-                    No marks found for the selected criteria. Please try a different filter.
+                    {{ __('No marks found for the selected criteria. Please try a different filter.') }}
                 </p>
             </div>
         @endif

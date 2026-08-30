@@ -3,7 +3,7 @@
         @foreach($groupedAssignments as $classId => $classAssignments)
             @php
                 $class = $classAssignments->first()->class ?? null;
-                $className = $class ? $class->name : 'Unassigned Class';
+                $className = $class ? $class->name : __('Unassigned Class');
                 $categoryName = $class?->category?->name ?? ($classAssignments->first()->category?->name ?? null);
                 $subjectCount = $classAssignments->count();
             @endphp
@@ -22,13 +22,13 @@
                                 @endif
                             </div>
                             <div class="class-meta-subtext" style="font-size: 0.72rem;">
-                                <i class="fa-regular fa-folder-open me-1"></i> Class Curriculum Subjects
+                                <i class="fa-regular fa-folder-open me-1"></i> {{ __('Class Curriculum Subjects') }}
                             </div>
                         </div>
                     </div>
                     <div class="class-header-stats">
                         <span class="badge stat-badge-primary" style="font-size: 0.75rem; padding: 4px 10px;">
-                            <i class="fa-solid fa-book-bookmark me-1"></i> {{ $subjectCount }} {{ Str::plural('Subject', $subjectCount) }}
+                            <i class="fa-solid fa-book-bookmark me-1"></i> {{ $subjectCount }} {{ __('Subjects') }}
                         </span>
                     </div>
                 </div>
@@ -40,11 +40,11 @@
                             <thead>
                                 <tr>
                                     <th style="width: 48px; padding: 8px 12px;" class="text-center">#</th>
-                                    <th style="width: 34%; padding: 8px 12px;">Subject</th>
-                                    <th style="width: 22%; padding: 8px 12px;">Sub Category</th>
-                                    <th class="text-center" style="width: 15%; padding: 8px 12px;">Full Mark</th>
-                                    <th class="text-center" style="width: 15%; padding: 8px 12px;">Pass Mark</th>
-                                    <th style="width: 80px; padding: 8px 12px;" class="text-end pe-3">Action</th>
+                                    <th style="width: 34%; padding: 8px 12px;">{{ __('Subject') }}</th>
+                                    <th style="width: 22%; padding: 8px 12px;">{{ __('Sub Category') }}</th>
+                                    <th class="text-center" style="width: 15%; padding: 8px 12px;">{{ __('Full Mark') }}</th>
+                                    <th class="text-center" style="width: 15%; padding: 8px 12px;">{{ __('Pass Mark') }}</th>
+                                    <th style="width: 80px; padding: 8px 12px;" class="text-end pe-3">{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,7 +61,7 @@
                                                 <div>
                                                     <span class="fw-bold text-dark subject-title" style="font-size: 0.85rem;">{{ $assignment->subject->name ?? 'N/A' }}</span>
                                                     @if(!empty($assignment->subject->code))
-                                                        <div class="subject-code-tag" style="font-size: 0.68rem;">Code: {{ $assignment->subject->code }}</div>
+                                                        <div class="subject-code-tag" style="font-size: 0.68rem;">{{ __('Code') }}: {{ $assignment->subject->code }}</div>
                                                     @endif
                                                 </div>
                                             </div>
@@ -73,7 +73,7 @@
                                                 </span>
                                             @else
                                                 <span class="badge badge-subcategory-none" style="font-size: 0.7rem; padding: 3px 6px;">
-                                                    None
+                                                    {{ __('None') }}
                                                 </span>
                                             @endif
                                         </td>
@@ -91,7 +91,7 @@
                                             <div class="d-inline-flex align-items-center justify-content-end gap-1">
                                                 <a href="{{ route('subjects.assign.edit', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}"
                                                    class="btn btn-action-icon btn-soft-warning" 
-                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Assignment">
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Edit') }}">
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </a>
                                                 <form action="{{ route('subjects.assign.destroy', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}"
@@ -100,7 +100,7 @@
                                                     @method('DELETE')
                                                     <button type="button" onclick="confirmDelete(this)" 
                                                             class="btn btn-action-icon btn-soft-danger" 
-                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Assignment">
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('Delete') }}">
                                                         <i class="fa-solid fa-trash-can"></i>
                                                     </button>
                                                 </form>
@@ -128,20 +128,20 @@
                                             <div class="d-flex align-items-center gap-1 flex-wrap mt-0.5">
                                                 <span class="text-muted" style="font-size: 0.68rem;">#{{ $assignment->id }}</span>
                                                 @if(!empty($assignment->subject->code))
-                                                    <span class="text-muted" style="font-size: 0.68rem;">• Code: {{ $assignment->subject->code }}</span>
+                                                    <span class="text-muted" style="font-size: 0.68rem;">• {{ __('Code') }}: {{ $assignment->subject->code }}</span>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-1">
                                         <a href="{{ route('subjects.assign.edit', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}"
-                                           class="btn btn-action-icon-sm btn-soft-warning" title="Edit">
+                                           class="btn btn-action-icon-sm btn-soft-warning" title="{{ __('Edit') }}">
                                             <i class="fa-regular fa-pen-to-square"></i>
                                         </a>
                                         <form action="{{ route('subjects.assign.destroy', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'assignment' => $assignment->id]) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-action-icon-sm btn-soft-danger" title="Delete">
+                                            <button type="button" onclick="confirmDelete(this)" class="btn btn-action-icon-sm btn-soft-danger" title="{{ __('Delete') }}">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </form>
@@ -155,16 +155,16 @@
                                             </span>
                                         @else
                                             <span class="badge badge-subcategory-none" style="font-size: 0.66rem; padding: 2px 5px;">
-                                                No Sub Category
+                                                {{ __('No Sub Category') }}
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="d-flex align-items-center gap-1 flex-wrap">
-                                        <span class="mark-pill-sm full-mark-pill" style="font-size: 0.68rem; padding: 2px 6px;">
-                                            Full: <strong>{{ $assignment->full_mark ?? '-' }}</strong>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <span class="mark-pill-sm full-mark-pill" style="font-size: 0.7rem; padding: 2px 6px;">
+                                            <i class="fa-solid fa-star me-1 text-warning"></i>{{ $assignment->full_mark ?? '-' }}
                                         </span>
-                                        <span class="mark-pill-sm pass-mark-pill" style="font-size: 0.68rem; padding: 2px 6px;">
-                                            Pass: <strong>{{ $assignment->pass_mark ?? '-' }}</strong>
+                                        <span class="mark-pill-sm pass-mark-pill" style="font-size: 0.7rem; padding: 2px 6px;">
+                                            <i class="fa-solid fa-circle-check me-1 text-success"></i>{{ $assignment->pass_mark ?? '-' }}
                                         </span>
                                     </div>
                                 </div>
@@ -180,7 +180,7 @@
         <div class="empty-icon-wrap" style="width: 56px; height: 56px; font-size: 1.5rem;">
             <i class="fa-solid fa-book-open-reader"></i>
         </div>
-        <h5 class="empty-title" style="font-size: 1rem;">No Subjects Assigned Yet</h5>
-        <p class="empty-desc" style="font-size: 0.82rem;">No subject allocations match your selected filter. Use the form on the left to map subjects to classes with full & pass marks.</p>
+        <h5 class="empty-title" style="font-size: 1rem;">{{ __('No Subjects Assigned Yet') }}</h5>
+        <p class="empty-desc" style="font-size: 0.82rem;">{{ __('No subject allocations match your selected filter. Use the form on the left to map subjects to classes with full & pass marks.') }}</p>
     </div>
 @endif

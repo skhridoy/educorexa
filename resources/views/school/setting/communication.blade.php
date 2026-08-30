@@ -6,8 +6,8 @@
     <!-- Header Section -->
     <div class="row mb-4 align-items-center">
         <div class="col-lg-8">
-            <h3 class="mb-1 fw-bold text-dark">Communication Settings</h3>
-            <p class="text-muted mb-0">Control email, SMS, and WhatsApp notifications dynamically for your school.</p>
+            <h3 class="mb-1 fw-bold text-dark">{{ __('Communication Settings') }}</h3>
+            <p class="text-muted mb-0">{{ __('Control email, SMS, and WhatsApp notifications dynamically for your school.') }}</p>
         </div>
     </div>
 
@@ -21,7 +21,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white border-bottom p-4">
-                    <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-list-check text-primary me-2"></i>Message Services</h5>
+                    <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-list-check text-primary me-2"></i>{{ __('Message Services') }}</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush rounded-bottom-4">
@@ -53,7 +53,7 @@
                                     </div>
                                 </div>
                                 <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#modal_{{ $key }}">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Settings
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> {{ __('Edit Settings') }}
                                 </button>
                             </div>
                         </div>
@@ -85,10 +85,10 @@
                         <div class="mb-3">
                             <i class="fa-solid fa-crown fa-3x text-warning"></i>
                         </div>
-                        <h5 class="fw-bold text-dark">Premium Feature</h5>
-                        <p class="text-muted mb-4 small">Upgrade your plan to unlock automated Email, SMS, and WhatsApp reminders.</p>
+                        <h5 class="fw-bold text-dark">{{ __('Premium Feature') }}</h5>
+                        <p class="text-muted mb-4 small">{{ __('Upgrade your plan to unlock automated Email, SMS, and WhatsApp reminders.') }}</p>
                         <a href="{{ route('school.pricing', ['tenant' => app('currentSchool')->slug]) }}" class="btn btn-primary btn-sm rounded-pill px-4 py-2">
-                            <i class="fa-solid fa-rocket me-2"></i>Upgrade Plan
+                            <i class="fa-solid fa-rocket me-2"></i>{{ __('Upgrade Plan') }}
                         </a>
                     </div>
                 </div>

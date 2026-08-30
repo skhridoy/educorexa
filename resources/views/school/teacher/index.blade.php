@@ -255,20 +255,20 @@
                     <i class="fa-solid fa-chalkboard-user"></i>
                 </div>
                 <div>
-                    <h1 class="page-title fs-4 mb-1">Teachers Management</h1>
-                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">Manage and view all teachers in your school</p>
+                    <h1 class="page-title fs-4 mb-1">{{ __('Teachers Management') }}</h1>
+                    <p class="page-subtitle mb-0 small" style="color: rgba(255,255,255,0.75);">{{ __('Manage and view all teachers in your school') }}</p>
                 </div>
             </div>
             <div class="header-actions d-flex flex-row gap-2 flex-shrink-0">
                 <button type="button" class="btn btn-sm btn-white rounded-pill px-3 shadow-sm"
                     data-bs-toggle="modal" data-bs-target="#teacherImportModal"
                     style="border:1.5px solid rgba(255,255,255,0.4); font-weight:600; font-size:13px; white-space:nowrap;">
-                    <i class="fa-solid fa-file-excel me-1" style="color:#16a34a;"></i> Import / Export
+                    <i class="fa-solid fa-file-excel me-1" style="color:#16a34a;"></i> {{ __('Import / Export') }}
                 </button>
                 <a href="{{ route('teachers.create', ['tenant' => auth()->user()?->school?->slug]) }}"
                    class="btn btn-sm btn-primary-modern rounded-pill px-3 shadow-sm"
                    style="font-size:13px; white-space:nowrap;">
-                    <i class="fa-solid fa-plus me-1"></i> Add Teacher
+                    <i class="fa-solid fa-plus me-1"></i> {{ __('Add Teacher') }}
                 </a>
             </div>
         </div>
@@ -308,8 +308,8 @@
                                 <i class="fa-solid fa-file-excel"></i>
                             </div>
                             <div>
-                                <h5 class="modal-title fw-bold mb-0" id="teacherImportModalLabel">Teacher Import / Export</h5>
-                                <small class="text-muted">Excel বা CSV ফাইলের মাধ্যমে শিক্ষক যুক্ত করুন</small>
+                                <h5 class="modal-title fw-bold mb-0" id="teacherImportModalLabel">{{ __('Teacher Import / Export') }}</h5>
+                                <small class="text-muted">{{ __('Add teachers via Excel or CSV file') }}</small>
                             </div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -322,14 +322,14 @@
                                 <button class="nav-link active fw-semibold px-4 py-2 rounded-3" id="import-tab"
                                     data-bs-toggle="pill" data-bs-target="#importTabPane" type="button" role="tab"
                                     style="font-size:13.5px;">
-                                    <i class="fa-solid fa-file-import me-2"></i>Import
+                                    <i class="fa-solid fa-file-import me-2"></i>{{ __('Import') }}
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link fw-semibold px-4 py-2 rounded-3" id="export-tab"
                                     data-bs-toggle="pill" data-bs-target="#exportTabPane" type="button" role="tab"
                                     style="font-size:13.5px;">
-                                    <i class="fa-solid fa-file-arrow-down me-2"></i>ডেমো ডাউনলোড
+                                    <i class="fa-solid fa-file-arrow-down me-2"></i>{{ __('Demo Download') }}
                                 </button>
                             </li>
                         </ul>
@@ -371,7 +371,7 @@
 
                                     {{-- Info row --}}
                                     <div class="mt-3 p-3 rounded-3 small" style="background:#f8fafc; border:1px solid #e2e8f0;">
-                                        <p class="fw-bold mb-1 text-dark"><i class="fa-solid fa-circle-info me-1 text-primary"></i>প্রয়োজনীয় কলামসমূহ:</p>
+                                        <p class="fw-bold mb-1 text-dark"><i class="fa-solid fa-circle-info me-1 text-primary"></i>{{ __('Required Columns:') }}</p>
                                         <div class="d-flex flex-wrap gap-1">
                                             @foreach(['name *','email *','phone *','gender','subject_name *','date_of_birth','father_name','mother_name','nid','blood_group','joining_date','qualification','address'] as $col)
                                                 <span class="badge rounded-pill fw-normal"
@@ -381,8 +381,8 @@
                                             @endforeach
                                         </div>
                                         <p class="text-muted mt-2 mb-0" style="font-size:11px;">
-                                            <span class="text-success fw-bold">*</span> চিহ্নিত কলামগুলো আবশ্যক &nbsp;|&nbsp;
-                                            ডিফল্ট পাসওয়ার্ড: <span class="badge bg-primary">12345678</span>
+                                            <span class="text-success fw-bold">*</span> {{ __('marked columns are required') }} &nbsp;|&nbsp;
+                                            {{ __('Default password') }}: <span class="badge bg-primary">12345678</span>
                                         </p>
                                     </div>
                                 </form>
@@ -442,12 +442,12 @@
 
                     {{-- Modal Footer --}}
                     <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">বাতিল</button>
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                         <button type="button" id="modal_import_submit_btn"
                                 class="btn fw-semibold rounded-pill px-5"
                                 style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;box-shadow:0 4px 14px rgba(22,163,74,0.3);display:none;"
                                 onclick="document.getElementById('modal_excel_import_form').submit();">
-                            <i class="fa-solid fa-file-import me-2"></i> Import শুরু করুন
+                            <i class="fa-solid fa-file-import me-2"></i> {{ __('Start Import') }}
                         </button>
                     </div>
 
@@ -461,13 +461,13 @@
             <form action="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" method="GET" id="teacherFilterForm">
                 <div class="row g-3 align-items-end">
                     <div class="col-lg-4 col-md-4 col-12">
-                        <label class="filter-label">Search Teacher</label>
+                        <label class="filter-label">{{ __('Search Teacher') }}</label>
                         <div class="input-group search-input-wrapper">
                             <span class="input-group-text bg-transparent border-end-0">
                                 <i class="fa-solid fa-magnifying-glass text-muted"></i>
                             </span>
                             <input type="text" name="search" id="searchInput" class="form-control border-start-0 pe-4" 
-                                   placeholder="Name, ID, Email, Phone..." value="{{ request('search') }}">
+                                   placeholder="{{ __('Name, ID, Email, Phone...') }}" value="{{ request('search') }}">
                             @if(request('search'))
                                 <button type="button" class="clear-search-btn" onclick="clearSearchField()" title="Clear Search">
                                     <i class="fa-solid fa-xmark"></i>
@@ -476,9 +476,9 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-3 col-6">
-                        <label class="filter-label">Subject</label>
+                        <label class="filter-label">{{ __('Subject') }}</label>
                         <select name="subject_id" class="form-select" onchange="this.form.submit()">
-                            <option value="">All Subjects</option>
+                            <option value="">{{ __('All Subjects') }}</option>
                             @foreach($subjects ?? [] as $subject)
                                 <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>
                                     {{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}
@@ -487,18 +487,18 @@
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-3 col-6">
-                        <label class="filter-label">Sort By</label>
+                        <label class="filter-label">{{ __('Sort By') }}</label>
                         <select name="sort" class="form-select" onchange="this.form.submit()">
-                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name (A-Z)</option>
-                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name (Z-A)</option>
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('Newest First') }}</option>
+                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>{{ __('Oldest First') }}</option>
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('Name (A-Z)') }}</option>
+                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>{{ __('Name (Z-A)') }}</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-2 col-12">
                         <div class="d-flex gap-2 w-100">
                             <button type="submit" class="btn btn-primary-modern flex-fill py-2 px-3 text-nowrap rounded-3">
-                                <i class="fa-solid fa-filter me-1"></i> Filter
+                                <i class="fa-solid fa-filter me-1"></i> {{ __('Filter') }}
                             </button>
                             @if(request()->hasAny(['search', 'subject_id', 'sort']))
                                 <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" 
@@ -514,7 +514,7 @@
             {{-- Active Filter Badges --}}
             @if(request()->hasAny(['search', 'subject_id', 'sort']))
                 <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top">
-                    <span class="small text-muted me-1"><i class="fa-solid fa-sliders me-1"></i>Active Filters:</span>
+                    <span class="small text-muted me-1"><i class="fa-solid fa-sliders me-1"></i>{{ __('Active Filters:') }}</span>
                     @if(request('search'))
                         <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium">
                             Search: "{{ request('search') }}"
@@ -535,7 +535,7 @@
                         </span>
                     @endif
                     <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="small text-danger ms-auto fw-semibold">
-                        Clear All
+                        {{ __('Clear All') }}
                     </a>
                 </div>
             @endif
@@ -545,9 +545,9 @@
         <div class="data-table-card">
             <div class="table-header px-4 py-3 border-bottom d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
-                    <h5 class="table-title mb-0"><i class="fa-solid fa-chalkboard-user me-2 text-primary"></i> Teacher Directory</h5>
+                    <h5 class="table-title mb-0"><i class="fa-solid fa-chalkboard-user me-2 text-primary"></i> {{ __('Teacher Directory') }}</h5>
                     <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 fw-bold" style="font-size:12px;">
-                        {{ method_exists($teachers, 'total') ? $teachers->total() : count($teachers) }} Teachers
+                        {{ method_exists($teachers, 'total') ? $teachers->total() : count($teachers) }} {{ __('Teachers') }}
                     </span>
                 </div>
             </div>
@@ -558,11 +558,11 @@
                     <table class="table edu-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th class="ps-4">Teacher Info</th>
-                                <th>ID & Subject</th>
-                                <th>Contact Info</th>
-                                <th>Qualification</th>
-                                <th class="text-center pe-4">Actions</th>
+                                <th class="ps-4">{{ __('Teacher Info') }}</th>
+                                <th>{{ __('ID & Subject') }}</th>
+                                <th>{{ __('Contact Info') }}</th>
+                                <th>{{ __('Qualification') }}</th>
+                                <th class="text-center pe-4">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -645,7 +645,7 @@
                                     <div class="teacher-info-row">
                                         <div class="teacher-info-label">
                                             <i class="fa-solid fa-book-open text-primary teacher-info-icon"></i>
-                                            <span>Subject:</span>
+                                            <span>{{ __('Subject:') }}</span>
                                         </div>
                                         <span class="teacher-info-value fw-semibold text-primary">
                                             {{ $teacher->subject?->name ?? 'N/A' }}
@@ -657,7 +657,7 @@
                                         <div class="teacher-info-row">
                                             <div class="teacher-info-label">
                                                 <i class="fa-solid fa-graduation-cap text-success teacher-info-icon"></i>
-                                                <span>Qualification:</span>
+                                                <span>{{ __('Qualification:') }}</span>
                                             </div>
                                             <span class="teacher-info-value fw-medium text-dark">
                                                 {{ $teacher->qualification }}
@@ -670,7 +670,7 @@
                                         <div class="teacher-info-row">
                                             <div class="teacher-info-label">
                                                 <i class="fa-solid fa-phone text-success teacher-info-icon"></i>
-                                                <span>Phone:</span>
+                                                <span>{{ __('Phone:') }}</span>
                                             </div>
                                             <a href="tel:{{ $teacher->phone }}" class="teacher-info-value fw-medium text-dark text-decoration-none">
                                                 {{ $teacher->phone }}
@@ -683,7 +683,7 @@
                                         <div class="teacher-info-row">
                                             <div class="teacher-info-label">
                                                 <i class="fa-regular fa-envelope text-primary teacher-info-icon"></i>
-                                                <span>Email:</span>
+                                                <span>{{ __('Email:') }}</span>
                                             </div>
                                             <a href="mailto:{{ $teacher->email }}" class="teacher-info-value fw-medium text-dark text-decoration-none">
                                                 {{ $teacher->email }}
@@ -694,7 +694,7 @@
 
                                 {{-- Bottom Action Row --}}
                                 <div class="d-flex align-items-center justify-content-between pt-2.5 border-top">
-                                    <span class="small text-muted fw-medium" style="font-size:11.5px;">Quick Actions</span>
+                                    <span class="small text-muted fw-medium" style="font-size:11.5px;">{{ __('Quick Actions') }}</span>
                                     <div class="d-flex align-items-center gap-2">
                                         <a href="{{ route('teachers.show', ['tenant' => auth()->user()?->school?->slug, 'teacher' => $teacher->id]) }}" 
                                            class="btn btn-icon-sm btn-soft-primary" title="View Details">
@@ -727,21 +727,21 @@
                                 <i class="fa-solid fa-chalkboard-user fa-2x"></i>
                             </span>
                         </div>
-                        <h5 class="fw-bold text-dark mb-1">No Teachers Found</h5>
+                        <h5 class="fw-bold text-dark mb-1">{{ __('No Teachers Found') }}</h5>
                         <p class="text-muted small mb-3">
                             @if(request()->hasAny(['search', 'subject_id', 'sort']))
-                                No teachers match your specified filter criteria.
+                                {{ __('No teachers match your specified filter criteria.') }}
                             @else
-                                No teacher records available in the system.
+                                {{ __('No teacher records available in the system.') }}
                             @endif
                         </p>
                         @if(request()->hasAny(['search', 'subject_id', 'sort']))
                             <a href="{{ route('teachers.index', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-outline-secondary rounded-pill px-4">
-                                <i class="fa-solid fa-rotate-left me-1"></i> Clear Filters
+                                <i class="fa-solid fa-rotate-left me-1"></i> {{ __('Clear Filters') }}
                             </a>
                         @else
                             <a href="{{ route('teachers.create', ['tenant' => auth()->user()?->school?->slug]) }}" class="btn btn-sm btn-primary-modern rounded-pill px-4">
-                                <i class="fa-solid fa-plus me-1"></i> Add Your First Teacher
+                                <i class="fa-solid fa-plus me-1"></i> {{ __('Add Your First Teacher') }}
                             </a>
                         @endif
                     </div>
@@ -771,14 +771,14 @@
     // Delete Confirmation
     function confirmDelete(button) {
         Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to delete this teacher?",
+            title: "{{ __('Are you sure?') }}",
+            text: "{{ __('Do you want to delete this teacher?') }}",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "{{ __('Yes, delete it!') }}",
+            cancelButtonText: "{{ __('Cancel') }}",
         }).then((result) => {
             if (result.isConfirmed) {
                 button.closest('form').submit();

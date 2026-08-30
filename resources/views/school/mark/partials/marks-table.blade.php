@@ -360,11 +360,11 @@
     <div class="entry-table-header">
         <h5 class="entry-table-title">
             <i class="fa-solid fa-file-pen" style="color:#7c3aed;"></i>
-            Enter Marks
+            {{ __('Enter Marks') }}
         </h5>
         <span class="full-mark-badge">
             <i class="fa-solid fa-bullseye" style="font-size:0.68rem;"></i>
-            Full Mark: {{ $fullMarks }}
+            {{ __('Full Mark:') }} {{ $fullMarks }}
         </span>
     </div>
 
@@ -375,15 +375,15 @@
         <table class="entry-data-table">
             <thead>
                 <tr>
-                    <th style="width:10%;">ID</th>
-                    <th style="width:6%;">Roll</th>
-                    <th style="width:20%;">Student Name</th>
-                    <th style="width:15%; text-align:center;">CQ</th>
-                    <th style="width:15%; text-align:center;">MCQ</th>
-                    <th style="width:15%; text-align:center;">Practical</th>
-                    <th style="width:15%; text-align:center;">Total (Obt.)</th>
-                    <th style="width:15%; text-align:center;">Grade</th>
-                    <th style="width:15%; text-align:center;">Attendance</th>
+                    <th style="width:10%;">{{ __('ID') }}</th>
+                    <th style="width:6%;">{{ __('Roll') }}</th>
+                    <th style="width:20%;">{{ __('Student Name') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('CQ') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('MCQ') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('Practical') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('Total (Obt.)') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('Grade') }}</th>
+                    <th style="width:15%; text-align:center;">{{ __('Attendance') }}</th>
                 </tr>
             </thead> 
             <tbody>
@@ -479,13 +479,13 @@
                                         class="est-btn {{ $sts == 'present' ? 'est-present' : '' }}"
                                         onclick="setEntryStatus({{ $student->id }}, 'present', this)">
                                     <i class="fa-solid fa-check"></i>
-                                    <span>Present</span>
+                                    <span>{{ __('Present') }}</span>
                                 </button>
                                 <button type="button"
                                         class="est-btn {{ $sts == 'absent' ? 'est-absent' : '' }}"
                                         onclick="setEntryStatus({{ $student->id }}, 'absent', this)">
                                     <i class="fa-solid fa-xmark"></i>
-                                    <span>Absent</span>
+                                    <span>{{ __('Absent') }}</span>
                                 </button>
                             </div>
                         </td>
@@ -527,7 +527,7 @@
                             <div class="esc-meta">
                                 <span class="esc-tag esc-roll-tag">
                                     <i class="fa-solid fa-hashtag" style="font-size:0.55rem;"></i>
-                                    Roll {{ $student->roll }}
+                                    {{ __('Roll') }} {{ $student->roll }}
                                 </span>
                                 <span class="esc-tag esc-id-tag">
                                     <i class="fa-solid fa-id-badge" style="font-size:0.55rem;"></i>
@@ -585,7 +585,7 @@
                 {{-- Bottom: Total mark input (Auto Calculated) + Status toggle --}}
                 <div class="esc-bottom">
                     <div class="esc-mark-group">
-                        <label style="font-size:11px;font-weight:700;color:#334155;">Total:</label>
+                        <label style="font-size:11px;font-weight:700;color:#334155;">{{ __('Total:') }}</label>
                         <div class="entry-mark-box total-box-readonly" title="Auto calculated: CQ + MCQ + Practical">
                             <input type="number" step="1" min="0" max="{{ $fullMarks }}"
                                    class="mark-input total-input"
@@ -612,13 +612,13 @@
                                     class="est-btn {{ $sts == 'present' ? 'est-present' : '' }}"
                                     onclick="setEntryStatus({{ $student->id }}, 'present', this)">
                                 <i class="fa-solid fa-check"></i>
-                                <span>Present</span>
+                                <span>{{ __('Present') }}</span>
                             </button>
                             <button type="button"
                                     class="est-btn {{ $sts == 'absent' ? 'est-absent' : '' }}"
                                     onclick="setEntryStatus({{ $student->id }}, 'absent', this)">
                                 <i class="fa-solid fa-xmark"></i>
-                                <span>Absent</span>
+                                <span>{{ __('Absent') }}</span>
                             </button>
                         </div>
                     </div>
