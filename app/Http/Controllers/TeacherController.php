@@ -16,6 +16,7 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Imports\TeacherImport;
 use App\Models\School;
 use App\Mail\TeacherCredentialsMail;
@@ -298,7 +299,13 @@ class TeacherController extends Controller
                 'role' => 'teacher',
             ]);
 
-            $user->assignRole('teacher'); 
+            if (method_exists($user, 'assignRole')) {
+                try {
+                    $user->assignRole('teacher');
+                } catch (\Throwable $e) {
+                    Log::warning("Could not assign 'teacher' role: " . $e->getMessage());
+                }
+            }
 
         });
 

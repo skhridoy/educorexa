@@ -82,6 +82,7 @@ class User extends Authenticatable
         'password',
         'role',
         'school_id',
+        'teacher_id',
         'phone',
         'photo',
     ];
