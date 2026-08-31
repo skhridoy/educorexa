@@ -213,92 +213,6 @@
     .roll-cell { font-weight: 700; color: #1e293b; font-size: 0.74rem; }
     .name-cell { font-weight: 600; color: #0f172a; font-size: 0.72rem; white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
 
-    /* ══════════════════════════════════════════════
-       MOBILE STUDENT CARD
-    ══════════════════════════════════════════════ */
-    .entry-student-card {
-        background: #fff;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 13px 15px;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 10px rgba(15,23,42,0.04);
-        transition: all 0.22s;
-    }
-    .entry-student-card:hover { border-color: #c7d2fe; box-shadow: 0 6px 20px rgba(99,102,241,0.08); }
-    .entry-student-card.row-absent { background: #fff8f8 !important; border-color: #fecaca !important; }
-
-    .esc-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        gap: 10px;
-    }
-    .esc-student-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-        flex: 1;
-    }
-    .esc-avatar {
-        width: 40px; height: 40px;
-        border-radius: 11px;
-        background: linear-gradient(135deg, #4f46e5, #7c3aed);
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 800;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        box-shadow: 0 3px 8px rgba(79,70,229,0.22);
-    }
-    .esc-name {
-        font-size: 0.87rem;
-        font-weight: 700;
-        color: #0f172a;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .esc-meta {
-        display: flex;
-        gap: 4px;
-        margin-top: 3px;
-        flex-wrap: nowrap;  /* keep roll+id on same line */
-        align-items: center;
-    }
-    .esc-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 2px;
-        font-size: 0.6rem;
-        font-weight: 600;
-        padding: 1px 6px;
-        border-radius: 4px;
-        border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        color: #64748b;
-        white-space: nowrap;
-    }
-    .esc-roll-tag { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .esc-id-tag   { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-
-    /* bottom row: mark + status always side by side */
-    .esc-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        padding-top: 9px;
-        border-top: 1px solid #f1f5f9;
-        flex-wrap: nowrap;  /* always one row */
-    }
-    .esc-mark-group {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-    }
 
     /* ══════════════════════════════════════════════
        DARK MODE
@@ -335,9 +249,11 @@
     /* ══════════════════════════════════════════════
        RESPONSIVE BREAKPOINTS
     ══════════════════════════════════════════════ */
+    /* Keep desktop table on all screens with horizontal scroll */
     @media (max-width: 991.98px) {
-        .entry-desktop-table { display: none !important; }
-        .entry-mobile-cards  { display: block !important; }
+        .entry-desktop-table { display: block !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+        .entry-desktop-table table, .entry-data-table { min-width: 680px !important; display: table !important; }
+        .entry-mobile-cards  { display: none !important; }
     }
     @media (max-width: 767.98px) {
         .entry-table-header { padding: 12px 14px; }
@@ -349,7 +265,6 @@
         .grade-pill-entry { height: 26px; min-width: 28px; font-size: 0.68rem; }
     }
     @media (max-width: 399.98px) {
-        .esc-name { font-size: 0.82rem; }
         .entry-status-toggle .est-btn { padding: 0 6px; }
     }
 </style>
@@ -495,139 +410,9 @@
         </table>
     </div>
 
-    {{-- ══════════════════════════════════════════════
-         MOBILE CARD VIEW (shown on tablet/mobile)
-    ══════════════════════════════════════════════ --}}
-    <div class="entry-mobile-cards p-3">
-        @foreach($students as $student)
-            @php
-                $sts   = $marksWithGrade[$student->id]['status'] ?? 'present';
-                $cq    = (isset($marksWithGrade[$student->id]['cq']) && $marksWithGrade[$student->id]['cq'] !== null && $marksWithGrade[$student->id]['cq'] !== '') ? (int)$marksWithGrade[$student->id]['cq'] : '';
-                $mcq   = (isset($marksWithGrade[$student->id]['mcq']) && $marksWithGrade[$student->id]['mcq'] !== null && $marksWithGrade[$student->id]['mcq'] !== '') ? (int)$marksWithGrade[$student->id]['mcq'] : '';
-                $prac  = (isset($marksWithGrade[$student->id]['practical']) && $marksWithGrade[$student->id]['practical'] !== null && $marksWithGrade[$student->id]['practical'] !== '') ? (int)$marksWithGrade[$student->id]['practical'] : '';
-                $mval  = (isset($marksWithGrade[$student->id]['marks']) && $marksWithGrade[$student->id]['marks'] !== null && $marksWithGrade[$student->id]['marks'] !== '') ? (int)$marksWithGrade[$student->id]['marks'] : '';
-                $gval  = $marksWithGrade[$student->id]['grade']  ?? '-';
-                $inits = strtoupper(substr($student->name, 0, 1));
-                $gradeClass = match($gval) {
-                    'A+' => 'gpe-ap', 'A' => 'gpe-a', 'A-' => 'gpe-am',
-                    'B'  => 'gpe-b',  'C' => 'gpe-c', 'D'  => 'gpe-d',
-                    'F'  => 'gpe-f',  default => 'gpe-default'
-                };
-            @endphp
-            <div class="entry-student-card {{ $sts === 'absent' ? 'row-absent' : '' }}"
-                 id="card-{{ $student->id }}"
-                 data-student="{{ $student->id }}">
-
-                {{-- Top: Avatar + Info --}}
-                <div class="esc-top">
-                    <div class="esc-student-info">
-                        <div class="esc-avatar">{{ $inits }}</div>
-                        <div style="min-width:0; flex:1;">
-                            <div class="esc-name">{{ strtoupper($student->name) }}</div>
-                            <div class="esc-meta">
-                                <span class="esc-tag esc-roll-tag">
-                                    <i class="fa-solid fa-hashtag" style="font-size:0.55rem;"></i>
-                                    {{ __('Roll') }} {{ $student->roll }}
-                                </span>
-                                <span class="esc-tag esc-id-tag">
-                                    <i class="fa-solid fa-id-badge" style="font-size:0.55rem;"></i>
-                                    {{ $student->student_id }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    {{-- Grade pill always visible top-right --}}
-                    <span class="grade-pill-entry {{ $gradeClass }}" id="grade-{{ $student->id }}">
-                        {{ $sts == 'absent' ? 'ABS' : ($gval ?? '-') }}
-                    </span>
-                </div>
-
-                {{-- Middle: CQ, MCQ, Prac Inputs --}}
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <div class="flex-fill">
-                        <label style="font-size:10px;font-weight:700;color:#64748b;">CQ</label>
-                        <div class="entry-mark-box w-100">
-                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
-                                   class="mark-input cq-input w-100"
-                                   data-student="{{ $student->id }}"
-                                   data-type="cq"
-                                   placeholder="CQ"
-                                   value="{{ $cq }}"
-                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
-                        </div>
-                    </div>
-                    <div class="flex-fill">
-                        <label style="font-size:10px;font-weight:700;color:#64748b;">MCQ</label>
-                        <div class="entry-mark-box w-100">
-                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
-                                   class="mark-input mcq-input w-100"
-                                   data-student="{{ $student->id }}"
-                                   data-type="mcq"
-                                   placeholder="MCQ"
-                                   value="{{ $mcq }}"
-                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
-                        </div>
-                    </div>
-                    <div class="flex-fill">
-                        <label style="font-size:10px;font-weight:700;color:#64748b;">Practical</label>
-                        <div class="entry-mark-box w-100">
-                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
-                                   class="mark-input prac-input w-100"
-                                   data-student="{{ $student->id }}"
-                                   data-type="practical"
-                                   placeholder="Prac"
-                                   value="{{ $prac }}"
-                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Bottom: Total mark input (Auto Calculated) + Status toggle --}}
-                <div class="esc-bottom">
-                    <div class="esc-mark-group">
-                        <label style="font-size:11px;font-weight:700;color:#334155;">{{ __('Total:') }}</label>
-                        <div class="entry-mark-box total-box-readonly" title="Auto calculated: CQ + MCQ + Practical">
-                            <input type="number" step="1" min="0" max="{{ $fullMarks }}"
-                                   class="mark-input total-input"
-                                   data-student="{{ $student->id }}"
-                                   data-type="total"
-                                   data-fullmarks="{{ $fullMarks }}"
-                                   placeholder="0"
-                                   value="{{ $mval }}"
-                                   readonly
-                                   tabindex="-1"
-                                   {{ $sts == 'absent' ? 'disabled' : '' }}>
-                            <span class="mark-denom">/ {{ $fullMarks }}</span>
-                        </div>
-                    </div>
-
-                    {{-- Status Toggle --}}
-                    <div>
-                        {{-- Hidden status-input for JS compatibility --}}
-                        <input type="hidden" class="status-input"
-                               data-student="{{ $student->id }}"
-                               value="{{ $sts }}">
-                        <div class="entry-status-toggle">
-                            <button type="button"
-                                    class="est-btn {{ $sts == 'present' ? 'est-present' : '' }}"
-                                    onclick="setEntryStatus({{ $student->id }}, 'present', this)">
-                                <i class="fa-solid fa-check"></i>
-                                <span>{{ __('Present') }}</span>
-                            </button>
-                            <button type="button"
-                                    class="est-btn {{ $sts == 'absent' ? 'est-absent' : '' }}"
-                                    onclick="setEntryStatus({{ $student->id }}, 'absent', this)">
-                                <i class="fa-solid fa-xmark"></i>
-                                <span>{{ __('Absent') }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    </div>
 
 </div>
+
 
 <script>
 // ── Entry Status Toggle (shared desktop + mobile) ──

@@ -284,10 +284,11 @@
             align-items: center;
             border: 1px solid #cbd5e1;
             border-radius: 5px;
-            background: #ffffff;
+            background-color: #ffffff;
             height: 38px;
             transition: all 0.2s ease;
             position: relative;
+            overflow: hidden;
         }
         .search-input-wrapper:focus-within {
             border-color: #4f46e5 !important;
@@ -299,20 +300,47 @@
             padding: 0 8px 0 12px !important;
             box-shadow: none !important;
             outline: none !important;
+            color: #64748b !important;
         }
         .search-input-wrapper .form-control {
             border: none !important;
             background: transparent !important;
+            background-color: transparent !important;
             box-shadow: none !important;
             outline: none !important;
             height: 100% !important;
             font-size: 0.82rem !important;
             padding-left: 0 !important;
+            color: #1e293b !important;
         }
         .search-input-wrapper .form-control:focus {
             box-shadow: none !important;
             outline: none !important;
             border: none !important;
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+        [data-bs-theme="dark"] .search-input-wrapper,
+        body.dark-mode .search-input-wrapper {
+            background-color: #09101f !important;
+            border-color: #1a253b !important;
+        }
+        [data-bs-theme="dark"] .search-input-wrapper:focus-within,
+        body.dark-mode .search-input-wrapper:focus-within {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+        }
+        [data-bs-theme="dark"] .search-input-wrapper .input-group-text,
+        body.dark-mode .search-input-wrapper .input-group-text {
+            background: transparent !important;
+            background-color: transparent !important;
+            color: #94a3b8 !important;
+        }
+        [data-bs-theme="dark"] .search-input-wrapper .form-control,
+        body.dark-mode .search-input-wrapper .form-control {
+            background: transparent !important;
+            background-color: transparent !important;
+            color: #f8fafc !important;
         }
 
         .search-card .form-select {

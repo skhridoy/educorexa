@@ -277,9 +277,27 @@
                 feather.replace();
             }
 
-            // Sidebar close for mobile
+            // Expand sidebar automatically when clicking submenu in folded state
+            $('.edu-has-submenu').on('click', function() {
+                if ($('body').hasClass('sidebar-folded')) {
+                    $('body').removeClass('sidebar-folded');
+                }
+            });
+
+            // Sidebar close for mobile (X button inside sidebar)
             $('.edu-mobile-close').on('click', function() {
                 $('body').removeClass('sidebar-open');
+            });
+
+            // Click outside sidebar to close on mobile
+            $(document).on('click', function(e) {
+                if (window.matchMedia('(max-width: 991px)').matches) {
+                    if ($('body').hasClass('sidebar-open') &&
+                        !$(e.target).closest('.sidebar').length &&
+                        !$(e.target).closest('.sidebar-toggler').length) {
+                        $('body').removeClass('sidebar-open');
+                    }
+                }
             });
         });
     </script>

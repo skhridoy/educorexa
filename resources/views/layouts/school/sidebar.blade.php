@@ -60,21 +60,30 @@
     {{-- Header Section --}}
     <div class="edu-sidebar-header">
         <a href="{{ route('school.home', ['tenant' => $tenant]) }}" class="edu-brand">
-            <div class="edu-brand-icon" style="background: linear-gradient(135deg, #4f46e5, #818cf8); color: white;">
-                {{ strtoupper(substr($school->name ?? 'E', 0, 1)) }}
-            </div>
-            <div>
-                <div class="edu-brand-name">{{ $school->name ?? 'EduCorexa' }}</div>
+            {{-- School Logo --}}
+            @if($school->logo ?? null)
+                <img src="{{ asset($school->logo) }}" alt="{{ $school->name }}" 
+                     class="edu-brand-logo"
+                     style="width:36px; height:36px; border-radius:10px; object-fit:cover; flex-shrink:0;">
+            @else
+                <div class="edu-brand-icon" style="background: linear-gradient(135deg, #4f46e5, #818cf8); color: white; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; flex-shrink:0;">
+                    {{ strtoupper(substr($school->name ?? 'E', 0, 1)) }}
+                </div>
+            @endif
+            <div class="edu-brand-text" style="min-width:0; overflow:hidden;">
+                <div class="edu-brand-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $school->name ?? 'EduCorexa' }}</div>
                 <div class="edu-brand-sub">School Portal</div>
             </div>
         </a>
         {{-- Mobile Close Button --}}
-        <div class="edu-mobile-close d-lg-none" style="cursor:pointer; color:#94a3b8; z-index: 9999; display: flex !important; align-items: center; justify-content: center; margin-left: auto;">
+        <button id="sidebarCloseBtn" class="edu-mobile-close d-lg-none" 
+                style="cursor:pointer; background:none; border:none; color:#94a3b8; padding: 6px; border-radius: 6px; transition: all 0.2s; margin-left: auto; flex-shrink:0;"
+                aria-label="Close Sidebar">
             <i data-feather="x" style="width:22px;height:22px;"></i>
-        </div>
+        </button>
     </div>
 
-    <div class="edu-sidebar-body">
+    <div class="edu-sidebar-body sidebar-body">
         <ul class="edu-nav">
             <li class="edu-nav-category">{{ __('Main') }}</li>
             <li class="edu-nav-item">
@@ -319,58 +328,57 @@
                 </div>
             </li>
             @endif
-
         </ul>
+    </div>
 
-        {{-- Upgrade Plan Card --}}
-        @if($user->hasRole('school_admin') || $user->role === 'school_admin')
-        @php
-            $currentPackage = optional($school->subscriptionPackage);
-            $isPremium = $currentPackage->is_popular ?? false;
-            $packageName = $currentPackage->name ?? 'Basic';
-        @endphp
+    {{-- Upgrade Plan Card (Pinned to Sidebar Bottom) --}}
+    @if($user->hasRole('school_admin') || $user->role === 'school_admin')
+    @php
+        $currentPackage = optional($school->subscriptionPackage);
+        $isPremium = $currentPackage->is_popular ?? false;
+        $packageName = $currentPackage->name ?? 'Basic';
+    @endphp
 
-        <div class="edu-sidebar-footer mx-3 my-4">
-            @if(!$isPremium)
-                {{-- Basic Package: Upgrade Card --}}
-                <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
-                    <div class="card-body p-3 text-white text-center">
-                        <div class="mb-2">
-                            <i class="fa-solid fa-rocket fa-2x opacity-75"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size:13px;">{{ __('Upgrade to Premium') }}</h6>
-                        <p class="mb-2" style="font-size:11px; opacity:0.8;">{{ __('Unlock all premium features and unlimited benefits.') }}</p>
-                        <div class="mb-2" style="font-size:10px; opacity:0.7;">
-                            <span class="badge" style="background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:20px;">
-                                {{ __('Current') }}: {{ $packageName }}
-                            </span>
-                        </div>
-                        <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" 
-                           class="btn w-100 rounded-pill py-2 fw-bold" 
-                           style="background:#fff; color:#4f46e5; font-size:12px; margin-top:4px;">
-                            <i class="fa-solid fa-arrow-up me-1"></i> {{ __('Upgrade Now') }}
-                        </a>
+    <div class="edu-sidebar-footer mx-3 mb-3 mt-auto sidebar-folded-hide">
+        @if(!$isPremium)
+            {{-- Basic Package: Upgrade Card --}}
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
+                <div class="card-body p-3 text-white text-center">
+                    <div class="mb-1.5">
+                        <i class="fa-solid fa-rocket fa-xl opacity-85"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1" style="font-size:12.5px;">{{ __('Upgrade to Premium') }}</h6>
+                    <p class="mb-2" style="font-size:10.5px; opacity:0.85; line-height:1.3;">{{ __('Unlock all premium features & unlimited benefits.') }}</p>
+                    <div class="mb-2">
+                        <span class="badge" style="background:rgba(255,255,255,0.22); padding:3px 8px; border-radius:20px; font-size:9.5px;">
+                            {{ __('Current') }}: {{ $packageName }}
+                        </span>
+                    </div>
+                    <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" 
+                       class="btn w-100 rounded-pill py-1.5 fw-bold" 
+                       style="background:#fff; color:#4f46e5; font-size:11.5px;">
+                        <i class="fa-solid fa-arrow-up me-1"></i> {{ __('Upgrade Now') }}
+                    </a>
+                </div>
+            </div>
+        @else
+            {{-- Premium Package: Active Badge --}}
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #059669, #10b981);">
+                <div class="card-body p-2.5 text-white text-center">
+                    <div class="mb-1">
+                        <i class="fa-solid fa-crown fa-lg" style="opacity:0.9; color:#fcd34d;"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0.5" style="font-size:12px; color:#fcd34d;">{{ __('Premium Active') }}</h6>
+                    <p class="mb-1.5" style="font-size:10.5px; opacity:0.85;">{{ __(':package package', ['package' => $packageName]) }}</p>
+                    <div style="background:rgba(255,255,255,0.18); border-radius:8px; padding:4px 8px; font-size:9.5px;">
+                        <i class="fa-solid fa-check-circle me-1" style="color:#fcd34d;"></i>
+                        {{ __('All features active') }}
                     </div>
                 </div>
-            @else
-                {{-- Premium Package: Active Badge --}}
-                <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #059669, #10b981);">
-                    <div class="card-body p-3 text-white text-center">
-                        <div class="mb-2">
-                            <i class="fa-solid fa-crown fa-2x" style="opacity:0.85; color:#fcd34d;"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1" style="font-size:13px; color:#fcd34d;">{{ __('Premium Active') }}</h6>
-                        <p class="mb-2" style="font-size:11px; opacity:0.85;">{{ __('You are on :package package.', ['package' => $packageName]) }}</p>
-                        <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:6px 10px; font-size:10px;">
-                            <i class="fa-solid fa-check-circle me-1" style="color:#fcd34d;"></i>
-                            {{ __('All premium features are active') }}
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
+            </div>
         @endif
     </div>
+    @endif
 </nav>
 
 <form id="logout-form" action="{{ route('school.logout', ['tenant' => $tenant]) }}" method="POST" style="display: none;">

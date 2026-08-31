@@ -156,8 +156,10 @@
             .exam-stat-icon { width: 36px; height: 36px; font-size: 1.1rem; }
             .exam-stat-val  { font-size: 1.25rem; }
             .exam-stat-lbl  { font-size: 0.7rem; }
-            .desktop-exam-table { display: none !important; }
-            .mobile-exam-card   { display: block !important; }
+            /* Keep desktop table on all screens - horizontal scroll */
+            .desktop-exam-table { display: block !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+            .desktop-exam-table table { min-width: 680px !important; display: table !important; }
+            .mobile-exam-card   { display: none !important; }
             .exam-filter-card .row > [class*="col-"] { margin-bottom: 4px; }
         }
         @media (max-width: 575.98px) {
@@ -489,54 +491,8 @@
                         </table>
                     </div>
 
-                    {{-- Mobile Card View --}}
-                    <div class="p-3 d-md-none">
-                        @forelse ($exams as $exam)
-                            <div class="mobile-exam-card">
-                                <div class="d-flex align-items-start justify-content-between mb-2">
-                                    <div>
-                                        <h6 class="fw-bold mb-0 text-dark">{{ $exam->name }}</h6>
-                                        <div class="d-flex align-items-center gap-1 mt-1 flex-wrap">
-                                            <span class="badge bg-soft-primary text-primary" style="font-size: 0.7rem;">{{ $exam->academicYear->name ?? 'N/A' }}</span>
-                                            @foreach($exam->categories as $cat)
-                                                <span class="badge bg-soft-info text-info" style="font-size: 0.7rem;">{{ $cat->name }}</span>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    <div class="d-flex gap-1">
-                                        <button type="button" class="btn-act btn-act-edit editBtn" data-id="{{ $exam->id }}"><i class="fa-solid fa-pen"></i></button>
-                                        <form action="{{ route('exams.destroy', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'exam' => $exam->id]) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" onclick="confirmDelete(this)" class="btn-act btn-act-del"><i class="fa-solid fa-trash-can"></i></button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="small text-muted mb-2">
-                                    <i class="fa-regular fa-calendar-check text-primary me-1"></i>
-                                    {{ \Carbon\Carbon::parse($exam->start_date)->format('d M') }} - {{ \Carbon\Carbon::parse($exam->end_date)->format('d M, Y') }}
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-                                    <div>
-                                        <span class="small text-muted me-1">{{ __('Active:') }}</span>
-                                        <div class="form-check form-switch d-inline-block">
-                                            <input class="form-check-input statusToggle" type="checkbox" data-id="{{ $exam->id }}" {{ $exam->status == 1 ? 'checked' : '' }}>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span class="small text-muted me-1">{{ __('Publish:') }}</span>
-                                        <div class="form-check form-switch d-inline-block">
-                                            <input class="form-check-input resultToggle" type="checkbox" data-id="{{ $exam->id }}" {{ $exam->is_published ? 'checked' : '' }}>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-4 text-muted">
-                                {{ __('No exams found.') }}
-                            </div>
-                        @endforelse
-                    </div>
+
+                    {{-- Pagination --}}
 
                     {{-- Pagination --}}
                     @if($exams->hasPages())

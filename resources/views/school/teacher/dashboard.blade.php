@@ -16,40 +16,33 @@
         @endphp
 
         {{-- ===== WELCOME HERO CARD ===== --}}
-        <div class="welcome-card mb-4 p-4 p-md-5">
-            <div class="row align-items-center position-relative" style="z-index:1;">
-                <div class="col-md-8">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="greet-icon-box d-none d-sm-flex">
-                            <i class="fa-solid {{ $faIcon }} fa-xl" style="color:{{ $greetColor == '#3b82f6' ? '#60a5fa' : $greetColor }}"></i>
-                        </div>
-                        <h2 class="mb-0 fw-bold">
-                            {{ $greeting }}, {{ auth()->user()->name }}!
-                        </h2>
-                    </div>
-                    <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
-                        আপনার আজকের ক্লাসের সময়সূচী এবং রিপোর্ট এক নজরে দেখে নিন।
-                    </p>
-                    <div class="mt-4 d-flex flex-wrap gap-2">
-                        <span class="badge bg-dark bg-opacity-10 border border-dark border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-calendar-days me-1"></i> {{ now()->format('d M Y') }}
-                        </span>
-                        <span class="badge bg-dark bg-opacity-10 border border-dark border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-clock me-1"></i> {{ now()->format('h:i A') }}
-                        </span>
+        <div class="welcome-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="{{ auth()->user()->photo ? asset(auth()->user()->photo) : (auth()->user()->teacher?->photo ? asset(auth()->user()->teacher->photo) : asset('assets/images/profile.webp')) }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         class="welcome-user-avatar">
+                    <div>
+                        <h4 class="welcome-card-title">{{ $greeting }}, {{ auth()->user()->name }}</h4>
+                        <p class="welcome-card-subtitle">আপনার আজকের ক্লাসের সময়সূচী এবং রিপোর্ট এক নজরে দেখে নিন।</p>
                     </div>
                 </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                    <i class="fa-solid fa-person-chalkboard text-dark opacity-10" style="font-size: 8rem;"></i>
+                <div class="d-flex align-items-center gap-2 align-self-start align-self-md-center">
+                    <span class="d-none d-sm-inline-flex align-items-center gap-1 text-white text-opacity-90 fw-semibold" style="font-size: 0.76rem; background: rgba(255,255,255,0.15); padding: 7px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);">
+                        <i class="fa-regular fa-calendar-days opacity-75 me-1"></i> {{ now()->format('d M Y') }}
+                    </span>
+                    <a href="{{ route('attendances.index') ?? '#' }}" class="btn-welcome-action">
+                        What's New!
+                    </a>
                 </div>
             </div>
         </div>
 
         {{-- ===== STAT CARDS ===== --}}
-        <div class="row g-4 mb-4">
+        <div class="row g-3 g-md-4 mb-4">
             <div class="col-md-3 col-6">
                 <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
                         <div class="icon-wrap" style="background:#dcfce7; color:#16a34a;">
                             <i class="fa-solid fa-wallet"></i>
                         </div>
@@ -61,7 +54,7 @@
             </div>
             <div class="col-md-3 col-6">
                 <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
                         <div class="icon-wrap" style="background:#eff6ff; color:#3b82f6;">
                             <i class="fa-solid fa-user-graduate"></i>
                         </div>
@@ -73,19 +66,19 @@
             </div>
             <div class="col-md-3 col-6">
                 <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
                         <div class="icon-wrap" style="background:#fef3c7; color:#d97706;">
                             <i class="fa-solid fa-chalkboard"></i>
                         </div>
                         <span class="stat-badge" style="background:#fef3c7;color:#d97706;">Classes</span>
                     </div>
                     <div class="stat-label">Today's Classes</div>
-                    <div class="stat-value">5</div>
+                    <div class="stat-value">{{ count($routines[date('l')] ?? []) }}</div>
                 </div>
             </div>
             <div class="col-md-3 col-6">
                 <div class="edu-stat-card">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
                         <div class="icon-wrap" style="background:#fee2e2; color:#dc2626;">
                             <i class="fa-solid fa-book"></i>
                         </div>
@@ -154,7 +147,7 @@
                         <h6 class="panel-title"><i class="fa-solid fa-table-list me-2 text-primary"></i>My Weekly Class Routine Chart</h6>
                     </div>
                     <div class="table-responsive">
-                        <table class="table routine-chart-table mb-0">
+                        <table class="table routine-chart-table mb-0 text-nowrap">
                             <thead>
                                 <tr>
                                     <th style="width: 120px;">Day</th>
@@ -171,7 +164,7 @@
                                         <td class="chart-day-cell">
                                             <span class="fw-bold">{{ $day }}</span>
                                             @if(strtolower($day) == strtolower($today))
-                                                <span class="badge bg-primary ms-1" style="font-size: 8px;">Today</span>
+                                                <span class="badge bg-primary ms-1 rounded-pill" style="font-size: 8px;">Today</span>
                                             @endif
                                         </td>
                                         <td class="chart-content-cell">
@@ -198,38 +191,50 @@
 
         <style>
             .routine-chart-table thead th {
-                background: #0f172a;
-                font-size: 11px;
+                background: #f8fafc;
+                font-size: 0.68rem;
+                font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                color: #f8fafc;
-                padding: 12px 20px;
-                border-bottom: 2px solid var(--border-color);
+                color: #64748b;
+                padding: 9px 14px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            [data-bs-theme="dark"] .routine-chart-table thead th, body.dark-mode .routine-chart-table thead th {
+                background: #0e172c !important;
+                color: #94a3b8 !important;
+                border-bottom-color: #1a253b !important;
             }
             .chart-day-cell {
-                background: rgba(0,0,0,0.02);
-                border-right: 1px solid var(--border-color);
-                padding: 15px 20px !important;
+                background: rgba(0,0,0,0.01);
+                border-right: 1px solid #e2e8f0;
+                padding: 10px 14px !important;
                 vertical-align: middle;
                 color: inherit;
+                font-size: 0.78rem;
             }
             [data-bs-theme="dark"] .chart-day-cell, body.dark-mode .chart-day-cell {
                 background: rgba(255,255,255,0.02);
+                border-right-color: #1a253b;
             }
             .chart-today .chart-day-cell {
                 background: rgba(79, 70, 229, 0.05);
                 color: #4f46e5;
             }
             .chart-content-cell {
-                padding: 15px 20px !important;
+                padding: 10px 14px !important;
             }
             .chart-routine-box {
-                background: var(--card-bg, #fff);
-                border: 1px solid var(--border-color, #e2e8f0);
-                border-radius: 8px;
-                padding: 8px 12px;
-                min-width: 160px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 5px;
+                padding: 6px 10px;
+                min-width: 140px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            }
+            [data-bs-theme="dark"] .chart-routine-box, body.dark-mode .chart-routine-box {
+                background: #09101f !important;
+                border-color: #1a253b !important;
             }
             .chart-routine-box .time {
                 font-size: 9px;
@@ -239,19 +244,19 @@
             }
             .chart-routine-box .subject {
                 font-weight: 700;
-                font-size: 0.85rem;
+                font-size: 0.78rem;
                 color: inherit;
             }
             .chart-routine-box .class-info {
                 font-size: 10px;
-                color: var(--text-muted);
+                color: #64748b;
             }
             .chart-today {
                 border-left: 3px solid #4f46e5;
             }
             @media (max-width: 768px) {
                 .chart-routine-box { min-width: 100%; }
-                .chart-day-cell { padding: 10px !important; font-size: 0.8rem; }
+                .chart-day-cell { padding: 8px 10px !important; font-size: 0.74rem; }
             }
         </style>
 
@@ -263,7 +268,7 @@
                         <h6 class="panel-title">My Recent Fee Collections</h6>
                     </div>
                     <div class="table-responsive">
-                        <table class="table edu-table mb-0">
+                        <table class="table edu-table align-middle mb-0 text-nowrap">
                             <thead>
                                 <tr>
                                     <th>Roll</th>
@@ -276,9 +281,9 @@
                             <tbody>
                                 @forelse($recentCollections as $collection)
                                 <tr>
-                                    <td><span class="badge bg-light text-dark fw-bold">{{ $collection->student->roll }}</span></td>
+                                    <td><span class="text-secondary fw-semibold">{{ $collection->student->roll }}</span></td>
                                     <td>{{ $collection->created_at->format('d M, Y') }}</td>
-                                    <td><span class="fw-bold">{{ $collection->student->name }}</span></td>
+                                    <td><span class="fw-bold text-dark">{{ $collection->student->name }}</span></td>
                                     <td>{{ $collection->feeHead->name ?? 'General Fee' }}</td>
                                     <td class="text-end fw-bold text-success">৳{{ number_format($collection->amount) }}</td>
                                 </tr>
@@ -288,7 +293,7 @@
                                         <div class="opacity-25 mb-2">
                                             <i class="fa-solid fa-receipt fa-3x"></i>
                                         </div>
-                                        <p class="text-muted">আপনি এখনও কোনো ফি কালেক্ট করেননি।</p>
+                                        <p class="text-muted small">আপনি এখনও কোনো ফি কালেক্ট করেননি।</p>
                                     </td>
                                 </tr>
                                 @endforelse

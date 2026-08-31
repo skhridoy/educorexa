@@ -164,34 +164,81 @@ h6,
 
 /* Folded sidebar (desktop) */
 @media (min-width: 992px) {
-    body.sidebar-folded .edu-sidebar {
-        width: 80px;
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-sidebar {
+        width: 70px !important;
     }
 
-    body.sidebar-folded .page-wrapper {
-        margin-left: 80px;
+    body.sidebar-folded:not(.open-sidebar-folded) .page-wrapper {
+        margin-left: 70px !important;
     }
 
-    body.sidebar-folded .edu-brand-name,
-    body.sidebar-folded .edu-brand-sub,
-    body.sidebar-folded .edu-nav-category,
-    body.sidebar-folded .edu-nav-link span,
-    body.sidebar-folded .edu-arrow {
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-brand-name,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-brand-sub,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-brand-text,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-nav-category,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-nav-link span,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-arrow,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-sidebar-footer,
+    body.sidebar-folded:not(.open-sidebar-folded) .sidebar-folded-hide,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-sidebar .collapse,
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-sidebar .edu-sub-nav {
         display: none !important;
     }
 
-    body.sidebar-folded .edu-nav-link {
-        justify-content: center;
-        padding: 12px;
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-nav-link {
+        justify-content: center !important;
+        padding: 10px 0 !important;
+        margin: 4px 8px !important;
     }
 
-    body.sidebar-folded .edu-sidebar-header {
-        padding: 18px 0;
-        justify-content: center;
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-sidebar-header {
+        padding: 14px 0 !important;
+        justify-content: center !important;
     }
 
-    body.sidebar-folded .edu-brand {
-        justify-content: center;
+    body.sidebar-folded:not(.open-sidebar-folded) .edu-brand {
+        justify-content: center !important;
+        margin: 0 auto !important;
+    }
+
+    /* Hover expanded state */
+    body.sidebar-folded.open-sidebar-folded .edu-sidebar {
+        width: 260px !important;
+        box-shadow: 10px 0 30px rgba(15, 23, 42, 0.15) !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-sidebar-header {
+        padding: 16px 20px !important;
+        justify-content: space-between !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-brand {
+        justify-content: flex-start !important;
+        margin: 0 !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-brand-name,
+    body.sidebar-folded.open-sidebar-folded .edu-brand-sub,
+    body.sidebar-folded.open-sidebar-folded .edu-nav-category,
+    body.sidebar-folded.open-sidebar-folded .edu-nav-link span,
+    body.sidebar-folded.open-sidebar-folded .edu-sidebar-footer,
+    body.sidebar-folded.open-sidebar-folded .sidebar-folded-hide {
+        display: block !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-brand-text {
+        display: flex !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-arrow {
+        display: inline-block !important;
+        margin-left: auto !important;
+    }
+
+    body.sidebar-folded.open-sidebar-folded .edu-nav-link {
+        justify-content: flex-start !important;
+        padding: 9px 14px !important;
+        margin: 1px 8px !important;
     }
 }
 
@@ -339,7 +386,7 @@ h6,
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 8px 0 24px;
+    padding: 6px 0 10px;
 }
 
 .edu-sidebar-body::-webkit-scrollbar {

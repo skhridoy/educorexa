@@ -32,35 +32,41 @@
             else                               { $greeting = __('Good Night');     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
         @endphp
         
+        @php
+            $authUser = auth()->user();
+            $bannerUserPhoto = asset('assets/images/profile.webp');
+            if ($authUser) {
+                if (($authUser->role === 'super_admin' || $authUser->role === 'HR' || $authUser->role === 'Marketing') && $authUser->photo) {
+                    $bannerUserPhoto = asset('uploads/super_admin/' . $authUser->photo);
+                } elseif ($authUser->photo) {
+                    $bannerUserPhoto = asset($authUser->photo);
+                } elseif ($authUser->teacher && $authUser->teacher->photo) {
+                    $bannerUserPhoto = asset($authUser->teacher->photo);
+                } elseif ($authUser->student && $authUser->student->photo) {
+                    $bannerUserPhoto = asset($authUser->student->photo);
+                }
+            }
+        @endphp
+
         {{-- ===== WELCOME HERO CARD ===== --}}
-        <div class="welcome-card mb-4 p-4 p-md-5 position-relative overflow-hidden" 
-             style="border-radius:24px; background:linear-gradient(135deg, #002147 0%, #003366 100%); color:white; box-shadow: 0 10px 30px rgba(0,33,71,0.15);">
-            <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
-            
-            <div class="row align-items-center position-relative" style="z-index:1;">
-                <div class="col-md-8">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="greet-icon-box d-none d-sm-flex" style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:14px; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
-                            <i class="fa-solid {{ $faIcon }} fa-xl" style="color:{{ $greetColor == '#3b82f6' ? '#60a5fa' : $greetColor }}"></i>
-                        </div>
-                        <h2 class="mb-0 fw-bold" style="font-family:'Outfit',sans-serif;">
-                            {{ $greeting }}, {{ auth()->user()->name }}!
-                        </h2>
-                    </div>
-                    <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
-                        {{ __('EduCorexa: Take a quick look at your school summary.') }}
-                    </p>
-                    <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
-                        <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-calendar-days me-1"></i> {{ now()->format('d M Y') }}
-                        </span>
-                        <span class="badge bg-white bg-opacity-10 border border-white border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-clock me-1"></i> {{ now()->format('h:i A') }}
-                        </span>
+        <div class="welcome-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="{{ $bannerUserPhoto }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         class="welcome-user-avatar">
+                    <div>
+                        <h4 class="welcome-card-title">{{ $greeting }}, {{ auth()->user()->name }}</h4>
+                        <p class="welcome-card-subtitle">{{ __('EduCorexa: Take a quick look at your school summary.') }}</p>
                     </div>
                 </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                    <i class="fa-solid fa-graduation-cap text-white opacity-10" style="font-size: 8rem;"></i>
+                <div class="d-flex align-items-center gap-2 align-self-start align-self-md-center">
+                    <span class="d-none d-sm-inline-flex align-items-center gap-1 text-white text-opacity-90 fw-semibold" style="font-size: 0.76rem; background: rgba(255,255,255,0.15); padding: 7px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);">
+                        <i class="fa-regular fa-calendar-days opacity-75 me-1"></i> {{ now()->format('d M Y') }}
+                    </span>
+                    <a href="{{ Route::has('admin.school.info-edit') ? route('admin.school.info-edit', ['tenant' => auth()->user()->school->slug ?? '']) : '#' }}" class="btn-welcome-action">
+                        {{ __("What's New!") }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -70,45 +76,57 @@
             
             <!-- Teachers Card -->
             <div class="col-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center p-2 p-md-3" style="border-radius: 10px;">
-                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f3e8ff; color: #9333ea;">
-                        <i class="fa-solid fa-chalkboard-user"></i>
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
+                        <div class="icon-wrap" style="background: #f3e8ff; color: #9333ea;">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <span class="stat-badge" style="background: #f3e8ff; color: #9333ea;">Faculty</span>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Teachers') }}</div>
-                    <div class="h5 fw-bolder mb-0">{{ $totalTeachers }}</div>
+                    <div class="stat-label">{{ __('Teachers') }}</div>
+                    <div class="stat-value">{{ $totalTeachers }}</div>
                 </div>
             </div>
 
             <!-- Students Card -->
             <div class="col-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center p-md-3" style="border-radius: 10px;">
-                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #fff7ed; color: #f97316;">
-                        <i class="fa-solid fa-user-graduate"></i>
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
+                        <div class="icon-wrap" style="background: #fff7ed; color: #f97316;">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <span class="stat-badge" style="background: #fff7ed; color: #f97316;">Active</span>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Students') }}</div>
-                    <div class="h5 fw-bolder mb-0">{{ $totalStudents }}</div>
+                    <div class="stat-label">{{ __('Students') }}</div>
+                    <div class="stat-value">{{ $totalStudents }}</div>
                 </div>
             </div>
 
             <!-- Collected Card -->
             <div class="col-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center p-md-3" style="border-radius: 15px;">
-                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #f0fdf4; color: #16a34a;">
-                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
+                        <div class="icon-wrap" style="background: #f0fdf4; color: #16a34a;">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                        <span class="stat-badge" style="background: #f0fdf4; color: #16a34a;">Revenue</span>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Collected') }}</div>
-                    <div class="h5 fw-bolder mb-0">৳{{ number_format($currentCollected, 0) }}</div>
+                    <div class="stat-label">{{ __('Collected') }}</div>
+                    <div class="stat-value">৳{{ number_format($currentCollected, 0) }}</div>
                 </div>
             </div>
 
             <!-- Expected Card -->
             <div class="col-6 col-md-3">
-                <div class="card h-100 border-0 shadow-sm text-center p-2 p-md-3" style="border-radius: 15px;">
-                    <div class="mx-auto mb-2 d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px; background: #eff6ff; color: #3b82f6;">
-                        <i class="fa-solid fa-calendar-check"></i>
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2.5">
+                        <div class="icon-wrap" style="background: #eff6ff; color: #3b82f6;">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <span class="stat-badge" style="background: #eff6ff; color: #3b82f6;">Target</span>
                     </div>
-                    <div class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">{{ __('Expected') }}</div>
-                    <div class="h5 fw-bolder mb-0">৳{{ number_format($currentTotal, 0) }}</div>
+                    <div class="stat-label">{{ __('Expected') }}</div>
+                    <div class="stat-value">৳{{ number_format($currentTotal, 0) }}</div>
                 </div>
             </div>
 
@@ -116,99 +134,95 @@
 
         {{-- ══════ QUICK ACTIONS ══════ --}}
         <div class="mb-4">
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;">
-                    <i class="fa-solid fa-bolt text-white" style="font-size:13px;"></i>
+            <div class="d-flex align-items-center gap-2 mb-2.5">
+                <div style="width:24px;height:24px;border-radius:5px;background:rgba(79,70,229,0.1);color:#4f46e5;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa-solid fa-bolt" style="font-size:11px;"></i>
                 </div>
-                <h6 class="fw-bold text-dark mb-0" style="font-size:13px;text-transform:uppercase;letter-spacing:.6px;">{{ __('Quick Actions') }}</h6>
+                <h6 class="fw-bold text-dark mb-0" style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;">{{ __('Quick Actions') }}</h6>
             </div>
-            <div class="row g-3">
+            <div class="row g-2.5 g-md-3">
 
                 {{-- Collect Payment (Highlighted) --}}
                 <div class="col-6 col-md-3 col-lg-2">
                     <a href="{{ route('payment.index', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100 position-relative overflow-hidden"
-                       style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border-radius:16px;box-shadow:0 4px 18px rgba(16,185,129,0.35);transition:all .25s cubic-bezier(.4,0,.2,1);"
-                       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 28px rgba(16,185,129,0.5)'"
-                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 18px rgba(16,185,129,0.35)'">
-                        <div style="position:absolute;top:-15px;right:-15px;width:60px;height:60px;background:rgba(255,255,255,0.12);border-radius:50%;"></div>
-                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;backdrop-filter:blur(4px);">
-                            <i class="fa-solid fa-hand-holding-dollar text-white" style="font-size:18px;"></i>
+                       class="d-block text-decoration-none text-center p-2.5 h-100 position-relative overflow-hidden"
+                       style="background:transparent; border:1.5px solid #10b981; border-radius:8px; transition:all .2s;"
+                       onmouseover="this.style.background='rgba(16,185,129,0.08)'"
+                       onmouseout="this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-hand-holding-dollar" style="color:#10b981;font-size:15px;"></i>
                         </div>
-                        <div class="text-white fw-bold" style="font-size:12px;line-height:1.3;">{{ __('Collect Payment') }}</div>
-                        <div style="background:rgba(255,255,255,0.2);border-radius:50px;padding:2px 10px;margin-top:8px;display:inline-block;">
-                            <span class="text-white" style="font-size:10px;font-weight:600;">{{ __('Fee Collection') }}</span>
-                        </div>
+                        <div class="fw-bold" style="font-size:11.5px;color:#10b981;line-height:1.3;">{{ __('Collect Payment') }}</div>
                     </a>
                 </div>
 
                 {{-- Add Student --}}
                 <div class="col-6 col-md-3 col-lg-2">
                     <a href="{{ route('students.create', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100"
-                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
-                       onmouseover="this.style.borderColor='#4f46e5';this.style.boxShadow='0 4px 18px rgba(79,70,229,0.15)';this.style.transform='translateY(-2px)'"
-                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
-                        <div style="width:44px;height:44px;border-radius:12px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-                            <i class="fa-solid fa-user-plus" style="color:#4f46e5;font-size:17px;"></i>
+                       class="d-block text-decoration-none text-center p-2.5 h-100"
+                       style="background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#4f46e5';this.style.background='rgba(79,70,229,0.04)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-user-plus" style="color:#4f46e5;font-size:14px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Add Student') }}</div>
+                        <div class="fw-bold text-dark" style="font-size:11.5px;line-height:1.3;">{{ __('Add Student') }}</div>
                     </a>
                 </div>
 
                 {{-- Add Teacher --}}
                 <div class="col-6 col-md-3 col-lg-2">
                     <a href="{{ route('teachers.create', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100"
-                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
-                       onmouseover="this.style.borderColor='#7c3aed';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.15)';this.style.transform='translateY(-2px)'"
-                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
-                        <div style="width:44px;height:44px;border-radius:12px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-                            <i class="fa-solid fa-chalkboard-user" style="color:#7c3aed;font-size:17px;"></i>
+                       class="d-block text-decoration-none text-center p-2.5 h-100"
+                       style="background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#7c3aed';this.style.background='rgba(124,58,237,0.04)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-chalkboard-user" style="color:#7c3aed;font-size:14px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Add Teacher') }}</div>
+                        <div class="fw-bold text-dark" style="font-size:11.5px;line-height:1.3;">{{ __('Add Teacher') }}</div>
                     </a>
                 </div>
 
                 {{-- Student List --}}
                 <div class="col-6 col-md-3 col-lg-2">
                     <a href="{{ route('students.index', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100"
-                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
-                       onmouseover="this.style.borderColor='#f59e0b';this.style.boxShadow='0 4px 18px rgba(245,158,11,0.15)';this.style.transform='translateY(-2px)'"
-                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
-                        <div style="width:44px;height:44px;border-radius:12px;background:#fffbeb;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-                            <i class="fa-solid fa-users" style="color:#f59e0b;font-size:17px;"></i>
+                       class="d-block text-decoration-none text-center p-2.5 h-100"
+                       style="background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(245,158,11,0.04)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:#fffbeb;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-users" style="color:#f59e0b;font-size:14px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Student List') }}</div>
+                        <div class="fw-bold text-dark" style="font-size:11.5px;line-height:1.3;">{{ __('Student List') }}</div>
                     </a>
                 </div>
 
                 {{-- Attendance --}}
                 <div class="col-6 col-md-3 col-lg-2">
                     <a href="{{ route('attendance.index', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100"
-                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
-                       onmouseover="this.style.borderColor='#ec4899';this.style.boxShadow='0 4px 18px rgba(236,72,153,0.15)';this.style.transform='translateY(-2px)'"
-                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
-                        <div style="width:44px;height:44px;border-radius:12px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-                            <i class="fa-solid fa-clipboard-check" style="color:#ec4899;font-size:17px;"></i>
+                       class="d-block text-decoration-none text-center p-2.5 h-100"
+                       style="background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#ec4899';this.style.background='rgba(236,72,153,0.04)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:#fdf2f8;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-clipboard-check" style="color:#ec4899;font-size:14px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('Take Attendance') }}</div>
+                        <div class="fw-bold text-dark" style="font-size:11.5px;line-height:1.3;">{{ __('Take Attendance') }}</div>
                     </a>
                 </div>
 
                 {{-- School Settings --}}
                 <div class="col-6 col-md-3 col-lg-2">
-                    <a href="{{ route('school.settings', ['tenant' => auth()->user()->school->slug]) }}"
-                       class="d-block text-decoration-none text-center p-3 h-100"
-                       style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);transition:all .25s;"
-                       onmouseover="this.style.borderColor='#64748b';this.style.boxShadow='0 4px 18px rgba(100,116,139,0.15)';this.style.transform='translateY(-2px)'"
-                       onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.05)';this.style.transform='translateY(0)'">
-                        <div style="width:44px;height:44px;border-radius:12px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
-                            <i class="fa-solid fa-gear" style="color:#64748b;font-size:17px;"></i>
+                    <a href="{{ Route::has('admin.school.info-edit') ? route('admin.school.info-edit', ['tenant' => auth()->user()->school->slug]) : '#' }}"
+                       class="d-block text-decoration-none text-center p-2.5 h-100"
+                       style="background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#64748b';this.style.background='rgba(100,116,139,0.04)'"
+                       onmouseout="this.style.borderColor='#e2e8f0';this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:8px;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+                            <i class="fa-solid fa-gear" style="color:#64748b;font-size:14px;"></i>
                         </div>
-                        <div class="fw-bold text-dark" style="font-size:12px;line-height:1.3;">{{ __('School Settings') }}</div>
+                        <div class="fw-bold text-dark" style="font-size:11.5px;line-height:1.3;">{{ __('School Settings') }}</div>
                     </a>
                 </div>
 
@@ -217,38 +231,34 @@
 
         {{-- Main Content Charts/Tables --}}
 
-        <div class="row g-4 mb-4">
+        <div class="row g-3 g-md-4 mb-4">
             {{-- Unpaid Student List --}}
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; box-shadow: 0 8px 28px rgba(15,23,42,0.06) !important; overflow: hidden;">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1.5px solid #f1f5f9;">
-                            <div class="d-flex align-items-center gap-3">
-                                <div style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(239,68,68,0.3);">
-                                    <i class="fa-solid fa-file-invoice-dollar text-white" style="font-size: 16px;"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-0" style="font-size: 16px; font-family: 'Outfit', sans-serif;">{{ __('Unpaid Student Fees') }}</h5>
-                                    <p class="text-muted mb-0" style="font-size: 12px;">{{ __('Filter list to check unpaid fees') }}</p>
-                                </div>
+                <div class="schools-panel mb-0 h-100">
+                    <div class="panel-header">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(239,68,68,0.1); display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-file-invoice-dollar text-danger" style="font-size: 13px;"></i>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <select id="unpaidMonthFilter"
-                                        class="form-select form-select-sm"
-                                        style="width: 155px; min-width: 155px; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 7px 30px 7px 12px; font-size: 12.5px; font-weight: 600; color: #475569; background-color: #f8fafc; cursor: pointer; transition: all .2s;"
-                                        onmouseover="this.style.borderColor='#4f46e5'"
-                                        onmouseout="this.style.borderColor='#e2e8f0'">
-                                    @for ($i = -3; $i < 5; $i++)
-                                        @php $m = now()->addMonths($i)->format('F-Y'); @endphp
-                                        <option value="{{ $m }}" {{ $m == now()->format('F-Y') ? 'selected' : '' }}>{{ $m }}</option>
-                                    @endfor
-                                </select>
+                            <div>
+                                <h6 class="panel-title">{{ __('Unpaid Student Fees') }}</h6>
                             </div>
                         </div>
-
+                        <div class="d-flex align-items-center gap-2">
+                            <select id="unpaidMonthFilter"
+                                    class="form-select form-select-sm"
+                                    style="width: 140px; border-radius: 5px; font-size: 0.76rem; font-weight: 600;">
+                                @for ($i = -3; $i < 5; $i++)
+                                    @php $m = now()->addMonths($i)->format('F-Y'); @endphp
+                                    <option value="{{ $m }}" {{ $m == now()->format('F-Y') ? 'selected' : '' }}>{{ $m }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div class="p-3">
                         <div id="unpaidListContainer">
                             <div class="text-center py-5">
-                                <div class="spinner-grow text-primary" role="status"></div>
+                                <div class="spinner-grow text-primary" role="status" style="width: 1.5rem; height: 1.5rem;"></div>
                                 <p class="mt-2 text-muted small">{{ __('Loading unpaid list...') }}</p>
                             </div>
                         </div>
@@ -258,14 +268,16 @@
 
             {{-- Attendance Pie Chart --}}
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-4">{{ __('Attendance Overview') }}</h5>
-                        <div style="height: 300px; position: relative;" class="d-flex align-items-center justify-content-center">
+                <div class="schools-panel mb-0 h-100">
+                    <div class="panel-header">
+                        <h6 class="panel-title"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>{{ __('Attendance Overview') }}</h6>
+                    </div>
+                    <div class="p-3">
+                        <div style="height: 260px; position: relative;" class="d-flex align-items-center justify-content-center">
                             <canvas id="attendancePieChart"></canvas>
                             <div class="position-absolute text-center">
-                                <h2 class="fw-bolder mb-0 text-primary">{{ $presentCount }}</h2>
-                                <p class="small text-muted mb-0">{{ __('Present Today') }}</p>
+                                <h3 class="fw-bolder mb-0 text-primary">{{ $presentCount }}</h3>
+                                <p class="small text-muted mb-0" style="font-size: 0.74rem;">{{ __('Present Today') }}</p>
                             </div>
                         </div>
                     </div>
@@ -273,23 +285,22 @@
             </div>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-3 g-md-4">
             {{-- Class-wise Collection --}}
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="d-md-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h5 class="card-title mb-1">{{ __('Class-wise Collection') }}</h5>
-                                <p class="text-muted small">{{ __('Total collection for current month by class.') }}</p>
-                            </div>
-                            <select id="feeMonthFilter" class="form-select form-select-sm border-0 bg-light rounded-pill px-3" style="width: auto;">
-                                @for ($m=1; $m<=12; $m++)
-                                    <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
-                                @endfor
-                            </select>
+                <div class="schools-panel mb-0 h-100">
+                    <div class="panel-header">
+                        <div>
+                            <h6 class="panel-title"><i class="fa-solid fa-chart-column me-2 text-success"></i>{{ __('Class-wise Collection') }}</h6>
                         </div>
-                        <div style="height:320px;">
+                        <select id="feeMonthFilter" class="form-select form-select-sm" style="width: auto; border-radius: 5px; font-size: 0.76rem; font-weight: 600;">
+                            @for ($m=1; $m<=12; $m++)
+                                <option value="{{ $m }}" {{ date('n') == $m ? 'selected' : '' }}>{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="p-3">
+                        <div style="height: 260px;">
                             <canvas id="classFeeBarChart"></canvas>
                         </div>
                     </div>
@@ -298,41 +309,41 @@
             
             {{-- Attendance Logs --}}
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-4">{{ __('Attendance Logs') }}</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover border-0">
-                                <thead class="bg-light border-0">
-                                    <tr>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Teacher') }}</th>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Class') }}</th>
-                                        <th class="border-0 small fw-bold text-uppercase py-3">{{ __('Status') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="border-0">
-                                    @foreach($attendanceLogs as $log)
-                                    <tr class="align-middle">
-                                        <td class="py-3">
-                                            <div class="fw-medium">{{ Str::limit($log->teacher->name, 15) }}</div>
-                                        </td>
-                                        <td class="py-3 small text-muted">{{ $log->class->name }}</td>
-                                        <td class="py-3">
-                                            <span class="badge bg-soft-success text-success rounded-pill px-3 py-2">OK</span>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                    @if($attendanceLogs->isEmpty())
-                                    <tr>
-                                        <td colspan="3" class="text-center py-5 text-muted small">
-                                            <i class="fa-solid fa-info-circle mb-2 d-block fs-4 opacity-50"></i>
-                                            {{ __('No logs found for today') }}
-                                        </td>
-                                    </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="schools-panel mb-0 h-100">
+                    <div class="panel-header">
+                        <h6 class="panel-title"><i class="fa-solid fa-clipboard-user me-2 text-info"></i>{{ __('Attendance Logs') }}</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table edu-table align-middle mb-0 text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Teacher') }}</th>
+                                    <th>{{ __('Class') }}</th>
+                                    <th class="text-end">{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($attendanceLogs as $log)
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ Str::limit($log->teacher->name, 15) }}</div>
+                                    </td>
+                                    <td><span class="text-muted">{{ $log->class->name }}</span></td>
+                                    <td class="text-end">
+                                        <span class="badge bg-soft-success text-success px-2 py-1" style="border-radius: 5px; font-size: 0.72rem;">OK</span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                                @if($attendanceLogs->isEmpty())
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted small">
+                                        <i class="fa-solid fa-info-circle mb-2 d-block fs-5 opacity-50"></i>
+                                        {{ __('No logs found for today') }}
+                                    </td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

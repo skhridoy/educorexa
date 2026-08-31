@@ -194,32 +194,41 @@
             else                               { $greeting = "Good Night";     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
         @endphp
         
+        @php
+            $authUser = auth()->user();
+            $bannerUserPhoto = asset('assets/images/profile.webp');
+            if ($authUser) {
+                if (($authUser->role === 'super_admin' || $authUser->role === 'HR' || $authUser->role === 'Marketing') && $authUser->photo) {
+                    $bannerUserPhoto = asset('uploads/super_admin/' . $authUser->photo);
+                } elseif ($authUser->photo) {
+                    $bannerUserPhoto = asset($authUser->photo);
+                } elseif ($authUser->teacher && $authUser->teacher->photo) {
+                    $bannerUserPhoto = asset($authUser->teacher->photo);
+                } elseif ($authUser->student && $authUser->student->photo) {
+                    $bannerUserPhoto = asset($authUser->student->photo);
+                }
+            }
+        @endphp
+
         {{-- ===== WELCOME HERO CARD ===== --}}
-        <div class="welcome-card mb-4 p-4 p-md-5">
-            <div class="row align-items-center position-relative" style="z-index:1;">
-                <div class="col-md-8">
-                    <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="greet-icon-box d-none d-sm-flex">
-                            <i class="fa-solid {{ $faIcon }} fa-xl" style="color:{{ $greetColor == '#3b82f6' ? '#60a5fa' : $greetColor }}"></i>
-                        </div>
-                        <h2 class="mb-0 fw-bold">
-                            {{ $greeting }}, {{ auth()->user()->name }}!
-                        </h2>
-                    </div>
-                    <p class="mb-0 opacity-75 fs-6 fs-md-5" style="max-width:600px;">
-                        EduCorexa: আপনার স্কুলের গুরুত্বপূর্ণ তথ্যসমূহ এক নজরে দেখে নিন।
-                    </p>
-                    <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
-                        <span class="badge bg-opacity-10 border border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-calendar-days me-1"></i> {{ now()->format('d M Y') }}
-                        </span>
-                        <span class="badge bg-opacity-10 border  border-opacity-25 px-3 py-2 rounded-pill small">
-                            <i class="fa-regular fa-clock me-1"></i> {{ now()->format('h:i A') }}
-                        </span>
+        <div class="welcome-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative" style="z-index: 1;">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="{{ $bannerUserPhoto }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         class="welcome-user-avatar">
+                    <div>
+                        <h4 class="welcome-card-title">{{ $greeting }}, {{ auth()->user()->name }}</h4>
+                        <p class="welcome-card-subtitle">Here is what's happening with your school today.</p>
                     </div>
                 </div>
-                <div class="col-md-4 text-md-end d-none d-md-block">
-                    <i class="fa-solid fa-graduation-cap text-dark opacity-10" style="font-size: 8rem;"></i>
+                <div class="d-flex align-items-center gap-2 align-self-start align-self-md-center">
+                    <span class="d-none d-sm-inline-flex align-items-center gap-1 text-white text-opacity-90 fw-semibold" style="font-size: 0.76rem; background: rgba(255,255,255,0.15); padding: 7px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.25);">
+                        <i class="fa-regular fa-calendar-days opacity-75 me-1"></i> {{ now()->format('d M Y') }}
+                    </span>
+                    <a href="{{ Route::has('admin.school.info-edit') ? route('admin.school.info-edit', ['tenant' => auth()->user()->school->slug ?? '']) : '#' }}" class="btn-welcome-action">
+                        What's New!
+                    </a>
                 </div>
             </div>
         </div>
@@ -564,9 +573,14 @@
             <div class="col-md-8">
                 <div class="schools-panel h-100">
                     <div class="panel-header d-flex flex-wrap justify-content-between align-items-center">
-                        <h6 class="panel-title mb-0">Unpaid Student Fees</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 28px; height: 28px; border-radius: 6px; background: rgba(239,68,68,0.1); display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-file-invoice-dollar text-danger" style="font-size: 13px;"></i>
+                            </div>
+                            <h6 class="panel-title mb-0">Unpaid Student Fees</h6>
+                        </div>
                         <div class="d-flex gap-2 mt-2 mt-sm-0">
-                            <select id="feeMonthFilter" class="form-select form-select-sm" style="width: auto;">
+                            <select id="feeMonthFilter" class="form-select form-select-sm" style="min-width: 145px; border-radius: 5px; font-size: 0.78rem; font-weight: 600;">
                                 @php
                                     $months = [];
                                     for ($i = 0; $i < 6; $i++) {
@@ -578,12 +592,12 @@
                                     <option value="{{ $m }}">{{ $m }}</option>
                                 @endforeach
                             </select>
-                            <button class="btn btn-sm btn-primary" onclick="loadUnpaidFees()">
+                            <button class="btn-icon-sm btn-soft-primary" style="width: 32px; height: 32px; border-radius: 5px;" onclick="loadUnpaidFees()" title="Refresh List">
                                 <i class="fa-solid fa-arrows-rotate"></i>
                             </button>
                         </div>
                     </div>
-                    <div id="unpaidListContainer" class="p-3 position-relative" style="min-height: 200px;">
+                    <div id="unpaidListContainer" class="position-relative" style="min-height: 200px;">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>

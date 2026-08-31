@@ -146,7 +146,7 @@ class DashboardController extends Controller
         $schoolId = auth()->user()->school_id;
         $month = $request->get('month', now()->format('F-Y'));
 
-        $unpaidList = StudentFee::with(['student.class', 'feeHead'])
+        $unpaidList = StudentFee::with(['student.class', 'student.section', 'feeHead'])
             ->where('school_id', $schoolId)
             ->where('status', 'unpaid')
             ->where('month', $month)
