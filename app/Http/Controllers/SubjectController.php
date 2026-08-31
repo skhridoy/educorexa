@@ -40,11 +40,10 @@ class SubjectController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:subjects,code,NULL,id,school_id,' . auth()->user()->school_id,
-            'type' => 'required|in:theory,practical',
+            'type' => 'required|in:theory,practical,theory_practical',
             'description' => 'nullable|string',
-            [
-                'code.unique' => 'এই কোডটি আপনার বিষয়ে ইতিমধ্যে তৈরি করা আছে!',
-            ]
+        ], [
+            'code.unique' => 'এই কোডটি আপনার বিষয়ে ইতিমধ্যে তৈরি করা আছে!',
         ]);
 
         Subject::create([
@@ -82,13 +81,19 @@ class SubjectController extends Controller
         return view('school.subject.edit', compact('subject', 'subjects'));
     }
 
-    public function update(Request $request,$tenant, $subject)
+    public function update(Request $request, $tenant, $subject)
     {
         $schoolId = auth()->user()->school_id;
 
         $subject = Subject::where('id', $subject)
                             ->where('school_id', $schoolId)
                             ->firstOrFail();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:theory,practical,theory_practical',
+            'description' => 'nullable|string',
+        ]);
 
         $subject->update([
             'name' => $request->name,

@@ -291,14 +291,33 @@ class MarkController extends Controller
         $percentage = ($marks / $fullMarks) * 100;
 
         if ($percentage >= 80) return ['grade' => 'A+', 'point' => 5];
-        if ($percentage >= 70) return ['grade' => 'A', 'point' => 4];
+        if ($percentage >= 70) return ['grade' => 'A',  'point' => 4];
         if ($percentage >= 60) return ['grade' => 'A-', 'point' => 3.5];
-        if ($percentage >= 50) return ['grade' => 'B', 'point' => 3];
-        if ($percentage >= 40) return ['grade' => 'C', 'point' => 2];
-        if ($percentage >= 33) return ['grade' => 'D', 'point' => 1];
+        if ($percentage >= 50) return ['grade' => 'B',  'point' => 3];
+        if ($percentage >= 40) return ['grade' => 'C',  'point' => 2];
+        if ($percentage >= 33) return ['grade' => 'D',  'point' => 1];
 
         return ['grade' => 'F', 'point' => 0];
     }
+
+    /**
+     * Check if a theory+practical subject truly passes based on individual component pass marks.
+     * Returns false if either theory or practical component fails.
+     *
+     * @param  float|null  $theoryMark         Student's theory mark (from marks.cq + marks.mcq or marks.cq alone)
+     * @param  float|null  $practicalMark      Student's practical mark (marks.practical)
+     * @param  float|null  $theoryPassMark     From assign_classes.theory_pass_mark
+     * @param  float|null  $practicalPassMark  From assign_classes.practical_pass_mark
+     * @return bool
+     */
+    private function checkTheoryPracticalPass($theoryMark, $practicalMark, $theoryPassMark, $practicalPassMark): bool
+    {
+        // If component pass marks are configured, enforce them
+        if ($theoryPassMark !== null && $theoryMark < $theoryPassMark) return false;
+        if ($practicalPassMark !== null && $practicalMark < $practicalPassMark) return false;
+        return true;
+    }
+
 
     /**
      * Group subjects by pair (Bangla 1st & 2nd, English 1st & 2nd)
@@ -539,13 +558,32 @@ class MarkController extends Controller
                 // Standalone Subject
                 $sub = $group['subjects'][0];
                 $mRec = $allMarks->where('student_id', $student->id)->where('subject_id', $sub->id)->first();
-                $raw = $mRec ? $mRec->marks : 0;
-                $full = AssignClass::where(['class_id' => $classId, 'subject_id' => $sub->id])->value('full_mark') ?? 100;
+                $raw  = $mRec ? $mRec->marks : 0;
+
+                $assignRec = AssignClass::where(['class_id' => $classId, 'subject_id' => $sub->id])->first();
+                $full      = $assignRec?->full_mark ?? 100;
 
                 $totalMarks += $raw;
                 $gradeInfo = $this->getGradeWithPoint($raw, $full);
 
-                if ($gradeInfo['grade'] === 'F') {
+                // For theory_practical subjects: enforce separate pass marks
+                $isFail = ($gradeInfo['grade'] === 'F');
+                if (!$isFail && $sub->type === 'theory_practical' && $assignRec) {
+                    $theoryMark     = ($mRec?->cq ?? 0) + ($mRec?->mcq ?? 0);
+                    $practicalMark  = $mRec?->practical ?? 0;
+                    $componentPassed = $this->checkTheoryPracticalPass(
+                        $theoryMark,
+                        $practicalMark,
+                        $assignRec->theory_pass_mark,
+                        $assignRec->practical_pass_mark
+                    );
+                    if (!$componentPassed) {
+                        $isFail    = true;
+                        $gradeInfo = ['grade' => 'F', 'point' => 0];
+                    }
+                }
+
+                if ($isFail) {
                     $failCount++;
                 } else {
                     $totalPoints += $gradeInfo['point'];
@@ -554,24 +592,30 @@ class MarkController extends Controller
                 $highest = $allMarks->where('subject_id', $sub->id)->max('marks');
 
                 $marksData[$sub->id] = [
-                    'subject_id'      => $sub->id,
-                    'subject_code'    => $sub->code ?? 'N/A',
-                    'subject_name'    => $sub->name,
-                    'full_mark'       => $full,
-                    'cq'              => $mRec?->cq,
-                    'mcq'             => $mRec?->mcq,
-                    'practical'       => $mRec?->practical,
-                    'marks'           => $raw,
-                    'highest_mark'    => $highest ?? '---',
-                    'is_paired'       => false,
-                    'is_first'        => true,
-                    'combined_full'   => $full,
-                    'combined_marks'  => $raw,
-                    'grade'           => $gradeInfo['grade'],
-                    'point'           => $gradeInfo['point'],
-                    'status'          => $mRec?->status ?? 'present',
+                    'subject_id'          => $sub->id,
+                    'subject_code'        => $sub->code ?? 'N/A',
+                    'subject_name'        => $sub->name,
+                    'subject_type'        => $sub->type,
+                    'full_mark'           => $full,
+                    'theory_full_mark'    => $assignRec?->theory_full_mark,
+                    'theory_pass_mark'    => $assignRec?->theory_pass_mark,
+                    'practical_full_mark' => $assignRec?->practical_full_mark,
+                    'practical_pass_mark' => $assignRec?->practical_pass_mark,
+                    'cq'                  => $mRec?->cq,
+                    'mcq'                 => $mRec?->mcq,
+                    'practical'           => $mRec?->practical,
+                    'marks'               => $raw,
+                    'highest_mark'        => $highest ?? '---',
+                    'is_paired'           => false,
+                    'is_first'            => true,
+                    'combined_full'       => $full,
+                    'combined_marks'      => $raw,
+                    'grade'               => $gradeInfo['grade'],
+                    'point'               => $gradeInfo['point'],
+                    'status'              => $mRec?->status ?? 'present',
                 ];
             }
+
         }
 
         $gpa = ($failCount > 0) ? 0.00 : (($subjectUnitCount > 0) ? round($totalPoints / $subjectUnitCount, 2) : 0.00);

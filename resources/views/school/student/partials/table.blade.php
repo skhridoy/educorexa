@@ -19,71 +19,71 @@
 }
 </style>
 @if($students->count() > 0)
-    {{-- DESKTOP VIEW: Clean Table (Visible on Tablets & Laptops >= md) --}}
-    <div class="table-responsive d-none d-md-block">
-        <table class="table edu-table align-middle mb-0">
+    {{-- Responsive Clean Table for all screens --}}
+    <div class="table-responsive">
+        <table class="table edu-table align-middle mb-0 text-nowrap">
             <thead>
                 <tr>
-                    <th class="ps-4">Student Info</th>
+                    <th class="ps-3">Student Info</th>
                     <th>ID & Roll</th>
                     <th>Class & Section</th>
                     <th>Contact & Guardian</th>
-                    <th class="text-center pe-4">Actions</th>
+                    <th class="text-center pe-3">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($students as $student)
                 <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center gap-3">
+                    <td class="ps-3">
+                        <div class="d-flex align-items-center">
                             <img src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}" 
-                                 alt="{{ $student->name }}" class="student-avatar-ring">
+                                 alt="{{ $student->name }}" class="student-avatar-ring me-3">
                             <div>
-                                <div class="fw-bold text-dark">{{ $student->name }}</div>
+                                <div class="student-name-text">{{ $student->name }}</div>
                                 @if($student->name_bn)
                                     <span class="student-name-bn">{{ $student->name_bn }}</span>
                                 @endif
-                                <div class="small">
+                                <div class="mt-0.5">
                                     @if($student->status == 'active')
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-0.5" style="font-size:10px;">Active</span>
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-1.5 py-0.5" style="font-size:9.5px; font-weight:600;">Active</span>
                                     @else
-                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 py-0.5" style="font-size:10px;">Inactive</span>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-1.5 py-0.5" style="font-size:9.5px; font-weight:600;">Inactive</span>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <span class="student-id-badge mb-1">{{ $student->student_id }}</span>
-                        <div class="small fw-semibold text-muted">Roll: {{ $student->roll ?? 'N/A' }}</div>
+                        <div class="student-id-text mb-0.5">{{ $student->student_id }}</div>
+                        <div class="student-meta-sub">Roll: {{ $student->roll ?? 'N/A' }}</div>
                     </td>
                     <td>
-                        <div class="small fw-bold text-primary mb-0.5">
+                        <div class="fw-bold text-primary mb-0.5" style="font-size: 0.8rem;">
                             <i class="fa-solid fa-graduation-cap me-1 opacity-75"></i>{{ $student->class?->name ?? 'N/A' }}
                         </div>
-                        <div class="small text-muted">
+                        <div class="student-meta-sub">
                             Sec: {{ $student->section?->name ?? 'N/A' }} {{ $student->group?->name ? '('.$student->group->name.')' : '' }}
                         </div>
                     </td>
                     <td>
                         @if($student->contact_number)
-                            <div class="small mb-1"><a href="tel:{{ $student->contact_number }}" class="text-secondary text-decoration-none"><i class="fa-solid fa-phone me-1 text-success"></i> {{ $student->contact_number }}</a></div>
+                            <div class="mb-0.5" style="font-size: 0.76rem;"><a href="tel:{{ $student->contact_number }}" class="text-secondary text-decoration-none"><i class="fa-solid fa-phone me-1 text-success"></i>{{ $student->contact_number }}</a></div>
                         @endif
-                        <div class="small text-muted"><i class="fa-solid fa-user me-1 opacity-50"></i> {{ $student->fathers_name ?? 'N/A' }}</div>
+                        <div class="student-meta-sub"><i class="fa-solid fa-user me-1 opacity-50"></i>{{ $student->fathers_name ?? 'N/A' }}</div>
                     </td>
-                    <td class="text-center pe-4">
+                    <td class="text-center pe-3">
                         <div class="d-flex justify-content-center gap-1">
-                            <button type="button" class="btn btn-icon-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#studentModal{{ $student->id }}" title="View Full Details">
+                            <button type="button" class="btn-icon-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#studentModal{{ $student->id }}" title="View Full Details">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
                             <a href="{{ route('students.edit', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" 
-                               class="btn btn-icon-sm btn-soft-warning" title="Edit Student">
+                               class="btn-icon-sm btn-soft-warning" title="Edit Student">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </a>
                             <form action="{{ route('students.destroy', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" onclick="confirmDelete(this)" class="btn btn-icon-sm btn-soft-danger" title="Delete Student">
+                                <button type="button" onclick="confirmDelete(this)" class="btn-icon-sm btn-soft-danger" title="Delete Student">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -95,106 +95,6 @@
         </table>
     </div>
 
-    {{-- MOBILE VIEW: Ultra-Clean Spacious Card Grid (Visible on Mobile Screens < md) --}}
-    <div class="d-block d-md-none p-3">
-        <div class="row g-3">
-            @foreach($students as $student)
-            <div class="col-12">
-                <div class="student-mobile-card">
-                    {{-- Top Header Row: Photo, Name, ID Badge --}}
-                    <div class="d-flex align-items-center justify-content-between mb-3 gap-2">
-                        <div class="d-flex align-items-center gap-2.5 min-w-0" style="min-width: 0;">
-                            <img src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}" 
-                                 alt="{{ $student->name }}" class="student-avatar-ring flex-shrink-0">
-                            <div class="min-w-0" style="min-width: 0;">
-                                <h6 class="fw-bold mb-0 text-dark text-truncate" style="font-size:14.5px;">{{ $student->name }}</h6>
-                                @if($student->name_bn)
-                                    <span class="student-name-bn">{{ $student->name_bn }}</span>
-                                @endif
-                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-0.5 mt-0.5" style="font-size:10px;">
-                                    {{ $student->status == 'active' ? 'Active' : 'Inactive' }}
-                                </span>
-                            </div>
-                        </div>
-                        <span class="student-id-badge flex-shrink-0">{{ $student->student_id }}</span>
-                    </div>
-
-                    {{-- Middle Info Box: Class, Roll, Father's Name, Phone --}}
-                    <div class="student-info-box">
-                        {{-- Class & Section --}}
-                        <div class="student-info-row">
-                            <div class="student-info-label">
-                                <i class="fa-solid fa-graduation-cap text-primary student-info-icon"></i>
-                                <span>Class & Sec:</span>
-                            </div>
-                            <span class="student-info-value fw-semibold text-primary">
-                                {{ $student->class?->name ?? 'N/A' }} - {{ $student->section?->name ?? 'N/A' }}
-                            </span>
-                        </div>
-
-                        {{-- Roll Row --}}
-                        <div class="student-info-row">
-                            <div class="student-info-label">
-                                <i class="fa-solid fa-list-ol text-info student-info-icon"></i>
-                                <span>Roll No:</span>
-                            </div>
-                            <span class="student-info-value fw-medium text-dark">
-                                {{ $student->roll ?? 'N/A' }}
-                            </span>
-                        </div>
-
-                        {{-- Father's Name Row --}}
-                        @if($student->fathers_name)
-                            <div class="student-info-row">
-                                <div class="student-info-label">
-                                    <i class="fa-solid fa-user-tie text-secondary student-info-icon"></i>
-                                    <span>Father's Name:</span>
-                                </div>
-                                <span class="student-info-value fw-medium text-dark">
-                                    {{ $student->fathers_name }}
-                                </span>
-                            </div>
-                        @endif
-
-                        {{-- Phone Row --}}
-                        @if($student->contact_number)
-                            <div class="student-info-row">
-                                <div class="student-info-label">
-                                    <i class="fa-solid fa-phone text-success student-info-icon"></i>
-                                    <span>Contact:</span>
-                                </div>
-                                <a href="tel:{{ $student->contact_number }}" class="student-info-value fw-medium text-dark text-decoration-none">
-                                    {{ $student->contact_number }}
-                                </a>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Bottom Action Row --}}
-                    <div class="d-flex align-items-center justify-content-between pt-2.5 border-top">
-                        <span class="small text-muted fw-medium" style="font-size:11.5px;">Quick Actions</span>
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-icon-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#studentModal{{ $student->id }}" title="View Full Details">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-                            <a href="{{ route('students.edit', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" 
-                               class="btn btn-icon-sm btn-soft-warning" title="Edit Student">
-                                <i class="fa-regular fa-pen-to-square"></i>
-                            </a>
-                            <form action="{{ route('students.destroy', ['tenant' => auth()->user()?->school?->slug, 'student' => $student->id]) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" onclick="confirmDelete(this)" class="btn btn-icon-sm btn-soft-danger" title="Delete Student">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
 @else
     {{-- Empty State --}}
     <div class="text-center py-5 px-3">

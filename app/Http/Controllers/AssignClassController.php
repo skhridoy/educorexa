@@ -67,7 +67,11 @@ class AssignClassController extends Controller
     {
         $schoolId = $this->getSchoolId($request);
 
-        $request->validate([
+        $subject = Subject::find($request->subject_id);
+        $subjectType = $subject?->type ?? 'theory';
+
+        // Base validation rules
+        $rules = [
             'class_id' => [
                 'required',
                 Rule::exists('classes', 'id')->where('school_id', $schoolId),
@@ -81,18 +85,49 @@ class AssignClassController extends Controller
                 'required',
                 Rule::exists('subjects', 'id')->where('school_id', $schoolId),
             ],
-            'full_mark'  => 'required|numeric',
-            'pass_mark'  => 'required|numeric'
-        ]);
+        ];
+
+        // Dynamic mark validation by subject type
+        if ($subjectType === 'theory_practical') {
+            $rules['theory_full_mark']      = 'required|numeric|min:0';
+            $rules['theory_pass_mark']      = 'required|numeric|min:0';
+            $rules['practical_full_mark']   = 'required|numeric|min:0';
+            $rules['practical_pass_mark']   = 'required|numeric|min:0';
+        } elseif ($subjectType === 'practical') {
+            $rules['practical_full_mark']   = 'required|numeric|min:0';
+            $rules['practical_pass_mark']   = 'required|numeric|min:0';
+        } else {
+            // theory (default)
+            $rules['theory_full_mark']  = 'required|numeric|min:0';
+            $rules['theory_pass_mark']  = 'required|numeric|min:0';
+        }
+
+        $request->validate($rules);
+
+        // Compute aggregated full_mark / pass_mark
+        if ($subjectType === 'theory_practical') {
+            $fullMark = $request->theory_full_mark + $request->practical_full_mark;
+            $passMark = $request->theory_pass_mark + $request->practical_pass_mark;
+        } elseif ($subjectType === 'practical') {
+            $fullMark = $request->practical_full_mark;
+            $passMark = $request->practical_pass_mark;
+        } else {
+            $fullMark = $request->theory_full_mark;
+            $passMark = $request->theory_pass_mark;
+        }
 
         AssignClass::create([
-            'school_id'  => $schoolId,
-            'school_category_id' => $request->school_category_id,
-            'school_sub_category_id' => $request->school_sub_category_id,
-            'class_id'   => $request->class_id,
-            'subject_id' => $request->subject_id,
-            'full_mark'  => $request->full_mark,
-            'pass_mark'  => $request->pass_mark,
+            'school_id'               => $schoolId,
+            'school_category_id'      => $request->school_category_id,
+            'school_sub_category_id'  => $request->school_sub_category_id,
+            'class_id'                => $request->class_id,
+            'subject_id'              => $request->subject_id,
+            'full_mark'               => $fullMark,
+            'pass_mark'               => $passMark,
+            'theory_full_mark'        => $subjectType !== 'practical' ? $request->theory_full_mark : null,
+            'theory_pass_mark'        => $subjectType !== 'practical' ? $request->theory_pass_mark : null,
+            'practical_full_mark'     => $subjectType !== 'theory'    ? $request->practical_full_mark : null,
+            'practical_pass_mark'     => $subjectType !== 'theory'    ? $request->practical_pass_mark : null,
         ]);
 
         if ($request->ajax()) {
@@ -152,7 +187,10 @@ class AssignClassController extends Controller
         $schoolId = $this->getSchoolId($request);
         $assignment = AssignClass::where('id', $assignment)->where('school_id', $schoolId)->firstOrFail();
 
-        $request->validate([
+        $subject = Subject::find($request->subject_id);
+        $subjectType = $subject?->type ?? 'theory';
+
+        $rules = [
             'class_id' => [
                 'required',
                 Rule::exists('classes', 'id')->where('school_id', $schoolId),
@@ -166,17 +204,45 @@ class AssignClassController extends Controller
                 'required',
                 Rule::exists('subjects', 'id')->where('school_id', $schoolId),
             ],
-            'full_mark'  => 'required|numeric',
-            'pass_mark'  => 'required|numeric',
-        ]);
+        ];
+
+        if ($subjectType === 'theory_practical') {
+            $rules['theory_full_mark']      = 'required|numeric|min:0';
+            $rules['theory_pass_mark']      = 'required|numeric|min:0';
+            $rules['practical_full_mark']   = 'required|numeric|min:0';
+            $rules['practical_pass_mark']   = 'required|numeric|min:0';
+        } elseif ($subjectType === 'practical') {
+            $rules['practical_full_mark']   = 'required|numeric|min:0';
+            $rules['practical_pass_mark']   = 'required|numeric|min:0';
+        } else {
+            $rules['theory_full_mark']  = 'required|numeric|min:0';
+            $rules['theory_pass_mark']  = 'required|numeric|min:0';
+        }
+
+        $request->validate($rules);
+
+        if ($subjectType === 'theory_practical') {
+            $fullMark = $request->theory_full_mark + $request->practical_full_mark;
+            $passMark = $request->theory_pass_mark + $request->practical_pass_mark;
+        } elseif ($subjectType === 'practical') {
+            $fullMark = $request->practical_full_mark;
+            $passMark = $request->practical_pass_mark;
+        } else {
+            $fullMark = $request->theory_full_mark;
+            $passMark = $request->theory_pass_mark;
+        }
 
         $assignment->update([
-            'class_id' => $request->class_id,
-            'subject_id' => $request->subject_id,
-            'full_mark' => $request->full_mark,
-            'pass_mark' => $request->pass_mark,
-            'school_category_id' => $request->school_category_id,
-            'school_sub_category_id' => $request->school_sub_category_id,
+            'class_id'                => $request->class_id,
+            'subject_id'              => $request->subject_id,
+            'full_mark'               => $fullMark,
+            'pass_mark'               => $passMark,
+            'theory_full_mark'        => $subjectType !== 'practical' ? $request->theory_full_mark : null,
+            'theory_pass_mark'        => $subjectType !== 'practical' ? $request->theory_pass_mark : null,
+            'practical_full_mark'     => $subjectType !== 'theory'    ? $request->practical_full_mark : null,
+            'practical_pass_mark'     => $subjectType !== 'theory'    ? $request->practical_pass_mark : null,
+            'school_category_id'      => $request->school_category_id,
+            'school_sub_category_id'  => $request->school_sub_category_id,
         ]);
 
         if ($request->ajax()) {

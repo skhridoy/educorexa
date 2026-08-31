@@ -37,7 +37,11 @@ class AssignClass extends Model
         'school_sub_category_id',
         'subject_id',
         'full_mark',
-        'pass_mark'
+        'pass_mark',
+        'theory_full_mark',
+        'theory_pass_mark',
+        'practical_full_mark',
+        'practical_pass_mark'
     ];
 
     // এই রেকর্ডটি কোন ক্লাসের?

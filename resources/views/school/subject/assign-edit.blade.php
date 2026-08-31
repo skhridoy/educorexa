@@ -291,11 +291,7 @@
             background: #ef4444;
             color: #ffffff;
         }
-        .btn-primary-gradient {
-            padding: 7px 16px !important;
-            font-size: 0.84rem !important;
-            border-radius: 8px !important;
-        }
+
 
         /* Empty State */
         .class-assign-empty-state {
@@ -556,7 +552,7 @@
                                 <select id="subject_id" name="subject_id" class="form-select" required>
                                     <option value="">{{ __('Select Subject') }}</option>
                                     @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}" {{ old('subject_id', $assignment->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
+                                        <option value="{{ $subject->id }}" data-type="{{ $subject->type }}" {{ old('subject_id', $assignment->subject_id) == $subject->id ? 'selected' : '' }}>{{ $subject->code ? $subject->code . ' - ' : '' }}{{ $subject->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('subject_id')
@@ -564,27 +560,56 @@
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="full_mark" class="form-label fw-semibold">{{ __('Full Mark') }} <span class="text-danger">*</span></label>
-                                <input type="number" id="full_mark" name="full_mark" class="form-control" placeholder="{{ __('Enter full mark') }}" value="{{ old('full_mark', $assignment->full_mark) }}" required>
-                                @error('full_mark')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
+                            {{-- Dynamic mark fields --}}
+                            @php
+                                $editSubjectType = $assignment->subject?->type ?? 'theory';
+                            @endphp
+
+                            <div id="theory-mark-group" style="display:{{ in_array($editSubjectType, ['theory','theory_practical']) ? 'block' : 'none' }}">
+                                <div class="fw-semibold text-primary mb-2" style="font-size: 0.8rem;">
+                                    <i class="fa-solid fa-pen-nib me-1"></i> {{ __('Theory Marks') }}
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold" style="font-size: 0.82rem;">{{ __('Full Mark') }} <span class="text-danger">*</span></label>
+                                        <input type="number" id="theory_full_mark" name="theory_full_mark" class="form-control form-control-sm" placeholder="e.g. 75" min="0" value="{{ old('theory_full_mark', $assignment->theory_full_mark) }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold" style="font-size: 0.82rem;">{{ __('Pass Mark') }} <span class="text-danger">*</span></label>
+                                        <input type="number" id="theory_pass_mark" name="theory_pass_mark" class="form-control form-control-sm" placeholder="e.g. 25" min="0" value="{{ old('theory_pass_mark', $assignment->theory_pass_mark) }}">
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="pass_mark" class="form-label fw-semibold">{{ __('Pass Marks') }} <span class="text-danger">*</span></label>
-                                <input type="number" id="pass_mark" name="pass_mark" class="form-control" placeholder="{{ __('Pass Marks') }}" value="{{ old('pass_mark', $assignment->pass_mark) }}" required>
-                                @error('pass_mark')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
+                            <div id="practical-mark-group" style="display:{{ in_array($editSubjectType, ['practical','theory_practical']) ? 'block' : 'none' }}">
+                                <div class="fw-semibold text-warning-emphasis mb-2" style="font-size: 0.8rem;">
+                                    <i class="fa-solid fa-flask me-1"></i> {{ __('Practical Marks') }}
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold" style="font-size: 0.82rem;">{{ __('Full Mark') }} <span class="text-danger">*</span></label>
+                                        <input type="number" id="practical_full_mark" name="practical_full_mark" class="form-control form-control-sm" placeholder="e.g. 25" min="0" value="{{ old('practical_full_mark', $assignment->practical_full_mark) }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold" style="font-size: 0.82rem;">{{ __('Pass Mark') }} <span class="text-danger">*</span></label>
+                                        <input type="number" id="practical_pass_mark" name="practical_pass_mark" class="form-control form-control-sm" placeholder="e.g. 8" min="0" value="{{ old('practical_pass_mark', $assignment->practical_pass_mark) }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="total-mark-summary" style="display:{{ $editSubjectType === 'theory_practical' ? 'block' : 'none' }};" class="mb-3">
+                                <div class="p-2 rounded-2" style="background:#f1f5f9; font-size: 0.82rem;">
+                                    <span class="fw-bold text-dark">{{ __('Total:') }}</span>
+                                    {{ __('Full') }} = <span id="total-full-display" class="text-primary fw-bold">{{ $assignment->full_mark ?? '—' }}</span>,
+                                    {{ __('Pass') }} = <span id="total-pass-display" class="text-success fw-bold">{{ $assignment->pass_mark ?? '—' }}</span>
+                                </div>
                             </div>
 
                             <div class="d-flex gap-2 pt-2">
-                                <button type="submit" class="btn btn-primary-gradient flex-grow-1 py-1.5 px-3 fw-bold" style="font-size: 0.84rem; border-radius: 8px;">
+                                <button type="submit" style="background:transparent; border:1.5px solid #4f46e5; color:#4f46e5; border-radius:5px; font-size:0.78rem; font-weight:600; padding:6px 14px; transition:all 0.2s; flex:1;" onmouseover="this.style.background='rgba(79,70,229,0.08)'" onmouseout="this.style.background='transparent'">
                                     <i class="fa-solid fa-check me-1"></i> {{ __('Update Assignment') }}
                                 </button>
-                                <a href="{{ route('subjects.assign', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" class="btn btn-outline-secondary py-1.5 px-3" style="font-size: 0.84rem; border-radius: 8px;">
+                                <a href="{{ route('subjects.assign', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant'))]) }}" style="background:transparent; border:1.5px solid #94a3b8; color:#64748b; border-radius:5px; font-size:0.78rem; font-weight:600; padding:6px 14px; text-decoration:none; display:inline-flex; align-items:center; transition:all 0.2s;" onmouseover="this.style.background='rgba(148,163,184,0.08)'" onmouseout="this.style.background='transparent'">
                                     {{ __('Cancel') }}
                                 </a>
                             </div>
@@ -756,5 +781,47 @@
                 }
             });
         }
+
+        // ─── Dynamic mark fields based on subject type ───
+        function updateMarkFields(isInit) {
+            const selectedOption = $('#subject_id option:selected');
+            const subjectType = selectedOption.data('type') || '';
+
+            const $theory    = $('#theory-mark-group');
+            const $practical = $('#practical-mark-group');
+            const $total     = $('#total-mark-summary');
+
+            if (!isInit) {
+                $('input[name="theory_full_mark"], input[name="theory_pass_mark"]').prop('required', false).val('');
+                $('input[name="practical_full_mark"], input[name="practical_pass_mark"]').prop('required', false).val('');
+            }
+
+            if (subjectType === 'theory') {
+                $theory.show(); $practical.hide(); $total.hide();
+                $('input[name="theory_full_mark"], input[name="theory_pass_mark"]').prop('required', true);
+            } else if (subjectType === 'practical') {
+                $theory.hide(); $practical.show(); $total.hide();
+                $('input[name="practical_full_mark"], input[name="practical_pass_mark"]').prop('required', true);
+            } else if (subjectType === 'theory_practical') {
+                $theory.show(); $practical.show(); $total.show();
+                $('input[name="theory_full_mark"], input[name="theory_pass_mark"], input[name="practical_full_mark"], input[name="practical_pass_mark"]').prop('required', true);
+            } else {
+                $theory.show(); $practical.hide(); $total.hide();
+                $('input[name="theory_full_mark"], input[name="theory_pass_mark"]').prop('required', true);
+            }
+        }
+
+        function updateTotalSummary() {
+            const tf = parseFloat($('#theory_full_mark').val()) || 0;
+            const tp = parseFloat($('#theory_pass_mark').val()) || 0;
+            const pf = parseFloat($('#practical_full_mark').val()) || 0;
+            const pp = parseFloat($('#practical_pass_mark').val()) || 0;
+            $('#total-full-display').text((tf + pf) || '—');
+            $('#total-pass-display').text((tp + pp) || '—');
+        }
+
+        $('#subject_id').on('change', function() { updateMarkFields(false); });
+        $(document).on('input', '#theory_full_mark, #theory_pass_mark, #practical_full_mark, #practical_pass_mark', updateTotalSummary);
+        updateMarkFields(true);
     </script>
 @endsection

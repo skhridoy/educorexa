@@ -280,7 +280,7 @@
                                         <a href="{{ route('school.roles.edit', ['tenant' => $tenant, 'role' => $role->id]) }}" class="action-btn" title="Modify Configuration">
                                             <i data-feather="edit-3" style="width:16px;"></i>
                                         </a>
-                                        <form action="{{ route('school.roles.destroy', ['tenant' => $tenant, 'role' => $role->id]) }}" method="POST" onsubmit="return confirm('{{ __(\'Attention: Deleting this role will affect all assigned staff. Continue?\') }}')">
+                                        <form action="{{ route('school.roles.destroy', ['tenant' => $tenant, 'role' => $role->id]) }}" method="POST" onsubmit="return confirm('{{ __('Attention: Deleting this role will affect all assigned staff. Continue?') }}')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="action-btn delete" title="Terminate Role">
                                                 <i data-feather="trash-2" style="width:16px;"></i>

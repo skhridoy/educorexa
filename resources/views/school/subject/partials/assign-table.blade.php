@@ -78,14 +78,39 @@
                                             @endif
                                         </td>
                                         <td class="text-center" style="padding: 9px 12px;">
-                                            <span class="mark-pill full-mark-pill" style="font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">
-                                                <i class="fa-solid fa-star me-1 text-warning"></i> {{ $assignment->full_mark ?? '-' }}
-                                            </span>
+                                            @php
+                                                $subType = $assignment->subject?->type ?? 'theory';
+                                            @endphp
+                                            @if($subType === 'theory_practical' && ($assignment->theory_full_mark || $assignment->practical_full_mark))
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <span class="mark-pill full-mark-pill" style="font-size: 0.74rem; padding: 2px 8px; border-radius: 6px;">
+                                                        <i class="fa-solid fa-star me-1 text-warning"></i>{{ $assignment->full_mark ?? '-' }}
+                                                    </span>
+                                                    <span class="text-muted" style="font-size: 0.66rem;">
+                                                        T:{{ $assignment->theory_full_mark ?? '-' }} / P:{{ $assignment->practical_full_mark ?? '-' }}
+                                                    </span>
+                                                </div>
+                                            @else
+                                                <span class="mark-pill full-mark-pill" style="font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">
+                                                    <i class="fa-solid fa-star me-1 text-warning"></i> {{ $assignment->full_mark ?? '-' }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="text-center" style="padding: 9px 12px;">
-                                            <span class="mark-pill pass-mark-pill" style="font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">
-                                                <i class="fa-solid fa-circle-check me-1 text-success"></i> {{ $assignment->pass_mark ?? '-' }}
-                                            </span>
+                                            @if($subType === 'theory_practical' && ($assignment->theory_pass_mark || $assignment->practical_pass_mark))
+                                                <div class="d-flex flex-column align-items-center gap-1">
+                                                    <span class="mark-pill pass-mark-pill" style="font-size: 0.74rem; padding: 2px 8px; border-radius: 6px;">
+                                                        <i class="fa-solid fa-circle-check me-1 text-success"></i>{{ $assignment->pass_mark ?? '-' }}
+                                                    </span>
+                                                    <span class="text-muted" style="font-size: 0.66rem;">
+                                                        T:{{ $assignment->theory_pass_mark ?? '-' }} / P:{{ $assignment->practical_pass_mark ?? '-' }}
+                                                    </span>
+                                                </div>
+                                            @else
+                                                <span class="mark-pill pass-mark-pill" style="font-size: 0.76rem; padding: 3px 8px; border-radius: 6px;">
+                                                    <i class="fa-solid fa-circle-check me-1 text-success"></i> {{ $assignment->pass_mark ?? '-' }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="text-end pe-3" style="padding: 9px 12px;">
                                             <div class="d-inline-flex align-items-center justify-content-end gap-1">

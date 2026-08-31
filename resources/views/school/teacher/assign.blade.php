@@ -344,11 +344,7 @@
             background: #ef4444;
             color: #ffffff;
         }
-        .btn-primary-gradient {
-            padding: 7px 16px !important;
-            font-size: 0.84rem !important;
-            border-radius: 8px !important;
-        }
+
 
         /* Empty State */
         .class-assign-empty-state {

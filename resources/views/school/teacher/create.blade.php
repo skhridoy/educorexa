@@ -61,20 +61,7 @@
             background-color: #ffffff;
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
         }
-        .btn-primary-gradient {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            color: #ffffff;
-            border: none;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
-            transition: all 0.3s ease;
-        }
-        .btn-primary-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-            color: #ffffff;
-        }
+
         .info-notice-banner {
             background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
             border-left: 4px solid #4f46e5;
