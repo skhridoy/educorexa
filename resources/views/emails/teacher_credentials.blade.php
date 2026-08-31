@@ -180,7 +180,7 @@
                 {{-- Action Button --}}
                 <div style="text-align:center;">
                     <a href="{{ $loginUrl }}" class="btn-login">
-                        Log In to Teacher Dashboard &rarr;
+                        Log In to Dashboard &rarr;
                     </a>
                 </div>
 

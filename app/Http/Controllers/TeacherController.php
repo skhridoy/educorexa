@@ -189,10 +189,10 @@ class TeacherController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     */
+     */ 
     public function create()
-    {
-        
+    { 
+          
         $subjects = Subject::where('school_id', auth()->user()->school_id)->get();
         return view('school.teacher.create', compact('subjects'));
     }

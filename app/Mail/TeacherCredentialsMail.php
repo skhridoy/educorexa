@@ -28,7 +28,7 @@ class TeacherCredentialsMail extends Mailable
         $this->teacher = $teacher;
         $this->school = $school;
         $this->password = $password;
-        $this->loginUrl = route('login.form');
+        $this->loginUrl = route('school.login.form'); 
     }
 
     /**
