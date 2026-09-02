@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fee_heads', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('school_id')->constrained()->cascadeOnDelete();;
+            $table->unsignedBigInteger('school_id')->constrained()->cascadeOnDelete();
             $table->string('name')->unique(); // e.g., Monthly Fee
             $table->enum('type', ['monthly', 'once', 'recurring']); 
             $table->timestamps();
