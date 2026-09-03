@@ -24,7 +24,6 @@
 
     <div class="edu-panel">
         <div class="edu-panel-hd">
-              <form id="global-api-form" action="{{ route('settings.api.update') }}" method="POST">
             <p class="mb-0 text-muted" style="font-size: 0.85rem;">This replaces the .env file configurations for global email sending.</p>
         </div>
         <div class="edu-panel-bd">
