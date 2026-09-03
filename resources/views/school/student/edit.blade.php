@@ -207,6 +207,16 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
+                    <label class="form-label" for="roll">Roll Number</label>
+                    <div class="input-icon-wrapper">
+                        <input type="number" name="roll" id="roll" min="1"
+                               class="form-control edu-input @error('roll') is-invalid @enderror"
+                               value="{{ old('roll', $student->roll) }}" required>
+                        <i class="fa-solid fa-hashtag field-icon @error('roll') invalid @else {{ old('roll', $student->roll) ? 'valid' : '' }} @enderror"></i>
+                        @error('roll') <div class="invalid-feedback" style="font-size:11px;">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <label class="form-label" for="class_id">Class</label>
                     <select class="form-select edu-input" id="class_id" name="class_id" required>
                         @foreach($classes as $class)

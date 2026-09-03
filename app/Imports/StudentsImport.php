@@ -159,14 +159,10 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 $rollVal = trim($rawRoll);
                 if (is_numeric($rollVal)) {
                     $finalRoll = (int)$rollVal;
-                } else {
-                    $suggestedRoll = 1;
-                    while (in_array($suggestedRoll, $usedRolls[$groupKey])) {
-                        $suggestedRoll++;
-                    }
-                    $finalRoll = $suggestedRoll;
                 }
-            } else {
+            }
+
+            if ($finalRoll === null) {
                 $suggestedRoll = 1;
                 while (in_array($suggestedRoll, $usedRolls[$groupKey])) {
                     $suggestedRoll++;
@@ -174,7 +170,9 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 $finalRoll = $suggestedRoll;
             }
 
-            $usedRolls[$groupKey][] = $finalRoll;
+            if (!in_array($finalRoll, $usedRolls[$groupKey])) {
+                $usedRolls[$groupKey][] = $finalRoll;
+            }
 
             // ── 6. Date of birth ──
             $dob = null;

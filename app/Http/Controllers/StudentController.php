@@ -21,6 +21,7 @@ use App\Imports\StudentsImport;
 use App\Exports\StudentsExport;
 use App\Exports\StudentTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -363,6 +364,21 @@ class StudentController extends Controller
             'section_id'             => 'nullable|exists:sections,id',
             'school_category_id'     => 'nullable',
             'school_sub_category_id' => 'nullable',
+            'roll'                   => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('students', 'roll')->where(function ($query) use ($schoolId, $student, $request) {
+                    $query->where('school_id', $schoolId)
+                        ->where('academic_year_id', $student->academic_year_id)
+                        ->where('class_id', $request->input('class_id', $student->class_id));
+
+                    $subCategoryId = $request->input('school_sub_category_id', $student->school_sub_category_id);
+                    $subCategoryId === null || $subCategoryId === ''
+                        ? $query->whereNull('school_sub_category_id')
+                        : $query->where('school_sub_category_id', $subCategoryId);
+                })->ignore($student->id),
+            ],
             'fathers_name'           => 'nullable|string|max:255',
             'fathers_name_bn'        => 'nullable|string|max:255',
             'father_name'            => 'nullable|string|max:255',
@@ -386,6 +402,11 @@ class StudentController extends Controller
             'address'                => 'nullable|string|max:500',
             'address_bn'             => 'nullable|string|max:500',
             'photo'                  => 'nullable|image|max:2048',
+        ], [
+            'roll.required' => 'Roll number is required.',
+            'roll.integer'  => 'Roll number must be a whole number.',
+            'roll.min'      => 'Roll number must be at least 1.',
+            'roll.unique'   => 'এই class/group-এ এই roll number ইতিমধ্যে ব্যবহার করা হয়েছে।',
         ]);
 
         $tenantSlug = auth()->user()->school->slug ?? $tenant;
@@ -426,6 +447,7 @@ class StudentController extends Controller
                 'school_category_id'     => $request->filled('school_category_id') ? $request->school_category_id : $student->school_category_id,
                 'school_sub_category_id' => $request->filled('school_sub_category_id') ? $request->school_sub_category_id : $student->school_sub_category_id,
                 'section_id'             => $request->filled('section_id') ? $request->section_id : $student->section_id,
+                'roll'                   => $validated['roll'],
                 'fathers_name'           => $request->fathers_name ?? $request->father_name ?? $student->fathers_name,
                 'fathers_name_bn'        => $request->has('fathers_name_bn') ? $request->fathers_name_bn : $student->fathers_name_bn,
                 'mothers_name'           => $request->mothers_name ?? $request->mother_name ?? $student->mothers_name,
