@@ -321,7 +321,6 @@
                                 $cp2 = trim($ca2 . ($pr2 !== '' ? ($ca2 !== '' ? '/' : '') . $pr2 : ''));
 
                                 $cpM = $cp1 . ($cp2 !== '' ? ($cp1 !== '' ? '+' : '') . $cp2 : '');
-                                $hp  = max($res['highest_mark'] ?? 0, $nx['highest_mark'] ?? 0);
                             @endphp
                             <tr>
                                 <td>{{ $res['subject_code'] }}</td>
@@ -330,7 +329,7 @@
                                 <td>{{ ($res['mcq'] ?? null) !== null ? $fmt($res['mcq']) : '' }}</td>
                                 <td rowspan="2" style="vertical-align: middle;">{{ $cpM }}</td>
                                 <td rowspan="2" style="vertical-align: middle;">{{ $fmt($res['combined_marks'] ?? '') }}</td>
-                                <td rowspan="2" style="vertical-align: middle;">{{ $hp > 0 ? $fmt($hp) : '' }}</td>
+                                <td style="vertical-align: middle;">{{ is_numeric($res['highest_mark'] ?? null) && $res['highest_mark'] > 0 ? $fmt($res['highest_mark']) : '' }}</td>
                                 <td rowspan="2" style="vertical-align: middle;">{{ number_format($res['point'] ?? 0, 1) }}</td>
                                 <td rowspan="2"  style="vertical-align: middle;">{{ $res['grade'] ?? '-' }}</td>
 
@@ -346,6 +345,7 @@
                                 <td class="tl" style="text-align: left;">{{ strtoupper($res['subject_name']) }}</td>
                                 <td>{{ ($res['cq'] ?? null) !== null ? $fmt($res['cq']) : '' }}</td>
                                 <td>{{ ($res['mcq'] ?? null) !== null ? $fmt($res['mcq']) : '' }}</td>
+                                <td style="vertical-align: middle;">{{ is_numeric($res['highest_mark'] ?? null) && $res['highest_mark'] > 0 ? $fmt($res['highest_mark']) : '' }}</td>
 
                                 @if($i === 0)
                                     <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center;">

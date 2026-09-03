@@ -324,6 +324,10 @@ class MarkController extends Controller
      */
     private function organizeSubjectsWithPairs($subjects)
     {
+        $subjects = $subjects->sort(function ($first, $second) {
+            return strnatcasecmp((string) ($first->code ?? ''), (string) ($second->code ?? ''));
+        })->values();
+
         $usedSubjectIds = [];
         $bangla1 = null; $bangla2 = null;
         $english1 = null; $english2 = null;
@@ -397,6 +401,13 @@ class MarkController extends Controller
                 ];
             }
         }
+
+        usort($groups, function ($first, $second) {
+            $firstCode = $first['subjects'][0]->code ?? '';
+            $secondCode = $second['subjects'][0]->code ?? '';
+
+            return strnatcasecmp((string) $firstCode, (string) $secondCode);
+        });
 
         return $groups;
     }
