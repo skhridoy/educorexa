@@ -16,7 +16,7 @@ use App\Http\Controllers\{
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
     MainContactMsgController, ReviewController,
     RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController,
-    ExamRoutineController
+    ExamRoutineController, InboundMessageController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -57,7 +57,10 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset');
     Route::post('/reset-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'resetPassword'])->name('password.update');
 
-    Route::post('/main-newsletter-subscribe', [NewsletterController::class, 'mainSubscribe'])->name('main.newsletter.subscribe');   
+    Route::post('/main-newsletter-subscribe', [NewsletterController::class, 'mainSubscribe'])->name('main.newsletter.subscribe');
+    Route::post('/webhooks/inbound-email', [InboundMessageController::class, 'webhook'])
+        ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+        ->name('inbound.email.webhook');
 
     // Language Switcher Route
     Route::get('/set-locale/{lang}', function ($lang) {
@@ -98,6 +101,10 @@ Route::domain(config('app.main_domain'))->group(function () {
         
         // --- Management Group (Prefix: manage, Name: manage.) ---
         Route::prefix('manage')->name('manage.')->group(function () {
+            Route::get('/inbox', [InboundMessageController::class, 'superIndex'])->name('inbox.index');
+            Route::get('/inbox/{id}', [InboundMessageController::class, 'show'])->name('inbox.show');
+            Route::patch('/inbox/{id}', [InboundMessageController::class, 'update'])->name('inbox.update');
+            Route::delete('/inbox/{id}', [InboundMessageController::class, 'destroy'])->name('inbox.destroy');
             
             // Schools Management
             Route::middleware(['permission:school.manage'])->group(function () {
@@ -279,6 +286,10 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('admin/messages', [ContactMessageController::class, 'index'])->name('admin.messages.index');
                     Route::get('admin/messages/{id}', [ContactMessageController::class, 'show'])->name('admin.messages.show');
                     Route::delete('admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
+                    Route::get('admin/inbox', [InboundMessageController::class, 'schoolIndex'])->name('school.inbox.index');
+                    Route::get('admin/inbox/{id}', [InboundMessageController::class, 'show'])->name('school.inbox.show');
+                    Route::patch('admin/inbox/{id}', [InboundMessageController::class, 'update'])->name('school.inbox.update');
+                    Route::delete('admin/inbox/{id}', [InboundMessageController::class, 'destroy'])->name('school.inbox.destroy');
                     // Support Tickets
                     Route::get('admin/support', [SchoolSupportController::class, 'index'])->name('school.support.index');
                     Route::get('admin/support/create', [SchoolSupportController::class, 'create'])->name('school.support.create');

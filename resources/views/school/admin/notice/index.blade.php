@@ -377,6 +377,15 @@
                             </button>
                         </form>
 
+                        {{-- SMS send --}}
+                        <form action="{{ route('notices.send', ['tenant' => auth()->user()->school->slug, 'id' => $notice->id]) }}" method="POST" class="send-form">
+                            @csrf
+                            <input type="hidden" name="method_type" value="sms">
+                            <button type="button" onclick="confirmSend(this, 'SMS')" class="notice-action-btn sms" title="SMS পাঠান">
+                                <i class="fa-solid fa-comment-sms"></i>
+                            </button>
+                        </form>
+
                         {{-- Edit --}}
                         <a href="{{ route('notices.edit', ['tenant' => auth()->user()->school->slug, 'notice' => $notice->id]) }}"
                            class="notice-action-btn edit" title="সম্পাদনা">

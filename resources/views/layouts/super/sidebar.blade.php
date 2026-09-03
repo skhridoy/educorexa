@@ -149,6 +149,13 @@
                 </li>
                 @endcan
 
+                <li class="edu-nav-item">
+                    <a href="{{ route('manage.inbox.index') }}" class="edu-nav-link {{ Request::is('manage/inbox*') ? 'active' : '' }}">
+                        <i data-feather="mail"></i>
+                        <span>Inbound Email Inbox</span>
+                    </a>
+                </li>
+
                 @can('support.manage')
                 <li class="edu-nav-item">
                     <a href="{{ route('manage.support.index') }}"

@@ -154,6 +154,76 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- SMS Settings Section --}}
+                                <div class="col-lg-5">
+                                    <div class="p-4 bg-light rounded-4 h-100">
+                                        <h5 class="fw-bold mb-4 text-dark border-bottom pb-2">
+                                            <i class="fa-solid fa-comment-sms me-2 text-success"></i> SMS API Setup
+                                        </h5>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Provider</label>
+                                                <select name="sms_api_provider" class="form-select" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                                    <option value="" {{ !$school->sms_api_provider ? 'selected' : '' }}>Disabled</option>
+                                                    <option value="generic" {{ $school->sms_api_provider == 'generic' ? 'selected' : '' }}>Generic JSON API</option>
+                                                    <option value="bulksmsbd" {{ $school->sms_api_provider == 'bulksmsbd' ? 'selected' : '' }}>Bulk SMS BD</option>
+                                                    <option value="sslwireless" {{ $school->sms_api_provider == 'sslwireless' ? 'selected' : '' }}>SSL Wireless</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">API URL</label>
+                                                <input type="url" name="sms_api_url" class="form-control" value="{{ $school->sms_api_url }}" placeholder="https://provider.example/api/send" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">API Key</label>
+                                                <input type="password" name="sms_api_key" class="form-control" value="{{ $school->sms_api_key }}" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">API Secret</label>
+                                                <input type="password" name="sms_api_secret" class="form-control" value="{{ $school->sms_api_secret }}" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Sender ID</label>
+                                                <input type="text" name="sms_sender_id" class="form-control" value="{{ $school->sms_sender_id }}" placeholder="School name or approved sender ID" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="alert alert-info border-0 shadow-sm small mb-0">
+                                                    <i class="fa-solid fa-circle-info me-2"></i>{{ $school->hasPackagePermission('sms.send') ? 'Leave provider blank to stop all SMS sending.' : 'Upgrade the school package to enable SMS service.' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-7">
+                                    <div class="p-4 bg-white border border-info-subtle rounded-4 h-100 shadow-sm">
+                                        <h5 class="fw-bold mb-4 text-info border-bottom pb-2"><i class="fa-solid fa-inbox me-2"></i>Incoming Email Webhook</h5>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" name="inbound_webhook_enabled" value="1" {{ $school->inbound_webhook_enabled ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold">Receive emails in School Email Inbox</label>
+                                        </div>
+                                        <label class="form-label fw-semibold">Webhook Secret</label>
+                                        <input type="password" name="inbound_webhook_secret" class="form-control mb-2" placeholder="Leave empty to keep current secret">
+                                        <small class="text-muted d-block">Webhook URL: {{ url('/webhooks/inbound-email') }}</small>
+                                        <small class="text-muted d-block">Send the secret in the <code>X-Inbound-Mail-Secret</code> header.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-5">
+                                    <div class="p-4 bg-white border border-primary-subtle rounded-4 h-100 shadow-sm">
+                                        <h5 class="fw-bold mb-4 text-primary border-bottom pb-2"><i class="fa-solid fa-envelope-open me-2"></i>IMAP Inbox</h5>
+                                        <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" name="imap_enabled" value="1" {{ $school->imap_enabled ? 'checked' : '' }}><label class="form-check-label fw-semibold">Enable IMAP polling</label></div>
+                                        <div class="row g-3">
+                                            <div class="col-8"><label class="form-label fw-semibold">Incoming Server</label><input type="text" name="imap_host" class="form-control" value="{{ $school->imap_host }}" placeholder="mail.educorexa.com"></div>
+                                            <div class="col-4"><label class="form-label fw-semibold">Port</label><input type="number" name="imap_port" class="form-control" value="{{ $school->imap_port ?: 993 }}"></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Username</label><input type="email" name="imap_username" class="form-control" value="{{ $school->imap_username }}" placeholder="school@example.com"></div>
+                                            <div class="col-12"><label class="form-label fw-semibold">Password</label><input type="password" name="imap_password" class="form-control" placeholder="Leave empty to keep current password"></div>
+                                            <div class="col-6"><label class="form-label fw-semibold">Security</label><select name="imap_encryption" class="form-select"><option value="ssl" @selected($school->imap_encryption === 'ssl')>SSL/TLS</option><option value="tls" @selected($school->imap_encryption === 'tls')>TLS</option><option value="none" @selected($school->imap_encryption === 'none')>None</option></select></div>
+                                            <div class="col-6"><label class="form-label fw-semibold">Folder</label><input type="text" name="imap_folder" class="form-control" value="{{ $school->imap_folder ?: 'INBOX' }}"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mt-5 text-end">

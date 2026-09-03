@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\School;
 use App\Models\AssignClass;
+use App\Models\CommunicationSetting;
+use App\Services\SmsService;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExamController extends Controller
@@ -492,6 +494,24 @@ class ExamController extends Controller
 
             $exam->is_published = $exam->is_published ? 0 : 1;
             $exam->save();
+
+            if ($exam->is_published) {
+                $setting = CommunicationSetting::where('school_id', $schoolId)
+                    ->where('event', 'result_published')->first();
+                $school = School::find($schoolId);
+                if ($setting?->sms_enabled && $school) {
+                    $students = Student::where('school_id', $schoolId)
+                        ->where('status', 'active')->whereNotNull('contact_number')->get();
+                    foreach ($students as $student) {
+                        $message = str_replace(
+                            ['[student_name]', '[exam_name]', '[school_name]'],
+                            [$student->name, $exam->name, $school->name],
+                            $setting->sms_template ?: 'Result for [exam_name] has been published. Please check the portal. - [school_name]'
+                        );
+                        app(SmsService::class)->send($school, $student->contact_number, $message);
+                    }
+                }
+            }
 
             return response()->json([
                 'success'      => true,

@@ -9,6 +9,9 @@ use App\Models\Teacher;
 use App\Models\Attendance;
 use App\Models\Holiday;
 use App\Models\Section;
+use App\Models\CommunicationSetting;
+use App\Models\School;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\DB;
 class AttendanceController extends Controller
 {
@@ -101,6 +104,12 @@ class AttendanceController extends Controller
 
         try {
             foreach ($request->attendance as $studentId => $status) {
+                $existing = Attendance::where([
+                    'school_id' => $schoolId,
+                    'student_id' => $studentId,
+                    'date' => $attendanceDate,
+                ])->first();
+
                 Attendance::updateOrCreate(
                     [
                         'school_id'  => $schoolId,
@@ -114,6 +123,20 @@ class AttendanceController extends Controller
                         'status'     => $status,
                     ]
                 );
+
+                if ($status === 'absent' && (!$existing || $existing->status !== 'absent')) {
+                    $student = Student::where('school_id', $schoolId)->find($studentId);
+                    $setting = CommunicationSetting::where('school_id', $schoolId)->where('event', 'attendance')->first();
+                    $school = School::find($schoolId);
+                    if ($student && $school && $setting?->sms_enabled && $student->contact_number) {
+                        $message = str_replace(
+                            ['[student_name]', '[date]', '[status]', '[school_name]'],
+                            [$student->name, $attendanceDate, 'absent', $school->name],
+                            $setting->sms_template ?: 'Dear Parent, [student_name] was absent today ([date]). - [school_name]'
+                        );
+                        app(SmsService::class)->send($school, $student->contact_number, $message);
+                    }
+                }
             }
             return response()->json(['success' => true, 'message' => 'Attendance saved successfully!']);
         } catch (\Exception $e) {

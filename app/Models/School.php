@@ -83,6 +83,14 @@ class School extends Model
         'whatsapp_api_provider',
         'whatsapp_api_key',
         'whatsapp_api_instance_id',
+        'sms_api_provider',
+        'sms_api_url',
+        'sms_api_key',
+        'sms_api_secret',
+        'sms_sender_id',
+        'inbound_webhook_secret',
+        'inbound_webhook_enabled',
+        'imap_enabled', 'imap_host', 'imap_port', 'imap_username', 'imap_password', 'imap_encryption', 'imap_folder',
         'pro_email_status',
         'pro_email_address',
         'pro_email_password',
@@ -92,6 +100,12 @@ class School extends Model
         'admission_closed_message',
         'admission_close_date',
         'admission_academic_year_id',
+    ];
+
+    protected $casts = [
+        'inbound_webhook_enabled' => 'boolean',
+        'imap_enabled' => 'boolean',
+        'imap_password' => 'encrypted',
     ];
 
     public function admissionAcademicYear()

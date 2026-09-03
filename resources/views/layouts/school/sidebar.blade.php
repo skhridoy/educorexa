@@ -280,6 +280,7 @@
                         @endif
                         @if($hasFeature('message.manage'))
                             <li class="edu-sub-item"><a href="{{ route('admin.message.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/message*') ? 'active' : '' }}">{{ __('Website Messages') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('school.inbox.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/inbox*') ? 'active' : '' }}">{{ __('School Email Inbox') }}</a></li>
                         @endif
                         @if($hasFeature('newsletter.manage'))
                             <li class="edu-sub-item"><a href="{{ route('admin.newsletter.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/newsletter*') ? 'active' : '' }}">{{ __('Newsletter Subscribers') }}</a></li>

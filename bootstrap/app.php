@@ -7,6 +7,7 @@ use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Illuminate\Auth\AuthenticationException; // এই লাইনটি যোগ করুন
+use Illuminate\Console\Scheduling\Schedule;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException; // এই লাইনটিও যোগ করুন
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -31,6 +32,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => \App\Http\Middleware\IsAdmin::class,
             'school_package' => \App\Http\Middleware\CheckSchoolPackage::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('inbound-mail:poll')->everyMinute()->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
     

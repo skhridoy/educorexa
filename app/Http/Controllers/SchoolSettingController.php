@@ -12,6 +12,7 @@ class SchoolSettingController extends Controller
     {
         $schoolId = auth()->user()->school_id;
         $school = School::findOrFail($schoolId);
+
         return view('school.setting.api_setup', compact('school'));
     }
 
@@ -20,6 +21,10 @@ class SchoolSettingController extends Controller
         $schoolId = auth()->user()->school_id;
         $school = School::findOrFail($schoolId);
 
+        if (!$school->hasPackagePermission('sms.send') && ($request->filled('sms_api_provider') || $request->filled('sms_api_url') || $request->filled('sms_api_key'))) {
+            return back()->with('error', 'SMS API is available only with a package that includes SMS service.');
+        }
+
         $request->validate([
             'mail_host' => 'nullable|string',
             'mail_port' => 'nullable|numeric',
@@ -27,13 +32,41 @@ class SchoolSettingController extends Controller
             'mail_password' => 'nullable|string',
             'mail_from_address' => 'nullable|email',
             'whatsapp_api_key' => 'nullable|string',
+            'sms_api_provider' => 'nullable|in:generic,bulksmsbd,sslwireless',
+            'sms_api_url' => 'nullable|url|max:255',
+            'sms_api_key' => 'nullable|string',
+            'sms_api_secret' => 'nullable|string',
+            'sms_sender_id' => 'nullable|string|max:50',
+            'inbound_webhook_secret' => 'nullable|string|max:255',
+            'imap_host' => 'nullable|string|max:255',
+            'imap_port' => 'nullable|integer|min:1|max:65535',
+            'imap_username' => 'nullable|email|max:255',
+            'imap_password' => 'nullable|string',
+            'imap_encryption' => 'nullable|in:ssl,tls,none',
+            'imap_folder' => 'nullable|string|max:100',
         ]);
 
         $school->update($request->only([
             'mail_mailer', 'mail_host', 'mail_port', 'mail_username', 
             'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
             'whatsapp_api_provider', 'whatsapp_api_key', 'whatsapp_api_instance_id'
+            , 'sms_api_provider', 'sms_api_url', 'sms_api_key', 'sms_api_secret', 'sms_sender_id'
+            , 'imap_host', 'imap_port', 'imap_username', 'imap_encryption', 'imap_folder'
         ]));
+
+        if ($request->filled('imap_password')) {
+            $school->imap_password = $request->imap_password;
+        }
+        $school->imap_enabled = $request->boolean('imap_enabled');
+        $school->imap_port = $request->imap_port ?: 993;
+        $school->imap_encryption = $request->imap_encryption ?: 'ssl';
+        $school->imap_folder = $request->imap_folder ?: 'INBOX';
+
+        if ($request->filled('inbound_webhook_secret')) {
+            $school->inbound_webhook_secret = $request->inbound_webhook_secret;
+        }
+        $school->inbound_webhook_enabled = $request->boolean('inbound_webhook_enabled');
+        $school->save();
 
         return back()->with('success', 'API settings updated successfully!');
     }
@@ -100,6 +133,18 @@ class SchoolSettingController extends Controller
                     'sms' => "Notice: [notice_title]. Check portal for details. - [school_name]",
                     'whatsapp' => "Dear [student_name],\n*Notice:* [notice_title]\nPlease check the portal for details.\n- [school_name]"
                 ]
+            ],
+            'result_published' => [
+                'title' => 'Exam Result Published',
+                'icon' => 'fa-graduation-cap',
+                'color' => 'success',
+                'description' => 'Notify guardians when an exam result is published.',
+                'variables' => ['[student_name]', '[exam_name]', '[school_name]'],
+                'defaults' => [
+                    'email' => "Dear [student_name],\n\nThe result for [exam_name] has been published. Please check the student portal.\n\nRegards,\n[school_name]",
+                    'sms' => "Result for [exam_name] of [student_name] has been published. Please check the portal. - [school_name]",
+                    'whatsapp' => "Dear [student_name],\nThe result for [exam_name] has been published. Please check the portal.\n- [school_name]"
+                ]
             ]
         ];
 
@@ -136,6 +181,7 @@ class SchoolSettingController extends Controller
         // Check Permissions
         $canSendEmail = $school->hasPackagePermission('email.send');
         $canSendSms = $school->hasPackagePermission('sms.send');
+        $canSendWhatsapp = $school->hasPackagePermission('whatsapp.send');
 
         $setting = \App\Models\CommunicationSetting::where('school_id', $schoolId)
                     ->where('event', $request->event)
@@ -144,7 +190,7 @@ class SchoolSettingController extends Controller
         $setting->update([
             'email_enabled' => $canSendEmail ? $request->has('email_enabled') : false,
             'sms_enabled' => $canSendSms ? $request->has('sms_enabled') : false,
-            'whatsapp_enabled' => $canSendSms ? $request->has('whatsapp_enabled') : false,
+            'whatsapp_enabled' => $canSendWhatsapp ? $request->has('whatsapp_enabled') : false,
             'email_template' => $request->email_template,
             'sms_template' => $request->sms_template,
             'whatsapp_template' => $request->whatsapp_template,

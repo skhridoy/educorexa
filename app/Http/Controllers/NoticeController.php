@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Traits\SchoolMailConfig;
+use App\Services\SmsService;
+use App\Models\CommunicationSetting;
 
 class NoticeController extends Controller
 {
@@ -153,7 +155,7 @@ class NoticeController extends Controller
     {
         $school = School::where('slug', $tenant)->firstOrFail();
         $notice = Notice::where('school_id', $school->id)->findOrFail($id);
-        $method = $request->method_type; // 'email' or 'whatsapp'
+        $method = $request->method_type; // 'email', 'sms' or 'whatsapp'
         
         // Dynamically set Mail Config if school has SMTP settings
         if ($method === 'email' && $school->mail_host) {
@@ -187,6 +189,17 @@ class NoticeController extends Controller
                 if ($student->contact_number) {
                     $sent = $this->sendWhatsAppMessage($student->contact_number, $notice, $school);
                     if ($sent) $successCount++;
+                    else $failCount++;
+                }
+            } elseif ($method === 'sms') {
+                $setting = CommunicationSetting::where('school_id', $school->id)->where('event', 'notice')->first();
+                if ($setting?->sms_enabled && $student->contact_number) {
+                    $message = str_replace(
+                        ['[student_name]', '[notice_title]', '[school_name]'],
+                        [$student->name, $notice->title, $school->name],
+                        $setting->sms_template ?: 'Notice: [notice_title] - [school_name]'
+                    );
+                    if (app(SmsService::class)->send($school, $student->contact_number, $message)) $successCount++;
                     else $failCount++;
                 }
             }

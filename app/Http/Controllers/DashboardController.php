@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\PackageUpgraded;
 use \App\Models\Student;
 use \App\Models\SubscriptionPackage;
+use App\Services\SmsService;
 class DashboardController extends Controller
 {
 
@@ -210,8 +211,9 @@ class DashboardController extends Controller
         if ($smsEnabled && $fee->student && $fee->student->contact_number) {
             $smsTemplate = $setting->sms_template ?? "Dear [student_name], your [fee_name] of ৳[fee_amount] for [month] is unpaid. Please pay soon. - [school_name]";
             $smsMessage = $parseTemplate($smsTemplate);
-            // TODO: Integrate Actual SMS API here using $smsMessage
-            $sentVia[] = 'SMS';
+            if (app(SmsService::class)->send($fee->school, $fee->student->contact_number, $smsMessage)) {
+                $sentVia[] = 'SMS';
+            }
         }
 
         // Simulate WhatsApp

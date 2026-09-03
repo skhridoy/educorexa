@@ -26,6 +26,7 @@
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush rounded-bottom-4">
                         @foreach($events as $key => $eventData)
+                        @php $setting = $settings[$key]; @endphp
                         <div class="list-group-item p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                             <div class="d-flex align-items-center mb-3 mb-md-0">
                                 <div class="icon-box bg-{{ $eventData['color'] }}-subtle text-{{ $eventData['color'] }} rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; font-size: 1.25rem;">

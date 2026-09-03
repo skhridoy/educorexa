@@ -42,4 +42,8 @@ return [
         'root_domain' => env('CPANEL_ROOT_DOMAIN', 'educorexa.com'),
     ],
 
+    'inbound_mail' => [
+        'webhook_secret' => env('INBOUND_MAIL_WEBHOOK_SECRET'),
+    ],
+
 ];

@@ -121,6 +121,16 @@ class SettingController extends Controller
 
     public function updateApiSetup(Request $request) {
         $setting = SiteSetting::first() ?? new SiteSetting();
+
+        $request->validate([
+            'inbound_webhook_secret' => 'nullable|string|max:255',
+            'imap_host' => 'nullable|string|max:255',
+            'imap_port' => 'nullable|integer|min:1|max:65535',
+            'imap_username' => 'nullable|email|max:255',
+            'imap_password' => 'nullable|string',
+            'imap_encryption' => 'nullable|in:ssl,tls,none',
+            'imap_folder' => 'nullable|string|max:100',
+        ]);
         
         // --- SMTP Data Update ---
         $setting->mail_mailer = $request->mail_mailer ?? 'smtp';
@@ -133,6 +143,19 @@ class SettingController extends Controller
         $setting->mail_encryption = $request->mail_encryption;
         $setting->mail_from_address = $request->mail_from_address;
         $setting->mail_from_name = $request->mail_from_name;
+        if ($request->filled('inbound_webhook_secret')) {
+            $setting->inbound_webhook_secret = $request->inbound_webhook_secret;
+        }
+        $setting->inbound_webhook_enabled = $request->boolean('inbound_webhook_enabled');
+        $setting->imap_enabled = $request->boolean('imap_enabled');
+        $setting->imap_host = $request->imap_host;
+        $setting->imap_port = $request->imap_port ?: 993;
+        $setting->imap_username = $request->imap_username;
+        $setting->imap_encryption = $request->imap_encryption ?: 'ssl';
+        $setting->imap_folder = $request->imap_folder ?: 'INBOX';
+        if ($request->filled('imap_password')) {
+            $setting->imap_password = $request->imap_password;
+        }
 
         $setting->save();
 
