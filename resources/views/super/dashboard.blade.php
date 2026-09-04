@@ -106,7 +106,7 @@
                         </div>
                         <span class="stat-badge" style="background:#fef3c7;color:#d97706;">Pending</span>
                     </div>
-                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-label">Pending School Requests</div>
                     <div class="stat-value">{{ $pendingSchools }}</div>
                 </div>
             </div>
@@ -117,23 +117,25 @@
                         <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;">
                             <i class="fa-solid fa-sack-dollar"></i>
                         </div>
-                        <span class="stat-badge" style="background:#dcfce7;color:#16a34a;">+4.2%</span>
+                        <span class="stat-badge" style="background:#dcfce7;color:#16a34a;">Total: ৳{{ number_format($totalPackageRevenue, 0) }}</span>
                     </div>
-                    <div class="stat-label">Monthly Revenue</div>
-                    <div class="stat-value">৳ 0</div>
+                    <div class="stat-label">Monthly Package Revenue</div>
+                    <div class="stat-value" style="font-size:1.35rem; color:#16a34a;">৳ {{ number_format($monthlyPackageRevenue, 2) }}</div>
                 </div>
             </div>
 
             <div class="col-md-3 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="icon-wrap" style="background:#f5f3ff; color:#7c3aed;">
-                            <i class="fa-solid fa-users-gear"></i>
+                        <div class="icon-wrap" style="background:#fdf2f8; color:#db2777;">
+                            <i class="fa-solid fa-receipt"></i>
                         </div>
-                        <span class="stat-badge" style="background:#e0e7ff;color:#4338ca;">Active</span>
+                        <a href="{{ route('super.subscription-payments.index') }}" class="stat-badge" style="background:#fce7f3;color:#be185d;text-decoration:none;">
+                            {{ $pendingSubscriptionsCount }} Pending
+                        </a>
                     </div>
-                    <div class="stat-label">System Users</div>
-                    <div class="stat-value" style="font-size:1.4rem;color:#16a34a;">Online</div>
+                    <div class="stat-label">Pending Package Payments</div>
+                    <div class="stat-value" style="font-size:1.35rem; color:#be185d;">৳ {{ number_format($pendingSubscriptionsAmount, 2) }}</div>
                 </div>
             </div>
 
@@ -221,6 +223,114 @@
                 </div>
             </div>
 
+        {{-- ===== PACKAGE SUBSCRIPTIONS & REVENUE PANEL ===== --}}
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="schools-panel">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:36px;height:36px;background:#ecfdf5;color:#10b981;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fa-solid fa-sack-dollar"></i>
+                            </div>
+                            <div>
+                                <h6 class="panel-title mb-0">Recent Package Payments & Revenue</h6>
+                                <small class="text-muted">Subscription income and transaction verification</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if($pendingSubscriptionsCount > 0)
+                                <span class="badge bg-danger rounded-pill px-3 py-1.5" style="font-size:0.75rem;">
+                                    <i class="fa-solid fa-bell me-1"></i> {{ $pendingSubscriptionsCount }} Pending Approval
+                                </span>
+                            @endif
+                            <a href="{{ route('super.subscription-payments.index') }}" class="badge-indigo" style="text-decoration:none; font-size:0.75rem;">
+                                View All Payments <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table edu-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>School</th>
+                                    <th>Package</th>
+                                    <th>Method & Trx ID</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($recentSubscriptionPayments as $sub)
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ $sub->school->name ?? '—' }}</div>
+                                        <small class="text-muted">{{ $sub->school->slug ?? '' }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2.5 py-1 rounded-pill fw-semibold">
+                                            {{ $sub->package->name ?? 'Package' }} ({{ ucfirst($sub->package->duration ?? 'Yearly') }})
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div><strong>{{ strtoupper($sub->payment_method ?? 'bKash/Nagad') }}</strong></div>
+                                        <code style="font-size:0.78rem;color:#4f46e5;">{{ $sub->payment_reference }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold" style="color:#16a34a;font-size:0.95rem;">
+                                            ৳{{ number_format($sub->amount, 2) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ ($sub->paid_at ?? $sub->payment_submitted_at ?? $sub->updated_at)->format('d M Y, h:i A') }}</small>
+                                    </td>
+                                    <td>
+                                        @if($sub->status === 'active')
+                                            <span class="badge-active">Paid & Active</span>
+                                        @elseif($sub->status === 'pending')
+                                            <span class="badge" style="background:#fef3c7;color:#b45309;font-weight:700;font-size:0.75rem;padding:4px 10px;border-radius:20px;">
+                                                <i class="fa-solid fa-clock me-1"></i> Pending Review
+                                            </span>
+                                        @else
+                                            <span class="badge-inactive">{{ ucfirst($sub->status) }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($sub->status === 'pending')
+                                            <div class="d-flex justify-content-center gap-1">
+                                                <form action="{{ route('super.subscription-payments.approve', $sub) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success px-2.5 py-1" style="font-size:0.75rem;border-radius:6px;" title="Approve & Activate">
+                                                        <i class="fa-solid fa-check me-1"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('super.subscription-payments.reject', $sub) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="rejection_reason" value="Payment details unverified.">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-2.5 py-1" style="font-size:0.75rem;border-radius:6px;" title="Reject">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <span class="text-muted small"><i class="fa-solid fa-check-double text-success me-1"></i> Verified</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="fa-solid fa-receipt fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                                        No subscription payment transactions found yet.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- ===== LOCATION REGISTRATION ANALYSIS ===== --}}

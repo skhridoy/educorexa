@@ -9,15 +9,32 @@ use Illuminate\Http\Request;
 
 class SchoolSubscriptionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subscriptions = SchoolSubscription::with(['school', 'package'])
-            ->where('status', 'pending')
-            ->whereNotNull('payment_reference')
-            ->latest('payment_submitted_at')
-            ->get();
+        $tab = $request->query('tab', 'pending');
 
-        return view('super.school-subscriptions.index', compact('subscriptions'));
+        $query = SchoolSubscription::with(['school', 'package', 'reviewer'])
+            ->whereNotNull('payment_reference');
+
+        if ($tab === 'pending') {
+            $query->where('status', 'pending');
+        } elseif ($tab === 'approved') {
+            $query->where('status', 'active')->whereNotNull('paid_at');
+        } elseif ($tab === 'rejected') {
+            $query->where('status', 'cancelled');
+        }
+
+        $subscriptions = $query->latest('updated_at')->paginate(20)->withQueryString();
+
+        $pendingCount = SchoolSubscription::where('status', 'pending')->whereNotNull('payment_reference')->count();
+        $approvedCount = SchoolSubscription::where('status', 'active')->whereNotNull('paid_at')->count();
+        $rejectedCount = SchoolSubscription::where('status', 'cancelled')->whereNotNull('payment_reference')->count();
+        $totalRevenue = (float) SchoolSubscription::where('status', 'active')->whereNotNull('paid_at')->sum('amount');
+        $pendingRevenue = (float) SchoolSubscription::where('status', 'pending')->whereNotNull('payment_reference')->sum('amount');
+
+        return view('super.school-subscriptions.index', compact(
+            'subscriptions', 'tab', 'pendingCount', 'approvedCount', 'rejectedCount', 'totalRevenue', 'pendingRevenue'
+        ));
     }
 
     public function approve(Request $request, SchoolSubscription $subscription)

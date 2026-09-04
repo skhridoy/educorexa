@@ -236,19 +236,46 @@
         {{-- ===== STAT CARDS ===== --}}
         <div class="row g-4 mb-4">
 
-            <div class="col-md-3 col-6">
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;">
                             <i class="fa-solid fa-sack-dollar"></i>
                         </div>
-                        <span class="stat-badge" style="background:#dcfce7;color:#16a34a;">Collected</span>
+                        <span class="stat-badge" style="background:#dcfce7;color:#16a34a;">Net Collected</span>
                     </div>
-                    <div class="stat-label">Total Earning</div>
+                    <div class="stat-label">Total Earning (Net)</div>
                     <div class="stat-value">৳{{ number_format($totalCollected, 0) }}</div>
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="icon-wrap" style="background:#fef2f2; color:#ef4444;">
+                            <i class="fa-solid fa-tags"></i>
+                        </div>
+                        <span class="stat-badge" style="background:#fee2e2;color:#dc2626;">মাসে ৳{{ number_format($currentMonthDiscount ?? 0, 0) }}</span>
+                    </div>
+                    <div class="stat-label">Total Discount (ছাড়)</div>
+                    <div class="stat-value text-danger">৳{{ number_format($totalDiscountGiven ?? 0, 0) }}</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 col-6">
+                <div class="edu-stat-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="icon-wrap" style="background:#eff6ff; color:#2563eb;">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <span class="stat-badge" style="background:#dbeafe;color:#1d4ed8;">{{ $activeConcessionsCount ?? 0 }} Concessions</span>
+                    </div>
+                    <div class="stat-label">Discounted Students</div>
+                    <div class="stat-value">{{ $discountedStudentsCount ?? 0 }}</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#fff7ed; color:#ea580c;">
@@ -260,7 +287,8 @@
                     <div class="stat-value">৳{{ number_format($totalExpected, 0) }}</div>
                 </div>
             </div>
-            <div class="col-md-3 col-6">
+
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#eff6ff; color:#3b82f6;">
@@ -273,7 +301,7 @@
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#fef3c7; color:#d97706;">
@@ -286,7 +314,7 @@
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;">
@@ -299,7 +327,7 @@
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
+            <div class="col-xl-3 col-md-6 col-6">
                 <div class="edu-stat-card">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div class="icon-wrap" style="background:#f5f3ff; color:#7c3aed;">
@@ -329,9 +357,15 @@
                         </span>
                         <i class="fa-solid fa-arrow-right arrow"></i>
                     </a>
-                    <a href="{{ route('teachers.create') ?? '#' }}" class="quick-action-btn">
+                    <a href="{{ route('payment.index', ['tenant' => app('currentSchool')->slug]) }}" class="quick-action-btn">
                         <span class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-person-chalkboard"></i> Add New Teacher
+                            <i class="fa-solid fa-hand-holding-dollar"></i> Collect Student Fee
+                        </span>
+                        <i class="fa-solid fa-arrow-right arrow"></i>
+                    </a>
+                    <a href="{{ route('student-fee-concessions.index', ['tenant' => app('currentSchool')->slug]) }}" class="quick-action-btn">
+                        <span class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-tags"></i> Fee Concessions (মাইনাস ফি)
                         </span>
                         <i class="fa-solid fa-arrow-right arrow"></i>
                     </a>

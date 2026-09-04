@@ -174,6 +174,15 @@ class School extends Model
         return (bool) $this->activeSubscription();
     }
 
+    public function pendingSubscription(): ?SchoolSubscription
+    {
+        return $this->subscriptions()
+            ->where('status', 'pending')
+            ->whereNotNull('payment_reference')
+            ->latest('id')
+            ->first();
+    }
+
     /**
      * Check if the school's current package allows a specific permission.
      */

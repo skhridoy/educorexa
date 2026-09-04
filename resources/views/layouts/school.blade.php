@@ -211,6 +211,7 @@
         @include('layouts.school.sidebar')
         <div class="page-wrapper">
             @include('layouts.school.header')
+            @include('layouts.school._subscription_alert')
             @yield('content')
             @include('layouts.footer')
         </div>

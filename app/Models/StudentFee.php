@@ -59,13 +59,32 @@ class StudentFee extends Model
         'school_sub_category_id',
         'fee_head_id',
         'amount',
+        'original_amount',
+        'discount_amount',
+        'discount_percent',
+        'paid_amount',
+        'discount_note',
         'month',
         'status',
         'collected_by',
         'payment_method',
         'due_date',
-        'receipt_no'
+        'receipt_no',
+        'fee_type_limit',
     ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'original_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'discount_percent' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+    ];
+
+    public function getGrossAmountAttribute(): float
+    {
+        return (float) ($this->original_amount ?: $this->amount);
+    }
 
     /**
      * যে স্টুডেন্টের এই ফি।

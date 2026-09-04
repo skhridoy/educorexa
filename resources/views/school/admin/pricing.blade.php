@@ -13,17 +13,26 @@
                     <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill">
                         Current Plan: {{ $currentSchool->subscriptionPackage->name ?? 'Basic' }}
                     </span>
-                    @if($activeSubscription)
-                        <span class="badge bg-success px-3 py-2 rounded-pill ms-1">
+                    @if($pendingSubscription && $pendingSubscription->payment_reference)
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill ms-1">
+                            <i data-feather="clock" class="icon-sm me-1" style="width:13px;height:13px;"></i> Payment Under Review ({{ $pendingSubscription->package->name ?? 'Package' }})
+                        </span>
+                    @elseif($activeSubscription)
+                        @php
+                            $daysLeft = $activeSubscription->daysRemaining();
+                            $expDate = $activeSubscription->getExpiryDate();
+                        @endphp
+                        <span class="badge {{ $activeSubscription->isExpiringSoon(15) ? 'bg-warning text-dark' : 'bg-success' }} px-3 py-2 rounded-pill ms-1">
                             {{ $activeSubscription->status === 'trialing' ? '7-Day Free Trial' : 'Active' }}
-                            @if($activeSubscription->status === 'trialing')
-                                · {{ $activeSubscription->trial_ends_at->format('d M Y') }}
-                            @elseif($activeSubscription->ends_at)
-                                · {{ $activeSubscription->ends_at->format('d M Y') }}
+                            @if($expDate)
+                                · Expires {{ $expDate->format('d M Y') }}
+                                @if($daysLeft !== null)
+                                    ({{ $daysLeft == 0 ? 'Today' : ($daysLeft == 1 ? '1 day left' : $daysLeft . ' days left') }})
+                                @endif
                             @endif
                         </span>
                     @else
-                        <span class="badge bg-danger px-3 py-2 rounded-pill ms-1">Payment Required</span>
+                        <span class="badge bg-danger px-3 py-2 rounded-pill ms-1">Payment Required / Expired</span>
                     @endif
                 </div>
             </div>
@@ -31,9 +40,16 @@
 
         <div class="row justify-content-center">
             @foreach($packages as $package)
+            @php
+                $isCurrent = ($package->id == $currentSchool->subscription_package_id);
+                $isPendingThis = ($pendingSubscription && $pendingSubscription->subscription_package_id == $package->id && $pendingSubscription->payment_reference);
+                $canRenewCurrent = ($activeSubscription && $activeSubscription->canRenew(15)) || !$activeSubscription;
+            @endphp
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card h-100 border-0 shadow-sm pricing-card {{ $package->is_popular ? 'popular' : '' }}">
-                    @if($package->is_popular)
+                <div class="card h-100 border-0 shadow-sm pricing-card {{ $isCurrent ? 'current-card' : '' }} {{ $package->is_popular ? 'popular' : '' }}">
+                    @if($isCurrent)
+                        <div class="current-plan-tag">Current Plan</div>
+                    @elseif($package->is_popular)
                         <div class="popular-tag">Most Popular</div>
                     @endif
                     <div class="card-body p-4 d-flex flex-column">
@@ -50,11 +66,11 @@
                         <ul class="list-unstyled mb-5 flex-grow-1">
                             <li class="mb-3 d-flex align-items-center">
                                 <i data-feather="check-circle" class="text-success me-2 icon-sm"></i>
-                                <span>{{ $package->student_limit }} Students</span>
+                                <span>{{ $package->student_limit ?? 'Unlimited' }} Students</span>
                             </li>
                             <li class="mb-3 d-flex align-items-center">
                                 <i data-feather="check-circle" class="text-success me-2 icon-sm"></i>
-                                <span>{{ $package->teacher_limit }} Teachers</span>
+                                <span>{{ $package->teacher_limit ?? 'Unlimited' }} Teachers</span>
                             </li>
                             @if($package->features)
                                 @foreach($package->features as $feature)
@@ -67,17 +83,40 @@
                         </ul>
 
                         <div class="d-grid">
-                            <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="package_id" value="{{ $package->id }}">
-                                <button type="submit" class="btn {{ $package->id == $currentSchool->subscription_package_id ? 'btn-primary' : ($package->is_popular ? 'btn-primary' : 'btn-outline-primary') }} ripple-effect w-100">
-                                    @if($package->id == $currentSchool->subscription_package_id)
-                                        <i data-feather="credit-card" class="me-1 icon-sm"></i> Pay Now
-                                    @else
-                                        <i data-feather="arrow-up" class="me-1 icon-sm"></i> Upgrade Now
-                                    @endif
+                            @if($isPendingThis)
+                                <button type="button" class="btn btn-warning w-100 fw-bold" disabled style="opacity: 0.9; cursor: not-allowed;">
+                                    <i data-feather="clock" class="me-1 icon-sm"></i> Verification Pending
                                 </button>
-                            </form>
+                            @elseif($isCurrent)
+                                @if($activeSubscription && $activeSubscription->status === 'active' && !$activeSubscription->isExpiringSoon(15))
+                                    {{-- Paid and Active with > 15 days left: Pay Now is DISABLED --}}
+                                    <button type="button" class="btn btn-secondary w-100 fw-bold" disabled style="opacity: 0.75; cursor: not-allowed;">
+                                        <i data-feather="check-circle" class="me-1 icon-sm"></i> Current Active Plan
+                                    </button>
+                                @else
+                                    {{-- Within 15-day renewal window OR expired / trial: ENABLED to Renew / Pay --}}
+                                    <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                        <button type="submit" class="btn {{ $activeSubscription ? 'btn-primary' : 'btn-danger' }} ripple-effect w-100 fw-bold">
+                                            @if($activeSubscription && $activeSubscription->isExpiringSoon(15))
+                                                <i data-feather="rotate-cw" class="me-1 icon-sm"></i> Renew Plan
+                                            @else
+                                                <i data-feather="credit-card" class="me-1 icon-sm"></i> Pay Now
+                                            @endif
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                {{-- Other package: Upgrade / Switch option --}}
+                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <button type="submit" class="btn {{ $package->is_popular ? 'btn-primary' : 'btn-outline-primary' }} ripple-effect w-100 fw-bold">
+                                        <i data-feather="arrow-up" class="me-1 icon-sm"></i> Upgrade Now
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -101,11 +140,26 @@
     .pricing-card.popular {
         border: 2px solid var(--table-header) !important;
     }
+    .pricing-card.current-card {
+        border: 2px solid #22c55e !important;
+    }
     .popular-tag {
         position: absolute;
         top: 20px;
         right: -35px;
         background: var(--table-header);
+        color: white;
+        padding: 5px 40px;
+        transform: rotate(45deg);
+        font-size: 0.7rem;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .current-plan-tag {
+        position: absolute;
+        top: 20px;
+        right: -35px;
+        background: #16a34a;
         color: white;
         padding: 5px 40px;
         transform: rotate(45deg);

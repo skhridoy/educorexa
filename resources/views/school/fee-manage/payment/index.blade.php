@@ -341,9 +341,9 @@
                     </div>
                     @endif
                 </div>
-                {{-- Summary Stats --}}
+                {{-- Summary Stats & Concession Button --}}
                 <div class="px-3 px-sm-4 pb-3 pb-sm-4">
-                    <div class="row g-2">
+                    <div class="row g-2 mb-3">
                         <div class="col-6">
                             <div style="background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-radius:12px;padding:12px;text-align:center;">
                                 <div style="font-size:20px;font-weight:800;color:#ef4444;">{{ $unpaidFees->count() }}</div>
@@ -357,6 +357,10 @@
                             </div>
                         </div>
                     </div>
+                    <a href="{{ route('student-fee-concessions.index', ['tenant' => auth()->user()->school->slug, 'student_id' => $student->student_id]) }}" 
+                       class="btn btn-outline-primary btn-sm w-100 fw-bold py-2" style="border-radius:10px;">
+                        <i class="fa-solid fa-tags me-1"></i> {{ __('মাইনাস ফি / Concession সেট করুন') }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -405,12 +409,21 @@
                                     </td>
                                     <td class="py-3">
                                         <div class="fw-semibold text-dark">{{ $fee->feeHead->name }}</div>
-                                        <div style="font-size:11px;color:#94a3b8;">Academic Fee Record</div>
+                                        @if(($fee->discount_amount && $fee->discount_amount > 0) || ($fee->original_amount && $fee->original_amount > $fee->amount))
+                                            <span class="badge bg-warning-subtle text-dark border" style="font-size:10px;">
+                                                <i class="fa-solid fa-tag me-1 text-warning"></i>পূর্ব নির্ধারিত ছাড়: ৳ {{ number_format($fee->discount_amount, 2) }}
+                                            </span>
+                                        @else
+                                            <div style="font-size:11px;color:#94a3b8;">Academic Fee Record</div>
+                                        @endif
                                     </td>
                                     <td>
                                         <span style="background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;">{{ $fee->month }}</span>
                                     </td>
                                     <td class="text-end pe-3 pe-sm-4 fw-bold" style="color:#ef4444;font-size:14px;" data-amount="{{ $fee->amount }}">
+                                        @if($fee->original_amount && $fee->original_amount > $fee->amount)
+                                            <small class="text-decoration-line-through text-muted me-1" style="font-size:11px;">৳{{ number_format($fee->original_amount, 2) }}</small>
+                                        @endif
                                         ৳ {{ number_format($fee->amount, 2) }}
                                     </td>
                                 </tr>
@@ -429,25 +442,63 @@
                         </table>
                     </div>
 
-                    {{-- Payment Footer --}}
+                    {{-- Collection & Discount Controls Footer --}}
                     @if($unpaidFees->count() > 0)
-                    <div class="payment-footer">
-                        <div class="payment-footer-total">
-                            <div style="font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">{{ __('Total Selected') }}</div>
-                            <div class="total-amount-display">৳ <span id="selected-total">0.00</span></div>
+                    <div class="p-3" style="background:#f8fafc; border-top:1.5px solid #f1f5f9;">
+                        {{-- Discount Controls --}}
+                        <div class="row g-3 align-items-center mb-3 p-2 bg-white rounded-3 border">
+                            <div class="col-md-5">
+                                <label class="form-label text-muted small fw-bold mb-1">
+                                    <i class="fa-solid fa-percent text-primary me-1"></i>{{ __('কালেকশন ডিস্কাউন্ট / ছাড় (% বা ৳)') }}
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <select name="discount_type" id="discount_type" class="form-select form-select-sm" style="max-width:110px;" onchange="updateTotal()">
+                                        <option value="percent">% Percent</option>
+                                        <option value="fixed">৳ Fixed</option>
+                                    </select>
+                                    <input type="number" step="0.01" min="0" name="discount_value" id="discount_value" 
+                                           class="form-control form-control-sm" placeholder="e.g. 10" 
+                                           oninput="updateTotal()">
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <label class="form-label text-muted small fw-bold mb-1">{{ __('ছাড়ের বিবরণ / নোট (ঐচ্ছিক)') }}</label>
+                                <input type="text" name="discount_note" class="form-control form-control-sm" placeholder="e.g. বিশেষ বিবেচনায় ১০% ছাড় প্রদান করা হলো">
+                            </div>
                         </div>
-                        <div class="payment-footer-actions d-flex align-items-center gap-2 gap-sm-3 flex-wrap">
-                            <select name="payment_method" class="form-select select-method">
-                                <option value="cash">💵 Cash</option>
-                                <option value="bkash">📱 bKash</option>
-                                <option value="nagad">📱 Nagad</option>
-                            </select>
-                            <button type="button" class="btn-collect" onclick="handleBulkPaymentClick(event)">
-                                <span style="width:22px;height:22px;background:rgba(255,255,255,0.22);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">
-                                    <i class="fa-solid fa-check" style="font-size:11px;"></i>
-                                </span>
-                                {{ __('Collect Payment') }}
-                            </button>
+
+                        {{-- Calculation & Action Bar --}}
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-3" style="font-size:13px;">
+                                    <div>
+                                        <span class="text-muted">মোট ফি:</span> 
+                                        <strong class="text-dark">৳ <span id="gross-total-display">0.00</span></strong>
+                                    </div>
+                                    <div id="discount-breakdown-display" style="display:none;">
+                                        <span class="text-danger fw-bold">ছাড়:</span> 
+                                        <strong class="text-danger">- ৳ <span id="discount-amount-display">0.00</span> (<span id="discount-percent-display">0</span>%)</strong>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="text-muted small fw-bold text-uppercase">{{ __('Net Payable') }}:</span>
+                                    <span class="total-amount-display" style="font-size:22px;">৳ <span id="selected-total">0.00</span></span>
+                                </div>
+                            </div>
+
+                            <div class="payment-footer-actions d-flex align-items-center gap-2 gap-sm-3 flex-wrap">
+                                <select name="payment_method" class="form-select select-method">
+                                    <option value="cash">💵 Cash</option>
+                                    <option value="bkash">📱 bKash</option>
+                                    <option value="nagad">📱 Nagad</option>
+                                </select>
+                                <button type="button" class="btn-collect" onclick="handleBulkPaymentClick(event)">
+                                    <span style="width:22px;height:22px;background:rgba(255,255,255,0.22);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">
+                                        <i class="fa-solid fa-check" style="font-size:11px;"></i>
+                                    </span>
+                                    {{ __('Collect Payment') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @endif
@@ -524,11 +575,47 @@
     }
 
     function updateTotal() {
-        let total = 0;
+        let grossTotal = 0;
         document.querySelectorAll('.fee-checkbox:checked').forEach(cb => {
-            total += parseFloat(cb.closest('tr').querySelector('td[data-amount]').getAttribute('data-amount'));
+            grossTotal += parseFloat(cb.closest('tr').querySelector('td[data-amount]').getAttribute('data-amount')) || 0;
         });
-        document.getElementById('selected-total').innerText = total.toFixed(2);
+
+        let grossElem = document.getElementById('gross-total-display');
+        if (grossElem) grossElem.innerText = grossTotal.toFixed(2);
+
+        let discountType = document.getElementById('discount_type') ? document.getElementById('discount_type').value : 'percent';
+        let discountValue = document.getElementById('discount_value') ? (parseFloat(document.getElementById('discount_value').value) || 0) : 0;
+
+        let discountAmount = 0;
+        let discountPercent = 0;
+
+        if (discountValue > 0 && grossTotal > 0) {
+            if (discountType === 'percent') {
+                discountPercent = Math.min(100, discountValue);
+                discountAmount = (grossTotal * discountPercent) / 100;
+            } else {
+                discountAmount = Math.min(grossTotal, discountValue);
+                discountPercent = (discountAmount / grossTotal) * 100;
+            }
+        }
+
+        let netTotal = Math.max(0, grossTotal - discountAmount);
+
+        let discountBox = document.getElementById('discount-breakdown-display');
+        if (discountBox) {
+            if (discountAmount > 0) {
+                discountBox.style.display = 'block';
+                document.getElementById('discount-amount-display').innerText = discountAmount.toFixed(2);
+                document.getElementById('discount-percent-display').innerText = discountPercent.toFixed(1);
+            } else {
+                discountBox.style.display = 'none';
+            }
+        }
+
+        let selectedTotalElem = document.getElementById('selected-total');
+        if (selectedTotalElem) {
+            selectedTotalElem.innerText = netTotal.toFixed(2);
+        }
     }
 
     function handleBulkPaymentClick(event) {
@@ -539,9 +626,16 @@
             return;
         }
         let totalAmt = document.getElementById('selected-total').innerText;
+        let discountBox = document.getElementById('discount-breakdown-display');
+        let hasDiscount = discountBox && discountBox.style.display !== 'none';
+        let discountText = hasDiscount ? `<div style="font-size:13px;color:#ef4444;margin-bottom:4px;">(ছাড় অন্তর্ভুক্ত রয়েছে)</div>` : '';
+
         Swal.fire({
             title: 'Confirm Payment',
-            html: `<div style="font-size:15px;color:#475569;margin:8px 0">Received total <strong style="color:#10b981;font-size:18px;">৳ ${totalAmt}</strong> for <strong>${selectedCount}</strong> fee(s)?</div>`,
+            html: `<div style="font-size:15px;color:#475569;margin:8px 0">
+                    ${discountText}
+                    Received total <strong style="color:#10b981;font-size:20px;">৳ ${totalAmt}</strong> for <strong>${selectedCount}</strong> fee item(s)?
+                   </div>`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#10b981',
@@ -564,7 +658,7 @@
         icon: '{{ session('type', 'success') }}',
         title: '{{ session('type') == 'success' ? 'Collected!' : 'Failed!' }}',
         text: '{{ session('success') }}',
-        timer: 2000,
+        timer: 2500,
         showConfirmButton: false,
         timerProgressBar: true
     }).then(() => {

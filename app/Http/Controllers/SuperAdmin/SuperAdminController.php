@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Mail\SchoolApprovedMail;
 use App\Mail\ProfessionalEmailDetailsMail;
 use Illuminate\Support\Facades\Mail;
+use App\Models\SchoolSubscription;
 use App\Services\MailServerService;
 use App\Services\SubscriptionBillingService;
 
@@ -52,9 +53,26 @@ class SuperAdminController extends Controller
                                ->take(5)
                                ->get();
 
+        // 💰 Package Revenue & Subscription Analytics
+        $totalPackageRevenue = (float) SchoolSubscription::where('status', 'active')->whereNotNull('paid_at')->sum('amount');
+        $monthlyPackageRevenue = (float) SchoolSubscription::where('status', 'active')
+            ->whereNotNull('paid_at')
+            ->whereMonth('paid_at', now()->month)
+            ->whereYear('paid_at', now()->year)
+            ->sum('amount');
+        $pendingSubscriptionsCount = SchoolSubscription::where('status', 'pending')->whereNotNull('payment_reference')->count();
+        $pendingSubscriptionsAmount = (float) SchoolSubscription::where('status', 'pending')->whereNotNull('payment_reference')->sum('amount');
+        $recentSubscriptionPayments = SchoolSubscription::with(['school', 'package'])
+            ->whereNotNull('payment_reference')
+            ->latest('updated_at')
+            ->take(6)
+            ->get();
+
         return view('super.dashboard', compact(
             'pendingSchools', 'totalSchools', 'recentSchools', 'upcomingEvents',
-            'mainDomain', 'schoolsByDivision', 'schoolsByDistrict', 'schoolsWithoutLocation'
+            'mainDomain', 'schoolsByDivision', 'schoolsByDistrict', 'schoolsWithoutLocation',
+            'totalPackageRevenue', 'monthlyPackageRevenue', 'pendingSubscriptionsCount',
+            'pendingSubscriptionsAmount', 'recentSubscriptionPayments'
         ));
     }
 

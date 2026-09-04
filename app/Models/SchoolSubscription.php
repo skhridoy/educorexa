@@ -71,4 +71,39 @@ class SchoolSubscription extends Model
 
         return $expiry instanceof Carbon && $expiry->isPast();
     }
+
+    public function getExpiryDate(): ?Carbon
+    {
+        return $this->status === 'trialing' ? $this->trial_ends_at : $this->ends_at;
+    }
+
+    public function daysRemaining(): ?int
+    {
+        $expiry = $this->getExpiryDate();
+        if (!$expiry) {
+            return null;
+        }
+
+        // Return positive days left if future, 0 or negative if today/past
+        return (int) ceil(now()->diffInSeconds($expiry, false) / 86400);
+    }
+
+    public function isExpiringSoon(int $days = 15): bool
+    {
+        if (!$this->isEntitled()) {
+            return false;
+        }
+
+        $remaining = $this->daysRemaining();
+        return $remaining !== null && $remaining <= $days && $remaining >= 0;
+    }
+
+    public function canRenew(int $days = 15): bool
+    {
+        if ($this->hasExpired() || $this->status === 'trialing') {
+            return true;
+        }
+
+        return $this->isExpiringSoon($days);
+    }
 }

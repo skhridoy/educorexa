@@ -59,7 +59,10 @@ class PaymentController extends Controller
             $request->validate([
                 'fee_ids' => 'required|array',
                 'fee_ids.*' => 'exists:student_fees,id',
-                'payment_method' => 'required|string'
+                'payment_method' => 'required|string',
+                'discount_type' => 'nullable|in:percent,fixed',
+                'discount_value' => 'nullable|numeric|min:0',
+                'discount_note' => 'nullable|string|max:255'
             ]);
 
             $fees = StudentFee::whereIn('id', $request->fee_ids)
@@ -71,20 +74,68 @@ class PaymentController extends Controller
                 return back()->with(['success' => 'কোনো ফি সিলেক্ট করা হয়নি বা ইতোমধ্যে পরিশোধিত!', 'type' => 'error']);
             }
 
+            $grossTotal = $fees->sum('amount');
+            $discountType = $request->discount_type ?? 'percent';
+            $discountValue = floatval($request->discount_value ?? 0);
+            $discountNote = $request->discount_note;
+
+            $totalDiscount = 0;
+            $discountPercent = 0;
+            if ($discountValue > 0 && $grossTotal > 0) {
+                if ($discountType === 'percent') {
+                    $discountPercent = min(100, $discountValue);
+                    $totalDiscount = round(($grossTotal * $discountPercent) / 100, 2);
+                } else {
+                    $totalDiscount = min($grossTotal, round($discountValue, 2));
+                    $discountPercent = round(($totalDiscount / $grossTotal) * 100, 2);
+                }
+            }
+
             $receiptNo = 'R' . date('md') . '-' . strtoupper(substr(uniqid(), -4));
+            $runningDiscountDistributed = 0;
+            $count = $fees->count();
+            $index = 0;
 
             foreach($fees as $fee) {
+                $index++;
+                $origAmt = ($fee->original_amount && $fee->original_amount > 0) ? $fee->original_amount : $fee->amount;
+                $feeDiscount = 0;
+
+                if ($totalDiscount > 0) {
+                    if ($index === $count) {
+                        // Ensure exact rounding total for last element
+                        $feeDiscount = round($totalDiscount - $runningDiscountDistributed, 2);
+                    } else {
+                        $feeDiscount = round(($fee->amount / $grossTotal) * $totalDiscount, 2);
+                        $runningDiscountDistributed += $feeDiscount;
+                    }
+                }
+
+                $totalItemDiscount = ($fee->discount_amount ?? 0) + $feeDiscount;
+                $finalPaid = max(0, round($fee->amount - $feeDiscount, 2));
+
                 $fee->update([
                     'status' => 'paid',
+                    'original_amount' => $origAmt,
+                    'discount_amount' => $totalItemDiscount,
+                    'discount_percent' => $discountPercent > 0 ? $discountPercent : ($fee->discount_percent ?? 0),
+                    'paid_amount' => $finalPaid,
+                    'amount' => $finalPaid, // Collected amount ensures no residual dues
                     'payment_method' => $request->payment_method,
                     'collected_by' => $user->id,
                     'receipt_no' => $receiptNo,
+                    'discount_note' => $discountNote,
                     'updated_at' => now()
                 ]);
             }
 
+            $successMessage = 'টাকা সফলভাবে জমা নেওয়া হয়েছে!';
+            if ($totalDiscount > 0) {
+                $successMessage .= ' (ছাড়: ৳ ' . number_format($totalDiscount, 2) . ')';
+            }
+
             return back()->with([
-                'success' => 'টাকা সফলভাবে জমা নেওয়া হয়েছে!',
+                'success' => $successMessage,
                 'type' => 'success',
                 'print_receipt_url' => route('payment.receiptMultiple', ['tenant' => $tenant, 'receipt_no' => $receiptNo])
             ]);
@@ -102,19 +153,43 @@ class PaymentController extends Controller
         try {
             $user = auth()->user();
             
-            // ১. ফি রেকর্ডটি খুঁজে বের করা
             $fee = StudentFee::where('id', $id)
                             ->where('school_id', $user->school_id)
                             ->firstOrFail();
 
             $receiptNo = 'R' . date('md') . '-' . strtoupper(substr(uniqid(), -4));
 
-            // ডাটা আপডেট করা
+            $discountType = $request->discount_type ?? 'percent';
+            $discountValue = floatval($request->discount_value ?? 0);
+            $discountNote = $request->discount_note;
+
+            $discountAmt = 0;
+            $discountPercent = 0;
+            if ($discountValue > 0 && $fee->amount > 0) {
+                if ($discountType === 'percent') {
+                    $discountPercent = min(100, $discountValue);
+                    $discountAmt = round(($fee->amount * $discountPercent) / 100, 2);
+                } else {
+                    $discountAmt = min($fee->amount, round($discountValue, 2));
+                    $discountPercent = round(($discountAmt / $fee->amount) * 100, 2);
+                }
+            }
+
+            $origAmt = ($fee->original_amount && $fee->original_amount > 0) ? $fee->original_amount : $fee->amount;
+            $totalItemDiscount = ($fee->discount_amount ?? 0) + $discountAmt;
+            $finalPaid = max(0, round($fee->amount - $discountAmt, 2));
+
             $fee->update([
                 'status' => 'paid',
+                'original_amount' => $origAmt,
+                'discount_amount' => $totalItemDiscount,
+                'discount_percent' => $discountPercent > 0 ? $discountPercent : ($fee->discount_percent ?? 0),
+                'paid_amount' => $finalPaid,
+                'amount' => $finalPaid,
                 'payment_method' => $request->payment_method ?? 'cash',
                 'collected_by' => $user->id,
                 'receipt_no' => $receiptNo,
+                'discount_note' => $discountNote,
                 'updated_at' => now()
             ]);
 
@@ -126,7 +201,6 @@ class PaymentController extends Controller
             
         } catch (\Exception $e) {
             return back()->with([
-                // এরর মেসেজ দেখার জন্য $e->getMessage() রাখা হয়েছে
                 'success' => 'কিছু একটা সমস্যা হয়েছে: ' . $e->getMessage(),
                 'type' => 'error'
             ]);
@@ -155,6 +229,10 @@ class PaymentController extends Controller
         $school = DB::table('schools')->find($schoolId);
         
         $totalAmount = $fees->sum('amount');
+        $subTotal = $fees->sum(function($item) {
+            return ($item->original_amount && $item->original_amount > $item->amount) ? $item->original_amount : ($item->amount + ($item->discount_amount ?? 0));
+        });
+        $totalDiscount = $fees->sum('discount_amount');
         
         $data = [
             'fees' => $fees,
@@ -162,12 +240,21 @@ class PaymentController extends Controller
             'student' => $student,
             'receiptNo' => str_starts_with($receiptNo, 'single_') ? ('R' . str_replace('single_', '', $receiptNo)) : $receiptNo,
             'schoolLogo' => $school->logo ?? 'no-logo.png',
+            'subTotal' => $subTotal,
+            'totalDiscount' => $totalDiscount,
+            'totalAmount' => $totalAmount,
             'amountInWords' => $this->amountInWords($totalAmount),
         ];
         $data['software'] = "Educorexa";
         $data['softwareVersion'] = "1.0.0"; 
 
-        $pdf = Pdf::loadView('school.fee-manage.payment.receipt_pdf', $data)->setOptions(['isRemoteEnabled' => true, 'dpi' => 72, 'isFontSubsetting' => true, 'isHtml5Parser' => true]);
+        $pdf = Pdf::loadView('school.fee-manage.payment.receipt_pdf', $data)->setOptions([
+            'isRemoteEnabled' => true,
+            'dpi' => 72,
+            'isFontSubsetting' => true,
+            'isHtml5Parser' => true,
+            'defaultFont' => 'SolaimanLipi'
+        ]);
         return $pdf->download('receipt-'.$data['receiptNo'].'.pdf');
     }
 
@@ -177,18 +264,30 @@ class PaymentController extends Controller
         $fee = StudentFee::with(['student.class', 'feeHead', 'school', 'collector'])->findOrFail($id);
         $school = DB::table('schools')->find($schoolId);
         
+        $subTotal = ($fee->original_amount && $fee->original_amount > $fee->amount) ? $fee->original_amount : ($fee->amount + ($fee->discount_amount ?? 0));
+        $totalDiscount = $fee->discount_amount ?? 0;
+
         $data = [
-            'fees' => collect([$fee]), // Make it a collection so the view can loop it
+            'fees' => collect([$fee]),
             'school' => $school,
             'student' => $fee->student,
             'receiptNo' => $fee->receipt_no ?? ('R' . $fee->id),
             'schoolLogo' => $school->logo ?? 'no-logo.png',
+            'subTotal' => $subTotal,
+            'totalDiscount' => $totalDiscount,
+            'totalAmount' => $fee->amount,
             'amountInWords' => $this->amountInWords($fee->amount),
         ];
         $data['software'] = "Educorexa";
         $data['softwareVersion'] = "1.0.0"; 
 
-        $pdf = Pdf::loadView('school.fee-manage.payment.receipt_pdf', $data)->setOptions(['isRemoteEnabled' => true, 'dpi' => 72, 'isFontSubsetting' => true, 'isHtml5Parser' => true]);
+        $pdf = Pdf::loadView('school.fee-manage.payment.receipt_pdf', $data)->setOptions([
+            'isRemoteEnabled' => true,
+            'dpi' => 72,
+            'isFontSubsetting' => true,
+            'isHtml5Parser' => true,
+            'defaultFont' => 'SolaimanLipi'
+        ]);
         return $pdf->download('receipt-'.$data['receiptNo'].'.pdf');
     }
 

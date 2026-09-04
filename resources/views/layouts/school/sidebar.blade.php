@@ -254,6 +254,7 @@
                             <li class="edu-sub-item"><a href="{{ route('fee-heads.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fee Heads') }}</a></li>
                             <li class="edu-sub-item"><a href="{{ route('fee-amounts.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fee Structure') }}</a></li>
                             <li class="edu-sub-item"><a href="{{ route('student-fees.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Fees Generation') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('student-fee-concessions.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/student-fee-concessions*') ? 'active' : '' }}">{{ __('Fee Concessions (মাইনাস ফি)') }}</a></li>
                         @endif
                         @if($hasFeature('fee.collect'))
                             <li class="edu-sub-item"><a href="{{ route('payment.index', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Collect Payment') }}</a></li>
@@ -350,6 +351,25 @@
                     <p class="mb-2" style="font-size:10.5px; opacity:0.85; line-height:1.3;">{{ __('Your trial or subscription has ended.') }}</p>
                     <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" class="btn w-100 rounded-pill py-1.5 fw-bold" style="background:#fff; color:#b91c1c; font-size:11.5px;">
                         <i class="fa-solid fa-arrow-right me-1"></i> {{ __('Pay Now') }}
+                    </a>
+                </div>
+            </div>
+        @elseif($activeSubscription->isExpiringSoon(15))
+            {{-- Renewal Reminder Card (15 days before expiry) --}}
+            @php $daysLeft = $activeSubscription->daysRemaining(); @endphp
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
+                <div class="card-body p-3 text-white text-center">
+                    <div class="mb-1.5">
+                        <i class="fa-solid fa-clock-rotate-left fa-xl opacity-90"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1" style="font-size:12.5px;">{{ __('Renew Plan') }}</h6>
+                    <p class="mb-2" style="font-size:10.5px; opacity:0.9; line-height:1.3;">
+                        {{ $daysLeft == 0 ? __('Expires today') : ($daysLeft == 1 ? __('1 day remaining') : __(':count days remaining', ['count' => $daysLeft])) }}
+                    </p>
+                    <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" 
+                       class="btn w-100 rounded-pill py-1.5 fw-bold shadow-sm" 
+                       style="background:#fff; color:#d97706; font-size:11.5px;">
+                        <i class="fa-solid fa-arrows-rotate me-1"></i> {{ __('Renew Now') }}
                     </a>
                 </div>
             </div>

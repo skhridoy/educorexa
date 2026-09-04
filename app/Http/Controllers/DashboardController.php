@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PackageUpgraded;
 use \App\Models\Student;
+use \App\Models\StudentFeeConcession;
 use \App\Models\SubscriptionPackage;
 use App\Services\SmsService;
 class DashboardController extends Controller
@@ -36,13 +37,35 @@ class DashboardController extends Controller
         $currentMonth = now()->format('F-Y');
         $currentMonthSummary = StudentFee::where('school_id', $schoolId)
             ->where('month', $currentMonth)
-            ->selectRaw("SUM(amount) as total, SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as collected")
+            ->selectRaw("SUM(amount) as total, SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) as collected, SUM(discount_amount) as discount")
             ->first();
+
+        // ২.১ ডিস্কাউন্ট ও মাইনাস ফি অ্যানালিটিক্স
+        $totalDiscountGiven = StudentFee::where('school_id', $schoolId)->sum('discount_amount');
+        $currentMonthDiscount = $currentMonthSummary->discount ?? 0;
+
+        $discountedStudentIdsFromFees = StudentFee::where('school_id', $schoolId)
+            ->where('discount_amount', '>', 0)
+            ->distinct()
+            ->pluck('student_id');
+
+        $concessionStudentIds = StudentFeeConcession::where('school_id', $schoolId)
+            ->where('is_active', true)
+            ->distinct()
+            ->pluck('student_id');
+
+        $allDiscountedStudentIds = $discountedStudentIdsFromFees->merge($concessionStudentIds)->unique();
+        $discountedStudentsCount = $allDiscountedStudentIds->count();
+        $activeConcessionsCount = StudentFeeConcession::where('school_id', $schoolId)->where('is_active', true)->count();
 
         $data['totalExpected'] = $totalExpected;
         $data['totalCollected'] = $totalCollected;
         $data['currentTotal'] = $currentMonthSummary->total ?? 0;
         $data['currentCollected'] = $currentMonthSummary->collected ?? 0;
+        $data['totalDiscountGiven'] = $totalDiscountGiven;
+        $data['currentMonthDiscount'] = $currentMonthDiscount;
+        $data['discountedStudentsCount'] = $discountedStudentsCount;
+        $data['activeConcessionsCount'] = $activeConcessionsCount;
 
         // ৩. আজকের উপস্থিতির পরিসংখ্যান (ওভাররাইট এড়াতে ভেরিয়েবল নাম পরিবর্তন করা হয়েছে)
         $todayAttendance = Attendance::where('school_id', $schoolId)

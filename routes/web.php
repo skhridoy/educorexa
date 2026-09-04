@@ -10,7 +10,7 @@ use App\Http\Controllers\{
     TeacherController, TeacherAssignSubjectController, ExamController,
     AssignClassController, MarkController, NewsletterController,
     ProfileController, NoticeController, AttendanceController,
-    FeeHeadController, FeeAmountController, StudentFeeController,
+    FeeHeadController, FeeAmountController, StudentFeeController, StudentFeeConcessionController,
     PaymentController, SliderController, AboutSectionController,
     FooterSettingController, SchoolOverviewController, LessonPlanController,
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
@@ -537,6 +537,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::resource('fee-amounts', FeeAmountController::class);
                     Route::get('student-fees/get-list', [StudentFeeController::class, 'getStudentList'])->name('student-fees.get-list');
                     Route::resource('student-fees', StudentFeeController::class);
+                    Route::get('student-fee-concessions/search-student', [StudentFeeConcessionController::class, 'searchStudent'])->name('student-fee-concessions.search-student');
+                    Route::resource('student-fee-concessions', StudentFeeConcessionController::class);
                 });
 
                 Route::middleware(['auth', 'permission:fee.collect', 'school_package:fee.collect'])->group(function () {

@@ -150,6 +150,14 @@ class StudentFeeController extends Controller
             return back()->with('error', 'নির্বাচিত মাস (' . $request->month . ') এর জন্য ফি ইতোমধ্যে তৈরি করা হয়েছে অথবা উপযুক্ত কোনো শিক্ষার্থী পাওয়া যায়নি।');
         }
 
+        // ৫. উপযুক্ত শিক্ষার্থীদের কোনো কনসেশন/মাইনাস ফি সেট করা আছে কিনা নিয়ে আসা
+        $studentConcessions = \App\Models\StudentFeeConcession::where('school_id', $schoolId)
+            ->where('fee_head_id', $request->fee_head_id)
+            ->where('is_active', true)
+            ->whereIn('student_id', $students->pluck('id'))
+            ->get()
+            ->keyBy('student_id');
+
         $count = 0;
         $now = now();
         $records = [];
@@ -176,6 +184,20 @@ class StudentFeeController extends Controller
                 }
 
                 $categoryId = $student->school_category_id ?? $student->class?->school_category_id ?? $applicableSetup->school_category_id;
+                $standardAmount = (float) $applicableSetup->amount;
+                $finalAmount = $standardAmount;
+                $discountAmount = 0.00;
+                $discountPercent = 0.00;
+                $discountNote = null;
+
+                // যদি শিক্ষার্থীর জন্য মাইনাস ফি / ছাড় কনফিগার করা থাকে
+                if (isset($studentConcessions[$student->id])) {
+                    $calc = $studentConcessions[$student->id]->calculateFee($standardAmount);
+                    $finalAmount = $calc['final_amount'];
+                    $discountAmount = $calc['discount_amount'];
+                    $discountPercent = $calc['discount_percent'];
+                    $discountNote = $studentConcessions[$student->id]->note ?: 'Student custom fee concession';
+                }
 
                 $records[] = [
                     'school_id'              => $schoolId,
@@ -183,7 +205,11 @@ class StudentFeeController extends Controller
                     'school_category_id'     => $categoryId,
                     'school_sub_category_id' => $student->school_sub_category_id ?? $applicableSetup->school_sub_category_id,
                     'fee_head_id'            => $request->fee_head_id,
-                    'amount'                 => $applicableSetup->amount,
+                    'amount'                 => $finalAmount,
+                    'original_amount'        => $standardAmount,
+                    'discount_amount'        => $discountAmount,
+                    'discount_percent'       => $discountPercent,
+                    'discount_note'          => $discountNote,
                     'month'                  => $request->month,
                     'status'                 => 'unpaid',
                     'due_date'               => $dueDate,

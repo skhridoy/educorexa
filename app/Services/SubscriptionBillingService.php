@@ -59,16 +59,45 @@ class SubscriptionBillingService
 
     public function markPaid(SchoolSubscription $subscription, string $reference): SchoolSubscription
     {
+        $package = $subscription->package;
+        $days = ($package && $package->duration === 'yearly') ? 365 : 30;
+
+        // Check if school currently has an active subscription that hasn't expired yet
+        $currentActive = $subscription->school->subscriptions()
+            ->where('status', 'active')
+            ->where('id', '!=', $subscription->id)
+            ->whereNotNull('ends_at')
+            ->where('ends_at', '>', now())
+            ->latest('ends_at')
+            ->first();
+
         $startsAt = now();
-        $days = $subscription->package->duration === 'yearly' ? 365 : 30;
+        $baseDate = ($currentActive && $currentActive->ends_at && $currentActive->ends_at->isFuture())
+            ? $currentActive->ends_at
+            : $startsAt;
+
+        $endsAt = $baseDate->copy()->addDays($days);
+
+        // Expire older active subscriptions if any
+        if ($currentActive) {
+            $subscription->school->subscriptions()
+                ->where('status', 'active')
+                ->where('id', '!=', $subscription->id)
+                ->update(['status' => 'expired']);
+        }
+
+        $amount = $subscription->amount > 0 ? $subscription->amount : ($package?->price ?? 0);
 
         $subscription->update([
             'status' => 'active',
+            'amount' => $amount,
             'starts_at' => $startsAt,
-            'ends_at' => $startsAt->copy()->addDays($days),
+            'ends_at' => $endsAt,
             'trial_ends_at' => null,
             'paid_at' => $startsAt,
             'payment_reference' => $reference,
+            'reviewed_by' => auth()->check() ? auth()->id() : $subscription->reviewed_by,
+            'reviewed_at' => now(),
         ]);
 
         $subscription->school->update([

@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="UTF-8">
     <style>
+        @font-face {
+            font-family: 'SolaimanLipi';
+            font-style: normal;
+            font-weight: normal;
+            src: url('{{ public_path('fonts/SolaimanLipi.ttf') }}') format('truetype');
+        }
+        @font-face {
+            font-family: 'SolaimanLipi';
+            font-style: normal;
+            font-weight: bold;
+            src: url('{{ public_path('fonts/SolaimanLipi.ttf') }}') format('truetype');
+        }
+
         @page { size: A4 landscape; margin: 5px; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Helvetica', sans-serif; margin: 0; padding: 5px; background: white; color: #333; font-size: 10px; line-height: 1.3; }
+        * { box-sizing: border-box; font-family: 'SolaimanLipi', sans-serif !important; }
+        body { font-family: 'SolaimanLipi', sans-serif !important; margin: 0; padding: 5px; background: white; color: #333; font-size: 10px; line-height: 1.3; }
 
         .master-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .receipt-col { width: 50%; padding: 5px; vertical-align: top; }
@@ -168,7 +182,7 @@
                                         <img src="{{ asset($schoolLogo) }}" alt="Logo" style="width:46px; height:46px; border-radius:50%; padding:2px;">
                                     </td>
                                     <td style="vertical-align:middle; padding-left:8px;">
-                                        <div class="school-name">{{ $school->name }}</div>
+                                        <div class="school-name">{{ $school->name ?? 'School Name' }}</div>
                                         <div class="copy-badge">{{ $copyType }}</div>
                                     </td>
                                 </tr>
@@ -228,22 +242,44 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $totalAmount = 0; @endphp
+                                @php 
+                                    $calculatedSubTotal = 0;
+                                    $calculatedDiscount = 0;
+                                    $calculatedTotal = 0;
+                                @endphp
                                 @foreach($fees as $f)
+                                @php
+                                    $itemOrig = ($f->original_amount && $f->original_amount > $f->amount) ? $f->original_amount : ($f->amount + ($f->discount_amount ?? 0));
+                                    $itemDisc = $f->discount_amount ?? 0;
+                                    $calculatedSubTotal += $itemOrig;
+                                    $calculatedDiscount += $itemDisc;
+                                    $calculatedTotal += $f->amount;
+                                @endphp
                                 <tr>
-                                    <td>{{ $f->feeHead->name }}</td>
+                                    <td>
+                                        {{ $f->feeHead->name }}
+                                        @if($itemDisc > 0)
+                                            <span style="font-size:8.5px; color:#c2410c; font-weight:bold;">(Less: Tk {{ number_format($itemDisc, 2) }})</span>
+                                        @endif
+                                    </td>
                                     <td class="c">{{ $f->month }}</td>
                                     <td class="r">Tk {{ number_format($f->amount, 2) }}</td>
                                 </tr>
-                                @php $totalAmount += $f->amount; @endphp
                                 @endforeach
+
                                 <tr>
                                     <td colspan="2" class="r" style="font-weight:bold;">Sub Total :</td>
-                                    <td class="r">Tk {{ number_format($totalAmount, 2) }}</td>
+                                    <td class="r">Tk {{ number_format($calculatedSubTotal, 2) }}</td>
                                 </tr>
+                                @if($calculatedDiscount > 0)
+                                <tr>
+                                    <td colspan="2" class="r" style="font-weight:bold; color:#dc2626;">Discount :</td>
+                                    <td class="r" style="font-weight:bold; color:#dc2626;">- Tk {{ number_format($calculatedDiscount, 2) }}</td>
+                                </tr>
+                                @endif
                                 <tr>
                                     <td colspan="2" class="r" style="font-weight:bold; font-size:11px;">Grand Total :</td>
-                                    <td class="r" style="font-weight:bold; font-size:11px; color:#2B3547;">Tk {{ number_format($totalAmount, 2) }}</td>
+                                    <td class="r" style="font-weight:bold; font-size:11px; color:#2B3547;">Tk {{ number_format($calculatedTotal, 2) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -266,7 +302,7 @@
                 </div>
 
                 <div class="bottom-bar">
-                    {{ $school->name }} &nbsp;|&nbsp; This Receipt is generated by Educorexa 1.0.0
+                    {{ $school->name ?? 'Educorexa' }} &nbsp;|&nbsp; This Receipt is generated by Educorexa 1.0.0
                 </div>
 
             </div>

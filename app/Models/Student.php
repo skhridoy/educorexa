@@ -227,4 +227,8 @@ class Student extends Model
     public function unpaidFees() {
         return $this->hasMany(StudentFee::class)->where('status', 'unpaid');
     }
+
+    public function feeConcessions() {
+        return $this->hasMany(StudentFeeConcession::class);
+    }
 }
