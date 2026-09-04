@@ -3,26 +3,48 @@
 @section('customCSS')
     @include('school.others._modern_design_styles')
     <style>
-        /* ── Search Hero ── */
-        .payment-search-hero {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
+        /* Exact Exam Page Stats Bar */
+        .fee-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
         }
-        .payment-search-hero::before {
-            content:''; position:absolute; top:-50px; right:-50px;
-            width:200px; height:200px; background:rgba(255,255,255,0.06); border-radius:50%;
+        .fee-stat-card {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            backdrop-filter: blur(8px);
         }
-        .payment-search-hero::after {
-            content:''; position:absolute; bottom:-60px; left:-30px;
-            width:160px; height:160px; background:rgba(255,255,255,0.04); border-radius:50%;
+        .fee-stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            color: #fff;
+            flex-shrink: 0;
         }
+        .fee-stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+        }
+        .fee-stat-lbl {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        /* Hero Search Field */
         .search-input-premium {
-            background: rgba(255,255,255,0.15) !important;
-            border: 1.5px solid rgba(255,255,255,0.3) !important;
+            background: rgba(255,255,255,0.18) !important;
+            border: 1.5px solid rgba(255,255,255,0.35) !important;
             border-radius: 12px !important;
             color: #fff !important;
             padding: 12px 20px !important;
@@ -31,16 +53,15 @@
             backdrop-filter: blur(8px);
             transition: all .2s;
         }
-        .search-input-premium::placeholder { color: rgba(255,255,255,0.6) !important; }
+        .search-input-premium::placeholder { color: rgba(255,255,255,0.7) !important; }
         .search-input-premium:focus {
-            background: rgba(255,255,255,0.22) !important;
-            border-color: rgba(255,255,255,0.6) !important;
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.15) !important;
-            color: #fff !important;
+            background: rgba(255,255,255,0.25) !important;
+            border-color: rgba(255,255,255,0.7) !important;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.2) !important;
             outline: none;
         }
         .btn-search-hero {
-            background: rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.25);
             backdrop-filter: blur(8px);
             color: #fff;
             border: 1.5px solid rgba(255,255,255,0.4);
@@ -57,199 +78,95 @@
             gap: 8px;
         }
         .btn-search-hero:hover {
-            background: rgba(255,255,255,0.32);
+            background: rgba(255,255,255,0.35);
             color: #fff;
+            transform: translateY(-1px);
         }
 
-        /* ── Student Profile Card ── */
+        /* Student Profile Card */
         .student-profile-premium {
             border-radius: 20px;
             overflow: hidden;
-            border: none;
-            box-shadow: 0 8px 30px rgba(15,23,42,0.10);
+            border: 1.5px solid #e2e8f0;
+            box-shadow: var(--card-shadow);
         }
         .profile-hero-bg {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 28px 20px 22px;
+            padding: 24px 20px;
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-        .profile-hero-bg::before {
-            content:''; position:absolute; top:-30px; right:-30px;
-            width:120px; height:120px; background:rgba(79,70,229,0.15); border-radius:50%;
         }
         .profile-avatar-ring {
-            width: 90px; height: 90px; border-radius: 50%;
+            width: 86px; height: 86px; border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255,255,255,0.4);
-            box-shadow: 0 0 0 4px rgba(79,70,229,0.3);
-            position: relative; z-index: 1;
+            border: 3px solid rgba(255,255,255,0.5);
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.35);
         }
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 9px 0;
             border-bottom: 1px solid #f1f5f9;
         }
         .info-row:last-child { border-bottom: none; }
         .info-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
-        .info-value { font-size: 13px; font-weight: 700; color: #1e293b; word-break: break-word; text-align: right; }
+        .info-value { font-size: 13px; font-weight: 700; color: #1e293b; text-align: right; }
 
-        /* ── Fee Table ── */
-        .fee-table-card {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 4px 20px rgba(15,23,42,0.07);
-            overflow: hidden;
-        }
-        .fee-section-header {
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .fee-header-pending { background: linear-gradient(90deg, #fff1f2, #ffe4e6); }
-        .fee-header-paid    { background: linear-gradient(90deg, #f0fdf4, #dcfce7); }
-        .fee-row-hover:hover { background: #fafbff !important; }
+        /* Action & Fee Styles */
         .fee-checkbox-custom {
-            width: 18px; height: 18px; border-radius: 5px !important;
+            width: 18px; height: 18px; border-radius: 6px !important;
             border: 2px solid #cbd5e1 !important; cursor: pointer;
         }
         .fee-checkbox-custom:checked { background-color: #4f46e5 !important; border-color: #4f46e5 !important; }
 
-        /* ── Total Footer ── */
-        .payment-footer {
-            background: #f8fafc;
-            border-top: 1.5px solid #f1f5f9;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
         .total-amount-display {
             font-size: 24px; font-weight: 800; color: #ef4444; font-variant-numeric: tabular-nums;
         }
         .select-method {
             border: 1.5px solid #e2e8f0 !important;
             border-radius: 10px !important;
-            padding: 10px 14px !important;
+            padding: 9px 14px !important;
             font-size: 13px; font-weight: 600;
             background: #fff;
         }
         .btn-collect {
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff; border: none; border-radius: 12px;
-            padding: 12px 28px; font-size: 14px; font-weight: 700;
+            padding: 10px 24px; font-size: 14px; font-weight: 700;
             box-shadow: 0 4px 14px rgba(16,185,129,0.35);
             transition: all .25s; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-collect:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(16,185,129,0.45); color:#fff; }
 
-        /* ── History ── */
         .receipt-badge {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff; border: none; border-radius: 8px;
-            padding: 6px 14px; font-size: 12px; font-weight: 600;
+            background: #f0fdf4;
+            color: #16a34a !important;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 700;
             display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-            text-decoration: none; transition: all .2s;
-            white-space: nowrap;
+            text-decoration: none;
+            transition: all .2s;
         }
-        .receipt-badge:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); color:#fff; }
+        .receipt-badge:hover {
+            background: #16a34a;
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
 
-        /* ══════════════════════════════════════════════════
-           📱 COMPREHENSIVE MOBILE & TABLET RESPONSIVENESS
-           ══════════════════════════════════════════════════ */
         @media (max-width: 991.98px) {
-            .student-profile-premium {
-                margin-bottom: 8px;
-            }
+            .fee-stats-bar { grid-template-columns: repeat(3, 1fr); }
         }
-
         @media (max-width: 767.98px) {
-            .payment-search-hero {
-                padding: 20px 16px;
-                border-radius: 16px;
-                margin-bottom: 18px;
-            }
-            .payment-search-hero h4 {
-                font-size: 17px !important;
-            }
-            .search-input-premium {
-                padding: 11px 16px 11px 42px !important;
-                font-size: 13.5px !important;
-            }
-            .btn-search-hero {
-                width: 100%;
-                padding: 11px 20px;
-                font-size: 13.5px;
-            }
-            .profile-hero-bg {
-                padding: 20px 16px 16px;
-            }
-            .profile-avatar-ring {
-                width: 76px;
-                height: 76px;
-            }
-            .fee-table-card {
-                border-radius: 16px;
-            }
-            .fee-section-header {
-                padding: 12px 16px;
-            }
-            .table-responsive {
-                border: 0;
-            }
-            .table-responsive table {
-                min-width: 480px;
-            }
-            .payment-footer {
-                padding: 14px 16px;
-                flex-direction: column;
-                align-items: stretch !important;
-                gap: 14px;
-            }
-            .payment-footer-total {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                border-bottom: 1px dashed #e2e8f0;
-                padding-bottom: 8px;
-            }
-            .payment-footer-actions {
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .select-method {
-                width: 100% !important;
-            }
-            .btn-collect {
-                width: 100% !important;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .page-content {
-                padding: 12px 8px;
-            }
-            .payment-search-hero {
-                padding: 16px 14px;
-            }
-            .fee-section-header h6, .fee-section-header div.fw-bold {
-                font-size: 13px !important;
-            }
-            .total-amount-display {
-                font-size: 20px;
-            }
+            .fee-stats-bar { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .fee-stat-card { padding: 10px 12px; gap: 10px; }
+            .fee-stat-icon { width: 36px; height: 36px; font-size: 1.1rem; }
+            .fee-stat-val  { font-size: 1.25rem; }
+            .fee-stat-lbl  { font-size: 0.7rem; }
         }
     </style>
 @endsection
@@ -257,27 +174,38 @@
 @section('content')
 <div class="page-content">
 
-    {{-- ══ SEARCH HERO ══ --}}
-    <div class="payment-search-hero">
-        <div style="position:relative;z-index:1;">
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div style="width:44px;height:44px;min-width:44px;border-radius:12px;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.3);">
-                    <i class="fa-solid fa-hand-holding-dollar text-white" style="font-size:18px;"></i>
+    {{-- ═════════════════════════════════════════════════════════════
+         HERO SEARCH & HEADER CARD (Matches Exam Page Header Exactly)
+    ══════════════════════════════════════════════════════════════ --}}
+    <div class="page-header-card">
+        <div class="page-header-content">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="page-header-icon">
+                        <i class="fa-solid fa-hand-holding-dollar text-white"></i>
+                    </div>
+                    <div>
+                        <h4 class="page-title mb-1">{{ __('Fee Collection (ফি সংগ্রহ ও রসিদ প্রদান)') }}</h4>
+                        <p class="page-subtitle mb-0">
+                            {{ __('Search student by ID, select pending dues, apply on-the-spot discount & print receipts') }}
+                        </p>
+                    </div>
                 </div>
-                <div class="flex-grow-1">
-                    <h4 class="text-white fw-bold mb-0" style="text-shadow:0 1px 4px rgba(0,0,0,0.2);">{{ __('Fee Collection') }}</h4>
-                    <p class="mb-0" style="color:rgba(255,255,255,0.7);font-size:12.5px;">{{ __('Search student by ID to collect payments') }}</p>
-                </div>
-                <div class="ms-auto d-none d-md-block">
-                    <span style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:#fff;font-size:12px;font-weight:600;padding:6px 16px;border-radius:50px;border:1px solid rgba(255,255,255,0.25);">
-                        <i class="fa-regular fa-calendar-days me-1"></i>{{ now()->format('d M, Y') }}
-                    </span>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ route('student-fee-concessions.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn-header-secondary">
+                        <i class="fa-solid fa-tags"></i> {{ __('Fee Concessions') }}
+                    </a>
+                    <a href="{{ route('student-fees.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn-header-primary">
+                        <i class="fa-solid fa-bolt"></i> {{ __('Generate Bills') }}
+                    </a>
                 </div>
             </div>
-            <form action="{{ route('payment.index', ['tenant' => auth()->user()->school->slug]) }}" method="GET">
+
+            {{-- Quick Search Form inside Hero Header --}}
+            <form action="{{ route('payment.index', ['tenant' => auth()->user()->school->slug]) }}" method="GET" class="mt-3">
                 <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
                     <div class="flex-grow-1 position-relative">
-                        <i class="fa-solid fa-id-card position-absolute" style="left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.6);font-size:15px;"></i>
+                        <i class="fa-solid fa-id-card position-absolute" style="left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.7);font-size:16px;"></i>
                         <input type="text" name="student_id" class="form-control search-input-premium ps-5"
                                placeholder="{{ __('Enter Student ID (e.g. STD-26011001)') }}"
                                value="{{ request('student_id') }}" required>
@@ -296,25 +224,21 @@
         {{-- ── Student Profile Card ── --}}
         <div class="col-lg-4">
             <div class="student-profile-premium card h-100">
-                {{-- Profile Hero --}}
                 <div class="profile-hero-bg">
-                    <div style="position:relative;z-index:1;">
-                        <img src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}"
-                             alt="{{ $student->name }}" class="profile-avatar-ring mb-3">
-                        <h5 class="text-white fw-bold mb-1 fs-16">{{ $student->name }}</h5>
-                        <div class="d-flex justify-content-center gap-2 flex-wrap">
-                            <span style="background:rgba(79,70,229,0.4);color:#c4b5fd;font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid rgba(79,70,229,0.4);">
-                                <i class="fa-solid fa-id-badge me-1 opacity-75"></i>{{ $student->student_id }}
-                            </span>
-                            @if($student->status == 'active')
-                            <span style="background:rgba(16,185,129,0.3);color:#6ee7b7;font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid rgba(16,185,129,0.4);">
-                                <i class="fa-solid fa-circle me-1" style="font-size:7px;"></i>Active
-                            </span>
-                            @endif
-                        </div>
+                    <img src="{{ $student->photo ? asset($student->photo) : asset('assets/images/profile.webp') }}"
+                         alt="{{ $student->name }}" class="profile-avatar-ring mb-3">
+                    <h5 class="text-white fw-bold mb-1 fs-16">{{ $student->name }}</h5>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <span style="background:rgba(79,70,229,0.4);color:#c4b5fd;font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid rgba(79,70,229,0.4);">
+                            <i class="fa-solid fa-id-badge me-1 opacity-75"></i>{{ $student->student_id }}
+                        </span>
+                        @if($student->status == 'active')
+                        <span style="background:rgba(16,185,129,0.3);color:#6ee7b7;font-size:11px;font-weight:700;padding:3px 12px;border-radius:50px;border:1px solid rgba(16,185,129,0.4);">
+                            <i class="fa-solid fa-circle me-1" style="font-size:7px;"></i>Active
+                        </span>
+                        @endif
                     </div>
                 </div>
-                {{-- Info List --}}
                 <div class="card-body px-3 px-sm-4 py-3">
                     <div class="info-row">
                         <span class="info-label"><i class="fa-solid fa-graduation-cap me-2" style="color:#4f46e5;"></i>{{ __('Class') }}</span>
@@ -341,7 +265,6 @@
                     </div>
                     @endif
                 </div>
-                {{-- Summary Stats & Concession Button --}}
                 <div class="px-3 px-sm-4 pb-3 pb-sm-4">
                     <div class="row g-2 mb-3">
                         <div class="col-6">
@@ -358,71 +281,69 @@
                         </div>
                     </div>
                     <a href="{{ route('student-fee-concessions.index', ['tenant' => auth()->user()->school->slug, 'student_id' => $student->student_id]) }}" 
-                       class="btn btn-outline-primary btn-sm w-100 fw-bold py-2" style="border-radius:10px;">
+                       class="btn btn-outline-primary btn-sm w-100 fw-bold py-2 rounded-3">
                         <i class="fa-solid fa-tags me-1"></i> {{ __('মাইনাস ফি / Concession সেট করুন') }}
                     </a>
                 </div>
             </div>
         </div>
 
-        {{-- ── Right Panel ── --}}
+        {{-- ── Right Panel: Collection Table & History ── --}}
         <div class="col-lg-8">
 
-            {{-- Pending Fees --}}
-            <div class="fee-table-card card mb-4">
+            {{-- Pending Fees Collection Card --}}
+            <div class="data-table-card mb-4">
                 <form action="{{ route('payment.collectMultiple', ['tenant' => auth()->user()->school->slug]) }}" method="POST" id="bulk-payment-form">
                     @csrf
-                    {{-- Section Header --}}
-                    <div class="fee-section-header fee-header-pending">
-                        <div class="d-flex align-items-center gap-2 gap-sm-3">
-                            <div style="width:36px;height:36px;min-width:36px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#dc2626);display:flex;align-items:center;justify-content:center;">
-                                <i class="fa-solid fa-clock-rotate-left text-white" style="font-size:14px;"></i>
+                    <div class="data-table-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="form-card-icon" style="background: #fef2f2; color: #ef4444; width: 34px; height: 34px;">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
                             </div>
                             <div>
-                                <div class="fw-bold text-dark" style="font-size:14px;">{{ __('Pending Fees') }}</div>
-                                <div style="font-size:11px;color:#94a3b8;">{{ __('Select fees to collect payment') }}</div>
+                                <h6 class="fw-bold mb-0 text-dark">{{ __('Pending Fees & Vouchers') }}</h6>
+                                <small class="text-muted">{{ __('Select fee items to collect payment') }}</small>
                             </div>
                         </div>
-                        <span style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;font-size:12px;font-weight:700;padding:4px 14px;border-radius:50px;">
-                            {{ $unpaidFees->count() }} {{ __('Items') }}
+                        <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-1 rounded-pill" style="font-size: 11.5px;">
+                            {{ $unpaidFees->count() }} {{ __('Items Due') }}
                         </span>
                     </div>
 
-                    {{-- Fee Table --}}
                     <div class="table-responsive">
-                        <table class="table align-middle mb-0" style="font-size:13px;">
-                            <thead style="background:#fafbfc;border-bottom:2px solid #f1f5f9;">
+                        <table class="table modern-table align-middle mb-0">
+                            <thead>
                                 <tr>
-                                    <th class="ps-3 ps-sm-4 py-3" style="width:44px;">
+                                    <th class="ps-4" style="width:44px;">
                                         <input class="form-check-input fee-checkbox-custom" type="checkbox" id="selectAll" onclick="toggleSelectAll(this)">
                                     </th>
-                                    <th class="py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Fee Head') }}</th>
-                                    <th class="py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Month') }}</th>
-                                    <th class="py-3 fw-bold text-uppercase text-end pe-3 pe-sm-4" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Amount') }}</th>
+                                    <th>{{ __('Fee Head') }}</th>
+                                    <th>{{ __('Month / Period') }}</th>
+                                    <th class="text-end pe-4">{{ __('Amount') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($unpaidFees as $fee)
-                                <tr class="fee-row-hover" style="border-bottom:1px solid #f8fafc;">
-                                    <td class="ps-3 ps-sm-4">
+                                <tr>
+                                    <td class="ps-4">
                                         <input class="form-check-input fee-checkbox-custom fee-checkbox" type="checkbox" name="fee_ids[]" value="{{ $fee->id }}" onclick="updateTotal()">
                                     </td>
-                                    <td class="py-3">
-                                        <div class="fw-semibold text-dark">{{ $fee->feeHead->name }}</div>
+                                    <td>
+                                        <div class="fw-bold text-dark fs-13">{{ $fee->feeHead->name }}</div>
                                         @if(($fee->discount_amount && $fee->discount_amount > 0) || ($fee->original_amount && $fee->original_amount > $fee->amount))
-                                            <span class="badge bg-warning-subtle text-dark border" style="font-size:10px;">
+                                            <span class="badge bg-warning-subtle text-dark border px-2 py-0" style="font-size:10px;">
                                                 <i class="fa-solid fa-tag me-1 text-warning"></i>পূর্ব নির্ধারিত ছাড়: ৳ {{ number_format($fee->discount_amount, 2) }}
                                             </span>
-                                        @else
-                                            <div style="font-size:11px;color:#94a3b8;">Academic Fee Record</div>
                                         @endif
                                     </td>
                                     <td>
-                                        <span style="background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;">{{ $fee->month }}</span>
+                                        <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill" style="font-size: 11px;">
+                                            {{ $fee->month }}
+                                        </span>
                                     </td>
-                                    <td class="text-end pe-3 pe-sm-4 fw-bold" style="color:#ef4444;font-size:14px;" data-amount="{{ $fee->amount }}">
+                                    <td class="text-end pe-4 fw-bold text-danger fs-14" data-amount="{{ $fee->amount }}">
                                         @if($fee->original_amount && $fee->original_amount > $fee->amount)
-                                            <small class="text-decoration-line-through text-muted me-1" style="font-size:11px;">৳{{ number_format($fee->original_amount, 2) }}</small>
+                                            <small class="text-decoration-line-through text-muted me-1 fs-11">৳{{ number_format($fee->original_amount, 2) }}</small>
                                         @endif
                                         ৳ {{ number_format($fee->amount, 2) }}
                                     </td>
@@ -430,8 +351,8 @@
                                 @empty
                                 <tr>
                                     <td colspan="4" class="text-center py-5">
-                                        <div style="width:64px;height:64px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-                                            <i class="fa-solid fa-circle-check" style="font-size:28px;color:#10b981;"></i>
+                                        <div style="width:54px;height:54px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                                            <i class="fa-solid fa-circle-check fs-4 text-success"></i>
                                         </div>
                                         <h6 class="fw-bold text-success mb-1">{{ __('All Dues Cleared!') }}</h6>
                                         <p class="text-muted small mb-0">{{ __('No pending fees found for this student.') }}</p>
@@ -442,60 +363,58 @@
                         </table>
                     </div>
 
-                    {{-- Collection & Discount Controls Footer --}}
+                    {{-- Collection & Live Discount Controls Footer --}}
                     @if($unpaidFees->count() > 0)
-                    <div class="p-3" style="background:#f8fafc; border-top:1.5px solid #f1f5f9;">
-                        {{-- Discount Controls --}}
-                        <div class="row g-3 align-items-center mb-3 p-2 bg-white rounded-3 border">
+                    <div class="p-3 bg-light border-top" style="border-color: #f1f5f9 !important;">
+                        {{-- Discount Input Controls --}}
+                        <div class="row g-3 align-items-center mb-3 p-3 bg-white rounded-3 border" style="border-color: #e2e8f0 !important;">
                             <div class="col-md-5">
                                 <label class="form-label text-muted small fw-bold mb-1">
                                     <i class="fa-solid fa-percent text-primary me-1"></i>{{ __('কালেকশন ডিস্কাউন্ট / ছাড় (% বা ৳)') }}
                                 </label>
                                 <div class="input-group input-group-sm">
-                                    <select name="discount_type" id="discount_type" class="form-select form-select-sm" style="max-width:110px;" onchange="updateTotal()">
+                                    <select name="discount_type" id="discount_type" class="form-select form-select-sm form-control-modern" style="max-width:110px;" onchange="updateTotal()">
                                         <option value="percent">% Percent</option>
                                         <option value="fixed">৳ Fixed</option>
                                     </select>
                                     <input type="number" step="0.01" min="0" name="discount_value" id="discount_value" 
-                                           class="form-control form-control-sm" placeholder="e.g. 10" 
+                                           class="form-control form-control-sm form-control-modern" placeholder="e.g. 10" 
                                            oninput="updateTotal()">
                                 </div>
                             </div>
                             <div class="col-md-7">
                                 <label class="form-label text-muted small fw-bold mb-1">{{ __('ছাড়ের বিবরণ / নোট (ঐচ্ছিক)') }}</label>
-                                <input type="text" name="discount_note" class="form-control form-control-sm" placeholder="e.g. বিশেষ বিবেচনায় ১০% ছাড় প্রদান করা হলো">
+                                <input type="text" name="discount_note" class="form-control form-control-sm form-control-modern" placeholder="e.g. বিশেষ বিবেচনায় ১০% ছাড় প্রদান করা হলো">
                             </div>
                         </div>
 
                         {{-- Calculation & Action Bar --}}
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                             <div>
-                                <div class="d-flex align-items-center gap-3" style="font-size:13px;">
+                                <div class="d-flex align-items-center gap-3 fs-13">
                                     <div>
-                                        <span class="text-muted">মোট ফি:</span> 
+                                        <span class="text-muted">{{ __('মোট ফি:') }}</span> 
                                         <strong class="text-dark">৳ <span id="gross-total-display">0.00</span></strong>
                                     </div>
                                     <div id="discount-breakdown-display" style="display:none;">
-                                        <span class="text-danger fw-bold">ছাড়:</span> 
+                                        <span class="text-danger fw-bold">{{ __('ছাড়:') }}</span> 
                                         <strong class="text-danger">- ৳ <span id="discount-amount-display">0.00</span> (<span id="discount-percent-display">0</span>%)</strong>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center gap-2 mt-1">
                                     <span class="text-muted small fw-bold text-uppercase">{{ __('Net Payable') }}:</span>
-                                    <span class="total-amount-display" style="font-size:22px;">৳ <span id="selected-total">0.00</span></span>
+                                    <span class="total-amount-display fs-4">৳ <span id="selected-total">0.00</span></span>
                                 </div>
                             </div>
 
-                            <div class="payment-footer-actions d-flex align-items-center gap-2 gap-sm-3 flex-wrap">
-                                <select name="payment_method" class="form-select select-method">
+                            <div class="payment-footer-actions d-flex align-items-center gap-2 flex-wrap">
+                                <select name="payment_method" class="form-select select-method form-control-modern">
                                     <option value="cash">💵 Cash</option>
                                     <option value="bkash">📱 bKash</option>
                                     <option value="nagad">📱 Nagad</option>
                                 </select>
                                 <button type="button" class="btn-collect" onclick="handleBulkPaymentClick(event)">
-                                    <span style="width:22px;height:22px;background:rgba(255,255,255,0.22);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">
-                                        <i class="fa-solid fa-check" style="font-size:11px;"></i>
-                                    </span>
+                                    <i class="fa-solid fa-check"></i>
                                     {{ __('Collect Payment') }}
                                 </button>
                             </div>
@@ -505,51 +424,51 @@
                 </form>
             </div>
 
-            {{-- Payment History --}}
+            {{-- Payment History Card --}}
             @if($paidFeesGroups && $paidFeesGroups->count() > 0)
-            <div class="fee-table-card card">
-                <div class="fee-section-header fee-header-paid">
-                    <div class="d-flex align-items-center gap-2 gap-sm-3">
-                        <div style="width:36px;height:36px;min-width:36px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;">
-                            <i class="fa-solid fa-receipt text-white" style="font-size:14px;"></i>
+            <div class="data-table-card">
+                <div class="data-table-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="form-card-icon" style="background: #f0fdf4; color: #16a34a; width: 34px; height: 34px;">
+                            <i class="fa-solid fa-receipt"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size:14px;">{{ __('Payment History') }}</div>
-                            <div style="font-size:11px;color:#94a3b8;">{{ $paidFeesGroups->count() }} {{ __('receipt(s) found') }}</div>
+                            <h6 class="fw-bold mb-0 text-dark">{{ __('Payment & Receipt History') }}</h6>
+                            <small class="text-muted">{{ $paidFeesGroups->count() }} {{ __('receipt(s) available') }}</small>
                         </div>
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0" style="font-size:13px;">
-                        <thead style="background:#fafbfc;border-bottom:2px solid #f1f5f9;">
+                    <table class="table modern-table align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th class="ps-3 ps-sm-4 py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Description') }}</th>
-                                <th class="py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Amount') }}</th>
-                                <th class="py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Method') }}</th>
-                                <th class="py-3 fw-bold text-uppercase" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Date') }}</th>
-                                <th class="py-3 fw-bold text-uppercase text-center pe-3 pe-sm-4" style="font-size:11px;color:#64748b;letter-spacing:.5px;">{{ __('Receipt') }}</th>
+                                <th class="ps-4">{{ __('Description') }}</th>
+                                <th>{{ __('Amount') }}</th>
+                                <th>{{ __('Method') }}</th>
+                                <th>{{ __('Date') }}</th>
+                                <th class="text-center pe-4" style="width: 130px;">{{ __('Receipt') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($paidFeesGroups as $receiptNo => $feesGroup)
-                            <tr style="border-bottom:1px solid #f8fafc;">
-                                <td class="ps-3 ps-sm-4 py-3">
-                                    <div class="fw-semibold text-dark">{{ Str::limit($feesGroup->pluck('feeHead.name')->implode(', '), 30) }}</div>
-                                    <div style="font-size:11px;color:#94a3b8;">{{ $feesGroup->pluck('month')->unique()->implode(', ') }}</div>
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark fs-13">{{ Str::limit($feesGroup->pluck('feeHead.name')->implode(', '), 30) }}</div>
+                                    <small class="text-muted fs-11">{{ $feesGroup->pluck('month')->unique()->implode(', ') }}</small>
                                 </td>
                                 <td>
-                                    <span class="fw-bold" style="color:#10b981;font-size:14px;">৳ {{ number_format($feesGroup->sum('amount'), 2) }}</span>
+                                    <span class="fw-bold text-success fs-14">৳ {{ number_format($feesGroup->sum('amount'), 2) }}</span>
                                 </td>
                                 <td>
-                                    <span style="background:#f0fdf4;color:#059669;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;text-transform:uppercase;">
+                                    <span class="badge bg-success-subtle text-success fw-bold px-2 py-1 rounded-pill" style="font-size: 11px; text-transform: uppercase;">
                                         {{ $feesGroup->first()->payment_method }}
                                     </span>
                                 </td>
-                                <td style="color:#64748b;font-size:12px;">{{ $feesGroup->first()->updated_at->format('d M, Y') }}</td>
-                                <td class="text-center pe-3 pe-sm-4">
+                                <td class="text-muted fs-12">{{ $feesGroup->first()->updated_at->format('d M, Y') }}</td>
+                                <td class="text-center pe-4">
                                     <a href="{{ route('payment.receiptMultiple', ['tenant' => auth()->user()->school->slug, 'receipt_no' => $receiptNo]) }}"
                                        class="receipt-badge">
-                                        <i class="fa-solid fa-print" style="font-size:11px;"></i> {{ __('Receipt') }}
+                                        <i class="fa-solid fa-print"></i> {{ __('Receipt') }}
                                     </a>
                                 </td>
                             </tr>
@@ -560,6 +479,19 @@
             </div>
             @endif
 
+        </div>
+    </div>
+    @else
+    {{-- Empty State when no student is searched yet --}}
+    <div class="data-table-card text-center py-5">
+        <div class="py-4">
+            <div style="width:72px;height:72px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <i class="fa-solid fa-user-check fs-2 text-primary"></i>
+            </div>
+            <h5 class="fw-bold text-dark">{{ __('Search Student to Start Fee Collection') }}</h5>
+            <p class="text-muted small mb-0" style="max-width: 420px; margin: 0 auto;">
+                {{ __('Enter a student ID in the search box above to view pending fees, apply discounts, and generate instant printable receipts.') }}
+            </p>
         </div>
     </div>
     @endif
