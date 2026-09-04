@@ -34,6 +34,17 @@ class CheckSchoolPackage
             return $next($request);
         }
 
+        if (!$school->hasActiveSubscription()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Your subscription is inactive. Please complete payment to continue.'
+                ], 402);
+            }
+
+            return redirect()->route('school.pricing', ['tenant' => $school->slug])
+                ->with('error', 'Your trial or subscription has ended. Please complete payment to continue.');
+        }
+
         // Check if the school's package has the required permission
         if (!$school->hasPackagePermission($permission)) {
             if ($request->ajax()) {

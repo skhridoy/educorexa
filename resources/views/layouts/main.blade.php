@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +28,79 @@
 
     @include('layouts._css')
 	<style>
+        /* Keep super-admin actions consistent with the school-admin button system. */
+        .super-admin-shell .btn:not(.btn-close) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 9px 18px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            font-size: .875rem;
+            font-weight: 600;
+            line-height: 1.2;
+            transition: all .15s ease;
+        }
+        .super-admin-shell .btn-primary,
+        .super-admin-shell .btn-success {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, .25);
+        }
+        .super-admin-shell .btn-primary:hover,
+        .super-admin-shell .btn-success:hover {
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, .35);
+        }
+        .super-admin-shell .btn-danger {
+            color: #ef4444;
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        .super-admin-shell .btn-danger:hover {
+            color: #fff;
+            background: #ef4444;
+        }
+        .super-admin-shell .btn-light,
+        .super-admin-shell .btn-outline-primary,
+        .super-admin-shell .btn-outline-indigo {
+            color: #64748b;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+        .super-admin-shell .btn-light:hover,
+        .super-admin-shell .btn-outline-primary:hover,
+        .super-admin-shell .btn-outline-indigo:hover {
+            color: #4f46e5;
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        .super-admin-shell .btn-sm {
+            min-height: 32px;
+            padding: 7px 12px;
+            font-size: .78rem;
+        }
+
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        body {
+            font-family: 'SolaimanLipi', 'Outfit', sans-serif;
+        }
+
+        .font-bn {
+            font-family: 'SolaimanLipi', sans-serif !important;
+        }
+
 		/* নোটিফিকেশন ড্রপডাউনটি ডান দিক থেকে এলাইন হবে */
 		.dropdown-menu-end {
 			right: 0 !important;
@@ -147,7 +220,7 @@
 	</style>
 	@yield('customCSS')
 </head>
-<body>
+<body class="super-admin-shell">
 	<div class="main-wrapper">
 		<!-- partial:partials/_sidebar.html -->
         @include('layouts.super.sidebar')

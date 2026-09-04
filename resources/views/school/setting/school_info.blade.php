@@ -15,6 +15,18 @@
             </div>
         </div>
 
+        <div class="settings-tabs mb-4">
+            <a href="{{ route('admin.school.info-edit', ['tenant' => auth()->user()->school->slug]) }}" class="settings-tab active">
+                <i class="fa-solid fa-sliders me-2"></i> General
+            </a>
+            <a href="{{ route('admin.school.api-setup', ['tenant' => auth()->user()->school->slug]) }}" class="settings-tab">
+                <i class="fa-solid fa-plug me-2"></i> API Setup
+            </a>
+            <a href="{{ route('admin.school.communication', ['tenant' => auth()->user()->school->slug]) }}" class="settings-tab">
+                <i class="fa-solid fa-comments me-2"></i> Communication
+            </a>
+        </div>
+
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="form-card">
@@ -51,6 +63,29 @@
 
                             <div class="col-md-12">
                                 <div class="section-divider"></div>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>School Location</h6>
+                                <p class="text-muted small mb-3">Set the division, district and upazila for regional reporting.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Division</label>
+                                <select name="division" id="division" class="form-select" data-selected="{{ $school->division }}" >
+                                    <option value="">Select division</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">District</label>
+                                <select name="district" id="district" class="form-select" data-selected="{{ $school->district }}" disabled>
+                                    <option value="">Select district</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Upazila</label>
+                                <select name="upazila" id="upazila" class="form-select" data-selected="{{ $school->upazila }}" disabled>
+                                    <option value="">Select upazila</option>
+                                </select>
                             </div>
 
                             {{-- Assets --}}
@@ -90,4 +125,66 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('customJs')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const division = document.getElementById('division');
+    const district = document.getElementById('district');
+    const upazila = document.getElementById('upazila');
+    const routes = {
+        divisions: @json(route('school.locations.divisions', ['tenant' => auth()->user()->school->slug])),
+        districts: `${window.location.origin}/locations/districts`,
+        upazilas: `${window.location.origin}/locations/upazilas`
+    };
+
+    const reset = (select, label) => {
+        select.innerHTML = `<option value="">${label}</option>`;
+        select.disabled = true;
+    };
+    const fill = (select, items, key, label, selected) => {
+        reset(select, label);
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item[key];
+            option.textContent = item[`${key}_bn`] || item[key];
+            option.selected = option.value === selected;
+            select.appendChild(option);
+        });
+        select.disabled = false;
+    };
+    const request = url => fetch(url).then(response => {
+        if (!response.ok) throw new Error('Location request failed');
+        return response.json();
+    });
+
+    request(routes.divisions).then(data => {
+        fill(division, data, 'name', 'Select division', division.dataset.selected);
+        if (division.value) division.dispatchEvent(new Event('change'));
+    });
+    division.addEventListener('change', function () {
+        reset(district, 'Select district');
+        reset(upazila, 'Select upazila');
+        if (!this.value) return;
+        request(`${routes.districts}/${encodeURIComponent(this.value)}`).then(data => {
+            fill(district, data, 'name', 'Select district', district.dataset.selected);
+            if (district.value) district.dispatchEvent(new Event('change'));
+        }).catch(error => console.error('District loading failed:', error));
+    });
+    district.addEventListener('change', function () {
+        reset(upazila, 'Select upazila');
+        if (!this.value) return;
+        request(`${routes.upazilas}/${encodeURIComponent(this.value)}`).then(data => {
+            fill(upazila, data, 'name', 'Select upazila', upazila.dataset.selected);
+        }).catch(error => console.error('Upazila loading failed:', error));
+    });
+});
+</script>
+<style>
+.settings-tabs { display:flex; gap:8px; padding:7px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; overflow-x:auto; }
+.settings-tab { white-space:nowrap; padding:11px 18px; border-radius:10px; color:#64748b; font-size:.875rem; font-weight:700; text-decoration:none; transition:all .2s ease; }
+.settings-tab:hover { color:#4f46e5; background:#eef2ff; }
+.settings-tab.active { color:#fff; background:linear-gradient(135deg,#4f46e5,#7c3aed); box-shadow:0 4px 12px rgba(79,70,229,.25); }
+</style>
 @endsection

@@ -122,6 +122,12 @@
                         <span>Subscription Packages</span>
                     </a>
                 </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('super.subscription-payments.index') }}" class="edu-nav-link {{ Request::is('super-admin/subscription-payments*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-money-check-dollar edu-nav-icon"></i>
+                        <span>Subscription Payments</span>
+                    </a>
+                </li>
 
                 {{-- Events --}}
                 <li class="edu-nav-item">
@@ -206,6 +212,13 @@
                        class="edu-nav-link {{ Request::is('api-setup') ? 'active' : '' }}">
                         <i data-feather="link"></i>
                         <span>API Setup</span>
+                    </a>
+                </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('settings.payment') }}"
+                       class="edu-nav-link {{ Request::is('payment-setup') ? 'active' : '' }}">
+                        <i data-feather="credit-card"></i>
+                        <span>Payment Setup</span>
                     </a>
                 </li>
             @endcan

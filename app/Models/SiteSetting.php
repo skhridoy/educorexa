@@ -55,13 +55,21 @@ class SiteSetting extends Model
         'logo_wide', 'logo_square', 'favicon', 'meta_title', 'meta_description', 'meta_keywords', 'og_image',
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username', 'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
         'inbound_webhook_secret', 'inbound_webhook_enabled'
-        , 'imap_enabled', 'imap_host', 'imap_port', 'imap_username', 'imap_password', 'imap_encryption', 'imap_folder'
+        , 'imap_enabled', 'imap_host', 'imap_port', 'imap_username', 'imap_password', 'imap_encryption', 'imap_folder',
+        'payment_mode', 'bkash_personal_number', 'nagad_personal_number',
+        'bkash_merchant_number', 'bkash_merchant_id', 'bkash_api_key', 'bkash_api_secret',
+        'nagad_merchant_number', 'nagad_merchant_id', 'nagad_api_key', 'nagad_api_secret',
+        'manual_payment_instructions'
     ];
 
     protected $casts = [
         'inbound_webhook_enabled' => 'boolean',
         'imap_enabled' => 'boolean',
         'imap_password' => 'encrypted',
+        'bkash_api_key' => 'encrypted',
+        'bkash_api_secret' => 'encrypted',
+        'nagad_api_key' => 'encrypted',
+        'nagad_api_secret' => 'encrypted',
     ];
 
 }

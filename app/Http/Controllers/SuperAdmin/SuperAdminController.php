@@ -18,6 +18,7 @@ use App\Mail\SchoolApprovedMail;
 use App\Mail\ProfessionalEmailDetailsMail;
 use Illuminate\Support\Facades\Mail;
 use App\Services\MailServerService;
+use App\Services\SubscriptionBillingService;
 
 class SuperAdminController extends Controller
 {
@@ -27,13 +28,34 @@ class SuperAdminController extends Controller
         $pendingSchools = School::where('status', 'pending')->count();
         $totalSchools = School::count();
         $recentSchools = School::latest()->take(5)->get();
+        $schoolsByDivision = School::query()
+            ->select('division', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('division')
+            ->where('division', '!=', '')
+            ->groupBy('division')
+            ->orderByDesc('total')
+            ->get();
+        $schoolsByDistrict = School::query()
+            ->select('district', 'division', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('district')
+            ->where('district', '!=', '')
+            ->groupBy('district', 'division')
+            ->orderByDesc('total')
+            ->get();
+        $schoolsWithoutLocation = School::where(function ($query) {
+            $query->whereNull('division')->orWhere('division', '')
+                ->orWhereNull('district')->orWhere('district', '');
+        })->count();
         $upcomingEvents = Event::where('event_date', '>=', now())
                                ->where('is_active', true)
                                ->orderBy('event_date', 'asc')
                                ->take(5)
                                ->get();
 
-        return view('super.dashboard', compact('pendingSchools', 'totalSchools', 'recentSchools', 'upcomingEvents', 'mainDomain'));
+        return view('super.dashboard', compact(
+            'pendingSchools', 'totalSchools', 'recentSchools', 'upcomingEvents',
+            'mainDomain', 'schoolsByDivision', 'schoolsByDistrict', 'schoolsWithoutLocation'
+        ));
     }
 
     // ২. পেন্ডিং স্কুল লিস্ট
@@ -84,6 +106,8 @@ class SuperAdminController extends Controller
                 // ৭. সবচেয়ে গুরুত্বপূর্ণ: Spatie এর ইন্টারনাল ক্যাশ ক্লিয়ার করা
                 app()[PermissionRegistrar::class]->forgetCachedPermissions();
             }
+
+            app(SubscriptionBillingService::class)->startTrial($school);
         });
        try {
             // ডাটাবেস থেকে লেটেস্ট ডাটা নিশ্চিত করতে রিফ্রেশ করুন
@@ -103,11 +127,35 @@ class SuperAdminController extends Controller
         return redirect()->route('manage.schools.all')->with('success', 'School Approved & Welcome Email Sent!');
     }
         
-    public function allSchools()
+    public function allSchools(Request $request)
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');
-        $schools = School::all();
-        return view('super.schools.all', compact('schools', 'mainDomain'));
+        $query = School::query();
+
+        if ($request->filled('division')) {
+            $query->where('division', $request->division);
+        }
+        if ($request->filled('district')) {
+            $query->where('district', $request->district);
+        }
+
+        $schools = $query->with('subscriptionPackage')->latest()->get();
+        $divisions = School::whereNotNull('division')->where('division', '!=', '')
+            ->distinct()->orderBy('division')->pluck('division');
+        $districts = School::whereNotNull('district')->where('district', '!=', '')
+            ->when($request->division, fn ($q) => $q->where('division', $request->division))
+            ->distinct()->orderBy('district')->pluck('district');
+        $divisionSummary = School::select('division', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('division')->where('division', '!=', '')
+            ->groupBy('division')->orderByDesc('total')->get();
+        $districtSummary = School::select('district', 'division', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('district')->where('district', '!=', '')
+            ->groupBy('district', 'division')->orderByDesc('total')->take(10)->get();
+
+        return view('super.schools.all', compact(
+            'schools', 'mainDomain', 'divisions', 'districts',
+            'divisionSummary', 'districtSummary'
+        ));
     }
 
     public function rejectSchool(School $school)
@@ -176,6 +224,10 @@ class SuperAdminController extends Controller
                 'is_active' => true,
                 'subscription_package_id' => $defaultPackage ? $defaultPackage->id : null,
             ]);
+
+            if ($defaultPackage) {
+                app(SubscriptionBillingService::class)->startTrial($newSchool);
+            }
 
             // 2️⃣ Create School Admin User
             $adminUser = User::create([
@@ -410,16 +462,8 @@ class SuperAdminController extends Controller
 
         $package = \App\Models\SubscriptionPackage::findOrFail($request->package_id);
 
-        $school->update([
-            'subscription_package_id' => $package->id
-        ]);
+        app(SubscriptionBillingService::class)->createPending($school, $package);
 
-        try {
-            \Illuminate\Support\Facades\Mail::to($school->email)->send(new \App\Mail\PackageUpgraded($school, $package));
-        } catch (\Exception $e) {
-            \Log::error("Failed to send package upgrade mail: " . $e->getMessage());
-        }
-
-        return back()->with('success', "School package updated to {$package->name} successfully.");
+        return back()->with('success', "Payment request created for {$package->name}. The package will activate after verification.");
     }
 }

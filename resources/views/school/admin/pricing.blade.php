@@ -13,6 +13,18 @@
                     <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill">
                         Current Plan: {{ $currentSchool->subscriptionPackage->name ?? 'Basic' }}
                     </span>
+                    @if($activeSubscription)
+                        <span class="badge bg-success px-3 py-2 rounded-pill ms-1">
+                            {{ $activeSubscription->status === 'trialing' ? '7-Day Free Trial' : 'Active' }}
+                            @if($activeSubscription->status === 'trialing')
+                                · {{ $activeSubscription->trial_ends_at->format('d M Y') }}
+                            @elseif($activeSubscription->ends_at)
+                                · {{ $activeSubscription->ends_at->format('d M Y') }}
+                            @endif
+                        </span>
+                    @else
+                        <span class="badge bg-danger px-3 py-2 rounded-pill ms-1">Payment Required</span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -55,19 +67,17 @@
                         </ul>
 
                         <div class="d-grid">
-                            @if($currentSchool->subscription_package_id == $package->id)
-                                <button class="btn btn-outline-secondary disabled" disabled>
-                                    <i data-feather="check" class="me-1 icon-sm"></i> Current Plan
+                            <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                <button type="submit" class="btn {{ $package->id == $currentSchool->subscription_package_id ? 'btn-primary' : ($package->is_popular ? 'btn-primary' : 'btn-outline-primary') }} ripple-effect w-100">
+                                    @if($package->id == $currentSchool->subscription_package_id)
+                                        <i data-feather="credit-card" class="me-1 icon-sm"></i> Pay Now
+                                    @else
+                                        <i data-feather="arrow-up" class="me-1 icon-sm"></i> Upgrade Now
+                                    @endif
                                 </button>
-                            @else
-                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
-                                    <button type="submit" class="btn {{ $package->is_popular ? 'btn-primary' : 'btn-outline-primary' }} ripple-effect w-100">
-                                        {{ $package->price > ($currentSchool->subscriptionPackage->price ?? 0) ? 'Upgrade Now' : 'Change Plan' }}
-                                    </button>
-                                </form>
-                            @endif
+                            </form>
                         </div>
                     </div>
                 </div>

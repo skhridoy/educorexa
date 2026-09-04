@@ -1,16 +1,16 @@
 <div class="container-fluid p-0 mb-5 shadow-sm" style="min-height: 600px; position: relative; z-index: 1; overflow: hidden;">
-    <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+    <div id="header-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5500">
         <div class="carousel-inner">
             @forelse($sliders as $key => $slider)
                 <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
                     <div class="carousel-caption d-block">
                         <div class="container h-100">
-                            <div class="row align-items-center h-100 g-5">
+                            <div class="row align-items-center h-100 g-3 g-lg-5">
                                 <!-- Left text -->
                                 <div class="col-lg-6 text-start text-white animate__animated animate__fadeInLeft">
                                     <h6 class="text-gold text-uppercase mb-3 fw-bold" style="letter-spacing: 2px; font-size: 15px;">{{ $slider->subtitle ?? 'Welcome to Our Academy' }}</h6>
                                     <h1 class="display-4 text-white mb-4 fw-bold" style="font-family: 'Outfit', sans-serif; line-height: 1.2;">{{ $slider->title ?? $school->name }}</h1>
-                                    <p class="fs-6 text-white-50 mb-4 d-none d-md-block">Experience a world-class education designed to build character, inspire intellect, and prepare outstanding global citizens.</p>
+                                    <p class="fs-6 text-white-50 mb-4">Experience a world-class education designed to build character, inspire intellect, and prepare outstanding global citizens.</p>
                                     
                                     <div class="mt-4 d-flex flex-wrap gap-3">
                                         <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-gold py-3 px-4 fw-bold">Apply Now <i class="fas fa-arrow-right ms-2"></i></a>
@@ -18,9 +18,9 @@
                                     </div>
                                 </div>
                                 <!-- Right image -->
-                                <div class="col-lg-6 text-center animate__animated animate__fadeInRight d-none d-lg-block">
+                                <div class="col-lg-6 text-center animate__animated animate__fadeInRight d-block">
                                     <div class="hero-image-wrapper bg-white shadow-lg p-2" style="border-radius: 30px; display: inline-block; width: 90%; transform: rotate(1.5deg); transition: 0.5s;">
-                                        <img class="img-fluid w-100" src="{{ asset($slider->image) }}" alt="Slider Image" style="border-radius: 25px; height: 380px; object-fit: cover;">
+                                        <img class="img-fluid w-100 school-hero-image" src="{{ asset($slider->image) }}" alt="Slider Image" style="border-radius: 25px; height: 380px; object-fit: cover;">
                                     </div>
                                 </div>
                             </div>
@@ -31,12 +31,12 @@
                 <div class="carousel-item active">
                     <div class="carousel-caption d-block">
                         <div class="container h-100">
-                            <div class="row align-items-center h-100 g-5">
+                            <div class="row align-items-center h-100 g-3 g-lg-5">
                                 <!-- Left text -->
                                 <div class="col-lg-6 text-start text-white animate__animated animate__fadeInLeft">
                                     <h6 class="text-gold text-uppercase mb-3 fw-bold" style="letter-spacing: 2px; font-size: 15px;">Welcome to Our School</h6>
                                     <h1 class="display-4 text-white mb-4 fw-bold" style="font-family: 'Outfit', sans-serif; line-height: 1.2;">Welcome to {{ $school->name ?? 'Our School' }}</h1>
-                                    <p class="fs-6 text-white-50 mb-4 d-none d-md-block">Experience a world-class education designed to build character, inspire intellect, and prepare outstanding global citizens.</p>
+                                    <p class="fs-6 text-white-50 mb-4">Experience a world-class education designed to build character, inspire intellect, and prepare outstanding global citizens.</p>
                                     
                                     <div class="mt-4 d-flex flex-wrap gap-3">
                                         <a href="{{ route('admission.create', ['tenant' => $school->slug]) }}" class="btn btn-gold py-3 px-4 fw-bold">Apply Now <i class="fas fa-arrow-right ms-2"></i></a>
@@ -44,9 +44,9 @@
                                     </div>
                                 </div>
                                 <!-- Right image -->
-                                <div class="col-lg-6 text-center animate__animated animate__fadeInRight d-none d-lg-block">
+                                <div class="col-lg-6 text-center animate__animated animate__fadeInRight d-block">
                                     <div class="hero-image-wrapper bg-white shadow-lg p-2" style="border-radius: 30px; display: inline-block; width: 90%; transform: rotate(1.5deg); transition: 0.5s;">
-                                        <img class="img-fluid w-100" src="{{ asset('main/img/hero.jpg') }}" alt="Default Hero" style="border-radius: 25px; height: 380px; object-fit: cover;">
+                                        <img class="img-fluid w-100 school-hero-image" src="{{ asset('main/img/hero.jpg') }}" alt="Default Hero" style="border-radius: 25px; height: 380px; object-fit: cover;">
                                     </div>
                                 </div>
                             </div>
@@ -55,6 +55,13 @@
                 </div>
             @endforelse
         </div>
+        @if($sliders->count() > 1)
+            <div class="carousel-indicators mb-3">
+                @foreach($sliders as $key => $slider)
+                    <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="{{ $key }}" class="{{ $key === 0 ? 'active' : '' }}" aria-current="{{ $key === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $key + 1 }}"></button>
+                @endforeach
+            </div>
+        @endif
         @if($sliders->count() > 1)
             <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: invert(1) grayscale(100) brightness(200);"></span>
@@ -100,18 +107,33 @@
     .hero-image-wrapper:hover {
         transform: rotate(0deg) scale(1.02) !important;
     }
+    .school-hero-image { display:block; }
     @media (max-width: 991px) {
         .carousel-item {
             height: auto;
-            min-height: 450px;
-            padding: 50px 0;
+            min-height: 650px;
+            padding: 32px 0 46px;
         }
         .carousel-caption {
             position: relative;
             height: auto;
         }
         .display-4 {
-            font-size: 2.2rem !important;
+            font-size: 1.85rem !important;
+        }
+        .school-hero-image {
+            height: 230px !important;
+        }
+        .hero-image-wrapper {
+            width: 94% !important;
+            border-radius: 20px !important;
+        }
+        .hero-image-wrapper img {
+            border-radius: 16px !important;
+        }
+        .carousel-caption .btn {
+            padding: 10px 14px !important;
+            font-size: .82rem;
         }
     }
 </style>

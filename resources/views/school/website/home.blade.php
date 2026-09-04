@@ -91,9 +91,97 @@
 
         /* Stats Counter */
         .stats-bar {
-            background: var(--navy);
-            padding: 80px 0;
-            color: #fff;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f4f8fc 0%, #e8f1f8 55%, #fdfaf0 100%);
+            padding: 72px 0;
+            color: var(--navy);
+        }
+        .stats-bar::before,
+        .stats-bar::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(249, 184, 0, .16);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .stats-bar::before {
+            width: 320px;
+            height: 320px;
+            top: -190px;
+            right: -80px;
+        }
+        .stats-bar::after {
+            width: 240px;
+            height: 240px;
+            bottom: -165px;
+            left: -75px;
+        }
+        .stats-bar .container {
+            position: relative;
+            z-index: 1;
+        }
+        .stats-card {
+            position: relative;
+            height: 100%;
+            padding: 28px 22px 24px;
+            overflow: hidden;
+            text-align: center;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(0, 33, 71, .08);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .9);
+            box-shadow: 0 14px 32px rgba(0, 33, 71, .1);
+            backdrop-filter: blur(8px);
+            transition: transform .3s ease, background .3s ease, box-shadow .3s ease;
+        }
+        .stats-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 22%;
+            right: 22%;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 0 0 8px 8px;
+        }
+        .stats-card:hover {
+            background: #fff;
+            box-shadow: 0 20px 42px rgba(0, 33, 71, .16);
+            transform: translateY(-8px);
+        }
+        .stats-icon {
+            width: 66px;
+            height: 66px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 17px;
+            color: var(--gold);
+            font-size: 1.65rem;
+            background: rgba(249, 184, 0, .15);
+            border: 1px solid rgba(249, 184, 0, .35);
+            border-radius: 50%;
+        }
+        .stats-card h2 {
+            font-size: clamp(1.8rem, 3vw, 2.35rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: .02em;
+            color: var(--navy) !important;
+        }
+        .stats-card p {
+            color: #64748b;
+            font-size: .76rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+        }
+        @media (max-width: 575px) {
+            .stats-bar { padding: 48px 0; }
+            .stats-bar .row { --bs-gutter-x: .8rem; --bs-gutter-y: .8rem; }
+            .stats-card { padding: 21px 10px 18px; border-radius: 14px; }
+            .stats-icon { width: 50px; height: 50px; margin-bottom: 13px; font-size: 1.25rem; }
+            .stats-card p { font-size: .62rem; letter-spacing: .04em; }
         }
 
         /* Notice & News */
@@ -107,6 +195,32 @@
             border-left-color: var(--gold);
             transform: translateX(5px);
         }
+
+        /* Latest news trigger */
+        .news-trigger {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 1050;
+            width: min(360px, calc(100vw - 32px));
+            background: #fff;
+            border: 1px solid #e6edf2;
+            border-left: 4px solid var(--gold);
+            border-radius: 12px;
+            box-shadow: 0 14px 35px rgba(0, 33, 71, .18);
+            transform: translateY(140%);
+            opacity: 0;
+            transition: transform .35s ease, opacity .35s ease;
+        }
+        .news-trigger.is-visible { transform: translateY(0); opacity: 1; }
+        .news-trigger-link { display: block; padding: 15px 42px 15px 16px; color: #002147; text-decoration: none; }
+        .news-trigger-link:hover { color: #002147; background: #fffdf4; }
+        .news-trigger-label { display: flex; align-items: center; gap: 7px; color: #a16207; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+        .news-trigger-title { display: block; margin-top: 5px; font-size: 15px; font-weight: 800; line-height: 1.35; }
+        .news-trigger-date { display: block; margin-top: 5px; color: #64748b; font-size: 11px; }
+        .news-trigger-close { position: absolute; top: 8px; right: 9px; width: 25px; height: 25px; padding: 0; border: 0; border-radius: 50%; background: #f1f5f9; color: #64748b; cursor: pointer; }
+        .news-trigger-close:hover { background: #e2e8f0; color: #002147; }
+        @media (max-width: 575px) { .news-trigger { right: 16px; bottom: 16px; } }
 
         /* Teachers */
         .teacher-item {
@@ -342,25 +456,33 @@
     <div class="container-fluid stats-bar my-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
             <div class="row g-4">
-                <div class="col-md-3 text-center">
-                    <i class="fa fa-users fa-3x text-gold mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $studentCount ?? 1200 }}</h2>
-                    <p class="text-uppercase mb-0">Total Students</p>
+                <div class="col-6 col-md-3">
+                    <div class="stats-card">
+                        <span class="stats-icon"><i class="fa fa-users"></i></span>
+                        <h2 class="text-white mb-2" data-toggle="counter-up">{{ $studentCount }}</h2>
+                        <p class="text-uppercase mb-0">Total Students</p>
+                    </div>
                 </div>
-                <div class="col-md-3 text-center">
-                    <i class="fa fa-user-tie fa-3x text-gold mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">{{ $teacherCount ?? 45 }}</h2>
-                    <p class="text-uppercase mb-0">Expert Teachers</p>
+                <div class="col-6 col-md-3">
+                    <div class="stats-card">
+                        <span class="stats-icon"><i class="fa fa-user-tie"></i></span>
+                        <h2 class="text-white mb-2" data-toggle="counter-up">{{ $teacherCount }}</h2>
+                        <p class="text-uppercase mb-0">Expert Teachers</p>
+                    </div>
                 </div>
-                <div class="col-md-3 text-center">
-                    <i class="fa fa-award fa-3x text-gold mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">100</h2>
-                    <p class="text-uppercase mb-0">Success Rate (%)</p>
+                <div class="col-6 col-md-3">
+                    <div class="stats-card">
+                        <span class="stats-icon"><i class="fa fa-award"></i></span>
+                        <h2 class="text-white mb-2" data-toggle="counter-up">{{ $noticeCount }}</h2>
+                        <p class="text-uppercase mb-0">Published Notices</p>
+                    </div>
                 </div>
-                <div class="col-md-3 text-center">
-                    <i class="fa fa-graduation-cap fa-3x text-gold mb-3"></i>
-                    <h2 class="text-white mb-2" data-toggle="counter-up">25</h2>
-                    <p class="text-uppercase mb-0">Years of Excellence</p>
+                <div class="col-6 col-md-3">
+                    <div class="stats-card">
+                        <span class="stats-icon"><i class="fa fa-graduation-cap"></i></span>
+                        <h2 class="text-white mb-2" data-toggle="counter-up">{{ $classCount }}</h2>
+                        <p class="text-uppercase mb-0">Academic Classes</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -423,6 +545,18 @@
             </div>
         </div>
     </div>
+
+    @if($notices->isNotEmpty())
+        @php $latestNotice = $notices->first(); @endphp
+        <aside class="news-trigger" id="school-news-trigger" data-notice-id="{{ $latestNotice->id }}">
+            <button type="button" class="news-trigger-close" aria-label="Close news alert"><i class="fa fa-times"></i></button>
+            <a class="news-trigger-link" href="{{ route('frontend.notice', ['tenant' => $school->slug]) }}">
+                <span class="news-trigger-label"><i class="fa fa-bell"></i> নতুন নোটিশ</span>
+                <span class="news-trigger-title">{{ $latestNotice->title }}</span>
+                <span class="news-trigger-date">বিস্তারিত দেখতে ক্লিক করুন</span>
+            </a>
+        </aside>
+    @endif
 
     {{-- Overview Section --}}
     <div class="container-xxl py-5 bg-light" id="overview">
@@ -606,14 +740,28 @@
 @endsection
 
 @push('customJs')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.counterup@2.1.0/jquery.counterup.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('[data-toggle="counter-up"]').counterUp({
-                delay: 10,
-                time: 2000
+        (function () {
+            const trigger = document.getElementById('school-news-trigger');
+            if (!trigger) return;
+
+            const storageKey = 'school-news-seen-' + @json($school->slug);
+            const noticeId = trigger.dataset.noticeId;
+            const closeButton = trigger.querySelector('.news-trigger-close');
+
+            if (window.localStorage.getItem(storageKey) !== noticeId) {
+                window.setTimeout(() => trigger.classList.add('is-visible'), 700);
+            }
+
+            closeButton.addEventListener('click', function () {
+                window.localStorage.setItem(storageKey, noticeId);
+                trigger.classList.remove('is-visible');
             });
-        });
+
+            trigger.querySelector('.news-trigger-link').addEventListener('click', function () {
+                window.localStorage.setItem(storageKey, noticeId);
+            });
+        })();
+
     </script>
 @endpush

@@ -88,6 +88,37 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-md-4">
+                                            <div class="form-floating custom-floating">
+                                                <select name="division" id="division" class="form-select" required>
+                                                    <option value="">বিভাগ নির্বাচন করুন</option>
+                                                </select>
+                                                <label for="division"><i class="bi bi-map me-2 text-muted"></i>বিভাগ</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating custom-floating">
+                                                <select name="district" id="district" class="form-select" required disabled>
+                                                    <option value="">জেলা নির্বাচন করুন</option>
+                                                </select>
+                                                <label for="district"><i class="bi bi-geo-alt me-2 text-muted"></i>জেলা</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-floating custom-floating">
+                                                <select name="upazila" id="upazila" class="form-select" required disabled>
+                                                    <option value="">উপজেলা নির্বাচন করুন</option>
+                                                </select>
+                                                <label for="upazila"><i class="bi bi-pin-map me-2 text-muted"></i>উপজেলা</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-floating custom-floating">
+                                                <textarea name="address" id="address" class="form-control" placeholder="School address" style="height: 100px" required>{{ old('address') }}</textarea>
+                                                <label for="address"><i class="bi bi-house me-2 text-muted"></i>এড্রেস</label>
+                                            </div>
+                                        </div>
+
                                         <div class="col-12">
                                             <label class="form-label small fw-bold text-secondary mb-1 ps-1">Login Subdomain</label>
                                             <div class="input-group custom-input-group shadow-sm">
@@ -275,6 +306,56 @@
             this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
             const val = this.value || 'abcschool';
             previewUrl.textContent = `${val}.${host}`;
+        });
+
+        const division = document.getElementById('division');
+        const district = document.getElementById('district');
+        const upazila = document.getElementById('upazila');
+        const oldDivision = @json(old('division'));
+        const oldDistrict = @json(old('district'));
+        const oldUpazila = @json(old('upazila'));
+
+        const resetSelect = (select, label) => {
+            select.innerHTML = `<option value="">${label}</option>`;
+            select.disabled = true;
+        };
+        const fillSelect = (select, items, key, label, selected) => {
+            resetSelect(select, label);
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item[key];
+                option.textContent = item[`${key}_bn`] || item[key];
+                option.selected = option.value === selected;
+                select.appendChild(option);
+            });
+            select.disabled = false;
+        };
+        const loadJson = (url) => fetch(url).then(response => {
+            if (!response.ok) throw new Error('Location request failed');
+            return response.json();
+        });
+
+        loadJson(@json(route('locations.divisions'))).then(data => {
+            fillSelect(division, data, 'name', 'বিভাগ নির্বাচন করুন', oldDivision);
+            if (oldDivision) division.dispatchEvent(new Event('change'));
+        }).catch(() => {});
+
+        division.addEventListener('change', function() {
+            resetSelect(district, 'জেলা নির্বাচন করুন');
+            resetSelect(upazila, 'উপজেলা নির্বাচন করুন');
+            if (!this.value) return;
+            loadJson(`${@json(url('/locations/districts'))}/${encodeURIComponent(this.value)}`).then(data => {
+                fillSelect(district, data, 'name', 'জেলা নির্বাচন করুন', oldDistrict);
+                if (oldDistrict) district.dispatchEvent(new Event('change'));
+            });
+        });
+
+        district.addEventListener('change', function() {
+            resetSelect(upazila, 'উপজেলা নির্বাচন করুন');
+            if (!this.value) return;
+            loadJson(`${@json(url('/locations/upazilas'))}/${encodeURIComponent(this.value)}`).then(data => {
+                fillSelect(upazila, data, 'name', 'উপজেলা নির্বাচন করুন', oldUpazila);
+            });
         });
     });
 </script>

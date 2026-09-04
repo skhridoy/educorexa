@@ -1,81 +1,8 @@
 @extends('layouts.main')
 
 @section('customCSS')
+@include('school.others._modern_design_styles')
 <style>
-    /* ===== Dashboard Specific Styles ===== */
-    .edu-stat-card {
-        background: #ffffff;
-        border: 1px solid #f1f5f9;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.05);
-        transition: border-color 0.2s ease, transform 0.2s ease;
-    }
-    .edu-stat-card:hover {
-        border-color: #c7d2fe;
-        transform: translateY(-2px);
-    }
-    @media (max-width: 576px) {
-        .edu-stat-card { padding: 16px; }
-        .edu-stat-card .stat-value { font-size: 1.4rem; }
-        .edu-stat-card .icon-wrap { width: 38px; height: 38px; font-size: 1rem; }
-    }
-    .edu-stat-card .icon-wrap {
-        width: 48px; height: 48px; border-radius: 12px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.25rem;
-        transition: transform 0.2s ease;
-    }
-    .edu-stat-card:hover .icon-wrap { transform: scale(1.1); }
-    .edu-stat-card .stat-badge {
-        font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
-    }
-    .edu-stat-card .stat-label {
-        font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
-        font-weight: 700; color: #64748b; margin-bottom: 4px;
-    }
-    .edu-stat-card .stat-value {
-        font-size: 1.75rem; font-weight: 700; color: #1e293b; line-height: 1;
-    }
-
-    /* Quick Actions gradient card */
-    .quick-actions-card {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        border-radius: 16px; padding: 32px; color: #ffffff;
-        min-height: 100%;
-    }
-    .quick-action-btn {
-        width: 100%; display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 16px; background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-        color: #ffffff; font-weight: 600; font-size: 0.875rem;
-        transition: background 0.2s ease; text-decoration: none; margin-bottom: 10px;
-    }
-    .quick-action-btn:hover { background: rgba(255,255,255,0.2); color: #ffffff; }
-    .quick-action-btn i { font-size: 1rem; opacity: 0.7; }
-    .quick-action-btn .arrow { opacity: 0; transition: opacity 0.2s, transform 0.2s; }
-    .quick-action-btn:hover .arrow { opacity: 1; transform: translateX(4px); }
-
-    /* Activity Feed */
-    .activity-card {
-        background: #ffffff; border: 1px solid #f1f5f9; border-radius: 16px;
-        padding: 32px; box-shadow: 0px 4px 20px rgba(15,23,42,0.05);
-    }
-    .activity-item { display: flex; gap: 16px; }
-    .activity-avatar { position: relative; flex-shrink: 0; }
-    .activity-avatar img, .activity-avatar .avatar-icon {
-        width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-    }
-    .activity-avatar .avatar-icon {
-        display: flex; align-items: center; justify-content: center;
-        background: #fef3c7; color: #d97706; font-size: 1rem;
-    }
-    .activity-badge {
-        position: absolute; bottom: -2px; right: -2px;
-        width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff;
-        display: flex; align-items: center; justify-content: center; font-size: 9px;
-    }
-
     /* Events panel */
     .event-item {
         padding: 16px; border-radius: 14px; border-left: 5px solid transparent;
@@ -91,47 +18,18 @@
     .event-item.green { border-left-color: #22c55e; background: #f0fdf4; }
     .event-time { font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
 
-    /* Attendance bar chart */
-    .attendance-card {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        border-radius: 16px; padding: 24px; color: #fff; position: relative; overflow: hidden;
-    }
-    .attendance-card::before {
-        content: ''; position: absolute; top: -40px; right: -40px;
-        width: 120px; height: 120px; border-radius: 50%;
-        background: rgba(99,102,241,0.2); filter: blur(40px);
-    }
-    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; position: relative; z-index: 1; }
-    .bar { flex: 1; border-radius: 4px 4px 0 0; background: rgba(255,255,255,0.15); transition: background 0.2s; }
-    .bar.active { background: #6366f1; box-shadow: 0 0 15px rgba(99,102,241,0.5); }
-    .bar:hover { background: rgba(255,255,255,0.3); }
-
     /* Recent Schools Table */
-    .schools-panel { background: #fff; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0px 4px 20px rgba(15,23,42,0.05); }
-    .panel-header { padding: 24px 28px; border-bottom: 1px solid #f8fafc; display: flex; justify-content: space-between; align-items: center; }
-    .panel-title { font-size: 1.05rem; font-weight: 700; color: #1e293b; margin: 0; }
-    .edu-table thead th { background: #1e293b; color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 14px 16px; border: none; }
-    .edu-table thead th:first-child { border-radius: 8px 0 0 8px; }
-    .edu-table thead th:last-child  { border-radius: 0 8px 8px 0; }
-    .edu-table tbody td { padding: 14px 16px; vertical-align: middle; border-bottom: 1px solid #f8fafc; color: #475569; }
-    .edu-table tbody tr:last-child td { border-bottom: none; }
-    .edu-table tbody tr:hover td { background: #fafbff; }
     .school-name { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
     .school-date { font-size: 0.75rem; color: #94a3b8; }
     .school-icon { width: 36px; height: 36px; background: #eef2ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-size: 0.9rem; flex-shrink: 0; }
     .slug-code { background: #eef2ff; color: #4f46e5; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-family: monospace; }
     .badge-active   { background: #dcfce7; color: #16a34a; font-weight: 700; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; }
     .badge-inactive { background: #f1f5f9; color: #64748b; font-weight: 700; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; }
+    .location-stat { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #f8fafc; }
+    .location-stat:hover { border-color: #a5b4fc; background: #eef2ff; }
+    .location-stat-name { color: #334155; font-size: .82rem; font-weight: 700; }
+    .location-stat-count { color: #4f46e5; font-size: 1.35rem; font-weight: 800; line-height: 1.1; }
 
-    /* Mobile Table Overrides */
-    @media (max-width: 768px) {
-        .edu-table thead { display: none; }
-        .edu-table tbody tr { display: block; padding: 15px; border-bottom: 8px solid #f8fafc; }
-        .edu-table tbody td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border: none; text-align: right; width: 100%; }
-        .edu-table tbody td::before { content: attr(data-label); font-weight: 700; font-size: 10px; text-transform: uppercase; color: #94a3b8; text-align: left; }
-        .edu-table tbody td:last-child { justify-content: center; border-top: 1px solid #f1f5f9; margin-top: 10px; padding-top: 15px; }
-        .edu-table tbody td:last-child::before { display: none; }
-    }
 </style>
 @endsection
 
@@ -147,6 +45,14 @@
             else                               { $greeting = "Good Night";     $faIcon = "fa-moon";    $greetColor = "#3b82f6"; }
         @endphp
 
+        @php
+            $authUser = auth()->user();
+            $bannerUserPhoto = asset('assets/images/profile.webp');
+            if ($authUser?->photo) {
+                $bannerUserPhoto = asset('uploads/super_admin/' . $authUser->photo);
+            }
+        @endphp
+
         {{-- ===== WELCOME HERO CARD ===== --}}
         <div class="welcome-card mb-5 p-4 p-md-5 position-relative overflow-hidden" style="border-radius:24px; background:linear-gradient(135deg, #1e293b, #334155); color:white; box-shadow: 0 10px 30px rgba(15,23,42,0.15);">
             <!-- Abstract background shapes -->
@@ -156,12 +62,11 @@
             <div class="row align-items-center position-relative" style="z-index:1;">
                 <div class="col-md-8">
                     <div class="d-flex align-items-center gap-3 mb-2">
-                        <div class="greet-icon-box" style="width:50px; height:50px; background:rgba(255,255,255,0.1); border-radius:14px; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
-                            <i class="fa-solid {{ $faIcon }} fa-xl" style="color:{{ $greetColor == '#3b82f6' ? '#60a5fa' : $greetColor }}"></i>
+                        <img src="{{ $bannerUserPhoto }}" alt="{{ auth()->user()->name }}" class="welcome-user-avatar" onerror="this.onerror=null;this.src='{{ asset('assets/images/profile.webp') }}';">
+                        <div>
+                            <h2 class="mb-0 fw-bold" style="font-family:'Outfit',sans-serif; letter-spacing:-0.02em;">{{ $greeting }}, {{ auth()->user()->name }}!</h2>
+                            <p class="mb-0 opacity-75" style="font-size:0.82rem;">EduCorexa Command Center</p>
                         </div>
-                        <h2 class="mb-0 fw-bold" style="font-family:'Outfit',sans-serif; letter-spacing:-0.02em;">
-                            {{ $greeting }}, {{ auth()->user()->name }}!
-                        </h2>
                     </div>
                     <p class="mb-0 opacity-75" style="font-size:1rem; max-width:500px;">
                         Welcome back to the EduCorexa Command Center. Here's a real-time overview of your platform's performance today.
@@ -316,6 +221,69 @@
                 </div>
             </div>
 
+        </div>
+
+        {{-- ===== LOCATION REGISTRATION ANALYSIS ===== --}}
+        <div class="row g-4 mb-4">
+            <div class="col-lg-5">
+                <div class="schools-panel h-100">
+                    <div class="panel-header">
+                        <div>
+                            <h6 class="panel-title mb-1">Schools by Division</h6>
+                            <small class="text-muted">Registration coverage by region</small>
+                        </div>
+                        <i class="fa-solid fa-map-location-dot text-primary"></i>
+                    </div>
+                    <div class="p-3">
+                        <div class="row g-2">
+                            @forelse($schoolsByDivision as $item)
+                                <div class="col-6">
+                                    <div class="location-stat">
+                                        <div class="location-stat-name">{{ $item->division }}</div>
+                                        <div class="location-stat-count">{{ $item->total }}</div>
+                                        <small class="text-muted">schools</small>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="col-12 text-muted small py-3">No division data available yet.</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="schools-panel h-100">
+                    <div class="panel-header">
+                        <div>
+                            <h6 class="panel-title mb-1">Schools by District</h6>
+                            <small class="text-muted">Target areas for marketing campaigns</small>
+                        </div>
+                        <span class="badge-indigo">{{ $schoolsByDistrict->count() }} districts</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table edu-table mb-0">
+                            <thead><tr><th>District</th><th>Division</th><th class="text-end">Schools</th></tr></thead>
+                            <tbody>
+                                @forelse($schoolsByDistrict as $item)
+                                    <tr>
+                                        <td class="fw-semibold">{{ $item->district }}</td>
+                                        <td class="text-muted">{{ $item->division ?: '—' }}</td>
+                                        <td class="text-end"><span class="badge-indigo">{{ $item->total }}</span></td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="3" class="text-center text-muted py-4">No district data available yet.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    @if($schoolsWithoutLocation > 0)
+                        <div class="px-3 pb-3 small text-warning">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i>
+                            {{ $schoolsWithoutLocation }} school(s) need location data.
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
         {{-- ===== BOTTOM ROW: Recent Schools Table + Side Panels ===== --}}

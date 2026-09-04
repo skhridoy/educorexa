@@ -26,10 +26,11 @@ use App\Http\Controllers\SuperAdmin\{
 
 // Site Map 
 Route::get('/sitemap.xml', function () {
-
+    $baseUrl = rtrim(config('app.url'), '/');
+    $mainDomain = config('app.main_domain');
     $schools = School::all();
 
-    return response()->view('sitemap', compact('schools'))
+    return response()->view('sitemap', compact('schools', 'baseUrl', 'mainDomain'))
         ->header('Content-Type', 'application/xml');
 });
 /*
@@ -52,6 +53,9 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
+    Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('locations.divisions');
+    Route::get('/locations/districts/{division}', [SchoolRegisterController::class, 'districts'])->name('locations.districts');
+    Route::get('/locations/upazilas/{district}', [SchoolRegisterController::class, 'upazilas'])->name('locations.upazilas');
     Route::get('/forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
     Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetPasswordForm'])->name('password.reset');
@@ -160,6 +164,8 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
             Route::get('/api-setup', [SettingController::class, 'apiSetup'])->name('settings.api');
             Route::post('/api-setup', [SettingController::class, 'updateApiSetup'])->name('settings.api.update');
+            Route::get('/payment-setup', [SettingController::class, 'paymentSetup'])->name('settings.payment');
+            Route::post('/payment-setup', [SettingController::class, 'updatePaymentSetup'])->name('settings.payment.update');
         });
         // Common Profile & Settings
         Route::get('/profile', [SuperAdminController::class, 'Profile'])->name('profile');
@@ -189,6 +195,9 @@ Route::domain(config('app.main_domain'))->group(function () {
         });
         Route::resource('employees', EmployeeController::class);
         Route::resource('subscription-packages', SubscriptionPackageController::class);
+        Route::get('/subscription-payments', [\App\Http\Controllers\SuperAdmin\SchoolSubscriptionController::class, 'index'])->name('subscription-payments.index');
+        Route::post('/subscription-payments/{subscription}/approve', [\App\Http\Controllers\SuperAdmin\SchoolSubscriptionController::class, 'approve'])->name('subscription-payments.approve');
+        Route::post('/subscription-payments/{subscription}/reject', [\App\Http\Controllers\SuperAdmin\SchoolSubscriptionController::class, 'reject'])->name('subscription-payments.reject');
         Route::patch('testimonials/{testimonial}/toggle', [TestimonialController::class, 'toggleStatus'])->name('testimonials.toggle');
         Route::resource('testimonials', TestimonialController::class);
         Route::resource('events', EventController::class);
@@ -226,6 +235,9 @@ Route::domain('{tenant}.' . config('app.main_domain'))
 
             Route::get('exam-routine/subjects-by-class/{classId}', [ExamRoutineController::class, 'subjectsByClass'])->name('exam.routine.subjects.by.class');
             Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
+            Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('school.locations.divisions');
+            Route::get('/locations/districts/{division}', [SchoolRegisterController::class, 'districts'])->name('school.locations.districts');
+            Route::get('/locations/upazilas/{district}', [SchoolRegisterController::class, 'upazilas'])->name('school.locations.upazilas');
             // Duplicate DELETE route removed (handled in auth middleware group)
 
             // Login Form
@@ -278,6 +290,8 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     Route::get('admin/dashboard', [DashboardController::class, 'index'])
                         ->name('school.dashboard');
                     Route::get('admin/pricing', [DashboardController::class, 'pricing'])->name('school.pricing');
+                    Route::get('admin/subscription-payment', [\App\Http\Controllers\SchoolSubscriptionController::class, 'create'])->name('school.subscription-payment.create');
+                    Route::post('admin/subscription-payment', [\App\Http\Controllers\SchoolSubscriptionController::class, 'store'])->name('school.subscription-payment.store');
                     Route::post('admin/upgrade', [DashboardController::class, 'upgradeRequest'])->name('school.upgrade.request');
                     Route::get('admin/review/create', [ReviewController::class, 'create'])->name('school.review.create');
                     Route::post('admin/review/store', [ReviewController::class, 'store'])->name('school.review.store');

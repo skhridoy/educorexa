@@ -336,12 +336,24 @@
     @if($user->hasRole('school_admin') || $user->role === 'school_admin')
     @php
         $currentPackage = optional($school->subscriptionPackage);
+        $activeSubscription = $school->activeSubscription();
         $isPremium = $currentPackage->is_popular ?? false;
         $packageName = $currentPackage->name ?? 'Basic';
     @endphp
 
     <div class="edu-sidebar-footer mx-3 mb-3 mt-auto sidebar-folded-hide">
-        @if(!$isPremium)
+        @if(!$activeSubscription)
+            <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #b91c1c, #ef4444);">
+                <div class="card-body p-3 text-white text-center">
+                    <div class="mb-1"><i class="fa-solid fa-credit-card fa-xl opacity-85"></i></div>
+                    <h6 class="fw-bold mb-1" style="font-size:12.5px;">{{ __('Payment Required') }}</h6>
+                    <p class="mb-2" style="font-size:10.5px; opacity:0.85; line-height:1.3;">{{ __('Your trial or subscription has ended.') }}</p>
+                    <a href="{{ route('school.pricing', ['tenant' => $tenant]) }}" class="btn w-100 rounded-pill py-1.5 fw-bold" style="background:#fff; color:#b91c1c; font-size:11.5px;">
+                        <i class="fa-solid fa-arrow-right me-1"></i> {{ __('Pay Now') }}
+                    </a>
+                </div>
+            </div>
+        @elseif(!$isPremium)
             {{-- Basic Package: Upgrade Card --}}
             <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
                 <div class="card-body p-3 text-white text-center">

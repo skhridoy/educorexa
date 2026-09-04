@@ -1,7 +1,6 @@
 @extends('layouts.school')
 
 @section('customCSS')
-    @include('school.others._modern_design_styles')
     <style>
         /* Responsive adjustments for the welcome card */
         @media (max-width: 768px) {

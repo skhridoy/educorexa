@@ -27,7 +27,7 @@
             @if($school && $school->logo)
                 <img src="{{ asset($school->logo) }}" alt="Logo" style="height: 45px;" class="me-2">
             @endif
-            <h2 class="m-0 text-navy fw-bold school-name-text d-none d-lg-inline" style="font-size: 1.5rem;">{{ $school->name ?? 'Edu Corexa' }}</h2>
+            <h2 class="m-0 text-navy fw-bold school-name-text d-inline" style="font-size: 1.5rem;">{{ $school->name ?? 'Edu Corexa' }}</h2>
         </a>
         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -129,6 +129,14 @@
         .navbar-brand img {
             height: 40px !important;
         }
+        .school-name-text {
+            max-width: 190px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1rem !important;
+        }
+        .navbar-brand { min-width: 0; }
         .btn-navy {
             margin: 15px;
             display: block;

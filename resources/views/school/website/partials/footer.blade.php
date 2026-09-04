@@ -7,7 +7,7 @@
         <div class="row g-5">
             <div class="col-md-6 col-lg-3">
                 <h5 class="text-white mb-4">Contact Us</h5>
-                <p class="small mb-2"><i class="fa fa-map-marker-alt me-3 text-gold"></i>{{ $school->address ?? 'Address not set' }}</p>
+                <p class="small mb-2"><i class="fa fa-map-marker-alt me-3 text-gold"></i>{{ filled($school->address) ? $school->address : 'Address not set' }}</p>
                 <p class="small mb-2"><i class="fa fa-phone-alt me-3 text-gold"></i>{{ $school->phone ?? 'Phone not set' }}</p>
                 <p class="small mb-4"><i class="fa fa-envelope me-3 text-gold"></i>{{ $school->email ?? 'Email not set' }}</p>
                 

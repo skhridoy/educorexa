@@ -1,18 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="eoLqsNruvR1AE3AKJLgPKIemPNHHjhwn8OLrGHyvQyk" />
-    <meta name="description" content="{{ $setting->meta_description ?? 'EduCorexa - The Most Reliable ERP Software for Schools' }}">
-    <meta name="keywords" content="{{ $setting->meta_keywords ?? 'School ERP, Education Management Software, Smart School Solution' }}">
+    <meta name="description" content="@yield('seo_description', $setting->meta_description ?? 'EduCorexa হলো আধুনিক স্কুল ম্যানেজমেন্ট সফটওয়্যার। ভর্তি, হাজিরা, ফলাফল, হিসাব ও অভিভাবক যোগাযোগ এক প্ল্যাটফর্মে পরিচালনা করুন।')">
+    <meta name="keywords" content="@yield('seo_keywords', $setting->meta_keywords ?? 'school management software, স্কুল ম্যানেজমেন্ট সফটওয়্যার, school ERP, school management system, শিক্ষা প্রতিষ্ঠান সফটওয়্যার')">
     <meta name="author" content="{{ $setting->site_name ?? 'EduCorexa' }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@yield('seo_title', $setting->meta_title ?? 'EduCorexa | School Management Software')">
+    <meta property="og:description" content="@yield('seo_description', $setting->meta_description ?? 'আধুনিক শিক্ষা প্রতিষ্ঠান পরিচালনার সম্পূর্ণ সমাধান।')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ $setting->site_name ?? 'EduCorexa' }}">
     <link rel="icon" type="image/x-icon" href="{{ asset($setting->favicon ?? 'frontend/img/favicon.ico') }}">
     <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
     {{-- টাইটেল সেকশন, যদি $setting না থাকে তবে ডিফল্ট নাম দেখাবে --}}    
     {{-- $setting ভেরিয়েবল না থাকলে ডিফল্ট নাম দেখাবে --}}
-    <title>@yield('title', $setting->site_name ?? 'EduCorexa') - @yield('subtitle', $setting->meta_title ?? 'EduCorexa')</title>
+    <title>@yield('title', $setting->site_name ?? 'EduCorexa') - @yield('subtitle', 'School Management Software')</title>
+
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'SoftwareApplication',
+        'name' => $setting->site_name ?? 'EduCorexa',
+        'url' => url('/'),
+        'applicationCategory' => 'BusinessApplication',
+        'operatingSystem' => 'Web',
+        'description' => $setting->meta_description ?? 'স্কুল ম্যানেজমেন্ট সফটওয়্যার দিয়ে শিক্ষা প্রতিষ্ঠান পরিচালনার সম্পূর্ণ সমাধান।',
+        'offers' => ['@type' => 'Offer', 'priceCurrency' => 'BDT', 'price' => '0'],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
     
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;family=Noto+Sans+Bengali:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -112,12 +131,23 @@
       }
     </script>
 <style>
-        /* Font fallback for Bengali using Noto Sans Bengali (web font) */
+        @font-face {
+            font-family: 'SolaimanLipi';
+            src: url('{{ asset('fonts/SolaimanLipi.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body, p, span:not(.material-symbols-outlined), div, a, li, td, th, label, input, button {
-            font-family: 'Inter', 'Noto Sans Bengali', sans-serif !important;
+            font-family: 'SolaimanLipi', 'Inter', sans-serif !important;
         }
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Manrope', 'Noto Sans Bengali', sans-serif !important;
+            font-family: 'SolaimanLipi', 'Manrope', sans-serif !important;
+        }
+        .font-label-sm, .font-headline-lg, .font-headline-md, .font-body-lg,
+        .font-body-md, .font-display-xl, .font-sans {
+            font-family: 'SolaimanLipi', 'Inter', sans-serif !important;
         }
         
         .material-symbols-outlined {

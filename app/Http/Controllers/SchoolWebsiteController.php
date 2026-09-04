@@ -55,6 +55,8 @@ class SchoolWebsiteController extends Controller
 
         $studentCount = Student::where('school_id', $school->id)->count();
         $teacherCount = Teacher::where('school_id', $school->id)->count();
+        $classCount = Classes::where('school_id', $school->id)->count();
+        $noticeCount = Notice::where('school_id', $school->id)->where('is_active', true)->count();
 
         $overviews = SchoolOverview::where('school_id', $school->id)
                             ->orderBy('order_by', 'asc')
@@ -62,7 +64,7 @@ class SchoolWebsiteController extends Controller
 
         return view('school.website.home', compact(
             'school', 'notices', 'sliders', 'about',
-            'teachers', 'studentCount', 'teacherCount', 'overviews'
+            'teachers', 'studentCount', 'teacherCount', 'classCount', 'noticeCount', 'overviews'
         ));
     }
 

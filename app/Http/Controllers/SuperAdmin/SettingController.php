@@ -161,4 +161,44 @@ class SettingController extends Controller
 
         return back()->with('success', 'API Settings updated successfully!');
     }
+
+    public function paymentSetup()
+    {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+        return view('super.settings.payment_setup', compact('setting'));
+    }
+
+    public function updatePaymentSetup(Request $request)
+    {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+
+        $validated = $request->validate([
+            'payment_mode' => 'required|in:personal,merchant',
+            'bkash_personal_number' => 'nullable|regex:/^01[3-9]\d{8}$/',
+            'nagad_personal_number' => 'nullable|regex:/^01[3-9]\d{8}$/',
+            'bkash_merchant_number' => 'nullable|regex:/^01[3-9]\d{8}$/',
+            'bkash_merchant_id' => 'nullable|string|max:100',
+            'bkash_api_key' => 'nullable|string|max:500',
+            'bkash_api_secret' => 'nullable|string|max:500',
+            'nagad_merchant_number' => 'nullable|regex:/^01[3-9]\d{8}$/',
+            'nagad_merchant_id' => 'nullable|string|max:100',
+            'nagad_api_key' => 'nullable|string|max:500',
+            'nagad_api_secret' => 'nullable|string|max:500',
+            'manual_payment_instructions' => 'nullable|string|max:2000',
+        ]);
+
+        foreach ($validated as $key => $value) {
+            if (str_ends_with($key, '_api_key') || str_ends_with($key, '_api_secret')) {
+                if ($value !== null && $value !== '') {
+                    $setting->{$key} = $value;
+                }
+                continue;
+            }
+            $setting->{$key} = $value;
+        }
+
+        $setting->save();
+
+        return back()->with('success', 'Payment setup updated successfully.');
+    }
 }

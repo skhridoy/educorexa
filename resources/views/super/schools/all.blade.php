@@ -21,6 +21,49 @@
         @endcan
     </div>
 
+    <div class="edu-panel mb-4">
+        <div class="edu-panel-hd">
+            <h6 class="edu-panel-ttl"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Location Analysis</h6>
+            <span style="font-size:0.8rem;color:#94a3b8;">Marketing overview</span>
+        </div>
+        <form method="GET" class="row g-3 p-3">
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-muted">Division</label>
+                <select name="division" class="form-select" onchange="this.form.submit()">
+                    <option value="">All divisions</option>
+                    @foreach($divisions as $division)
+                        <option value="{{ $division }}" @selected(request('division') === $division)>{{ $division }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-muted">District</label>
+                <select name="district" class="form-select">
+                    <option value="">All districts</option>
+                    @foreach($districts as $district)
+                        <option value="{{ $district }}" @selected(request('district') === $district)>{{ $district }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100"><i class="fa-solid fa-filter me-1"></i>Analyze</button>
+            </div>
+        </form>
+        <div class="row g-3 px-3 pb-3">
+            @forelse($divisionSummary as $item)
+                <div class="col-sm-6 col-lg-3">
+                    <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                        <div class="small text-muted">{{ $item->division }}</div>
+                        <div class="fs-4 fw-bold text-primary">{{ $item->total }}</div>
+                        <div class="small text-muted">registered schools</div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12 text-muted small">Location data will appear as schools register with division and district.</div>
+            @endforelse
+        </div>
+    </div>
+
     <div class="edu-panel">
         <div class="edu-panel-hd">
             <h6 class="edu-panel-ttl">Schools List</h6>
@@ -32,6 +75,7 @@
                     <tr>
                         <th>#</th>
                         <th>School</th>
+                        <th>Location</th>
                         <th>Package</th>
                         <th>Admin Email</th>
                         <th>Domain</th>
@@ -51,6 +95,10 @@
                                 </div>
                                 <span style="font-weight:700;color:#1e293b;">{{ $school->name }}</span>
                             </div>
+                        </td>
+                        <td>
+                            <div class="small fw-semibold">{{ $school->district ?: '—' }}</div>
+                            <div class="small text-muted">{{ $school->division ?: 'Location not set' }}</div>
                         </td>
                         <td>
                             <div class="dropdown">
@@ -116,7 +164,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="edu-empty">
+                        <td colspan="7" class="edu-empty">
                             <i class="fa-solid fa-school-flag"></i>
                             <p>No schools registered yet.</p>
                         </td>

@@ -3,14 +3,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://educorexa.com</loc>
+        <loc>{{ $baseUrl }}</loc>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
 
+    @foreach(['/features', '/pricing', '/why-us', '/contact', '/blogs', '/register-school'] as $path)
+    <url>
+        <loc>{{ $baseUrl . $path }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
+
     @foreach($schools as $school)
     <url>
-        <loc>https://{{ $school->slug }}.educorexa.com</loc>
+        <loc>{{ parse_url($baseUrl, PHP_URL_SCHEME) . '://' . $school->slug . '.' . $mainDomain }}</loc>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>

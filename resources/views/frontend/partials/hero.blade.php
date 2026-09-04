@@ -8,12 +8,12 @@
         $heroContent = json_decode($heroSection->content, true) ?? [];
     }
 
-    // Defaults matching the reference image
-    $title = $heroContent['title'] ?? 'The Most Reliable ERP <br><span class="text-slate-800">Software</span>';
-    $description = $heroContent['description'] ?? 'We make learning engaging & effective, so that you are ready to achieve your goals';
-    $btn1_text = $heroContent['btn1_text'] ?? 'Get Started';
+    // বাংলা fallback content for the public homepage
+    $title = $heroContent['title'] ?? 'আপনার প্রতিষ্ঠানের জন্য<br><span class="text-slate-800">স্মার্ট শিক্ষা ব্যবস্থাপনা</span>';
+    $description = $heroContent['description'] ?? 'EduCorexa হলো আধুনিক school management software, যেখানে ভর্তি, হাজিরা, ফলাফল, হিসাব ও অভিভাবক যোগাযোগ এক জায়গা থেকে পরিচালনা করা যায়।';
+    $btn1_text = $heroContent['btn1_text'] ?? 'শুরু করুন';
     $btn1_link = $heroContent['btn1_link'] ?? 'http://schoolerp.test/register-school';
-    $btn2_text = $heroContent['btn2_text'] ?? 'View Demo';
+    $btn2_text = $heroContent['btn2_text'] ?? 'ডেমো দেখুন';
     $btn2_link = $heroContent['btn2_link'] ?? '#';
     
     // Using a high-quality girl pointing image from Unsplash as fallback
@@ -21,17 +21,17 @@
 @endphp
 
 <!-- Reference-Matched Hero Section -->
-<section class="relative min-h-[85vh] flex items-center overflow-hidden px-4 lg:px-20 bg-gradient-to-br from-[#FFFBEB] to-[#FFF1F2]">
+<section class="relative min-h-[68vh] flex items-center overflow-hidden px-4 lg:px-20 bg-gradient-to-br from-[#FFFBEB] to-[#FFF1F2]">
     
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10 py-12 md:py-20">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10 py-8 md:py-12">
         
         <!-- Left Content -->
-        <div class="space-y-6 md:space-y-8 animate-fade-in-left">
-            <div class="space-y-4 md:space-y-5">
-                <h1 class="font-display-xl text-[32px] sm:text-[40px] md:text-[50px] lg:text-[60px] text-[#2D2D2D] font-extrabold leading-[1.2] md:leading-[1.1] tracking-tight">
+        <div class="space-y-5 md:space-y-6 animate-fade-in-left">
+            <div class="space-y-3 md:space-y-4">
+                <h1 class="font-display-xl text-[28px] sm:text-[34px] md:text-[42px] lg:text-[48px] text-[#2D2D2D] font-extrabold leading-[1.2] md:leading-[1.12] tracking-tight">
                     {!! $title !!}
                 </h1>
-                <p class="font-body-lg text-sm sm:text-base md:text-lg text-slate-600 max-w-lg leading-relaxed">
+                <p class="font-body-lg text-sm sm:text-base md:text-base text-slate-600 max-w-lg leading-relaxed">
                     {{ $description }}
                 </p>
             </div>
@@ -53,14 +53,14 @@
         </div>
 
         <!-- Right Side: Image with Floating Cards -->
-        <div class="relative animate-fade-in-right flex justify-center lg:justify-end mt-12 lg:mt-0">
+        <div class="relative animate-fade-in-right flex justify-center lg:justify-end mt-6 lg:mt-0">
             <!-- Background Dotted Circle -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border-2 border-dashed border-red-300 rounded-full opacity-40 animate-[spin_20s_linear_infinite]"></div>
             
             <!-- Main Image Container with Red/Pink Circle -->
-            <div class="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden border-[10px] sm:border-[15px] border-white shadow-2xl z-20">
+            <div class="relative w-[230px] h-[230px] sm:w-[290px] sm:h-[290px] md:w-[360px] md:h-[360px] lg:w-[410px] lg:h-[410px] rounded-full overflow-hidden border-[8px] sm:border-[11px] border-white shadow-2xl z-20">
                 <div class="absolute inset-0 bg-[#FF5A79]"></div>
-                <img src="{{ $image }}" alt="Education Potential" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[110%] object-cover object-top scale-110">
+                <img src="{{ $image }}" alt="শিক্ষা ব্যবস্থাপনা" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[110%] object-cover object-top scale-110">
             </div>
 
             <!-- Floating Info Cards -->
@@ -71,7 +71,7 @@
                 </div>
                 <div>
                     <p class="text-base sm:text-xl font-black text-[#2D2D2D]">15+</p>
-                    <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">Districts</p>
+                    <p class="text-[8px] sm:text-[10px] font-bold text-slate-400">জেলা</p>
                 </div>
             </div>
 
@@ -81,7 +81,7 @@
                     <span class="material-symbols-outlined text-[18px] sm:text-[24px]">school</span>
                 </div>
                 <p class="text-base sm:text-xl font-black text-[#2D2D2D]">25K</p>
-                <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">Students</p>
+                <p class="text-[8px] sm:text-[10px] font-bold text-slate-400">শিক্ষার্থী</p>
             </div>
 
             <!-- 20+ School -->
@@ -91,7 +91,7 @@
                 </div>
                 <div>
                     <p class="text-base sm:text-xl font-black text-[#2D2D2D]">20+</p>
-                    <p class="text-[8px] sm:text-[10px] uppercase font-bold text-slate-400">School</p>
+                    <p class="text-[8px] sm:text-[10px] font-bold text-slate-400">প্রতিষ্ঠান</p>
                 </div>
             </div>
         </div>

@@ -9,6 +9,10 @@ use App\Mail\SchoolPendingMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rule;
+use App\Models\SubscriptionPackage;
+use App\Services\SubscriptionBillingService;
 
 class SchoolRegisterController extends Controller
 {
@@ -21,11 +25,15 @@ class SchoolRegisterController extends Controller
     {
         $request->validate([
             'school_name'     => 'required|string|max:255',
+            'division'        => 'required|string|max:100',
+            'district'        => 'required|string|max:100',
+            'upazila'         => 'required|string|max:100',
+            'address'         => 'required|string|max:500',
             'slug'            => 'required|alpha_num|unique:schools,slug',
             'admin_name'      => 'required|string|max:255',
             'admin_email'     => 'required|email|unique:users,email',
             'admin_password'  => 'required|min:8',
-            'package_id'      => 'required|exists:subscription_packages,id',
+            'package_id'      => ['required', Rule::exists('subscription_packages', 'id')->where('is_active', true)],
         ]);
 
         // আমরা ডাটাগুলো ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবলে রাখছি
@@ -40,9 +48,23 @@ class SchoolRegisterController extends Controller
                 'slug'   => strtolower($request->slug),
                 'app_code' => $appCode,
                 'email'  => $request->admin_email,
+                'division' => $request->division,
+                'district' => $request->district,
+                'upazila' => $request->upazila,
+                'address' => implode(', ', [
+                    $request->address,
+                    $request->upazila,
+                    $request->district,
+                    $request->division,
+                ]),
                 'status' => 'pending',
                 'subscription_package_id' => $request->package_id,
             ]);
+
+            app(SubscriptionBillingService::class)->createPending(
+                $newSchool,
+                SubscriptionPackage::findOrFail($request->package_id)
+            );
 
             // 2️⃣ Create School Admin User
             $user = User::create([
@@ -56,6 +78,7 @@ class SchoolRegisterController extends Controller
             if (method_exists($user, 'assignRole')) {
                 $user->assignRole('school_admin');
             }
+
         });
 
         $superAdmin = User::where('role', 'super_admin')->first();
@@ -90,6 +113,135 @@ class SchoolRegisterController extends Controller
             ->with('success', 'School registered successful! Waiting for approval. You will receive an email once your school is approved.');
     }
 
+    public function divisions()
+    {
+        try {
+            $appPath = dirname(__DIR__, 2);
+            $rootPath = dirname($appPath);
+            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            
+            if (!file_exists($filePath)) {
+                return response()->json([
+                    'message' => 'লোকেশন ডেটা ফাইল পাওয়া যায়নি।',
+                ], 502);
+            }
+            
+            $json = file_get_contents($filePath);
+            $data = json_decode($json, true);
+            
+            if (!$data || !isset($data['divisions'])) {
+                return response()->json([
+                    'message' => 'লোকেশন ডেটা লোড করা যায়নি।',
+                ], 502);
+            }
+
+            $divisions = collect($data['divisions'])->map(function ($division) {
+                return [
+                    'name' => $division['name'],
+                    'name_bn' => $division['name_bn'] ?? $division['name'],
+                ];
+            })->values();
+
+            return response()->json($divisions);
+        } catch (\Exception $e) {
+            \Log::error('Division loading error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'লোকেশন ডেটা লোড করা যায়নি।',
+            ], 502);
+        }
+    }
+
+    public function districts(string $division)
+    {
+        try {
+            $appPath = dirname(__DIR__, 2); // app/Http -> app
+            $rootPath = dirname($appPath); // app -> educorexa (root)
+            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            
+            if (!file_exists($filePath)) {
+                return response()->json([
+                    'message' => 'ডিস্ট্রিক্ট ডেটা ফাইল পাওয়া যায়নি।',
+                ], 502);
+            }
+            
+            $json = file_get_contents($filePath);
+            $data = json_decode($json, true);
+            
+            if (!$data || !isset($data['divisions'])) {
+                return response()->json([
+                    'message' => 'ডিস্ট্রিক্ট ডেটা লোড করা যায়নি।',
+                ], 502);
+            }
+
+            $divisionData = collect($data['divisions'])
+                ->firstWhere('name', $division);
+
+            if (!$divisionData || !isset($divisionData['districts'])) {
+                return response()->json([]);
+            }
+
+            $districts = collect($divisionData['districts'])->map(function ($district) {
+                return [
+                    'name' => $district['name'],
+                    'name_bn' => $district['name_bn'] ?? $district['name'],
+                ];
+            })->values();
+
+            return response()->json($districts);
+        } catch (\Exception $e) {
+            \Log::error('District loading error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'ডিস্ট্রিক্ট ডেটা লোড করা যায়নি।',
+            ], 502);
+        }
+    }
+
+    public function upazilas(string $district)
+    {
+        try {
+            $appPath = dirname(__DIR__, 2); // app/Http -> app
+            $rootPath = dirname($appPath); // app -> educorexa (root)
+            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            
+            if (!file_exists($filePath)) {
+                return response()->json([
+                    'message' => 'উপজেলা ডেটা ফাইল পাওয়া যায়নি।',
+                ], 502);
+            }
+            
+            $json = file_get_contents($filePath);
+            $data = json_decode($json, true);
+            
+            if (!$data || !isset($data['divisions'])) {
+                return response()->json([
+                    'message' => 'উপজেলা ডেটা লোড করা যায়নি।',
+                ], 502);
+            }
+
+            $upazilas = [];
+            foreach ($data['divisions'] as $division) {
+                foreach ($division['districts'] as $dist) {
+                    if ($dist['name'] === $district && isset($dist['upazilas'])) {
+                        $upazilas = collect($dist['upazilas'])->map(function ($upazila) {
+                            return [
+                                'name' => $upazila['name'],
+                                'name_bn' => $upazila['name_bn'] ?? $upazila['name'],
+                            ];
+                        })->values()->toArray();
+                        break 2;
+                    }
+                }
+            }
+
+            return response()->json($upazilas);
+        } catch (\Exception $e) {
+            \Log::error('Upazila loading error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'উপজেলা ডেটা লোড করা যায়নি।',
+            ], 502);
+        }
+    }
+
     // ১. এডিট পেজ দেখানোর জন্য (GET Method)
     public function edit()
     {
@@ -106,6 +258,9 @@ class SchoolRegisterController extends Controller
 
         $request->validate([
             'name'    => 'required|string|max:255',
+            'division' => 'nullable|string|max:100',
+            'district' => 'nullable|string|max:100',
+            'upazila' => 'nullable|string|max:100',
             'logo'    => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             // 'image' রুলটি অনেক সময় ICO বা কিছু বিশেষ PNG-তে ঝামেলা করে, তাই শুধু mimes ব্যবহার করা নিরাপদ
             'favicon' => 'nullable|mimes:png,ico,jpg,jpeg|max:1024', 
@@ -116,6 +271,9 @@ class SchoolRegisterController extends Controller
         $school->phone = $request->phone;
         $school->ein_number = $request->ein_number;
         $school->emis_code = $request->emis_code;
+        $school->division = $request->division;
+        $school->district = $request->district;
+        $school->upazila = $request->upazila;
         if ($request->filled('app_code')) {
             $school->app_code = $request->app_code;
         }

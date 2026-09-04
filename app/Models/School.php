@@ -100,6 +100,9 @@ class School extends Model
         'admission_closed_message',
         'admission_close_date',
         'admission_academic_year_id',
+        'division',
+        'district',
+        'upazila',
     ];
 
     protected $casts = [
@@ -144,6 +147,31 @@ class School extends Model
     public function subscriptionPackage()
     {
         return $this->belongsTo(SubscriptionPackage::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(SchoolSubscription::class);
+    }
+
+    public function activeSubscription(): ?SchoolSubscription
+    {
+        $subscription = $this->subscriptions()
+            ->whereIn('status', ['trialing', 'active'])
+            ->latest('id')
+            ->first();
+
+        if ($subscription && !$subscription->isEntitled()) {
+            $subscription->update(['status' => 'expired']);
+            return null;
+        }
+
+        return $subscription;
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return (bool) $this->activeSubscription();
     }
 
     /**

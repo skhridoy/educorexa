@@ -240,7 +240,9 @@ class DashboardController extends Controller
     {
         $packages = SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
         $currentSchool = app('currentSchool');
-        return view('school.admin.pricing', compact('packages', 'currentSchool'));
+        $activeSubscription = $currentSchool->activeSubscription();
+        $pendingSubscription = $currentSchool->subscriptions()->where('status', 'pending')->latest()->first();
+        return view('school.admin.pricing', compact('packages', 'currentSchool', 'activeSubscription', 'pendingSubscription'));
     }
 
     public function upgradeRequest(Request $request)
@@ -250,21 +252,12 @@ class DashboardController extends Controller
         ]);
 
         $school = app('currentSchool');
-        $package = SubscriptionPackage::findOrFail($request->package_id);
+        $package = SubscriptionPackage::where('is_active', true)->findOrFail($request->package_id);
+        $pendingSubscription = app(\App\Services\SubscriptionBillingService::class)
+            ->createPending($school, $package);
 
-        // Update school package
-        $school->subscription_package_id = $package->id;
-        $school->save();
-
-        // Send Email
-        try {
-            Mail::to($school->email)->send(new PackageUpgraded($school, $package));
-        } catch (\Exception $e) {
-            // Log error but don't stop the flow
-            \Log::error("Failed to send upgrade email: " . $e->getMessage());
-        }
-
-        return redirect()->back()->with('success', 'Your subscription has been successfully upgraded to ' . $package->name . '. Enjoy the new features!');
+        return redirect()->route('school.subscription-payment.create', ['tenant' => $school->slug])
+            ->with('success', 'Enter your payment details to activate ' . $package->name . '.');
     }
 
     // অ্যাটেনডেন্স চার্ট ডাটা (API)
