@@ -106,4 +106,37 @@ class SubscriptionBillingService
 
         return $subscription->fresh();
     }
+
+    /**
+     * Activate a free (price = 0) package without any payment.
+     * Creates a subscription record and marks it active immediately.
+     */
+    public function activateFree(School $school, SubscriptionPackage $package): SchoolSubscription
+    {
+        $days = ($package->duration === 'yearly') ? 365 : 30;
+        $startsAt = now();
+        $endsAt   = $startsAt->copy()->addDays($days);
+
+        // Expire any existing active subscriptions
+        $school->subscriptions()
+            ->whereIn('status', ['active', 'trialing'])
+            ->update(['status' => 'expired']);
+
+        $subscription = $school->subscriptions()->create([
+            'subscription_package_id' => $package->id,
+            'status'    => 'active',
+            'amount'    => 0,
+            'currency'  => 'BDT',
+            'starts_at' => $startsAt,
+            'ends_at'   => $endsAt,
+            'paid_at'   => $startsAt,
+            'payment_reference' => 'FREE-' . strtoupper(uniqid()),
+        ]);
+
+        $school->update([
+            'subscription_package_id' => $package->id,
+        ]);
+
+        return $subscription->fresh();
+    }
 }

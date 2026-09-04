@@ -41,66 +41,497 @@
             font-weight: 500;
         }
 
-        /* Filter Card Toolbar */
-        .fee-filter-card {
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--card-shadow);
+        /* ═════════════════════════════════════════════════════════════
+           FEE AMOUNT PAGE CARDS & MODERN DESIGN SYSTEM
+        ══════════════════════════════════════════════════════════════ */
+        .fee-card-wrap {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(79, 70, 229, 0.06);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease;
         }
-        [data-bs-theme="dark"] .fee-filter-card,
-        body.dark-mode .fee-filter-card {
-            background: #0c1427 !important;
-            border-color: #1a253b !important;
+        .fee-card-wrap {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease;
+        }
+        .fee-card-header {
+            padding: 13px 18px;
+            background: linear-gradient(135deg, #fafbff 0%, #f1f5ff 100%);
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .fee-card-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .fee-icon-indigo {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            box-shadow: 0 3px 8px rgba(79, 70, 229, 0.2);
+        }
+        .fee-icon-sky {
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            box-shadow: 0 3px 8px rgba(14, 165, 233, 0.2);
+        }
+        .fee-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .fee-card-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin: 0;
+        }
+        .fee-card-body {
+            padding: 16px;
+        }
+        .fee-pill-badge {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            color: #4f46e5;
+            font-weight: 700;
+            font-size: 10.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid #c7d2fe;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .fee-pill-sky {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #0284c7;
+            border-color: #7dd3fc;
         }
 
-        /* Action Buttons (Exact Exam Page Styles) */
-        .btn-act {
-            width: 30px; height: 30px;
-            border-radius: 8px;
-            display: inline-flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-            font-size: 0.8rem;
-            text-decoration: none;
+        /* ── Modern Form Labels ── */
+        .fee-form-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* ── Modern Select Box (Compact, Tidy, No Arrow Overlap) ── */
+        .fee-select-modern {
+            width: 100%;
+            height: 38px;
+            padding: 7px 32px 7px 11px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px 14px;
             cursor: pointer;
         }
-        .btn-act-edit { 
-            background: #eff6ff !important; 
-            color: #3b82f6 !important; 
-            border: 1px solid #bfdbfe !important; 
+        .fee-select-modern:hover {
+            border-color: #94a3b8;
+            background-color: #ffffff;
         }
-        .btn-act-edit:hover { 
-            background: #3b82f6 !important; 
-            color: #fff !important; 
-            transform: translateY(-1px);
-        }
-        .btn-act-del { 
-            background: #fef2f2 !important; 
-            color: #ef4444 !important; 
-            border: 1px solid #fecaca !important; 
-        }
-        .btn-act-del:hover { 
-            background: #ef4444 !important; 
-            color: #fff !important; 
-            transform: translateY(-1px);
+        .fee-select-modern:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+            background-color: #ffffff;
         }
 
-        /* Class-wise fee table input */
-        .class-fee-input {
+        /* ── Disable Number Input Steppers / Spin Buttons ── */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button,
+        .fee-amount-input::-webkit-inner-spin-button,
+        .fee-amount-input::-webkit-outer-spin-button {
+            -webkit-appearance: none !important;
+            margin: 0 !important;
+        }
+        input[type="number"],
+        .fee-amount-input {
+            -moz-appearance: textfield !important;
+        }
+
+        /* ── Class-wise Fee Table & Input Wrap ── */
+        .fee-class-table-box {
             border: 1.5px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+        }
+        .fee-class-table-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .fee-class-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
+        }
+        .fee-class-table thead tr th {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            padding: 8px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        .fee-class-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .fee-class-table tbody tr:hover {
+            background: #f8faff;
+        }
+        .fee-class-table tbody tr td {
             padding: 6px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-size: 12px;
+        }
+        .fee-class-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .fee-class-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4f46e5;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* ── Modern Amount Input Wrap (Compact, No Spinner) ── */
+        .fee-amount-input-wrap {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            overflow: hidden;
+            width: 110px;
+            margin-left: auto;
+            transition: all 0.2s ease;
+        }
+        .fee-amount-input-wrap:hover {
+            border-color: #94a3b8;
+            background: #ffffff;
+        }
+        .fee-amount-input-wrap:focus-within {
+            border-color: #4f46e5;
+            background: #ffffff;
+            box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15);
+        }
+        .fee-curr-prefix {
+            padding: 4px 7px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #4f46e5;
+            background: #eef2ff;
+            border-right: 1px solid #c7d2fe;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .fee-amount-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 12.5px;
             font-weight: 700;
             color: #1e293b;
             text-align: right;
-            transition: all 0.2s;
-        }
-        .class-fee-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            padding: 4px 6px;
             outline: none;
+        }
+        .fee-amount-input::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* ── Primary Submit Button ── */
+        .fee-btn-save {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+            transition: all 0.2s ease;
+        }
+        .fee-btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.35);
+            color: #ffffff;
+        }
+
+        /* ═════════════════════════════════════════════════════════════
+           RIGHT TABLE: CURRENT CONFIGURATIONS
+        ══════════════════════════════════════════════════════════════ */
+        .fee-list-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
+        }
+        .fee-list-table thead tr th {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            padding: 11px 14px;
+            white-space: nowrap;
+        }
+        .fee-list-table tbody tr {
+            transition: background 0.15s ease;
+        }
+        .fee-list-table tbody tr:hover {
+            background: #f8faff;
+        }
+        .fee-list-table tbody tr td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            font-size: 12px;
+        }
+        .fee-list-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Fee Head Badge */
+        .fee-head-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 16px;
+            box-shadow: 0 1px 2px rgba(79, 70, 229, 0.05);
+        }
+
+        /* Class pill in table */
+        .fee-class-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #334155;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 1px 8px;
+            border-radius: 12px;
+            margin-top: 2px;
+        }
+
+        /* Amount Display */
+        .fee-amount-val {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #059669;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+        .fee-amount-val .fee-taka-sign {
+            font-size: 12px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        /* Action Buttons */
+        .fee-btn-edit {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #eff6ff !important;
+            color: #2563eb !important;
+            border: 1px solid #bfdbfe !important;
+            transition: all 0.2s;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .fee-btn-edit:hover {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+        .fee-btn-del {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
+            transition: all 0.2s;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .fee-btn-del:hover {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+        }
+
+        /* ═════════════════════════════════════════════════════════════
+           DARK MODE OVERRIDES
+        ══════════════════════════════════════════════════════════════ */
+        [data-bs-theme="dark"] .fee-card-wrap,
+        body.dark-mode .fee-card-wrap {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
+        }
+        [data-bs-theme="dark"] .fee-card-header,
+        body.dark-mode .fee-card-header {
+            background: linear-gradient(135deg, #0c1427, #111d35) !important;
+            border-color: #1a253b !important;
+        }
+        [data-bs-theme="dark"] .fee-card-title,
+        body.dark-mode .fee-card-title {
+            color: #f1f5f9 !important;
+        }
+        [data-bs-theme="dark"] .fee-card-subtitle,
+        body.dark-mode .fee-card-subtitle {
+            color: #94a3b8 !important;
+        }
+        [data-bs-theme="dark"] .fee-form-label,
+        body.dark-mode .fee-form-label {
+            color: #cbd5e1 !important;
+        }
+        [data-bs-theme="dark"] .fee-select-modern,
+        body.dark-mode .fee-select-modern {
+            background-color: #111d35 !important;
+            border-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") !important;
+        }
+        [data-bs-theme="dark"] .fee-select-modern:focus,
+        body.dark-mode .fee-select-modern:focus {
+            border-color: #6366f1 !important;
+            background-color: #14213d !important;
+        }
+        [data-bs-theme="dark"] .fee-class-table-box,
+        body.dark-mode .fee-class-table-box {
+            background: #0c1427 !important;
+            border-color: #1a253b !important;
+        }
+        [data-bs-theme="dark"] .fee-class-table thead tr th,
+        body.dark-mode .fee-class-table thead tr th,
+        [data-bs-theme="dark"] .fee-list-table thead tr th,
+        body.dark-mode .fee-list-table thead tr th {
+            background: #111d35 !important;
+            border-color: #1a253b !important;
+            color: #94a3b8 !important;
+        }
+        [data-bs-theme="dark"] .fee-class-table tbody tr:hover,
+        body.dark-mode .fee-class-table tbody tr:hover,
+        [data-bs-theme="dark"] .fee-list-table tbody tr:hover,
+        body.dark-mode .fee-list-table tbody tr:hover {
+            background: #111d35 !important;
+        }
+        [data-bs-theme="dark"] .fee-class-table tbody tr td,
+        body.dark-mode .fee-class-table tbody tr td,
+        [data-bs-theme="dark"] .fee-list-table tbody tr td,
+        body.dark-mode .fee-list-table tbody tr td {
+            border-color: #1a253b !important;
+        }
+        [data-bs-theme="dark"] .fee-amount-input-wrap,
+        body.dark-mode .fee-amount-input-wrap {
+            background: #111d35 !important;
+            border-color: #1e293b !important;
+        }
+        [data-bs-theme="dark"] .fee-curr-prefix,
+        body.dark-mode .fee-curr-prefix {
+            background: #1a253b !important;
+            border-color: #334155 !important;
+            color: #818cf8 !important;
+        }
+        [data-bs-theme="dark"] .fee-amount-input,
+        body.dark-mode .fee-amount-input {
+            color: #f1f5f9 !important;
+        }
+        [data-bs-theme="dark"] .fee-class-pill,
+        body.dark-mode .fee-class-pill {
+            background: #111d35 !important;
+            border-color: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+        [data-bs-theme="dark"] .fee-head-badge,
+        body.dark-mode .fee-head-badge {
+            background: #172554 !important;
+            border-color: #1e3a8a !important;
+            color: #93c5fd !important;
+        }
+        [data-bs-theme="dark"] .fee-amount-val,
+        body.dark-mode .fee-amount-val {
+            color: #34d399 !important;
+        }
+        [data-bs-theme="dark"] .fee-btn-edit,
+        body.dark-mode .fee-btn-edit {
+            background: #172554 !important;
+            border-color: #1e3a8a !important;
+            color: #60a5fa !important;
+        }
+        [data-bs-theme="dark"] .fee-btn-del,
+        body.dark-mode .fee-btn-del {
+            background: #450a0a !important;
+            border-color: #7f1d1d !important;
+            color: #f87171 !important;
         }
 
         @media (max-width: 991.98px) {
@@ -184,25 +615,31 @@
     ══════════════════════════════════════════════════════════════ --}}
     <div class="row g-4">
         {{-- ── Left: Fee Setup Form ── --}}
-        <div class="col-lg-5">
-            <div class="form-card sticky-top" style="top: 80px; z-index: 10;">
-                <div class="form-card-header">
-                    <div class="form-card-title">
-                        <div class="form-card-icon" style="background: #eff6ff; color: #3b82f6;">
+        <div class="col-xl-4 col-lg-5 col-md-12">
+            <div class="fee-card-wrap sticky-top" style="top: 80px; z-index: 10;">
+                <div class="fee-card-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fee-card-icon fee-icon-indigo">
                             <i class="fa-solid fa-plus-circle"></i>
                         </div>
-                        {{ __('Setup Category & Class Rates') }}
+                        <div>
+                            <h6 class="fee-card-title">{{ __('Setup Category & Class Rates') }}</h6>
+                            <small class="fee-card-subtitle">{{ __('Set class-wise fee amounts') }}</small>
+                        </div>
                     </div>
-                    <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
-                        {{ __('Fee Rates') }}
+                    <span class="fee-pill-badge">
+                        <i class="fa-solid fa-tag"></i> {{ __('Fee Rates') }}
                     </span>
                 </div>
-                <div class="form-card-body">
+                <div class="fee-card-body">
                     <form action="{{ route('fee-amounts.store', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-dark small">{{ __('Select Fee Head') }} <span class="text-danger">*</span></label>
-                            <select name="fee_head_id" class="form-select form-control-modern" required>
+                            <label class="fee-form-label">
+                                <i class="fa-solid fa-coins text-primary me-1"></i>
+                                {{ __('Select Fee Head') }} <span class="text-danger">*</span>
+                            </label>
+                            <select name="fee_head_id" class="fee-select-modern" required>
                                 <option value="" disabled selected>{{ __('Choose a Fee Head...') }}</option>
                                 @foreach($feeHeads as $head)
                                     <option value="{{ $head->id }}">{{ $head->name }} ({{ ucfirst($head->type) }})</option>
@@ -211,39 +648,48 @@
                         </div>
 
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark small">{{ __('Category') }} <span class="text-danger">*</span></label>
-                                <select id="setup_category_id" name="school_category_id" class="form-select form-control-modern" required>
+                            <div class="col-sm-6 col-12">
+                                <label class="fee-form-label">
+                                    <i class="fa-solid fa-layer-group text-primary me-1"></i>
+                                    {{ __('Category') }} <span class="text-danger">*</span>
+                                </label>
+                                <select id="setup_category_id" name="school_category_id" class="fee-select-modern" required>
                                     <option value="">{{ __('Select Category') }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark small">{{ __('Sub-Category') }}</label>
-                                <select id="setup_sub_category_id" name="school_sub_category_id" class="form-select form-control-modern">
+                            <div class="col-sm-6 col-12">
+                                <label class="fee-form-label">
+                                    <i class="fa-solid fa-cubes text-info me-1"></i>
+                                    {{ __('Sub-Category') }}
+                                </label>
+                                <select id="setup_sub_category_id" name="school_sub_category_id" class="fee-select-modern">
                                     <option value="">{{ __('None / All Groups') }}</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="mb-2 d-flex justify-content-between align-items-center">
-                            <label class="form-label fw-bold text-dark small mb-0">{{ __('Class-wise Amounts (টাকা)') }}:</label>
+                            <label class="fee-form-label mb-0">
+                                <i class="fa-solid fa-graduation-cap text-primary me-1"></i>
+                                {{ __('Class-wise Amounts (টাকা)') }}:
+                            </label>
                         </div>
-                        <div class="border rounded-3 overflow-hidden bg-white shadow-sm mb-4" style="border-color: #e2e8f0 !important;">
-                            <div class="table-responsive" style="max-height: 320px;">
-                                <table class="table table-sm modern-table align-middle mb-0">
-                                    <thead class="bg-light sticky-top" style="z-index: 5;">
+                        <div class="fee-class-table-box">
+                            <div class="fee-class-table-scroll">
+                                <table class="fee-class-table">
+                                    <thead>
                                         <tr>
-                                            <th class="ps-3 py-2 text-uppercase fs-11 text-muted">{{ __('Class Name') }}</th>
-                                            <th class="pe-3 py-2 text-end text-uppercase fs-11 text-muted" width="150">{{ __('Amount (৳)') }}</th>
+                                            <th class="ps-3">{{ __('Class Name') }}</th>
+                                            <th class="pe-3 text-end" style="width: 125px;">{{ __('Amount (৳)') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="class_amount_body">
                                         <tr>
-                                            <td colspan="2" class="text-center py-5 text-muted small">
-                                                <i class="fa-solid fa-layer-group d-block mb-2 fs-4 opacity-50 text-primary"></i>
+                                            <td colspan="2" class="text-center py-4 text-muted small">
+                                                <i class="fa-solid fa-layer-group d-block mb-2 fs-5 opacity-50 text-primary"></i>
                                                 {{ __('প্রথমে ক্যাটেগরি সিলেক্ট করুন') }}
                                             </td>
                                         </tr>
@@ -252,8 +698,8 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary-gradient w-100 py-2 fw-bold">
-                            <i class="fa-solid fa-floppy-disk me-2"></i> {{ __('Save Fee Structure') }}
+                        <button type="submit" class="fee-btn-save">
+                            <i class="fa-solid fa-floppy-disk"></i> {{ __('Save Fee Structure') }}
                         </button>
                     </form>
                 </div>
@@ -261,68 +707,71 @@
         </div>
 
         {{-- ── Right: Existing Configurations List ── --}}
-        <div class="col-lg-7">
-            <div class="data-table-card">
-                <div class="data-table-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="col-xl-8 col-lg-7">
+            <div class="fee-card-wrap">
+                <div class="fee-card-header">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="form-card-icon" style="background: #eff6ff; color: #3b82f6; width: 34px; height: 34px;">
+                        <div class="fee-card-icon fee-icon-sky">
                             <i class="fa-solid fa-table-list"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0 text-dark">{{ __('Current Fee Configurations') }}</h6>
-                            <small class="text-muted">{{ __('All configured rates by head, class & category') }}</small>
+                            <h6 class="fee-card-title">{{ __('Current Fee Configurations') }}</h6>
+                            <small class="fee-card-subtitle">{{ __('All configured rates by head, class & category') }}</small>
                         </div>
                     </div>
-                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">
-                        {{ $feeAmounts->total() }} {{ __('Rates Defined') }}
+                    <span class="fee-pill-badge fee-pill-sky">
+                        <i class="fa-solid fa-sliders"></i> {{ $feeAmounts->total() }} {{ __('Rates Defined') }}
                     </span>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table modern-table table-hover align-middle mb-0">
+                    <table class="fee-list-table">
                         <thead>
                             <tr>
-                                <th class="ps-4">{{ __('Fee Head') }}</th>
+                                <th class="ps-3">{{ __('Fee Head') }}</th>
                                 <th>{{ __('Category / Target') }}</th>
                                 <th class="text-end">{{ __('Amount') }}</th>
-                                <th class="text-center pe-4" style="width: 110px;">{{ __('Action') }}</th>
+                                <th class="text-center pe-3" style="width: 95px;">{{ __('Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($feeAmounts as $setup)
                             <tr>
-                                <td class="ps-4">
-                                    <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                <td class="ps-3">
+                                    <span class="fee-head-badge">
+                                        <i class="fa-solid fa-tag text-primary opacity-75"></i>
                                         {{ $setup->feeHead->name }}
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-dark fs-13">{{ $setup->category->name ?? 'N/A' }}</div>
+                                    <div class="fw-bold text-dark fs-12">{{ $setup->category->name ?? 'N/A' }}</div>
                                     @if($setup->subCategory)
                                         <div class="text-muted fs-11">{{ $setup->subCategory->name }}</div>
                                     @endif
-                                    <span class="badge bg-slate-subtle text-dark border px-2 py-0 mt-1" style="font-size: 10.5px;">
+                                    <span class="fee-class-pill">
                                         <i class="fa-solid fa-graduation-cap me-1 text-primary"></i>{{ $setup->class->name ?? 'All Classes' }}
                                     </span>
                                 </td>
-                                <td class="text-end fw-bold text-dark fs-14">
-                                    ৳ {{ number_format($setup->amount, 2) }}
+                                <td class="text-end">
+                                    <span class="fee-amount-val">
+                                        <span class="fee-taka-sign">৳</span>{{ number_format($setup->amount, 0) }}
+                                    </span>
                                 </td>
-                                <td class="text-center pe-4">
+                                <td class="text-center pe-3">
                                     <div class="d-flex justify-content-center align-items-center gap-1">
-                                        {{-- Edit Button (Exam style) --}}
-                                        <button type="button" class="btn-act btn-act-edit" 
+                                        {{-- Edit Button --}}
+                                        <button type="button" class="fee-btn-edit" 
                                                 onclick="editFee('{{ $setup->id }}', '{{ $setup->amount }}', '{{ addslashes($setup->feeHead->name) }}')"
                                                 title="{{ __('Quick Edit Amount') }}">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
 
-                                        {{-- Delete Button (Exam style) --}}
+                                        {{-- Delete Button --}}
                                         <form action="{{ route('fee-amounts.destroy', ['tenant' => auth()->user()->school->slug, 'fee_amount' => $setup->id]) }}" 
                                               method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" class="btn-act btn-act-del" onclick="confirmDelete(this)" title="{{ __('Delete Rate') }}">
+                                            <button type="button" class="fee-btn-del" onclick="confirmDelete(this)" title="{{ __('Delete Rate') }}">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </form>
@@ -332,8 +781,10 @@
                             @empty
                             <tr>
                                 <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-receipt fs-1 mb-2 opacity-25 text-secondary d-block"></i>
-                                    <h6 class="fw-bold">{{ __('No Fee Structure Configured') }}</h6>
+                                    <div style="width: 64px; height: 64px; border-radius: 50%; background: #f1f5f9; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                                        <i class="fa-solid fa-receipt fs-2 text-secondary opacity-50"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">{{ __('No Fee Structure Configured') }}</h6>
                                     <p class="small text-muted mb-0">{{ __('Use the form on the left to set class-wise fee amounts.') }}</p>
                                 </td>
                             </tr>
@@ -386,6 +837,11 @@
                 loadClassesForSetup(categoryId);
             }
         });
+
+        // Disable mouse wheel increment on number inputs
+        $(document).on('wheel', 'input[type=number]', function (e) {
+            $(this).blur();
+        });
     });
 
     function loadClassesForSetup(categoryId) {
@@ -417,17 +873,26 @@
                         let amount = (existingAmounts && existingAmounts[item.id] !== undefined) ? existingAmounts[item.id] : '';
                         
                         html += `<tr>
-                            <td class="ps-3 py-2 fw-semibold text-dark">${item.name}</td>
-                            <td class="pe-3 py-2">
-                                <input type="number" name="amounts[${item.id}]" 
-                                    value="${amount}" 
-                                    class="class-fee-input form-control form-control-sm" 
-                                    placeholder="0.00" step="0.01">
+                            <td class="ps-3 py-1 text-truncate" title="${item.name}">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fee-class-dot"></span>
+                                    <span class="fw-bold text-dark fs-12 text-truncate">${item.name}</span>
+                                </div>
+                            </td>
+                            <td class="pe-3 py-1 text-end" style="width: 125px;">
+                                <div class="fee-amount-input-wrap">
+                                    <span class="fee-curr-prefix">৳</span>
+                                    <input type="number" name="amounts[${item.id}]" 
+                                        value="${amount ? Math.round(amount) : ''}" 
+                                        class="fee-amount-input" 
+                                        placeholder="0" step="1"
+                                        onwheel="this.blur()">
+                                </div>
                             </td>
                         </tr>`;
                     });
                 } else {
-                    html = '<tr><td colspan="2" class="text-center text-danger py-4">{{ __("কোনো ক্লাস পাওয়া যায়নি।") }}</td></tr>';
+                    html = '<tr><td colspan="2" class="text-center text-danger py-4"><i class="fa-solid fa-circle-exclamation me-1"></i> {{ __("কোনো ক্লাস পাওয়া যায়নি।") }}</td></tr>';
                 }
                 $('#class_amount_body').html(html);
             }
@@ -463,9 +928,9 @@
             text: '{{ __("নতুন অ্যামাউন্ট লিখুন:") }}',
             input: 'number',
             inputAttributes: {
-                step: '0.01'
+                step: '1'
             },
-            inputValue: amount,
+            inputValue: amount ? Math.round(amount) : '',
             showCancelButton: true,
             confirmButtonText: '{{ __("Update Rate") }}',
             cancelButtonText: '{{ __("Cancel") }}',

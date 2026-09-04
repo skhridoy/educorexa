@@ -289,7 +289,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-success fs-14">৳ {{ number_format($gen->total_amount, 2) }}</div>
+                                    <div class="fw-bold text-success fs-14">৳ {{ number_format($gen->total_amount, 0) }}</div>
                                 </td>
                                 <td class="text-center pe-4">
                                     <div class="d-flex justify-content-center align-items-center gap-1">

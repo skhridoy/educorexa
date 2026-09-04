@@ -274,8 +274,16 @@ class DashboardController extends Controller
             'package_id' => 'required|exists:subscription_packages,id'
         ]);
 
-        $school = app('currentSchool');
+        $school  = app('currentSchool');
         $package = SubscriptionPackage::where('is_active', true)->findOrFail($request->package_id);
+
+        // ফ্রি প্যাকেজ হলে পেমেন্ট পেজে না গিয়ে সরাসরি অ্যাক্টিভ করা
+        if ((float) $package->price === 0.0) {
+            app(\App\Services\SubscriptionBillingService::class)->activateFree($school, $package);
+            return redirect()->route('school.pricing', ['tenant' => $school->slug])
+                ->with('success', '🎉 ' . $package->name . ' package activated successfully! Enjoy your free plan.');
+        }
+
         $pendingSubscription = app(\App\Services\SubscriptionBillingService::class)
             ->createPending($school, $package);
 

@@ -74,6 +74,18 @@
         li{
             list-style: none;
         }
+        /* ── Premium Locked Sidebar Links ── */
+        .edu-locked-link {
+            opacity: 0.55 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            position: relative;
+        }
+        .edu-locked-link:hover {
+            opacity: 0.75 !important;
+            color: #d97706 !important;
+        }
+
         body.dark-mode {
             --bg-color: #060c18;
             --card-bg: #0c1427;
