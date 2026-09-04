@@ -116,9 +116,7 @@ class SchoolRegisterController extends Controller
     public function divisions()
     {
         try {
-            $appPath = dirname(__DIR__, 2);
-            $rootPath = dirname($appPath);
-            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            $filePath = public_path('data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json');
             
             if (!file_exists($filePath)) {
                 return response()->json([
@@ -154,9 +152,7 @@ class SchoolRegisterController extends Controller
     public function districts(string $division)
     {
         try {
-            $appPath = dirname(__DIR__, 2); // app/Http -> app
-            $rootPath = dirname($appPath); // app -> educorexa (root)
-            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            $filePath = public_path('data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json');
             
             if (!file_exists($filePath)) {
                 return response()->json([
@@ -173,8 +169,9 @@ class SchoolRegisterController extends Controller
                 ], 502);
             }
 
-            $divisionData = collect($data['divisions'])
-                ->firstWhere('name', $division);
+            $divisionData = collect($data['divisions'])->first(function ($d) use ($division) {
+                return $d['name'] === $division || ($d['name_bn'] ?? '') === $division;
+            });
 
             if (!$divisionData || !isset($divisionData['districts'])) {
                 return response()->json([]);
@@ -199,9 +196,7 @@ class SchoolRegisterController extends Controller
     public function upazilas(string $district)
     {
         try {
-            $appPath = dirname(__DIR__, 2); // app/Http -> app
-            $rootPath = dirname($appPath); // app -> educorexa (root)
-            $filePath = $rootPath . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json';
+            $filePath = public_path('data' . DIRECTORY_SEPARATOR . 'bangladesh-locations.json');
             
             if (!file_exists($filePath)) {
                 return response()->json([
@@ -221,7 +216,7 @@ class SchoolRegisterController extends Controller
             $upazilas = [];
             foreach ($data['divisions'] as $division) {
                 foreach ($division['districts'] as $dist) {
-                    if ($dist['name'] === $district && isset($dist['upazilas'])) {
+                    if (($dist['name'] === $district || ($dist['name_bn'] ?? '') === $district) && isset($dist['upazilas'])) {
                         $upazilas = collect($dist['upazilas'])->map(function ($upazila) {
                             return [
                                 'name' => $upazila['name'],

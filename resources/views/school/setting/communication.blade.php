@@ -11,6 +11,19 @@
         </div>
     </div>
 
+    <!-- Settings Navigation Tabs -->
+    <div class="d-flex align-items-center gap-2 bg-white p-2 border rounded-4 shadow-sm mb-4 overflow-auto">
+        <a href="{{ route('admin.school.info-edit', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-sm btn-light border-0 fw-bold px-3 py-2 text-secondary rounded-3 text-nowrap">
+            <i class="fa-solid fa-sliders me-1 text-primary"></i> {{ __('General Profile') }}
+        </a>
+        <a href="{{ route('admin.school.api-setup', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-sm btn-light border-0 fw-bold px-3 py-2 text-secondary rounded-3 text-nowrap">
+            <i class="fa-solid fa-plug me-1 text-primary"></i> {{ __('API & SMTP Setup') }}
+        </a>
+        <a href="{{ route('admin.school.communication', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-sm btn-primary border-0 fw-bold px-3 py-2 rounded-3 text-nowrap shadow-sm">
+            <i class="fa-solid fa-comments me-1"></i> {{ __('Communication') }}
+        </a>
+    </div>
+
     @php
         $canSendEmail = $school->hasPackagePermission('email.send') || $school->hasPackagePermission('professional_email'); // using common permission strings, adjust if needed
         $canSendSms = $school->hasPackagePermission('sms.send');

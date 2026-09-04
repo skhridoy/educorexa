@@ -388,8 +388,7 @@
                 </a>
                 <div class="collapse {{ Request::is('*/school-settings*') || Request::is('*/sliders*') || Request::is('*/about-settings*') || Request::is('*/settings/footer*') ? 'show' : '' }}" id="settingMenu">
                     <ul class="edu-sub-nav">
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('API Setup') }}</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') || Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
                         <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">{{ __('Communication Settings') }}</a></li>
                         @if($user->hasRole('school_admin'))
                             <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">{{ __('Role & Permissions') }}</a></li>
