@@ -20,7 +20,11 @@ class SchoolSupportController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('school.support.index', compact('tickets', 'tenant'));
+        $totalTickets    = SupportTicket::where('school_id', $school->id)->count();
+        $openTickets     = SupportTicket::where('school_id', $school->id)->whereIn('status', ['open', 'pending'])->count();
+        $resolvedTickets = SupportTicket::where('school_id', $school->id)->where('status', 'resolved')->count();
+
+        return view('school.support.index', compact('tickets', 'tenant', 'totalTickets', 'openTickets', 'resolvedTickets'));
     }
 
     public function create($tenant)
