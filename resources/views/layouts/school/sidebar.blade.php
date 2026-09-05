@@ -207,7 +207,7 @@
                         @if($hasFeature('student.idcard'))
                             <li class="edu-sub-item"><a href="{{ route('students.idcard.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/id-cards*') ? 'active' : '' }}">{{ __('ID Cards') }}</a></li>
                         @elseif($isPremiumLocked('student.idcard'))
-                            <li class="edu-sub-item"><a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link" title="Upgrade to access"><i class="fa-solid fa-lock me-1 text-warning" style="font-size:9px;"></i>{{ __('ID Cards') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('students.idcard.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/id-cards*') ? 'active' : '' }}" title="Premium Feature"><i class="fa-solid fa-crown me-1 text-warning" style="font-size:10px;"></i>{{ __('ID Cards') }} <span class="badge bg-warning-subtle text-warning ms-1" style="font-size:8.5px; padding:2px 5px;">PRO</span></a></li>
                         @endif
                         @if($hasFeature('student.promotion'))
                             <li class="edu-sub-item"><a href="{{ route('students.promotion', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/promotion*') ? 'active' : '' }}">{{ __('Promotion') }}</a></li>
@@ -281,8 +281,12 @@
                             <li class="edu-sub-item"><a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link" title="Upgrade to access"><i class="fa-solid fa-lock me-1 text-warning" style="font-size:9px;"></i>{{ __('Holidays Setup') }}</a></li>
                         @endif
                         @if($hasFeature('exam.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') ? 'active' : '' }}">{{ __('Exams List') }}</a></li>
-                            <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Admit Cards') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') && !Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Exams List') }}</a></li>
+                            @if($hasFeature('exam.admit_card'))
+                                <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Admit Cards') }}</a></li>
+                            @elseif($isPremiumLocked('exam.admit_card'))
+                                <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}" title="Premium Feature"><i class="fa-solid fa-crown me-1 text-warning" style="font-size:10px;"></i>{{ __('Admit Cards') }} <span class="badge bg-warning-subtle text-warning ms-1" style="font-size:8.5px; padding:2px 5px;">PRO</span></a></li>
+                            @endif
                             <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">{{ __('Exams Routine') }}</a></li>
                         @elseif($isPremiumLocked('exam.manage'))
                             <li class="edu-sub-item"><a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link" title="Upgrade to access"><i class="fa-solid fa-lock me-1 text-warning" style="font-size:9px;"></i>{{ __('Exams List') }}</a></li>
@@ -388,7 +392,8 @@
                 </a>
                 <div class="collapse {{ Request::is('*/school-settings*') || Request::is('*/sliders*') || Request::is('*/about-settings*') || Request::is('*/settings/footer*') ? 'show' : '' }}" id="settingMenu">
                     <ul class="edu-sub-nav">
-                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') || Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
+                        <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('API & Gateway Setup') }}</a></li>
                         <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">{{ __('Communication Settings') }}</a></li>
                         @if($user->hasRole('school_admin'))
                             <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">{{ __('Role & Permissions') }}</a></li>

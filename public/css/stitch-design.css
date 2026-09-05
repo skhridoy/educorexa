@@ -103,7 +103,7 @@ h6,
     height: 64px;
     position: sticky;
     top: 0;
-    z-index: 99;
+    z-index: 1030;
     width: 100%;
 }
 

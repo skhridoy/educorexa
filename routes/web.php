@@ -413,7 +413,7 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                         Route::middleware('permission:student.idcard')->group(function () {
                             Route::get('/', [StudentController::class, 'idCardIndex'])->name('students.idcard.index');
                             Route::get('/preview', [StudentController::class, 'idCardPreview'])->name('students.idcard.preview');
-                            Route::get('/print/{class_id}', [StudentController::class, 'idCardPrint'])->name('students.idcard.print');
+                            Route::get('/download/{class_id}', [StudentController::class, 'idCardDownload'])->name('students.idcard.download');
                         });
                     });
                     

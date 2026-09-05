@@ -30,7 +30,7 @@
 @endphp
 {{-- ফটো লজিক শেষ --}}
 
-<nav class="navbar mb-0 shadow-sm border-bottom border-light" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+<nav class="navbar mb-0 shadow-sm border-bottom border-light" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1030;">
 
     {{-- Left: Hamburger + Search --}}
     <div class="d-flex align-items-center gap-3 flex-grow-1">
@@ -63,7 +63,7 @@
                 <span class="d-none d-sm-inline">{{ $currentLocale === 'bn' ? 'বাংলা' : 'EN' }}</span>
                 <i data-feather="chevron-down" style="width:12px;height:12px;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2" style="border-radius: 12px; min-width: 140px; margin-top: 8px;">
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2" style="border-radius: 12px; min-width: 140px; margin-top: 8px; z-index: 1050;">
                 <li>
                     @php
                         $enRoute = $tenant ? route('school.set.locale', ['tenant' => $tenant, 'lang' => 'en']) : route('set.locale', ['lang' => 'en']);
@@ -115,7 +115,7 @@
             </button>
 
             <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0"
-                 style="width:340px;border-radius:16px;overflow:hidden;margin-top:8px;">
+                 style="width:340px;border-radius:16px;overflow:hidden;margin-top:8px;z-index:1050;">
                 <div class="p-3 border-bottom" style="background:#fafbff;">
                     <div class="d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-bold">{{ __('Notifications') }}</h6>
@@ -165,7 +165,7 @@
             </button>
 
             <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0"
-                 style="width:240px;border-radius:16px;overflow:hidden;margin-top:8px;">
+                 style="width:240px;border-radius:16px;overflow:hidden;margin-top:8px;z-index:1050;">
                 
                 <div class="p-4 text-center border-bottom" style="background:linear-gradient(135deg,#f8f7ff,#eef2ff);">
                     <img src="{{ $userPhoto }}" alt="{{ $user->name }}"

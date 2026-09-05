@@ -25,10 +25,27 @@
     </div>
 
     @php
-        $canSendEmail = $school->hasPackagePermission('email.send') || $school->hasPackagePermission('professional_email'); // using common permission strings, adjust if needed
+        $canSendEmail = $school->hasPackagePermission('email.send') || $school->hasPackagePermission('professional_email');
         $canSendSms = $school->hasPackagePermission('sms.send');
         $canSendWhatsapp = $school->hasPackagePermission('whatsapp.send');
     @endphp
+
+    @if(!$canSendEmail || !$canSendSms || !$canSendWhatsapp)
+    <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #f59e0b !important;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold text-dark mb-1">{{ __('স্বয়ংক্রিয় মেসেজিং সুবিধা আপগ্রেড প্রয়োজন') }}</h5>
+                <p class="text-secondary mb-0 small">{{ __('আপনার বর্তমান প্যাকেজে স্বয়ংক্রিয় Email, SMS বা WhatsApp মেসেজিং সক্রিয় নেই। সুবিধাগুলো সেটআপ ও চালু করতে প্রিমিয়াম প্যাকেজে আপগ্রেড করুন।') }}</p>
+            </div>
+        </div>
+        <a href="{{ route('school.pricing', ['tenant' => app('currentSchool')->slug]) }}" class="btn btn-warning fw-bold px-4 py-2 rounded-pill shadow-sm text-dark flex-shrink-0">
+            <i class="fa-solid fa-gem me-2"></i>{{ __('প্রিমিয়াম প্যাকেজ চালু করুন') }}
+        </a>
+    </div>
+    @endif
 
     <div class="row">
         <div class="col-12">
@@ -92,7 +109,7 @@
             </div>
             <div class="modal-body p-4 position-relative">
                 
-                @if(!$canSendEmail && !$canSendSms)
+                @if(!$canSendEmail && !$canSendSms && !$canSendWhatsapp)
                 <!-- Premium Overlay -->
                 <div class="position-absolute top-0 start-0 w-100 h-100 bg-white rounded-bottom-4 d-flex align-items-center justify-content-center" style="opacity: 0.95; z-index: 10;">
                     <div class="text-center p-4">
@@ -146,9 +163,9 @@
                                     <label class="form-check-label fw-bold mb-0 small" for="whatsappToggle_{{ $key }}">
                                         <i class="fa-brands fa-whatsapp text-success me-1"></i>WhatsApp
                                     </label>
-                                    <input class="form-check-input ms-0" type="checkbox" role="switch" id="whatsappToggle_{{ $key }}" name="whatsapp_enabled" value="1" {{ $setting->whatsapp_enabled ? 'checked' : '' }} {{ !$canSendSms ? 'disabled' : '' }}>
+                                    <input class="form-check-input ms-0" type="checkbox" role="switch" id="whatsappToggle_{{ $key }}" name="whatsapp_enabled" value="1" {{ $setting->whatsapp_enabled ? 'checked' : '' }} {{ !$canSendWhatsapp ? 'disabled' : '' }}>
                                 </div>
-                                @if(!$canSendSms)
+                                @if(!$canSendWhatsapp)
                                     <small class="text-danger mt-2 d-block" style="font-size: 0.75rem;"><i class="fa-solid fa-lock me-1"></i>Upgrade to enable</small>
                                 @endif
                             </div>

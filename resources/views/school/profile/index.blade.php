@@ -358,6 +358,57 @@
                                 </div>
                             </div>
                         @endif
+
+                        @if($user->role == 'school_admin')
+                            <div class="border-top mt-4 pt-4">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">
+                                        <i class="fa-solid fa-signature me-2 text-primary"></i> {{ __('Principal / Headmaster Signature (প্রধান শিক্ষকের ডিজিটাল স্বাক্ষর)') }}
+                                    </h6>
+                                    @if($user->signature && file_exists(public_path($user->signature)))
+                                        <span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1 rounded-pill" style="font-size: 0.72rem;">
+                                            <i class="fa-solid fa-circle-check me-1"></i>{{ __('স্বাক্ষর আপলোড করা আছে') }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning fw-bold px-2.5 py-1 rounded-pill" style="font-size: 0.72rem;">
+                                            <i class="fa-solid fa-circle-exclamation me-1"></i>{{ __('স্বাক্ষর সেট করা নেই') }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="p-3 rounded-4 mb-3" style="background: #f8fafc; border: 1.5px dashed #cbd5e1;">
+                                    <div class="row align-items-center g-3">
+                                        <div class="col-md-5 text-center">
+                                            <div class="signature-preview-container d-inline-flex align-items-center justify-content-center p-2 rounded-3 bg-white shadow-sm" style="width: 100%; max-width: 240px; height: 95px; border: 1px solid #e2e8f0;">
+                                                <img id="signaturePreview" 
+                                                     src="{{ ($user->signature && file_exists(public_path($user->signature))) ? asset($user->signature) : asset('assets/images/signature.png') }}" 
+                                                     alt="Signature Preview" 
+                                                     style="max-height: 75px; max-width: 210px; object-fit: contain;">
+                                            </div>
+                                            <small class="d-block text-muted mt-1" style="font-size: 0.72rem;">{{ __('বর্তমান স্বাক্ষরের লাইভ প্রিভিউ') }}</small>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <label class="form-label fw-semibold small mb-1">{{ __('নতুন স্বাক্ষর নির্বাচন করুন (Upload Signature)') }}</label>
+                                            <input type="file" name="signature" id="signatureFileInput" class="form-control form-control-sm mb-2" accept="image/png, image/jpeg, image/webp" style="border-radius: 8px;">
+                                            <input type="hidden" name="remove_signature" id="removeSignatureInput" value="0">
+                                            
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                @if($user->signature && file_exists(public_path($user->signature)))
+                                                    <button type="button" id="btnRemoveSig" class="btn btn-outline-danger btn-sm py-1 px-2.5 rounded-2" style="font-size: 0.72rem;">
+                                                        <i class="fa-solid fa-trash me-1"></i>{{ __('স্বাক্ষর মুছে ফেলুন') }}
+                                                    </button>
+                                                @endif
+                                            </div>
+
+                                            <p class="text-muted mb-0" style="font-size: 0.72rem; line-height: 1.45;">
+                                                <i class="fa-solid fa-circle-info text-primary me-1"></i>
+                                                {{ __('স্বচ্ছ ব্যাকগ্রাউন্ডের স্পষ্ট স্বাক্ষর (PNG/WEBP/JPG, সর্বোচ্চ ২MB) আপলোড করুন। এই স্বাক্ষরটি স্টুডেন্ট আইডি কার্ড, পরীক্ষার প্রবেশপত্র এবং মার্কশীটে স্বয়ংক্রিয়ভাবে প্রদর্শিত হবে।') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                         
                         <div class="text-end mt-4 pt-2">
                             <button type="submit" class="btn btn-primary-gradient fw-bold px-4 py-2" style="border-radius:10px; font-size:0.8rem;">
@@ -483,6 +534,25 @@
         @if(session('error'))
             Toast.fire({ icon: 'error', title: '{{ session('error') }}' });
         @endif
+
+        // Digital Signature preview & removal handler
+        $('#signatureFileInput').on('change', function(e) {
+            if (this.files && this.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(evt) {
+                    $('#signaturePreview').attr('src', evt.target.result);
+                    $('#removeSignatureInput').val('0');
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        $('#btnRemoveSig').on('click', function() {
+            $('#removeSignatureInput').val('1');
+            $('#signatureFileInput').val('');
+            $('#signaturePreview').attr('src', '{{ asset("assets/images/signature.png") }}');
+            $(this).fadeOut();
+        });
     });
 </script>
 @endsection

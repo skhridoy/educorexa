@@ -120,6 +120,64 @@ class ProfileController extends Controller
                 $user->photo = $photoPath;
             }
         }
+
+        // ৫. প্রধান শিক্ষক / অধ্যক্ষের স্বাক্ষর হ্যান্ডলিং (School Admin / Principal Signature)
+        if ($user->role == 'school_admin') {
+            $sigFolder = public_path("uploads/schools/{$tenantSlug}/signatures/");
+            if (!file_exists($sigFolder)) {
+                mkdir($sigFolder, 0755, true);
+            }
+
+            // Remove signature if requested
+            if ($request->remove_signature == '1') {
+                if ($user->signature && file_exists(public_path($user->signature))) {
+                    @unlink(public_path($user->signature));
+                }
+                $user->signature = null;
+                if ($user->school) {
+                    $user->school->update(['signature' => null]);
+                }
+            }
+
+            // Cropped base64 signature
+            if ($request->cropped_signature) {
+                if ($user->signature && file_exists(public_path($user->signature))) {
+                    @unlink(public_path($user->signature));
+                }
+
+                $sig_parts = explode(";base64,", $request->cropped_signature);
+                $sig_base64 = base64_decode($sig_parts[1]);
+                $sigFilename = 'sig_' . time() . '_' . uniqid() . '.webp';
+                file_put_contents($sigFolder . $sigFilename, $sig_base64);
+
+                $sigPath = "uploads/schools/{$tenantSlug}/signatures/" . $sigFilename;
+                $user->signature = $sigPath;
+                if ($user->school) {
+                    $user->school->update(['signature' => $sigPath]);
+                }
+            }
+            // Direct file upload signature
+            elseif ($request->hasFile('signature')) {
+                $request->validate([
+                    'signature' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+                ]);
+
+                if ($user->signature && file_exists(public_path($user->signature))) {
+                    @unlink(public_path($user->signature));
+                }
+
+                $file = $request->file('signature');
+                $ext = $file->getClientOriginalExtension();
+                $sigFilename = 'sig_' . time() . '_' . uniqid() . '.' . $ext;
+                $file->move($sigFolder, $sigFilename);
+
+                $sigPath = "uploads/schools/{$tenantSlug}/signatures/" . $sigFilename;
+                $user->signature = $sigPath;
+                if ($user->school) {
+                    $user->school->update(['signature' => $sigPath]);
+                }
+            }
+        }
         
         $user->save();
         return back()->with('success', 'Profile updated successfully!');

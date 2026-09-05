@@ -490,6 +490,13 @@
             <form action="{{ route('admin.school.api-setup.update', ['tenant' => auth()->user()->school->slug]) }}" method="POST">
                 @csrf
 
+                @php
+                    $canEmail = $school->hasPackagePermission('email.send');
+                    $canWhatsapp = $school->hasPackagePermission('whatsapp.send');
+                    $canSms = $school->hasPackagePermission('sms.send');
+                    $pricingUrl = route('school.pricing', ['tenant' => $school->slug]);
+                @endphp
+
                 <div class="row g-4">
                     {{-- ── 1. Professional Email (SMTP) ── --}}
                     <div class="col-lg-7">
@@ -504,15 +511,30 @@
                                         <p class="api-card-desc">{{ __('Outgoing mail server used for notices, invoices and credential emails') }}</p>
                                     </div>
                                 </div>
-                                <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
-                                    SMTP
-                                </span>
+                                @if(!$canEmail)
+                                    <span class="badge bg-warning-subtle text-warning fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        <i class="fa-solid fa-crown me-1"></i>PRO
+                                    </span>
+                                @else
+                                    <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        SMTP
+                                    </span>
+                                @endif
                             </div>
                             <div class="api-card-body">
+                                @if(!$canEmail)
+                                    <div class="alert alert-warning border-0 rounded-3 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: #fffbeb; border-left: 3px solid #f59e0b !important;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-crown text-warning fs-5"></i>
+                                            <span class="small fw-bold text-dark">{{ __('ইমেইল ও কাস্টম SMTP গেটওয়ে সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। ব্যবহার করতে প্রিমিয়াম প্যাকেজ চালু করুন।') }}</span>
+                                        </div>
+                                        <a href="{{ $pricingUrl }}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark px-3">{{ __('প্রিমিয়াম চালু করুন') }}</a>
+                                    </div>
+                                @endif
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <label class="api-label">{{ __('Mail Driver') }}</label>
-                                        <select name="mail_mailer" class="api-select">
+                                        <select name="mail_mailer" class="api-select" {{ !$canEmail ? 'disabled' : '' }}>
                                             <option value="smtp" {{ $school->mail_mailer == 'smtp' ? 'selected' : '' }}>SMTP</option>
                                             <option value="mailgun" {{ $school->mail_mailer == 'mailgun' ? 'selected' : '' }}>Mailgun</option>
                                             <option value="sendmail" {{ $school->mail_mailer == 'sendmail' ? 'selected' : '' }}>Sendmail</option>
@@ -520,15 +542,15 @@
                                     </div>
                                     <div class="col-md-5">
                                         <label class="api-label">{{ __('Mail Host') }}</label>
-                                        <input type="text" name="mail_host" class="api-input" value="{{ $school->mail_host }}" placeholder="e.g. mail.domain.com">
+                                        <input type="text" name="mail_host" class="api-input" value="{{ $school->mail_host }}" placeholder="e.g. mail.domain.com" {{ !$canEmail ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="api-label">{{ __('Port') }}</label>
-                                        <input type="text" name="mail_port" class="api-input" value="{{ $school->mail_port }}" placeholder="465">
+                                        <input type="text" name="mail_port" class="api-input" value="{{ $school->mail_port }}" placeholder="465" {{ !$canEmail ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="api-label">{{ __('Encryption') }}</label>
-                                        <select name="mail_encryption" class="api-select">
+                                        <select name="mail_encryption" class="api-select" {{ !$canEmail ? 'disabled' : '' }}>
                                             <option value="ssl" {{ $school->mail_encryption == 'ssl' ? 'selected' : '' }}>SSL</option>
                                             <option value="tls" {{ $school->mail_encryption == 'tls' ? 'selected' : '' }}>TLS</option>
                                             <option value="" {{ $school->mail_encryption == '' ? 'selected' : '' }}>None</option>
@@ -536,24 +558,24 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="api-label">{{ __('Username / Email') }}</label>
-                                        <input type="text" name="mail_username" class="api-input" value="{{ $school->mail_username }}" placeholder="support@domain.com">
+                                        <input type="text" name="mail_username" class="api-input" value="{{ $school->mail_username }}" placeholder="support@domain.com" {{ !$canEmail ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="api-label">{{ __('Password') }}</label>
                                         <div class="api-input-group">
-                                            <input type="password" name="mail_password" value="{{ $school->mail_password }}" id="smtp_pass" placeholder="••••••••">
-                                            <button class="api-eye-btn" type="button" onclick="togglePass('smtp_pass')" title="Toggle visibility">
+                                            <input type="password" name="mail_password" value="{{ $school->mail_password }}" id="smtp_pass" placeholder="••••••••" {{ !$canEmail ? 'disabled' : '' }}>
+                                            <button class="api-eye-btn" type="button" onclick="togglePass('smtp_pass')" title="Toggle visibility" {{ !$canEmail ? 'disabled' : '' }}>
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('From Email Address') }}</label>
-                                        <input type="email" name="mail_from_address" class="api-input" value="{{ $school->mail_from_address }}" placeholder="noreply@domain.com">
+                                        <input type="email" name="mail_from_address" class="api-input" value="{{ $school->mail_from_address }}" placeholder="noreply@domain.com" {{ !$canEmail ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('From Display Name') }}</label>
-                                        <input type="text" name="mail_from_name" class="api-input" value="{{ $school->mail_from_name }}" placeholder="Your School Name">
+                                        <input type="text" name="mail_from_name" class="api-input" value="{{ $school->mail_from_name }}" placeholder="Your School Name" {{ !$canEmail ? 'disabled' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -573,9 +595,15 @@
                                         <p class="api-card-desc">{{ __('Custom branded mailbox on your institution subdomain') }}</p>
                                     </div>
                                 </div>
-                                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
-                                    Pro Email
-                                </span>
+                                @if(!$canEmail)
+                                    <span class="badge bg-warning-subtle text-warning fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        <i class="fa-solid fa-crown me-1"></i>PRO
+                                    </span>
+                                @else
+                                    <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        Pro Email
+                                    </span>
+                                @endif
                             </div>
                             <div class="api-card-body d-flex flex-column justify-content-between">
                                 @if($school->pro_email_status == 'none' || $school->pro_email_status == 'rejected')
@@ -587,9 +615,15 @@
                                         <p class="text-muted small mb-3">
                                             {{ __('Create an official institutional email like info@:domain', ['domain' => $school->slug . '.educorexa.com']) }}
                                         </p>
-                                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#requestEmailModal">
-                                            <i class="fa-solid fa-plus-circle me-1"></i> {{ __('Request Email') }}
-                                        </button>
+                                        @if($canEmail)
+                                            <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#requestEmailModal">
+                                                <i class="fa-solid fa-plus-circle me-1"></i> {{ __('Request Email') }}
+                                            </button>
+                                        @else
+                                            <a href="{{ $pricingUrl }}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm">
+                                                <i class="fa-solid fa-crown me-1"></i> {{ __('প্রিমিয়ামে আপগ্রেড করুন') }}
+                                            </a>
+                                        @endif
                                     </div>
                                 @elseif($school->pro_email_status == 'pending')
                                     <div class="text-center py-4 my-auto">
@@ -631,28 +665,43 @@
                                         <p class="api-card-desc">{{ __('Automated instant notifications for fees, attendance and student notices') }}</p>
                                     </div>
                                 </div>
-                                <span class="badge bg-success-subtle text-success fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
-                                    WhatsApp
-                                </span>
+                                @if(!$canWhatsapp)
+                                    <span class="badge bg-warning-subtle text-warning fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        <i class="fa-solid fa-crown me-1"></i>PRO
+                                    </span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        WhatsApp
+                                    </span>
+                                @endif
                             </div>
                             <div class="api-card-body">
+                                @if(!$canWhatsapp)
+                                    <div class="alert alert-warning border-0 rounded-3 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: #fffbeb; border-left: 3px solid #f59e0b !important;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-crown text-warning fs-5"></i>
+                                            <span class="small fw-bold text-dark">{{ __('WhatsApp নোটিফিকেশন গেটওয়ে সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। সেটআপ করতে প্রিমিয়াম প্যাকেজ চালু করুন।') }}</span>
+                                        </div>
+                                        <a href="{{ $pricingUrl }}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark px-3">{{ __('প্রিমিয়াম চালু করুন') }}</a>
+                                    </div>
+                                @endif
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('API Provider') }}</label>
-                                        <select name="whatsapp_api_provider" class="api-select">
+                                        <select name="whatsapp_api_provider" class="api-select" {{ !$canWhatsapp ? 'disabled' : '' }}>
                                             <option value="ultramsg" {{ $school->whatsapp_api_provider == 'ultramsg' ? 'selected' : '' }}>UltraMsg (Recommended)</option>
                                             <option value="twilio" {{ $school->whatsapp_api_provider == 'twilio' ? 'selected' : '' }}>Twilio WhatsApp</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('Instance ID') }}</label>
-                                        <input type="text" name="whatsapp_api_instance_id" class="api-input" value="{{ $school->whatsapp_api_instance_id }}" placeholder="e.g. instance10582">
+                                        <input type="text" name="whatsapp_api_instance_id" class="api-input" value="{{ $school->whatsapp_api_instance_id }}" placeholder="e.g. instance10582" {{ !$canWhatsapp ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-12">
                                         <label class="api-label">{{ __('API Key / Token / Secret') }}</label>
                                         <div class="api-input-group">
-                                            <input type="password" name="whatsapp_api_key" value="{{ $school->whatsapp_api_key }}" id="wa_key" placeholder="Enter provider API token">
-                                            <button class="api-eye-btn" type="button" onclick="togglePass('wa_key')" title="Toggle visibility">
+                                            <input type="password" name="whatsapp_api_key" value="{{ $school->whatsapp_api_key }}" id="wa_key" placeholder="Enter provider API token" {{ !$canWhatsapp ? 'disabled' : '' }}>
+                                            <button class="api-eye-btn" type="button" onclick="togglePass('wa_key')" title="Toggle visibility" {{ !$canWhatsapp ? 'disabled' : '' }}>
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
                                         </div>
@@ -681,15 +730,30 @@
                                         <p class="api-card-desc">{{ __('Carrier SMS provider configuration') }}</p>
                                     </div>
                                 </div>
-                                <span class="badge bg-teal-subtle text-teal fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
-                                    SMS
-                                </span>
+                                @if(!$canSms)
+                                    <span class="badge bg-warning-subtle text-warning fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        <i class="fa-solid fa-crown me-1"></i>PRO
+                                    </span>
+                                @else
+                                    <span class="badge bg-teal-subtle text-teal fw-bold px-2 py-1 rounded-pill" style="font-size: 11px;">
+                                        SMS
+                                    </span>
+                                @endif
                             </div>
                             <div class="api-card-body">
+                                @if(!$canSms)
+                                    <div class="alert alert-warning border-0 rounded-3 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: #fffbeb; border-left: 3px solid #f59e0b !important;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-crown text-warning fs-5"></i>
+                                            <span class="small fw-bold text-dark">{{ __('বাল্ক এসএমএস গেটওয়ে সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। সেটআপ করতে প্রিমিয়াম প্যাকেজ চালু করুন।') }}</span>
+                                        </div>
+                                        <a href="{{ $pricingUrl }}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark px-3">{{ __('প্রিমিয়াম চালু করুন') }}</a>
+                                    </div>
+                                @endif
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="api-label">{{ __('SMS Gateway Provider') }}</label>
-                                        <select name="sms_api_provider" class="api-select" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                        <select name="sms_api_provider" class="api-select" {{ !$canSms ? 'disabled' : '' }}>
                                             <option value="" {{ !$school->sms_api_provider ? 'selected' : '' }}>Disabled</option>
                                             <option value="generic" {{ $school->sms_api_provider == 'generic' ? 'selected' : '' }}>Generic JSON API</option>
                                             <option value="bulksmsbd" {{ $school->sms_api_provider == 'bulksmsbd' ? 'selected' : '' }}>Bulk SMS BD</option>
@@ -698,24 +762,24 @@
                                     </div>
                                     <div class="col-12">
                                         <label class="api-label">{{ __('API Endpoint URL') }}</label>
-                                        <input type="url" name="sms_api_url" class="api-input" value="{{ $school->sms_api_url }}" placeholder="https://provider.example/api/send" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                        <input type="url" name="sms_api_url" class="api-input" value="{{ $school->sms_api_url }}" placeholder="https://provider.example/api/send" {{ !$canSms ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('API Key') }}</label>
-                                        <input type="password" name="sms_api_key" class="api-input" value="{{ $school->sms_api_key }}" placeholder="Key" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                        <input type="password" name="sms_api_key" class="api-input" value="{{ $school->sms_api_key }}" placeholder="Key" {{ !$canSms ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="api-label">{{ __('API Secret') }}</label>
-                                        <input type="password" name="sms_api_secret" class="api-input" value="{{ $school->sms_api_secret }}" placeholder="Secret" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                        <input type="password" name="sms_api_secret" class="api-input" value="{{ $school->sms_api_secret }}" placeholder="Secret" {{ !$canSms ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-12">
                                         <label class="api-label">{{ __('Approved Sender ID') }}</label>
-                                        <input type="text" name="sms_sender_id" class="api-input" value="{{ $school->sms_sender_id }}" placeholder="e.g. EduCorexa or School Name" {{ !$school->hasPackagePermission('sms.send') ? 'disabled' : '' }}>
+                                        <input type="text" name="sms_sender_id" class="api-input" value="{{ $school->sms_sender_id }}" placeholder="e.g. EduCorexa or School Name" {{ !$canSms ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-12">
                                         <div class="api-status-box api-status-amber small mb-0">
                                             <i class="fa-solid fa-triangle-exclamation me-1"></i>
-                                            {{ $school->hasPackagePermission('sms.send') ? __('Leave provider blank to stop all SMS dispatch.') : __('Upgrade the institution package to enable SMS gateway access.') }}
+                                            {{ $canSms ? __('Leave provider blank to stop all SMS dispatch.') : __('Upgrade the institution package to enable SMS gateway access.') }}
                                         </div>
                                     </div>
                                 </div>

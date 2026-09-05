@@ -85,6 +85,7 @@ class User extends Authenticatable
         'teacher_id',
         'phone',
         'photo',
+        'signature',
     ];
 
     /**

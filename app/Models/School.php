@@ -72,6 +72,7 @@ class School extends Model
         'app_code',
         'favicon',
         'logo',
+        'signature',
         'mail_mailer',
         'mail_host',
         'mail_port',

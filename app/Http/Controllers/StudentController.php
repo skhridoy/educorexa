@@ -22,6 +22,8 @@ use App\Exports\StudentsExport;
 use App\Exports\StudentTemplateExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -583,37 +585,57 @@ class StudentController extends Controller
 
     public function idCardIndex() 
     {
-        $classes = Classes::where('school_id', auth()->user()->school_id)->get();
-        return view('school.student.id_card_index', compact('classes'));
+        $schoolId = auth()->user()->school_id;
+        $classes = Classes::where('school_id', $schoolId)->withCount('students')->get();
+        $totalStudents = Student::where('school_id', $schoolId)->count();
+        return view('school.student.id_card_index', compact('classes', 'totalStudents'));
     }
     public function idCardPreview(Request $request) 
     {
-        $schoolId = auth()->user()->school_id;
-        $class_id = $request->class_id;
-        $students = Student::where('school_id', $schoolId)
-                        ->where('class_id', $class_id)
-                        ->with('class')
-                        ->get();
-        
-        return view('school.student.id_card_preview', compact('students', 'class_id'));
-    }
-
-
-    public function idCardPrint($tenant, $class_id) 
-    {
-        $schoolId = auth()->user()->school_id;
-        $students = Student::where('class_id', $class_id)
-                    ->where('school_id', $schoolId)
-                    ->with(['class', 'school'])
-                    ->get();
-
-        
-        if ($students->isEmpty()) {
-            return "এই ক্লাসে কোনো শিক্ষার্থী খুঁজে পাওয়া যায়নি!";
+        $school = auth()->user()?->school;
+        if ($school && !$school->hasPackagePermission('student.idcard')) {
+            return redirect()->route('students.idcard.index', ['tenant' => $school->slug])
+                ->with('error', 'স্টুডেন্ট আইডি কার্ড প্রিভিউ ও জেনারেট সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।');
         }
 
-        return view('school.student.bulk_id_cards', compact('students', 'class_id'));
+        $schoolId = auth()->user()->school_id;
+        $class_id = $request->class_id;
+        $selectedClass = Classes::where('school_id', $schoolId)->find($class_id);
+        $students = Student::where('school_id', $schoolId)
+                        ->where('class_id', $class_id)
+                        ->with(['class', 'academicYear', 'school'])
+                        ->orderBy('roll', 'asc')
+                        ->get();
+        
+        return view('school.student.id_card_preview', compact('students', 'class_id', 'selectedClass'));
     }
 
-    
+
+    public function idCardDownload($tenant, $class_id) 
+    {
+        $school = auth()->user()?->school;
+        if ($school && !$school->hasPackagePermission('student.idcard')) {
+            return redirect()->route('students.idcard.index', ['tenant' => $school->slug])
+                ->with('error', 'স্টুডেন্ট আইডি কার্ড ডাউনলোড সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
+
+        $schoolId = auth()->user()->school_id;
+        $class = Classes::where('school_id', $schoolId)->findOrFail($class_id);
+        $students = Student::where('class_id', $class_id)
+                    ->where('school_id', $schoolId)
+                    ->with(['class', 'academicYear', 'school'])
+                    ->orderBy('roll', 'asc')
+                    ->get();
+
+        if ($students->isEmpty()) {
+            return back()->with('error', 'এই ক্লাসে কোনো শিক্ষার্থী খুঁজে পাওয়া যায়নি!');
+        }
+
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '512M');
+
+        $pdf = Pdf::loadView('school.student.bulk_id_cards_pdf', compact('students', 'school', 'class'));
+        $fileName = 'id-cards-' . Str::slug($class->name) . '-' . date('Ymd') . '.pdf';
+        return $pdf->setPaper('a4', 'landscape')->download($fileName);
+    }
 }

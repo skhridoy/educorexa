@@ -74,6 +74,12 @@
         li{
             list-style: none;
         }
+        .navbar {
+            z-index: 1030 !important;
+        }
+        .navbar .dropdown-menu {
+            z-index: 1050 !important;
+        }
         /* ── Premium Locked Sidebar Links ── */
         .edu-locked-link {
             opacity: 0.55 !important;

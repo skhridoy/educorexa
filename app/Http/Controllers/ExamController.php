@@ -456,6 +456,12 @@ class ExamController extends Controller
 
     public function bulkAdmitCard(Request $request, $tenant)
     {
+        $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
+        if ($school && !$school->hasPackagePermission('exam.admit_card')) {
+            return redirect()->route('exams.admit-card', ['tenant' => $tenant])
+                ->with('error', 'প্রবেশপত্র ডাউনলোড ও প্রিন্ট করার সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
+
         $schoolId = $this->getSchoolId($request);
         $students = Student::where('school_id', $schoolId)
             ->where('class_id', $request->class_id)
@@ -464,7 +470,6 @@ class ExamController extends Controller
             ->get();
 
         $exam   = Exam::with('categories')->findOrFail($request->exam_id);
-        $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
 
         $examRoutines = ExamRoutine::where('school_id', $schoolId)
             ->where('exam_id', $request->exam_id)

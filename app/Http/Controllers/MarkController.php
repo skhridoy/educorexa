@@ -1065,6 +1065,7 @@ class MarkController extends Controller
             'instituteLogo'        => $this->compressImageToBase64($instituteLogo, 160),
             'watermarkLogo'        => $this->compressImageToBase64($instituteLogo, 400),
             'studentPhoto'         => $this->compressImageToBase64($studentPhoto, 120),
+            'headmasterSignature'  => !empty($school->signature) ? $this->compressImageToBase64(public_path($school->signature), 160) : '',
             'formattedDOB'         => $student->date_of_birth ? date('Y-m-d', strtotime($student->date_of_birth)) : 'N/A',
             'totalWorkingDays'     => $totalWorkingDays,
             'presentDays'          => $presentDays,
@@ -1212,6 +1213,7 @@ class MarkController extends Controller
             'academic_year'    => $academicYearName,
             'instituteLogo'    => $compressedLogo,
             'watermarkLogo'    => $watermarkLogo,
+            'headmasterSignature' => !empty($school->signature) ? $this->compressImageToBase64(public_path($school->signature), 160) : '',
             'sheets'           => $sheets,
         ];
 

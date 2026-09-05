@@ -366,9 +366,22 @@
 <div class="footer-sig">
     <table class="sig">
         <tr>
-            <td style="width: 33%;"><span class="sig-line">Signature (Guardian)</span></td>
-            <td style="width: 34%;"><span class="sig-line">Signature (Class Teacher)</span></td>
-            <td style="width: 33%;"><span class="sig-line">Signature (Head Master)</span></td>
+            <td style="width: 33%; vertical-align: bottom;">
+                <div style="height: 28px;"></div>
+                <span class="sig-line">Signature (Guardian)</span>
+            </td>
+            <td style="width: 34%; vertical-align: bottom;">
+                <div style="height: 28px;"></div>
+                <span class="sig-line">Signature (Class Teacher)</span>
+            </td>
+            <td style="width: 33%; vertical-align: bottom;">
+                <div style="height: 28px; text-align: center;">
+                    @if(!empty($headmasterSignature))
+                        <img src="{{ $headmasterSignature }}" style="max-height: 28px; max-width: 110px; display: inline-block;">
+                    @endif
+                </div>
+                <span class="sig-line">Signature (Head Master)</span>
+            </td>
         </tr>
     </table>
 </div>

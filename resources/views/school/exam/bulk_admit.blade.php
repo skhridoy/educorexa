@@ -28,9 +28,34 @@
 </style>
 @endsection
 
+@php
+    $canGenerateAdmitCard = $school ? $school->hasPackagePermission('exam.admit_card') : false;
+    $pricingUrl = route('school.pricing', ['tenant' => $tenant]);
+@endphp
+
 @section('content')
 <div class="page-content">
     <div class="container-fluid px-3 px-md-4">
+
+        {{-- Premium Alert Banner --}}
+        @if(!$canGenerateAdmitCard)
+            <div class="card border-0 mb-4 shadow-sm" style="border-radius: 16px; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid #f59e0b !important;">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #d97706, #fbbf24); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">{{ __('প্রিমিয়াম সুবিধা: পরীক্ষার প্রবেশপত্র তৈরি ও PDF ডাউনলোড') }}</h5>
+                            <p class="text-muted mb-0 small" style="max-width: 650px;">{{ __('আপনার বর্তমান প্যাকেজে প্রবেশপত্র (Admit Card) তৈরি ও প্রিন্ট করার সুবিধাটি বন্ধ রয়েছে। স্বয়ংক্রিয় রুটিন ও বারকোডযুক্ত প্রবেশপত্র তৈরি করতে অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।') }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ $pricingUrl }}" class="btn btn-warning fw-bold px-4 py-2.5 rounded-pill shadow-sm" style="font-size: 14px;">
+                        <i class="fa-solid fa-rocket me-1"></i> {{ __('প্রিমিয়াম প্যাকেজ চালু করুন (Upgrade Plan)') }}
+                    </a>
+                </div>
+            </div>
+        @endif
 
         {{-- Filter Card --}}
         <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px; background: #ffffff;">
@@ -38,14 +63,25 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <h5 class="fw-bold mb-0 text-dark">
                         <i class="fa-solid fa-id-card me-2 text-primary"></i>প্রবেশপত্র তৈরি ও ডাউনলোড (Admit Card Generator)
+                        @if(!$canGenerateAdmitCard)
+                            <span class="badge bg-warning-subtle text-warning fw-bold px-2.5 py-1 rounded-pill ms-2" style="font-size: 11px;">
+                                <i class="fa-solid fa-lock me-1"></i>{{ __('Locked') }}
+                            </span>
+                        @endif
                     </h5>
                     @if(isset($students) && $students->count() > 0)
-                        <a href="{{ route('exam.bulk_admit_card', ['tenant' => $tenant, 'class_id' => request('class_id'), 'exam_id' => request('exam_id')]) }}"
-                           target="_blank"
-                           class="btn btn-success fw-bold"
-                           style="border-radius: 10px; padding: 9px 20px;">
-                            <i class="fa-solid fa-file-pdf me-2"></i>PDF ডাউনলোড
-                        </a>
+                        @if($canGenerateAdmitCard)
+                            <a href="{{ route('exam.bulk_admit_card', ['tenant' => $tenant, 'class_id' => request('class_id'), 'exam_id' => request('exam_id')]) }}"
+                               target="_blank"
+                               class="btn btn-success fw-bold"
+                               style="border-radius: 10px; padding: 9px 20px;">
+                                <i class="fa-solid fa-file-pdf me-2"></i>PDF ডাউনলোড
+                            </a>
+                        @else
+                            <a href="{{ $pricingUrl }}" class="btn btn-warning fw-bold" style="border-radius: 10px; padding: 9px 20px;">
+                                <i class="fa-solid fa-crown me-1"></i> প্রিমিয়ামে আপগ্রেড করুন
+                            </a>
+                        @endif
                     @endif
                 </div>
 
@@ -53,7 +89,7 @@
                     <div class="row g-3 align-items-end">
                         <div class="col-md-5">
                             <label class="form-label fw-bold text-muted" style="font-size: 0.8rem;">শ্রেণি (Class)</label>
-                            <select name="class_id" class="form-select" required style="border-radius: 10px; padding: 10px;">
+                            <select name="class_id" class="form-select" required style="border-radius: 10px; padding: 10px;" {{ !$canGenerateAdmitCard ? 'disabled' : '' }}>
                                 <option value="">-- শ্রেণি নির্বাচন করুন --</option>
                                 @foreach($classes as $class)
                                     <option value="{{ $class->id }}" {{ request('class_id') == $class->id ? 'selected' : '' }}>
@@ -64,7 +100,7 @@
                         </div>
                         <div class="col-md-5">
                             <label class="form-label fw-bold text-muted" style="font-size: 0.8rem;">পরীক্ষা (Exam)</label>
-                            <select name="exam_id" class="form-select" required style="border-radius: 10px; padding: 10px;">
+                            <select name="exam_id" class="form-select" required style="border-radius: 10px; padding: 10px;" {{ !$canGenerateAdmitCard ? 'disabled' : '' }}>
                                 <option value="">-- পরীক্ষা নির্বাচন করুন --</option>
                                 @foreach($exams as $exam)
                                     <option value="{{ $exam->id }}" {{ request('exam_id') == $exam->id ? 'selected' : '' }}>
@@ -74,9 +110,15 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 10px; padding: 10px;">
-                                <i class="fa-solid fa-magnifying-glass me-1"></i> খুঁজুন
-                            </button>
+                            @if($canGenerateAdmitCard)
+                                <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 10px; padding: 10px;">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i> খুঁজুন
+                                </button>
+                            @else
+                                <a href="{{ $pricingUrl }}" class="btn btn-warning w-100 fw-bold" style="border-radius: 10px; padding: 10px;">
+                                    <i class="fa-solid fa-crown me-1"></i> আপগ্রেড
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </form>

@@ -233,7 +233,7 @@
             table-layout: fixed;
         }
         .sig-box {
-            width: 40%;
+            width: 100%;
             text-align: center;
             font-size: 9px;
             font-weight: bold;
@@ -485,9 +485,19 @@
                             <div class="footer-wrap">
                                 <table class="footer-tbl" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td class="sig-box">Class Teacher</td>
+                                        <td style="width: 40%; text-align: center; vertical-align: bottom;">
+                                            <div style="height: 25px;"></div>
+                                            <div class="sig-box">Class Teacher</div>
+                                        </td>
                                         <td style="width: 20%;"></td>
-                                        <td class="sig-box">Principal / Headmaster</td>
+                                        <td style="width: 40%; text-align: center; vertical-align: bottom;">
+                                            <div style="height: 25px; text-align: center;">
+                                                @if(!empty($school->signature) && file_exists(public_path($school->signature)))
+                                                    <img src="{{ public_path($school->signature) }}" style="max-height: 25px; max-width: 90px; display: inline-block;">
+                                                @endif
+                                            </div>
+                                            <div class="sig-box">Principal / Headmaster</div>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>

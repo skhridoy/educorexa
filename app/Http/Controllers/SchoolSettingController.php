@@ -21,8 +21,17 @@ class SchoolSettingController extends Controller
         $schoolId = auth()->user()->school_id;
         $school = School::findOrFail($schoolId);
 
+        // Check Package Permissions
+        if (!$school->hasPackagePermission('email.send') && ($request->filled('mail_host') || $request->filled('mail_username') || $request->filled('mail_password'))) {
+            return back()->with('error', 'ইমেইল ও কাস্টম SMTP সেটআপ সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। দয়া করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
+
+        if (!$school->hasPackagePermission('whatsapp.send') && ($request->filled('whatsapp_api_key') || $request->filled('whatsapp_api_instance_id'))) {
+            return back()->with('error', 'WhatsApp গেটওয়ে সেটআপ সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। দয়া করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
+
         if (!$school->hasPackagePermission('sms.send') && ($request->filled('sms_api_provider') || $request->filled('sms_api_url') || $request->filled('sms_api_key'))) {
-            return back()->with('error', 'SMS API is available only with a package that includes SMS service.');
+            return back()->with('error', 'SMS গেটওয়ে সেটআপ সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। দয়া করে প্রিমিয়াম প্যাকেজ চালু করুন।');
         }
 
         $request->validate([
@@ -75,6 +84,10 @@ class SchoolSettingController extends Controller
     {
         $schoolId = auth()->user()->school_id;
         $school = School::findOrFail($schoolId);
+
+        if (!$school->hasPackagePermission('email.send')) {
+            return back()->with('error', 'প্রফেশনাল ডোমেন ইমেইল সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। দয়া করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
 
         if ($school->pro_email_status !== 'none' && $school->pro_email_status !== 'rejected') {
             return back()->with('error', 'You already have a request in progress or approved.');
