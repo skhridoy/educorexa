@@ -12,13 +12,15 @@ class RolePermissionSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // ১. পারমিশন তৈরি (আগের মতোই কনফিগ থেকে)
+        // ১. পারমিশন তৈরি (কনফিগ থেকে)
+        $validPermissions = [];
         foreach (config('permissions.permissions') as $groupName => $permissions) {
             foreach ($permissions as $name => $displayName) {
                 Permission::updateOrCreate(
                     ['name' => $name, 'guard_name' => 'web'],
                     ['group_name' => $groupName]
                 );
+                $validPermissions[] = $name;
             }
         }
 
@@ -45,6 +47,6 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'super_admin', 'guard_name' => 'web'],
             ['role_type' => 'employee'] // সুপার এডমিনকেও employee টাইপে রাখা হলো, কারণ তিনি কোম্পানির স্টাফ হিসেবেই কাজ করবেন
         );
-        $superAdmin->syncPermissions(Permission::all());
+        $superAdmin->syncPermissions(Permission::whereIn('name', $validPermissions)->get());
     }
 }
