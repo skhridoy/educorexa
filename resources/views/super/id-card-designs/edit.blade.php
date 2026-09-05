@@ -2,175 +2,348 @@
 @section('customCSS')
 @include('layouts._shared_styles')
 <style>
-    .color-input-group {
-        display: flex;
+    /* ── Top Header Toolbar ── */
+    .preview-header-toolbar {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 16px 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+    }
+
+    /* ── Side View Toggle Buttons (আইডি কার্ড প্রিভিউ পেজ এর বাটন স্টাইল) ── */
+    .idcard-view-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .idcard-view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1.5px solid #0d6efd;
+        background: #ffffff;
+        color: #0d6efd;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        line-height: 1.4;
+    }
+    .idcard-view-btn i {
+        font-size: 13px;
+        color: #0d6efd;
+        transition: color 0.2s ease;
+    }
+    .idcard-view-btn:hover:not(.active) {
+        background: #e7f1ff;
+        color: #0b5ed7;
+    }
+    .idcard-view-btn.active {
+        background: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.35);
+    }
+    .idcard-view-btn.active i {
+        color: #ffffff !important;
+    }
+
+    /* ── Preset Pill Buttons ── */
+    .preset-pill-btn {
+        display: inline-flex;
         align-items: center;
         gap: 8px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #334155;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .preset-pill-btn:hover {
+        border-color: #0d6efd;
+        color: #0d6efd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.15);
+    }
+    .preset-color-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1.5px solid #ffffff;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        flex-shrink: 0;
+    }
+
+    /* ── Current Asset Card ── */
+    .current-asset-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .current-asset-thumb {
+        width: 60px;
+        height: 32px;
+        object-fit: contain;
+        background: #ffffff;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        padding: 2px;
+    }
+
+    /* ── Upload Dropzone ── */
+    .upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .upload-box:hover {
+        border-color: #0d6efd;
+        background: #f0f7ff;
+    }
+    .upload-box input[type="file"] {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* ── Color Input Cards ── */
+    .color-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        transition: all 0.15s;
+    }
+    .color-card:hover {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .color-picker-input {
-        width: 44px;
+        width: 42px;
         height: 38px;
-        padding: 2px;
         border-radius: 8px;
-        border: 1px solid #cbd5e1;
+        border: 1.5px solid #cbd5e1;
+        padding: 2px;
         cursor: pointer;
-        background: #fff;
+        background: #ffffff;
+        flex-shrink: 0;
     }
-    .preview-sticky {
+
+    /* ── Live Sticky Preview Station ── */
+    .preview-station {
         position: sticky;
         top: 24px;
-    }
-    .preview-card-box {
-        background: #f1f5f9;
-        border: 2px dashed #cbd5e1;
-        border-radius: 16px;
-        padding: 30px 20px;
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        padding: 20px;
         display: flex;
         flex-direction: column;
+        align-items: center;
+    }
+
+    /* ── Simulator Stage & Cards ── */
+    .sim-stage-flex {
+        display: flex;
         align-items: center;
         justify-content: center;
+        gap: 14px;
+        width: 100%;
+        padding: 12px 0;
+        flex-wrap: wrap;
     }
-    /* ID Card Simulation */
     .sim-card {
-        width: 220px;
-        height: 320px;
+        width: 162px;
+        height: 250px;
         background: #ffffff;
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border-radius: 10px;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.04);
         position: relative;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        border: 0.5px solid #cbd5e1;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
     }
-    .sim-header {
+    .sim-card:hover {
+        transform: scale(1.02);
+    }
+    .sim-card-gloss {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 95px;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 55%);
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    /* Front Card Elements */
+    .card-front-header {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 75px;
         background-color: {{ $design->primary_color }};
         z-index: 1;
         overflow: hidden;
     }
-    .sim-header img {
-        width: 100%;
-        height: 100%;
+    .card-front-header img {
+        width: 100%; height: 100%;
         object-fit: fill;
         display: block;
     }
-    .sim-school-text {
+    .card-school-name {
         position: absolute;
-        top: 10px;
-        left: 0;
-        width: 100%;
+        top: 7px; left: 0; width: 100%;
         text-align: center;
         color: #ffffff;
         font-weight: 800;
-        font-size: 11px;
+        font-size: 8px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
         z-index: 2;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        padding: 0 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.4);
     }
-    .sim-photo-wrap {
+    .card-avatar-box {
         position: relative;
         z-index: 3;
-        margin-top: 55px;
-        width: 65px;
-        height: 80px;
-        border-radius: 8px;
+        margin: 45px auto 0 auto;
+        width: 48px;
+        height: 58px;
+        border-radius: 6px;
         background: #f8fafc;
-        border: 3px solid {{ $design->photo_border_color }};
+        border: 2.5px solid {{ $design->photo_border_color }};
         display: flex;
         align-items: center;
         justify-content: center;
         color: #94a3b8;
-        font-size: 26px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        font-size: 20px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.12);
         overflow: hidden;
     }
-    .sim-photo-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .sim-name {
-        margin-top: 8px;
-        font-size: 13px;
+    .card-student-name {
+        margin-top: 5px;
+        font-size: 9.5px;
         font-weight: 800;
         color: #1e293b;
         text-align: center;
+        line-height: 1.1;
     }
-    .sim-badge {
-        margin-top: 4px;
-        font-size: 9px;
+    .card-badge-pill {
+        margin: 3px auto 0 auto;
+        display: table;
+        font-size: 7px;
         font-weight: 700;
         color: #ffffff;
         background: {{ $design->badge_color }};
-        padding: 2px 10px;
-        border-radius: 12px;
+        padding: 1.5px 10px;
+        border-radius: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
     }
-    .sim-info-table {
-        margin-top: 8px;
-        width: 85%;
-        font-size: 9px;
+    .card-meta-table {
+        margin: 6px auto 0 auto;
+        width: 88%;
+        font-size: 7px;
         border-collapse: collapse;
     }
-    .sim-info-table td {
-        padding: 2px 4px;
+    .card-meta-table td {
+        padding: 1px 2px;
     }
-    .sim-info-label {
+    .card-lbl {
         font-weight: 700;
         color: {{ $design->label_color }};
-        width: 45%;
+        width: 42%;
     }
-    .sim-info-val {
+    .card-val {
         font-weight: 600;
         color: #334155;
     }
-    .sim-bottom-bar {
+    .card-bottom-bar {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 10px;
+        bottom: 0; left: 0; width: 100%; height: 7px;
         background: {{ $design->primary_color }};
         z-index: 2;
     }
-    .sim-bottom-bar img {
-        width: 100%;
-        height: 100%;
+    .card-bottom-bar img {
+        width: 100%; height: 100%;
         object-fit: cover;
         display: block;
     }
-    .preset-chip {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        border: 1px solid #e2e8f0;
-        background: #fff;
-        cursor: pointer;
-        display: inline-flex;
+
+    /* Back Card Elements */
+    .card-back-container {
+        width: 100%; height: 100%;
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 6px;
-        transition: all 0.2s;
+        padding: 14px 10px 8px 10px;
+        position: relative;
     }
-    .preset-chip:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    .card-back-hd {
+        font-size: 7.5px;
+        font-weight: 800;
+        padding: 3px 10px;
+        border-radius: 3px;
+        text-align: center;
+        width: 92%;
+        letter-spacing: 0.2px;
+        background: {{ $design->back_header_bg }};
+        color: {{ $design->back_header_text }};
     }
-    .current-asset-thumb {
-        width: 100px;
-        height: 40px;
-        object-fit: contain;
-        background: #e2e8f0;
-        border-radius: 6px;
-        border: 1px solid #cbd5e1;
-        padding: 2px;
+    .card-back-terms {
+        font-size: 6.5px;
+        color: #475569;
+        line-height: 1.35;
+        margin-top: 8px;
+        text-align: center;
+    }
+    .card-back-qr {
+        margin-top: auto;
+        margin-bottom: 12px;
+        padding: 3px;
+        border: 0.5px solid #cbd5e1;
+        background: #ffffff;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .card-back-qr i {
+        font-size: 26px;
+        color: {{ $design->primary_color }};
+    }
+    .card-back-id {
+        font-size: 6.5px;
+        font-weight: 700;
+        margin-top: 2px;
+        color: {{ $design->label_color }};
     }
 </style>
 @endsection
@@ -182,19 +355,35 @@
         <li><span>/</span></li>
         <li><a href="{{ route('super.id-card-designs.index') }}">ID Card Designs</a></li>
         <li><span>/</span></li>
-        <li class="active">Edit Design: {{ $design->name }}</li>
+        <li class="active">Edit: {{ $design->name }}</li>
     </ul>
 
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    {{-- Top Action Toolbar (Matching preview toolbar) --}}
+    <div class="preview-header-toolbar d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>
-            <h2 class="edu-page-title"><i class="fa-solid fa-pen-to-square me-2" style="color:#4f46e5;"></i> Edit ID Card Design</h2>
-            <p class="edu-page-sub">Update custom shape, colors, and configuration for "{{ $design->name }}".</p>
+            <h4 class="fw-bold mb-1 text-dark" style="font-family:'Outfit',sans-serif;">
+                <i class="fa-solid fa-pen-to-square text-primary me-2"></i>{{ __('আইডি কার্ড ডিজাইন এডিট: ') }} {{ $design->name }}
+            </h4>
+            <p class="text-muted small mb-0">{{ __('হেডার শেপ ফাইল পরিবর্তন করুন ও প্রিভিউ পেজ এর মতো লাইভ কার্ডে টেস্ট করুন।') }}</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark border font-monospace px-3 py-2 rounded-pill small">
+                {{ $design->slug }}
+            </span>
+            <a href="{{ route('super.id-card-designs.index') }}" class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> {{ __('টেমপ্লেট তালিকা') }}
+            </a>
+            <button type="button" onclick="document.getElementById('designEditForm').submit();" class="btn btn-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
+                <i class="fa-solid fa-check me-1.5"></i> {{ __('আপডেট করুন') }}
+            </button>
         </div>
     </div>
 
     @if (isset($errors) && $errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0">
+        <div class="alert alert-danger alert-dismissible fade show border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> ত্রুটিগুলো সংশোধন করুন:</h6>
+            <ul class="mb-0 small ps-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -204,226 +393,339 @@
     @endif
 
     <div class="row g-4">
-        {{-- Left: Form Inputs --}}
+        {{-- Left Form Panel --}}
         <div class="col-lg-7">
-            <form action="{{ route('super.id-card-designs.update', $design->id) }}" method="POST" enctype="multipart/form-data" id="designForm">
+            <form action="{{ route('super.id-card-designs.update', $design->id) }}" method="POST" enctype="multipart/form-data" id="designEditForm">
                 @csrf
                 @method('PUT')
-                
-                {{-- Basic Details --}}
+
+                {{-- Section 1: Details --}}
                 <div class="edu-panel mb-4">
                     <div class="edu-panel-hd">
-                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-tag me-2 text-primary"></i> Basic Information</h6>
+                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-tag text-primary me-2"></i>১. ডিজাইনের নাম ও তথ্য</h6>
                     </div>
                     <div class="edu-panel-bd">
                         <div class="row g-3">
                             <div class="col-md-7">
-                                <label class="edu-label">Design Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" id="designName" class="form-control edu-input" value="{{ old('name', $design->name) }}" required>
+                                <label class="edu-label">টেমপ্লেট নাম <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="nameInput" class="form-control edu-input" value="{{ old('name', $design->name) }}" required>
                             </div>
                             <div class="col-md-5">
-                                <label class="edu-label">Slug</label>
+                                <label class="edu-label">স্লাগ (Slug)</label>
                                 <input type="text" class="form-control edu-input" value="{{ $design->slug }}" disabled>
-                                <small class="text-muted">Slug cannot be changed once created</small>
+                                <small class="text-muted" style="font-size:11px;">স্লাগ পরিবর্তনযোগ্য নয়</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="edu-label">Sort Order</label>
+                                <label class="edu-label">সিরিয়াল / সাজানোর ক্রম (Sort Order)</label>
                                 <input type="number" name="sort_order" class="form-control edu-input" value="{{ old('sort_order', $design->sort_order) }}">
                             </div>
-                            <div class="col-md-6 d-flex align-items-center pt-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="is_active" id="isActive" value="1" {{ old('is_active', $design->is_active) ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-bold" for="isActive">Is Active (Visible to Schools)</label>
+                            <div class="col-md-6 d-flex align-items-center pt-3">
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" name="is_active" id="isActiveCheck" value="1" {{ old('is_active', $design->is_active) ? 'checked' : '' }} style="cursor:pointer; width:40px; height:22px;">
+                                    <label class="form-check-label fw-bold ms-2" for="isActiveCheck" style="font-size:13px; cursor:pointer;">
+                                        স্কুলের তালিকায় সক্রিয় রাখুন
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Shape & Images Upload --}}
+                {{-- Section 2: Header Shape & Assets --}}
                 <div class="edu-panel mb-4">
-                    <div class="edu-panel-hd">
-                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-shapes me-2 text-primary"></i> Shape & Image Assets</h6>
+                    <div class="edu-panel-hd d-flex justify-content-between align-items-center">
+                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-shapes text-primary me-2"></i>২. হেডার শেপ ও গ্রাফিক ফাইল</h6>
+                        <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2.5 py-1" style="font-size:11px;">PNG / JPG</span>
                     </div>
                     <div class="edu-panel-bd">
+                        {{-- Header Shape Upload Box --}}
+                        <div class="mb-3">
+                            <label class="edu-label">হেডার শেপ ওভারলে ইমেজ</label>
+                            
+                            @if($design->header_shape && file_exists(public_path($design->header_shape)))
+                                <div class="current-asset-card">
+                                    <img src="{{ asset($design->header_shape) }}" class="current-asset-thumb" alt="Current Shape">
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <div class="fw-bold small text-dark">বর্তমান সক্রিয় হেডার শেপ</div>
+                                        <div class="text-muted font-monospace text-truncate" style="font-size:11px;">{{ $design->header_shape }}</div>
+                                    </div>
+                                    <span class="badge bg-success-subtle text-success fw-bold rounded-pill px-2 py-1" style="font-size:10px;">আপলোড করা আছে</span>
+                                </div>
+                            @endif
+
+                            <div class="upload-box" id="shapeUploadBox">
+                                <input type="file" name="header_shape" id="headerShapeInput" accept="image/png, image/jpeg, image/jpg">
+                                <div class="d-inline-flex align-items-center justify-content-center text-primary mb-1" style="font-size:20px;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark" style="font-size:12.5px;">নতুন শেপ ফাইল দিয়ে রিপ্লেস করতে ক্লিক করুন (ঐচ্ছিক)</h6>
+                                <p class="text-muted small mb-0" style="font-size:11px;">ফাঁকা রাখলে বর্তমান শেপ অপরিবর্তিত থাকবে</p>
+                            </div>
+                        </div>
+
                         <div class="row g-3">
-                            <div class="col-12">
-                                <label class="edu-label">Header Shape Image (PNG / JPG)</label>
-                                @if($design->header_shape && file_exists(public_path($design->header_shape)))
-                                    <div class="d-flex align-items-center gap-3 mb-2 p-2 bg-light rounded">
-                                        <img src="{{ asset($design->header_shape) }}" class="current-asset-thumb" alt="Current Header Shape">
-                                        <div class="small">
-                                            <strong>Current Shape Uploaded</strong><br>
-                                            <span class="text-muted">{{ $design->header_shape }}</span>
-                                        </div>
-                                    </div>
-                                @endif
-                                <input type="file" name="header_shape" id="headerShapeInput" class="form-control edu-input" accept="image/png, image/jpeg, image/jpg">
-                                <small class="text-muted">Upload a new header shape to replace the existing one (leave empty to keep current).</small>
-                            </div>
                             <div class="col-md-6">
-                                <label class="edu-label">Bottom Gradient Bar (Optional)</label>
+                                <label class="edu-label">নিচের গ্রেডিয়েন্ট বার</label>
                                 @if($design->gradient_bar && file_exists(public_path($design->gradient_bar)))
-                                    <div class="d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded">
-                                        <img src="{{ asset($design->gradient_bar) }}" class="current-asset-thumb" alt="Current Bar">
-                                        <span class="small text-muted">Uploaded</span>
+                                    <div class="d-flex align-items-center gap-2 mb-2 p-1.5 bg-light rounded border">
+                                        <img src="{{ asset($design->gradient_bar) }}" class="current-asset-thumb" style="width:45px; height:16px;" alt="Bar">
+                                        <span class="small text-muted font-monospace" style="font-size:10px;">সক্রিয় আছে</span>
                                     </div>
                                 @endif
-                                <input type="file" name="gradient_bar" id="bottomBarInput" class="form-control edu-input" accept="image/png, image/jpeg, image/jpg">
-                                <small class="text-muted">Leave empty to keep current</small>
+                                <input type="file" name="gradient_bar" id="gradientBarInput" class="form-control edu-input" accept="image/png, image/jpeg, image/jpg">
+                                <small class="text-muted" style="font-size:11px;">নতুন ফাইল দিলে রিপ্লেস হবে</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="edu-label">Pattern Overlay (Optional)</label>
+                                <label class="edu-label">ওয়াটারমার্ক প্যাটার্ন</label>
                                 @if($design->pattern && file_exists(public_path($design->pattern)))
-                                    <div class="d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded">
-                                        <img src="{{ asset($design->pattern) }}" class="current-asset-thumb" alt="Current Pattern">
-                                        <span class="small text-muted">Uploaded</span>
+                                    <div class="d-flex align-items-center gap-2 mb-2 p-1.5 bg-light rounded border">
+                                        <img src="{{ asset($design->pattern) }}" class="current-asset-thumb" style="width:28px; height:24px;" alt="Pattern">
+                                        <span class="small text-muted font-monospace" style="font-size:10px;">সক্রিয় আছে</span>
                                     </div>
                                 @endif
                                 <input type="file" name="pattern" class="form-control edu-input" accept="image/png, image/jpeg, image/jpg">
-                                <small class="text-muted">Leave empty to keep current</small>
+                                <small class="text-muted" style="font-size:11px;">নতুন ফাইল দিলে রিপ্লেস হবে</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Color Palette --}}
+                {{-- Section 3: Palette Studio with Preview Page Button Style --}}
                 <div class="edu-panel mb-4">
                     <div class="edu-panel-hd d-flex justify-content-between align-items-center">
-                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-palette me-2 text-primary"></i> Color Palette</h6>
-                        <span class="text-muted small">Pick custom colors or select a preset below</span>
+                        <h6 class="edu-panel-ttl"><i class="fa-solid fa-palette text-primary me-2"></i>৩. কালার প্যালেট স্টুডিও</h6>
+                        <span class="text-muted small">এক ক্লিকে প্রিসেট সেট করুন</span>
                     </div>
                     <div class="edu-panel-bd">
-                        {{-- Presets --}}
-                        <div class="mb-3">
-                            <label class="edu-label mb-2">Quick Presets:</label>
+                        {{-- Presets using pill style matching preview buttons --}}
+                        <div class="mb-4">
+                            <label class="edu-label mb-2">রেডিমেড কালার প্রিসেট সমূহ:</label>
                             <div class="d-flex flex-wrap gap-2">
-                                <button type="button" class="preset-chip" onclick="applyPreset('#6a1b9a','#6a1b9a','#7b1fa2','#ab47bc','#f3e5f5','#6a1b9a')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#6a1b9a;display:inline-block;"></span> Royal Purple
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#6a1b9a','#841778','#6a1b9a','#ab47bc','#f3e8ff','#6a1b9a')">
+                                    <span class="preset-color-dot" style="background:#6a1b9a;"></span>
+                                    <span>রয়্যাল পার্পল</span>
                                 </button>
-                                <button type="button" class="preset-chip" onclick="applyPreset('#1e3a8a','#1e3a8a','#1d4ed8','#3b82f6','#dbeafe','#1e3a8a')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#1e3a8a;display:inline-block;"></span> Deep Navy
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#1e3a8a','#0f172a','#1e40af','#3b82f6','#e0e7ff','#1e3a8a')">
+                                    <span class="preset-color-dot" style="background:#1e3a8a;"></span>
+                                    <span>ডিপ নেভি</span>
                                 </button>
-                                <button type="button" class="preset-chip" onclick="applyPreset('#065f46','#065f46','#047857','#10b981','#d1fae5','#065f46')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#065f46;display:inline-block;"></span> Emerald Green
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#065f46','#064e3b','#047857','#10b981','#ecfdf5','#065f46')">
+                                    <span class="preset-color-dot" style="background:#065f46;"></span>
+                                    <span>এমারেল্ড গ্রিন</span>
                                 </button>
-                                <button type="button" class="preset-chip" onclick="applyPreset('#991b1b','#991b1b','#b91c1c','#ef4444','#fee2e2','#991b1b')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#991b1b;display:inline-block;"></span> Crimson Red
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#0284c7','#0369a1','#0284c7','#38bdf8','#e0f2fe','#0369a1')">
+                                    <span class="preset-color-dot" style="background:#0284c7;"></span>
+                                    <span>মডার্ন সিয়ান</span>
                                 </button>
-                                <button type="button" class="preset-chip" onclick="applyPreset('#0f766e','#0f766e','#0d9488','#14b8a6','#ccfbf1','#0f766e')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#0f766e;display:inline-block;"></span> Teal Ocean
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#be123c','#881337','#9f1239','#fb7185','#ffe4e6','#9f1239')">
+                                    <span class="preset-color-dot" style="background:#be123c;"></span>
+                                    <span>রিগ্যাল মেরুন</span>
                                 </button>
-                                <button type="button" class="preset-chip" onclick="applyPreset('#1e293b','#1e293b','#334155','#64748b','#f1f5f9','#1e293b')">
-                                    <span style="width:12px;height:12px;border-radius:50%;background:#1e293b;display:inline-block;"></span> Slate Dark
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#ea580c','#c2410c','#ea580c','#f97316','#ffedd5','#c2410c')">
+                                    <span class="preset-color-dot" style="background:#ea580c;"></span>
+                                    <span>সানসেট আম্বার</span>
+                                </button>
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#1e293b','#0f172a','#334155','#64748b','#f1f5f9','#1e293b')">
+                                    <span class="preset-color-dot" style="background:#1e293b;"></span>
+                                    <span>ডার্ক স্লেট</span>
+                                </button>
+                                <button type="button" class="preset-pill-btn" onclick="applyPreset('#0d9488','#115e59','#0f766e','#2dd4bf','#ccfbf1','#0f766e')">
+                                    <span class="preset-color-dot" style="background:#0d9488;"></span>
+                                    <span>টিয়াল ওশান</span>
                                 </button>
                             </div>
                         </div>
 
+                        {{-- Granular Color Pickers --}}
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="edu-label">Primary Color <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="primaryColorPick" class="color-picker-input" value="{{ old('primary_color', $design->primary_color) }}">
-                                    <input type="text" name="primary_color" id="primaryColorText" class="form-control edu-input" value="{{ old('primary_color', $design->primary_color) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">প্রাইমারি থিম কালার <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="primaryPick" class="color-picker-input" value="{{ old('primary_color', $design->primary_color) }}">
+                                        <input type="text" name="primary_color" id="primaryText" class="form-control edu-input" value="{{ old('primary_color', $design->primary_color) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">হেডার ব্যাকগ্রাউন্ড ও কিউআর অ্যাকসেন্ট</small>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="edu-label">Student Badge Color <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="badgeColorPick" class="color-picker-input" value="{{ old('badge_color', $design->badge_color) }}">
-                                    <input type="text" name="badge_color" id="badgeColorText" class="form-control edu-input" value="{{ old('badge_color', $design->badge_color) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">স্টুডেন্ট ব্যাজ কালার <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="badgePick" class="color-picker-input" value="{{ old('badge_color', $design->badge_color) }}">
+                                        <input type="text" name="badge_color" id="badgeText" class="form-control edu-input" value="{{ old('badge_color', $design->badge_color) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">STUDENT লেখার ব্যাকগ্রাউন্ড</small>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="edu-label">Field Label Color <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="labelColorPick" class="color-picker-input" value="{{ old('label_color', $design->label_color) }}">
-                                    <input type="text" name="label_color" id="labelColorText" class="form-control edu-input" value="{{ old('label_color', $design->label_color) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">ফিল্ড লেবেল কালার <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="labelPick" class="color-picker-input" value="{{ old('label_color', $design->label_color) }}">
+                                        <input type="text" name="label_color" id="labelText" class="form-control edu-input" value="{{ old('label_color', $design->label_color) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">Class, Roll, ID লেবেল ফন্ট কালার</small>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="edu-label">Photo Border Color <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="photoBorderColorPick" class="color-picker-input" value="{{ old('photo_border_color', $design->photo_border_color) }}">
-                                    <input type="text" name="photo_border_color" id="photoBorderColorText" class="form-control edu-input" value="{{ old('photo_border_color', $design->photo_border_color) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">ছবির বর্ডার কালার <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="photoBorderPick" class="color-picker-input" value="{{ old('photo_border_color', $design->photo_border_color) }}">
+                                        <input type="text" name="photo_border_color" id="photoBorderText" class="form-control edu-input" value="{{ old('photo_border_color', $design->photo_border_color) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">শিক্ষার্থীর ছবির ফ্রেমের রঙ</small>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="edu-label">Back Header Background <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="backHeaderBgPick" class="color-picker-input" value="{{ old('back_header_bg', $design->back_header_bg) }}">
-                                    <input type="text" name="back_header_bg" id="backHeaderBgText" class="form-control edu-input" value="{{ old('back_header_bg', $design->back_header_bg) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">পেছনের হেডার ব্যাকগ্রাউন্ড <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="backBgPick" class="color-picker-input" value="{{ old('back_header_bg', $design->back_header_bg) }}">
+                                        <input type="text" name="back_header_bg" id="backBgText" class="form-control edu-input" value="{{ old('back_header_bg', $design->back_header_bg) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">TERMS AND CONDITIONS বক্স ব্যাকগ্রাউন্ড</small>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="edu-label">Back Header Text Color <span class="text-danger">*</span></label>
-                                <div class="color-input-group">
-                                    <input type="color" id="backHeaderTextColorPick" class="color-picker-input" value="{{ old('back_header_text', $design->back_header_text) }}">
-                                    <input type="text" name="back_header_text" id="backHeaderTextColorText" class="form-control edu-input" value="{{ old('back_header_text', $design->back_header_text) }}" required>
+                                <div class="color-card">
+                                    <label class="edu-label mb-1">পেছনের হেডার টেক্সট কালার <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="backTextPick" class="color-picker-input" value="{{ old('back_header_text', $design->back_header_text) }}">
+                                        <input type="text" name="back_header_text" id="backTextText" class="form-control edu-input" value="{{ old('back_header_text', $design->back_header_text) }}" required>
+                                    </div>
+                                    <small class="text-muted" style="font-size:11px;">TERMS AND CONDITIONS টেক্সটের রঙ</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Action Buttons --}}
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn-edu btn-edu-primary" style="padding: 12px 36px;">
-                        <i class="fa-solid fa-check me-1"></i> Update Design
+                {{-- Action Buttons (Matching id_card_preview.blade.php styles) --}}
+                <div class="d-flex align-items-center gap-3 pt-2">
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2.5 rounded-pill shadow-sm">
+                        <i class="fa-solid fa-check me-1.5"></i> {{ __('আপডেট ও সংরক্ষণ করুন') }}
                     </button>
-                    <a href="{{ route('super.id-card-designs.index') }}" class="btn-edu btn-edu-light" style="padding: 12px 28px;">Cancel</a>
+                    <a href="{{ route('super.id-card-designs.index') }}" class="btn btn-outline-secondary px-4 py-2.5 rounded-pill fw-semibold shadow-sm">
+                        {{ __('বাতিল') }}
+                    </a>
                 </div>
             </form>
         </div>
 
-        {{-- Right: Live Interactive Card Preview --}}
+        {{-- Right: Live Interactive Card Simulator Station --}}
         <div class="col-lg-5">
-            <div class="preview-sticky">
-                <div class="preview-card-box">
-                    <h6 class="text-muted mb-3 fw-bold"><i class="fa-solid fa-eye me-1"></i> Live Design Preview</h6>
+            <div class="preview-station">
+                <div class="d-flex align-items-center justify-content-between w-100 mb-3">
+                    <h6 class="fw-bold text-dark mb-0">
+                        <i class="fa-solid fa-eye text-primary me-1.5"></i>{{ __('লাইভ আইডি কার্ড প্রিভিউ') }}
+                    </h6>
+                    <span class="badge bg-primary-subtle text-primary fw-bold rounded-pill px-2.5 py-1" style="font-size:11px;">CR80 Scaled</span>
+                </div>
 
-                    <div class="sim-card">
-                        <div class="sim-header" id="previewSimHeader" style="background-color: {{ $design->primary_color }};">
-                            <img id="previewShapeImg" 
+                {{-- Side Visibility Toggle Buttons (EXACTLY like id_card_preview.blade.php) --}}
+                <div class="idcard-view-group mb-3" role="group" aria-label="Side visibility">
+                    <button type="button" class="idcard-view-btn active" id="btnShowBoth" onclick="setSideView('both')">
+                        <i class="fa-solid fa-table-columns me-1"></i>
+                        <span>{{ __('উভয় পাশ') }}</span>
+                    </button>
+                    <button type="button" class="idcard-view-btn" id="btnShowFront" onclick="setSideView('front')">
+                        <i class="fa-solid fa-id-card me-1"></i>
+                        <span>{{ __('সম্মুখভাগ (Front)') }}</span>
+                    </button>
+                    <button type="button" class="idcard-view-btn" id="btnShowBack" onclick="setSideView('back')">
+                        <i class="fa-solid fa-qrcode me-1"></i>
+                        <span>{{ __('পেছনভাগ (Back)') }}</span>
+                    </button>
+                </div>
+
+                {{-- Card Simulator Stage --}}
+                <div class="sim-stage-flex" id="simStageFlex">
+                    
+                    {{-- ── FRONT CARD ── --}}
+                    <div class="sim-card card-front-box" id="cardFrontBox">
+                        <div class="sim-card-gloss"></div>
+
+                        <div class="card-front-header" id="simFrontHeader" style="background-color: {{ $design->primary_color }};">
+                            <img id="simHeaderShapeImg" 
                                  src="{{ $design->header_shape && file_exists(public_path($design->header_shape)) ? asset($design->header_shape) : '' }}" 
                                  style="{{ $design->header_shape && file_exists(public_path($design->header_shape)) ? '' : 'display:none;' }}" 
-                                 alt="Shape">
+                                 alt="Header Shape">
                         </div>
-                        <div class="sim-school-text">IDEAL MODEL SCHOOL</div>
-                        
-                        <div class="sim-photo-wrap" id="previewPhotoWrap" style="border-color: {{ $design->photo_border_color }};">
+                        <div class="card-school-name">IDEAL MODEL HIGH SCHOOL</div>
+
+                        <div class="card-avatar-box" id="simAvatarBox" style="border-color: {{ $design->photo_border_color }};">
                             <i class="fa-solid fa-user"></i>
                         </div>
-                        
-                        <div class="sim-name" id="previewStudentName">ARIF HOSSAIN</div>
-                        <div class="sim-badge" id="previewBadge" style="background-color: {{ $design->badge_color }};">STUDENT</div>
 
-                        <table class="sim-info-table">
+                        <div class="card-student-name">ARIF HOSSAIN</div>
+                        <div class="card-badge-pill" id="simBadgePill" style="background-color: {{ $design->badge_color }};">STUDENT</div>
+
+                        <table class="card-meta-table">
                             <tr>
-                                <td class="sim-info-label" id="previewLbl1" style="color: {{ $design->label_color }};">Class</td>
-                                <td class="sim-info-val">: Class 8</td>
+                                <td class="card-lbl" id="simLblClass" style="color: {{ $design->label_color }};">Class</td>
+                                <td class="card-val">: Class 8</td>
                             </tr>
                             <tr>
-                                <td class="sim-info-label" id="previewLbl2" style="color: {{ $design->label_color }};">Roll No</td>
-                                <td class="sim-info-val">: 12</td>
+                                <td class="card-lbl" id="simLblRoll" style="color: {{ $design->label_color }};">Roll No</td>
+                                <td class="card-val">: 12</td>
                             </tr>
                             <tr>
-                                <td class="sim-info-label" id="previewLbl3" style="color: {{ $design->label_color }};">Blood Grp</td>
-                                <td class="sim-info-val">: B+</td>
+                                <td class="card-lbl" id="simLblId" style="color: {{ $design->label_color }};">Student ID</td>
+                                <td class="card-val">: STU-2026-0812</td>
+                            </tr>
+                            <tr>
+                                <td class="card-lbl" id="simLblBlood" style="color: {{ $design->label_color }};">Blood Grp</td>
+                                <td class="card-val">: B+</td>
                             </tr>
                         </table>
 
-                        <div class="sim-bottom-bar" id="previewBottomBar" style="background-color: {{ $design->primary_color }};">
-                            <img id="previewBottomImg" 
+                        <div class="card-bottom-bar" id="simBottomBar" style="background-color: {{ $design->primary_color }};">
+                            <img id="simBottomBarImg" 
                                  src="{{ $design->gradient_bar && file_exists(public_path($design->gradient_bar)) ? asset($design->gradient_bar) : '' }}" 
                                  style="{{ $design->gradient_bar && file_exists(public_path($design->gradient_bar)) ? '' : 'display:none;' }}" 
                                  alt="Bar">
                         </div>
                     </div>
 
-                    <div class="text-center mt-3 text-muted small">
-                        Card dimensions and elements dynamically adapt to colors and shape image.
+                    {{-- ── BACK CARD ── --}}
+                    <div class="sim-card card-back-box" id="cardBackBox">
+                        <div class="sim-card-gloss"></div>
+
+                        <div class="card-back-container">
+                            <div class="card-bottom-bar" id="simBackTopBar" style="top:0; height:6px; background-color: {{ $design->primary_color }};"></div>
+
+                            <div class="card-back-hd" id="simBackHeader" style="background: {{ $design->back_header_bg }}; color: {{ $design->back_header_text }};">
+                                TERMS AND CONDITIONS
+                            </div>
+
+                            <div class="card-back-terms">
+                                <p class="mb-1">• Property of <strong>Ideal Model High School</strong>.</p>
+                                <p class="mb-1">• Return if found to school administration office.</p>
+                                <p class="mb-0"><strong>Session:</strong> 2026</p>
+                            </div>
+
+                            <div class="card-back-qr">
+                                <i class="fa-solid fa-qrcode" id="simQrIcon" style="color: {{ $design->primary_color }};"></i>
+                                <span class="card-back-id" id="simBackIdTxt" style="color: {{ $design->label_color }};">STU-2026-0812</span>
+                            </div>
+
+                            <div class="card-bottom-bar" id="simBackBottomBar" style="background-color: {{ $design->primary_color }};"></div>
+                        </div>
                     </div>
+
+                </div>
+
+                {{-- Footnote helper --}}
+                <div class="text-center mt-3 pt-2 text-muted small border-top w-100" style="font-size:11.5px;">
+                    <i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i>
+                    {{ __('কালার পিকার বা শেপ সিলেক্ট করলে সরাসরি উভয় পাশে পরিবর্তন দেখা যাবে।') }}
                 </div>
             </div>
         </div>
@@ -433,96 +735,133 @@
 
 @section('customJS')
 <script>
-    // Color sync helpers
-    function syncColor(pickId, textId, updateCallback) {
-        const picker = document.getElementById(pickId);
-        const text = document.getElementById(textId);
-        if (!picker || !text) return;
+    // Side View Switcher (Exactly matching id_card_preview.blade.php buttons & logic)
+    function setSideView(view) {
+        const frontBox = document.getElementById('cardFrontBox');
+        const backBox = document.getElementById('cardBackBox');
+        const btnBoth = document.getElementById('btnShowBoth');
+        const btnFront = document.getElementById('btnShowFront');
+        const btnBack = document.getElementById('btnShowBack');
 
-        picker.addEventListener('input', () => {
-            text.value = picker.value;
-            if (updateCallback) updateCallback(picker.value);
+        $('.idcard-view-btn').removeClass('active');
+
+        if (view === 'both') {
+            btnBoth.classList.add('active');
+            frontBox.style.display = 'block';
+            backBox.style.display = 'block';
+        } else if (view === 'front') {
+            btnFront.classList.add('active');
+            frontBox.style.display = 'block';
+            backBox.style.display = 'none';
+        } else if (view === 'back') {
+            btnBack.classList.add('active');
+            frontBox.style.display = 'none';
+            backBox.style.display = 'block';
+        }
+    }
+
+    // Color sync binding helper
+    function bindColorSync(pickerId, textId, onUpdate) {
+        const pick = document.getElementById(pickerId);
+        const txt = document.getElementById(textId);
+        if (!pick || !txt) return;
+
+        pick.addEventListener('input', () => {
+            txt.value = pick.value;
+            if (onUpdate) onUpdate(pick.value);
         });
-        text.addEventListener('input', () => {
-            if (/^#[0-9A-Fa-f]{6}$/.test(text.value)) {
-                picker.value = text.value;
-                if (updateCallback) updateCallback(text.value);
+        txt.addEventListener('input', () => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(txt.value)) {
+                pick.value = txt.value;
+                if (onUpdate) onUpdate(txt.value);
             }
         });
     }
 
-    // Update preview elements
-    function updatePrimaryColor(val) {
-        document.getElementById('previewSimHeader').style.backgroundColor = val;
-        document.getElementById('previewBottomBar').style.backgroundColor = val;
+    // Realtime card updates
+    function updatePrimary(c) {
+        document.getElementById('simFrontHeader').style.backgroundColor = c;
+        document.getElementById('simBottomBar').style.backgroundColor = c;
+        document.getElementById('simBackTopBar').style.backgroundColor = c;
+        document.getElementById('simBackBottomBar').style.backgroundColor = c;
+        document.getElementById('simQrIcon').style.color = c;
     }
-    function updateBadgeColor(val) {
-        document.getElementById('previewBadge').style.backgroundColor = val;
+    function updateBadge(c) {
+        document.getElementById('simBadgePill').style.backgroundColor = c;
     }
-    function updateLabelColor(val) {
-        document.getElementById('previewLbl1').style.color = val;
-        document.getElementById('previewLbl2').style.color = val;
-        document.getElementById('previewLbl3').style.color = val;
+    function updateLabel(c) {
+        ['simLblClass', 'simLblRoll', 'simLblId', 'simLblBlood'].forEach(id => {
+            document.getElementById(id).style.color = c;
+        });
+        document.getElementById('simBackIdTxt').style.color = c;
     }
-    function updatePhotoBorder(val) {
-        document.getElementById('previewPhotoWrap').style.borderColor = val;
+    function updateBorder(c) {
+        document.getElementById('simAvatarBox').style.borderColor = c;
+    }
+    function updateBackHeader(bg, text) {
+        const el = document.getElementById('simBackHeader');
+        if (bg) el.style.backgroundColor = bg;
+        if (text) el.style.color = text;
     }
 
-    syncColor('primaryColorPick', 'primaryColorText', updatePrimaryColor);
-    syncColor('badgeColorPick', 'badgeColorText', updateBadgeColor);
-    syncColor('labelColorPick', 'labelColorText', updateLabelColor);
-    syncColor('photoBorderColorPick', 'photoBorderColorText', updatePhotoBorder);
-    syncColor('backHeaderBgPick', 'backHeaderBgText');
-    syncColor('backHeaderTextColorPick', 'backHeaderTextColorText');
+    bindColorSync('primaryPick', 'primaryText', updatePrimary);
+    bindColorSync('badgePick', 'badgeText', updateBadge);
+    bindColorSync('labelPick', 'labelText', updateLabel);
+    bindColorSync('photoBorderPick', 'photoBorderText', updateBorder);
+    bindColorSync('backBgPick', 'backBgText', (v) => updateBackHeader(v, null));
+    bindColorSync('backTextPick', 'backTextText', (v) => updateBackHeader(null, v));
 
     // Preset helper
     function applyPreset(primary, badge, label, border, backBg, backText) {
-        document.getElementById('primaryColorPick').value = primary;
-        document.getElementById('primaryColorText').value = primary;
-        updatePrimaryColor(primary);
+        document.getElementById('primaryPick').value = primary;
+        document.getElementById('primaryText').value = primary;
+        updatePrimary(primary);
 
-        document.getElementById('badgeColorPick').value = badge;
-        document.getElementById('badgeColorText').value = badge;
-        updateBadgeColor(badge);
+        document.getElementById('badgePick').value = badge;
+        document.getElementById('badgeText').value = badge;
+        updateBadge(badge);
 
-        document.getElementById('labelColorPick').value = label;
-        document.getElementById('labelColorText').value = label;
-        updateLabelColor(label);
+        document.getElementById('labelPick').value = label;
+        document.getElementById('labelText').value = label;
+        updateLabel(label);
 
-        document.getElementById('photoBorderColorPick').value = border;
-        document.getElementById('photoBorderColorText').value = border;
-        updatePhotoBorder(border);
+        document.getElementById('photoBorderPick').value = border;
+        document.getElementById('photoBorderText').value = border;
+        updateBorder(border);
 
-        document.getElementById('backHeaderBgPick').value = backBg;
-        document.getElementById('backHeaderBgText').value = backBg;
+        document.getElementById('backBgPick').value = backBg;
+        document.getElementById('backBgText').value = backBg;
 
-        document.getElementById('backHeaderTextColorPick').value = backText;
-        document.getElementById('backHeaderTextColorText').value = backText;
+        document.getElementById('backTextPick').value = backText;
+        document.getElementById('backTextText').value = backText;
+        updateBackHeader(backBg, backText);
     }
 
-    // Header shape preview
-    document.getElementById('headerShapeInput').addEventListener('change', function(e) {
+    // Header shape replacement preview
+    const shapeInput = document.getElementById('headerShapeInput');
+    const simShapeImg = document.getElementById('simHeaderShapeImg');
+    shapeInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        const img = document.getElementById('previewShapeImg');
         if (file) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                img.src = evt.target.result;
-                img.style.display = 'block';
+                simShapeImg.src = evt.target.result;
+                simShapeImg.style.display = 'block';
             };
             reader.readAsDataURL(file);
         }
     });
 
     // Bottom bar preview
-    document.getElementById('bottomBarInput').addEventListener('change', function(e) {
+    const barInput = document.getElementById('gradientBarInput');
+    const simBarImg = document.getElementById('simBottomBarImg');
+    barInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        const img = document.getElementById('previewBottomImg');
         if (file) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                img.src = evt.target.result;
-                img.style.display = 'block';
+                simBarImg.src = evt.target.result;
+                simBarImg.style.display = 'block';
             };
             reader.readAsDataURL(file);
         }
