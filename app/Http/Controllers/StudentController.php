@@ -583,13 +583,76 @@ class StudentController extends Controller
         return view('school.student.id_card', compact('student'));
     }
 
-    public function idCardIndex() 
+    public static function getIdCardDesigns()
+    {
+        $designs = [];
+        try {
+            $dbDesigns = \App\Models\IdCardDesign::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get();
+
+            foreach ($dbDesigns as $d) {
+                $designs[$d->slug] = [
+                    'id'               => $d->slug,
+                    'db_id'            => $d->id,
+                    'name'             => $d->name,
+                    'name_bn'          => $d->name,
+                    'subtitle'         => 'কালার: ' . $d->primary_color,
+                    'primary_color'    => $d->primary_color,
+                    'gradient_css'     => "linear-gradient(135deg, {$d->primary_color} 0%, {$d->badge_color} 100%)",
+                    'badge_color'      => $d->badge_color,
+                    'label_color'      => $d->label_color,
+                    'photo_border'     => $d->photo_border_color,
+                    'back_header_bg'   => $d->back_header_bg,
+                    'back_header_text' => $d->back_header_text,
+                    'qr_rgb'           => $d->rgb,
+                    'header_shape'     => $d->header_shape,
+                    'gradient_bar'     => $d->gradient_bar,
+                    'pattern'          => $d->pattern,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // DB fallback
+        }
+
+        if (empty($designs)) {
+            $designs['purple_classic'] = [
+                'id'               => 'purple_classic',
+                'name'             => 'Classic Purple',
+                'name_bn'          => 'ডিজাইন ১: ক্লাসিক পার্পল',
+                'subtitle'         => 'রয়্যাল পার্পল ও ম্যাগনেটা শিল্ড',
+                'primary_color'    => '#6a1b9a',
+                'gradient_css'     => 'linear-gradient(135deg, #6a1b9a 0%, #ad1457 100%)',
+                'badge_color'      => '#841778',
+                'label_color'      => '#6a1b9a',
+                'photo_border'     => '#6a1b9a',
+                'back_header_bg'   => '#f3e8ff',
+                'back_header_text' => '#6a1b9a',
+                'qr_rgb'           => [106, 27, 154],
+                'header_shape'     => 'assets/images/id_card/designs/purple_classic/header_shape.png',
+                'gradient_bar'     => 'assets/images/id_card/designs/purple_classic/gradient_bar.png',
+                'pattern'          => 'assets/images/id_card/designs/purple_classic/pattern.png',
+            ];
+        }
+
+        return $designs;
+    }
+
+    public function idCardIndex(Request $request) 
     {
         $schoolId = auth()->user()->school_id;
         $classes = Classes::where('school_id', $schoolId)->withCount('students')->get();
         $totalStudents = Student::where('school_id', $schoolId)->count();
-        return view('school.student.id_card_index', compact('classes', 'totalStudents'));
+        $designs = self::getIdCardDesigns();
+        $defaultKey = array_key_first($designs) ?? 'purple_classic';
+        $selectedDesign = $request->get('design', $defaultKey);
+        if (!isset($designs[$selectedDesign])) {
+            $selectedDesign = $defaultKey;
+        }
+        return view('school.student.id_card_index', compact('classes', 'totalStudents', 'designs', 'selectedDesign'));
     }
+
     public function idCardPreview(Request $request) 
     {
         $school = auth()->user()?->school;
@@ -607,11 +670,18 @@ class StudentController extends Controller
                         ->orderBy('roll', 'asc')
                         ->get();
         
-        return view('school.student.id_card_preview', compact('students', 'class_id', 'selectedClass'));
+        $designs = self::getIdCardDesigns();
+        $defaultKey = array_key_first($designs) ?? 'purple_classic';
+        $selectedDesign = $request->get('design', $defaultKey);
+        if (!isset($designs[$selectedDesign])) {
+            $selectedDesign = $defaultKey;
+        }
+        
+        return view('school.student.id_card_preview', compact('students', 'class_id', 'selectedClass', 'designs', 'selectedDesign'));
     }
 
 
-    public function idCardDownload($tenant, $class_id) 
+    public function idCardDownload(Request $request, $tenant, $class_id) 
     {
         $school = auth()->user()?->school;
         if ($school && !$school->hasPackagePermission('student.idcard')) {
@@ -634,8 +704,15 @@ class StudentController extends Controller
         ini_set('max_execution_time', 300);
         ini_set('memory_limit', '512M');
 
-        $pdf = Pdf::loadView('school.student.bulk_id_cards_pdf', compact('students', 'school', 'class'));
-        $fileName = 'id-cards-' . Str::slug($class->name) . '-' . date('Ymd') . '.pdf';
+        $designs = self::getIdCardDesigns();
+        $defaultKey = array_key_first($designs) ?? 'purple_classic';
+        $design = $request->get('design', $defaultKey);
+        if (!isset($designs[$design])) {
+            $design = $defaultKey;
+        }
+
+        $pdf = Pdf::loadView('school.student.bulk_id_cards_pdf', compact('students', 'school', 'class', 'design'));
+        $fileName = 'id-cards-' . Str::slug($class->name) . '-' . $design . '-' . date('Ymd') . '.pdf';
         return $pdf->setPaper('a4', 'landscape')->download($fileName);
     }
 }

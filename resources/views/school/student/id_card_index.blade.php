@@ -228,6 +228,37 @@
             border: 0.5px solid #cbd5e1;
         }
 
+        /* ── Design Selector Cards ── */
+        .id-design-card-option {
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .id-design-card-option:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            transform: translateX(2px);
+        }
+        .id-design-card-option.active {
+            border-color: #4f46e5 !important;
+            background: #f5f3ff !important;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.12) !important;
+        }
+        [data-bs-theme="dark"] .id-design-card-option,
+        body.dark-mode .id-design-card-option {
+            background: #111c34 !important;
+            border-color: #1e2d45 !important;
+        }
+        [data-bs-theme="dark"] .id-design-card-option.active,
+        body.dark-mode .id-design-card-option.active {
+            background: #1e1b4b !important;
+            border-color: #6366f1 !important;
+        }
+
         /* Dark mode overrides */
         [data-bs-theme="dark"] .stat-card-modern,
         body.dark-mode .stat-card-modern {
@@ -416,6 +447,45 @@
                                     <small class="text-muted mt-1 d-block">
                                         <i class="fa-solid fa-circle-info text-primary me-1"></i>
                                         {{ __('নির্বাচিত ক্লাসের সকল সক্রিয় শিক্ষার্থীর কার্ড একসঙ্গে প্রিভিউ ও PDF ডাউনলোড হবে।') }}
+                                    </small>
+                                </div>
+
+                                {{-- ── Design Theme Selector ── --}}
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label fw-bold text-dark small mb-0">
+                                            <i class="fa-solid fa-palette text-primary me-1"></i>
+                                            {{ __('আইডি কার্ড ডিজাইন বা থিম নির্বাচন করুন') }} <span class="text-danger">*</span>
+                                        </label>
+                                        <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 rounded-pill" id="activeDesignNameBadge" style="font-size: 11px;">
+                                            {{ $designs[$selectedDesign ?? 'purple_classic']['name_bn'] ?? 'ডিজাইন ১: ক্লাসিক পার্পল' }}
+                                        </span>
+                                    </div>
+                                    <input type="hidden" name="design" id="selectedDesignInput" value="{{ $selectedDesign ?? 'purple_classic' }}">
+
+                                    <div class="d-flex flex-column gap-2" id="designOptionsContainer">
+                                        @foreach($designs as $dKey => $dCfg)
+                                            @php $isSelected = ($dKey === ($selectedDesign ?? 'purple_classic')); @endphp
+                                            <div class="id-design-card-option d-flex align-items-center justify-content-between {{ $isSelected ? 'active' : '' }}"
+                                                 data-design="{{ $dKey }}"
+                                                 data-title="{{ $dCfg['name_bn'] }}">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="rounded-circle shadow-sm"
+                                                         style="width: 32px; height: 32px; background: {{ $dCfg['gradient_css'] }}; border: 2px solid #ffffff; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.15);"></div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark" style="font-size: 13px;">{{ $dCfg['name_bn'] }}</div>
+                                                        <div class="text-muted" style="font-size: 11px;">{{ $dCfg['subtitle'] }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="design-check-indicator">
+                                                    <i class="fa-solid {{ $isSelected ? 'fa-circle-check text-primary' : 'fa-circle text-secondary opacity-25' }}" style="font-size: 18px;"></i>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <small class="text-muted mt-1.5 d-block">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i>
+                                        {{ __('যে কোনো ডিজাইন ক্লিক করলে ডানপাশের লাইভ কার্ডে তাৎক্ষণিক পরিবর্তন দেখতে পাবেন।') }}
                                     </small>
                                 </div>
 
@@ -620,4 +690,72 @@
 
         </div>
     </div>
+@endsection
+
+@section('customJs')
+<script>
+    $(document).ready(function() {
+        const designs = @json($designs);
+
+        function updateMockup(designKey) {
+            const d = designs[designKey] || designs['purple_classic'];
+            $('#selectedDesignInput').val(designKey);
+            $('#activeDesignNameBadge').text(d.name_bn);
+
+            // Update options UI
+            $('.id-design-card-option').removeClass('active');
+            $('.id-design-card-option[data-design="' + designKey + '"]').addClass('active');
+            $('.id-design-card-option .design-check-indicator i').removeClass('fa-circle-check text-primary').addClass('fa-circle text-secondary opacity-25');
+            $('.id-design-card-option[data-design="' + designKey + '"] .design-check-indicator i').removeClass('fa-circle text-secondary opacity-25').addClass('fa-circle-check text-primary');
+
+            // Header shape clip-path
+            let clipPath = 'polygon(0 0, 100% 0, 100% 70%, 85% 75%, 75% 85%, 50% 100%, 25% 85%, 15% 75%, 0 70%)';
+            if (designKey === 'navy_gold') {
+                clipPath = 'polygon(0 0, 100% 0, 100% 72%, 50% 98%, 0 72%)';
+            } else if (designKey === 'emerald_wave') {
+                clipPath = 'ellipse(95% 75% at 50% 25%)';
+            } else if (designKey === 'cyan_modern') {
+                clipPath = 'polygon(0 0, 100% 0, 100% 68%, 50% 95%, 0 68%)';
+            } else if (designKey === 'maroon_regal') {
+                clipPath = 'polygon(0 0, 100% 0, 100% 85%, 70% 75%, 35% 98%, 0 78%)';
+            }
+
+            if (d.header_shape) {
+                const shapeUrl = d.header_shape.startsWith('http') ? d.header_shape : ('/' + d.header_shape.replace(/^\//, ''));
+                $('.mockup-header-shape').css({
+                    'background-image': 'url("' + shapeUrl + '")',
+                    'background-size': '100% 100%',
+                    'background-repeat': 'no-repeat',
+                    'background-color': d.primary_color,
+                    'clip-path': 'none'
+                });
+            } else {
+                $('.mockup-header-shape').css({
+                    'background-image': 'none',
+                    'background': d.gradient_css,
+                    'clip-path': clipPath
+                });
+            }
+
+            $('.mockup-photo-box').css('border-color', d.photo_border);
+            $('.mockup-name-badge').css('background', d.badge_color);
+            $('.mockup-row strong').css('color', d.label_color);
+            $('.mockup-bottom-bar').css('background', d.gradient_css);
+            $('.mockup-back-top').css('background', d.gradient_css);
+            $('.mockup-back-header').css({
+                'background': d.back_header_bg,
+                'color': d.back_header_text
+            });
+        }
+
+        $(document).on('click', '.id-design-card-option', function() {
+            const dKey = $(this).data('design');
+            updateMockup(dKey);
+        });
+
+        // Initialize with default or passed design
+        const initialDesign = $('#selectedDesignInput').val() || Object.keys(designs)[0] || 'purple_classic';
+        updateMockup(initialDesign);
+    });
+</script>
 @endsection

@@ -124,8 +124,6 @@
         /* ── BACK SIDE ── */
         .back-header {
             width: 130pt;
-            background: #f3e8ff;
-            color: #6a1b9a;
             text-align: center;
             font-size: 8pt;
             font-weight: 800;
@@ -137,7 +135,6 @@
         .b-lbl {
             width: 48pt;
             font-weight: bold;
-            color: #6a1b9a;
             font-size: 8pt;
         }
         .b-val {
@@ -149,6 +146,43 @@
 <body>
 
 @php
+    $designKey = $design ?? 'purple_classic';
+    $designList = \App\Http\Controllers\StudentController::getIdCardDesigns();
+    $defaultKey = array_key_first($designList) ?? 'purple_classic';
+    $currentDesign = $designList[$designKey] ?? ($designList[$defaultKey] ?? reset($designList));
+
+    // Resolve header shape
+    $headerShapePath = null;
+    if (!empty($currentDesign['header_shape']) && file_exists(public_path($currentDesign['header_shape']))) {
+        $headerShapePath = public_path($currentDesign['header_shape']);
+    } elseif (file_exists(public_path("assets/images/id_card/designs/{$designKey}/header_shape.png"))) {
+        $headerShapePath = public_path("assets/images/id_card/designs/{$designKey}/header_shape.png");
+    } elseif (file_exists(public_path('assets/images/id_card/header_shape.png'))) {
+        $headerShapePath = public_path('assets/images/id_card/header_shape.png');
+    }
+
+    // Resolve gradient bar
+    $gradientBarPath = null;
+    if (!empty($currentDesign['gradient_bar']) && file_exists(public_path($currentDesign['gradient_bar']))) {
+        $gradientBarPath = public_path($currentDesign['gradient_bar']);
+    } elseif (file_exists(public_path("assets/images/id_card/designs/{$designKey}/gradient_bar.png"))) {
+        $gradientBarPath = public_path("assets/images/id_card/designs/{$designKey}/gradient_bar.png");
+    } elseif (file_exists(public_path('assets/images/id_card/gradient_bar.png'))) {
+        $gradientBarPath = public_path('assets/images/id_card/gradient_bar.png');
+    }
+
+    // Resolve pattern
+    $patternPath = null;
+    if (!empty($currentDesign['pattern']) && file_exists(public_path($currentDesign['pattern']))) {
+        $patternPath = public_path($currentDesign['pattern']);
+    } elseif (file_exists(public_path("assets/images/id_card/designs/{$designKey}/pattern.png"))) {
+        $patternPath = public_path("assets/images/id_card/designs/{$designKey}/pattern.png");
+    } elseif (file_exists(public_path('assets/images/id_card/dot_pattern.png'))) {
+        $patternPath = public_path('assets/images/id_card/dot_pattern.png');
+    }
+
+    $qrRgb = $currentDesign['qr_rgb'] ?? [106, 27, 154];
+
     $currentSchool = $school ?? ($students->first()?->school ?? (app()->bound('currentSchool') ? app('currentSchool') : null));
     $schoolName = $currentSchool?->name ?? 'SCHOOL NAME';
     $schoolLogo = $currentSchool?->logo ?? null;
@@ -176,7 +210,7 @@
                         $qrSvg = null;
                         try {
                             $qrText = "ID: {$student->student_id} | Name: {$student->name}";
-                            $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(40)->color(106, 27, 154)->generate($qrText));
+                            $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(40)->color($qrRgb[0], $qrRgb[1], $qrRgb[2])->generate($qrText));
                         } catch (\Throwable $e) {
                             $qrSvg = null;
                         }
@@ -196,8 +230,14 @@
                                 {{-- ── FRONT SIDE ── --}}
                                 <td class="side-td">
                                     <div class="card-container">
-                                        <img src="{{ public_path('assets/images/id_card/dot_pattern.png') }}" class="dot-pattern">
-                                        <img src="{{ public_path('assets/images/id_card/header_shape.png') }}" class="top-header-shape">
+                                        @if($patternPath)
+                                            <img src="{{ $patternPath }}" class="dot-pattern">
+                                        @endif
+                                        @if($headerShapePath)
+                                            <img src="{{ $headerShapePath }}" class="top-header-shape">
+                                        @else
+                                            <div class="top-header-shape" style="background-color: {{ $currentDesign['primary_color'] }};"></div>
+                                        @endif
 
                                         {{-- 1. School Logo & School Name (Exact Symmetrical Centering) --}}
                                         <div style="position: absolute; top: 6pt; left: 0; width: 153pt; text-align: center; z-index: 3;">
@@ -230,7 +270,7 @@
                                             <table style="width: 153pt; border-collapse: collapse; margin: 0; padding: 0;" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td align="center" style="padding: 0; text-align: center;">
-                                                        <div style="width: 54pt; height: 54pt; background: #ffffff; border-radius: 50%; padding: 2px; border: 2px solid #6a1b9a; display: inline-block;">
+                                                        <div style="width: 54pt; height: 54pt; background: #ffffff; border-radius: 50%; padding: 2px; border: 2px solid {{ $currentDesign['photo_border'] }}; display: inline-block;">
                                                             @if($photoPath)
                                                                 <img src="{{ $photoPath }}" style="width: 100%; height: 100%; border-radius: 50%; display: block;">
                                                             @else
@@ -246,8 +286,8 @@
                                         <div style="position: absolute; top: 121pt; left: 0; width: 153pt; text-align: center; z-index: 3;">
                                             <table style="width: 153pt; border-collapse: collapse; margin: 0; padding: 0;" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td align="center" style="padding: 0; text-align: center;">
-                                                        <div style="background-color: #841778; border-radius: 7px; font-size: 9pt; padding: 2pt 8pt; font-weight: bold; color: #ffffff; display: inline-block; white-space: nowrap; overflow: hidden; text-transform: uppercase;">
+                                                     <td align="center" style="padding: 0; text-align: center;">
+                                                        <div style="background-color: {{ $currentDesign['badge_color'] }}; border-radius: 7px; font-size: 9pt; padding: 2pt 8pt; font-weight: bold; color: #ffffff; display: inline-block; white-space: nowrap; overflow: hidden; text-transform: uppercase;">
                                                             {{ $student->name }}
                                                         </div>
                                                     </td>
@@ -259,27 +299,27 @@
                                         <div style="position: absolute; top: 139pt; left: 0; width: 153pt; z-index: 3;">
                                             <table style="width: 137pt; margin: 0 8pt; border-collapse: collapse;" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Class') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Class') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->class->name }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Roll No') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Roll No') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->roll }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Student ID') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Student ID') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->student_id }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Guardians') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Guardians') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->fathers_name ?: 'N/A' }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Blood Group') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Blood Group') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->blood_group ?: 'N/A' }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: #6a1b9a; padding: 0.5pt 0;">{{ __('Emergency') }}</td>
+                                                    <td style="width: 42%; font-size: 8pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; padding: 0.5pt 0;">{{ __('Emergency') }}</td>
                                                     <td style="width: 58%; font-size: 8pt; font-weight: bold; color: #1e293b; padding: 0.5pt 0; white-space: nowrap; overflow: hidden;">: {{ $student->contact_number ?: 'N/A' }}</td>
                                                 </tr>
                                             </table>
@@ -297,7 +337,11 @@
                                             <p>{{ __('Principal') }}</p>
                                         </div>
 
-                                        <img src="{{ public_path('assets/images/id_card/gradient_bar.png') }}" class="bottom-bar">
+                                        @if($gradientBarPath)
+                                            <img src="{{ $gradientBarPath }}" class="bottom-bar">
+                                        @else
+                                            <div class="bottom-bar" style="background-color: {{ $currentDesign['primary_color'] }};"></div>
+                                        @endif
                                     </div>
                                 </td>
 
@@ -307,15 +351,21 @@
                                 {{-- ── BACK SIDE ── --}}
                                 <td class="side-td">
                                     <div class="card-container">
-                                        <img src="{{ public_path('assets/images/id_card/dot_pattern.png') }}" class="dot-pattern">
-                                        <img src="{{ public_path('assets/images/id_card/gradient_bar.png') }}" class="back-top-bar">
+                                        @if($patternPath)
+                                            <img src="{{ $patternPath }}" class="dot-pattern">
+                                        @endif
+                                        @if($gradientBarPath)
+                                            <img src="{{ $gradientBarPath }}" class="back-top-bar">
+                                        @else
+                                            <div class="back-top-bar" style="background-color: {{ $currentDesign['primary_color'] }};"></div>
+                                        @endif
 
                                         {{-- 1. Terms and Conditions Header Box (Centered) --}}
                                         <div style="position: absolute; top: 24pt; left: 0; width: 153pt; text-align: center; z-index: 2;">
                                             <table style="width: 153pt; border-collapse: collapse; margin: 0; padding: 0;" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td align="center" style="padding: 0; text-align: center;">
-                                                        <div class="back-header">
+                                                        <div class="back-header" style="background: {{ $currentDesign['back_header_bg'] }}; color: {{ $currentDesign['back_header_text'] }};">
                                                             {{ __('TERMS AND CONDITIONS') }}
                                                         </div>
                                                     </td>
@@ -335,15 +385,15 @@
                                         <div style="position: absolute; top: 82pt; left: 0; width: 153pt; z-index: 2;">
                                             <table style="width: 137pt; margin: 0 8pt; border-collapse: collapse;" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td class="b-lbl">Session</td>
+                                                    <td class="b-lbl" style="color: {{ $currentDesign['label_color'] }};">Session</td>
                                                     <td class="b-val">: {{ $sessionName }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="b-lbl">D.O.B</td>
+                                                    <td class="b-lbl" style="color: {{ $currentDesign['label_color'] }};">D.O.B</td>
                                                     <td class="b-val">: {{ $dobStr }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="b-lbl">Valid Up To</td>
+                                                    <td class="b-lbl" style="color: {{ $currentDesign['label_color'] }};">Valid Up To</td>
                                                     <td class="b-val">: {{ $validUpTo }}</td>
                                                 </tr>
                                             </table>
@@ -353,11 +403,11 @@
                                         <div style="position: absolute; top: 114pt; left: 0; width: 153pt; z-index: 2;">
                                             <table style="width: 137pt; margin: 0 8pt; border-collapse: collapse;" cellpadding="0" cellspacing="0">
                                                 <tr>
-                                                    <td class="b-lbl">Phone</td>
+                                                    <td class="b-lbl" style="color: {{ $currentDesign['label_color'] }};">Phone</td>
                                                     <td class="b-val">: {{ $student->school->phone ?? $schoolPhone }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="b-lbl">Website</td>
+                                                    <td class="b-lbl" style="color: {{ $currentDesign['label_color'] }};">Website</td>
                                                     <td class="b-val" style="white-space: nowrap; overflow: hidden;">: {{ $fullUrl }}</td>
                                                 </tr>
                                             </table>
@@ -373,7 +423,7 @@
                                                                 <img src="data:image/svg+xml;base64,{!! $qrSvg !!}" style="width: 36pt; height: 36pt; display: block;">
                                                             @endif
                                                         </div>
-                                                        <div style="font-size: 6.5pt; margin-top: 2pt; font-weight: bold; color: #6a1b9a; text-align: center;">
+                                                        <div style="font-size: 6.5pt; margin-top: 2pt; font-weight: bold; color: {{ $currentDesign['label_color'] }}; text-align: center;">
                                                             {{ $student->student_id }}
                                                         </div>
                                                     </td>
@@ -381,7 +431,11 @@
                                             </table>
                                         </div>
 
-                                        <img src="{{ public_path('assets/images/id_card/gradient_bar.png') }}" class="bottom-bar">
+                                        @if($gradientBarPath)
+                                            <img src="{{ $gradientBarPath }}" class="bottom-bar">
+                                        @else
+                                            <div class="bottom-bar" style="background-color: {{ $currentDesign['primary_color'] }};"></div>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

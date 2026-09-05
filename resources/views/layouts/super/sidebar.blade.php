@@ -143,6 +143,13 @@
                         <span>Testimonials</span>
                     </a>
                 </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('super.id-card-designs.index') }}"
+                       class="edu-nav-link {{ Request::is('super-admin/id-card-designs*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-id-card edu-nav-icon"></i>
+                        <span>ID Card Designs</span>
+                    </a>
+                </li>
                 @endif
 
                 @can('contact.messages.view')

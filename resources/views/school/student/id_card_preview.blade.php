@@ -426,6 +426,56 @@
             background: linear-gradient(90deg, #6a1b9a, #ad1457);
         }
 
+        /* ── DYNAMIC MULTI-DESIGN THEME STYLES ── */
+        @foreach($designs as $slug => $d)
+        .card-container.theme-{{ $slug }} .dot-pattern {
+            @if(!empty($d['pattern']) && file_exists(public_path($d['pattern'])))
+                background-image: url('{{ asset($d['pattern']) }}');
+                background-size: cover;
+            @else
+                background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1.5px, transparent 1.5px);
+            @endif
+        }
+        .card-container.theme-{{ $slug }} .top-header-shape {
+            background-color: {{ $d['primary_color'] }};
+            @if(!empty($d['header_shape']) && file_exists(public_path($d['header_shape'])))
+                background-image: url('{{ asset($d['header_shape']) }}') !important;
+                background-size: 100% 100% !important;
+                background-repeat: no-repeat !important;
+                clip-path: none !important;
+            @else
+                background: {{ $d['gradient_css'] ?? $d['primary_color'] }};
+                clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 75%, 75% 85%, 50% 100%, 25% 85%, 15% 75%, 0 70%);
+            @endif
+        }
+        .card-container.theme-{{ $slug }} .photo-border {
+            border-color: {{ $d['photo_border'] ?? $d['primary_color'] }};
+        }
+        .card-container.theme-{{ $slug }} .name {
+            background: {{ $d['badge_color'] ?? $d['primary_color'] }};
+            border: none;
+        }
+        .card-container.theme-{{ $slug }} .label,
+        .card-container.theme-{{ $slug }} .extra-info-section strong,
+        .card-container.theme-{{ $slug }} .school-info-section strong,
+        .card-container.theme-{{ $slug }} .qr-section-id {
+            color: {{ $d['label_color'] ?? $d['primary_color'] }} !important;
+        }
+        .card-container.theme-{{ $slug }} .bottom-bar,
+        .card-container.theme-{{ $slug }} .back-top-bar {
+            @if(!empty($d['gradient_bar']) && file_exists(public_path($d['gradient_bar'])))
+                background-image: url('{{ asset($d['gradient_bar']) }}') !important;
+                background-size: 100% 100% !important;
+            @else
+                background: {{ $d['gradient_css'] ?? $d['primary_color'] }};
+            @endif
+        }
+        .card-container.theme-{{ $slug }} .back-header {
+            background: {{ $d['back_header_bg'] ?? '#f3e8ff' }};
+            color: {{ $d['back_header_text'] ?? $d['primary_color'] }};
+        }
+        @endforeach
+
         /* ── Floating Sticky Bottom Action Bar ── */
         .floating-action-bar {
             position: fixed;
@@ -476,6 +526,7 @@
 
 @php
     $school = auth()->user()?->school ?? (app()->bound('currentSchool') ? app('currentSchool') : null);
+    $tenantSlug = $school?->slug ?? (auth()->user()?->school?->slug ?? 'school');
     $signaturePath = $school?->signature ?? auth()->user()?->signature;
     $hasSignature = !empty($signaturePath) && file_exists(public_path($signaturePath));
 @endphp
@@ -488,7 +539,7 @@
         <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <a href="{{ route('students.idcard.index', ['tenant' => auth()->user()->school->slug]) }}" class="text-secondary text-decoration-none small">
+                    <a href="{{ route('students.idcard.index', ['tenant' => $tenantSlug]) }}" class="text-secondary text-decoration-none small">
                         <i class="fa-solid fa-arrow-left me-1"></i> {{ __('ক্লাস পরিবর্তন') }}
                     </a>
                     <span class="text-muted small">/</span>
@@ -505,10 +556,11 @@
             </div>
 
             <div class="d-flex align-items-center gap-2 flex-wrap header-actions-wrap">
-                <a href="{{ route('students.idcard.index', ['tenant' => auth()->user()->school->slug]) }}" class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold shadow-sm">
+                <a href="{{ route('students.idcard.index', ['tenant' => $tenantSlug, 'design' => $selectedDesign ?? 'purple_classic']) }}" class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-pill fw-semibold shadow-sm">
                     <i class="fa-solid fa-sliders me-1"></i> {{ __('সেটিংস পেজ') }}
                 </a>
-                <a href="{{ route('students.idcard.download', ['tenant' => auth()->user()->school->slug, 'class_id' => $class_id]) }}" 
+                <a href="{{ route('students.idcard.download', ['tenant' => $tenantSlug, 'class_id' => $class_id, 'design' => $selectedDesign ?? 'purple_classic']) }}" 
+                   id="btnDownloadPdf"
                    class="btn btn-primary fw-bold px-3 px-sm-4 py-2 rounded-pill shadow-sm">
                     <i class="fa-solid fa-file-arrow-down me-1.5"></i>
                     <span class="d-none d-sm-inline">{{ __('ডাউনলোড(Download)') }}</span>
@@ -544,6 +596,34 @@
                             <span class="d-md-none">{{ __('পেছন (Back)') }}</span>
                         </button>
                     </div>
+
+                    {{-- ── Multi-Design Dropdown Switcher ── --}}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill dropdown-toggle fw-bold d-flex align-items-center gap-2 px-3 py-1.5" 
+                                type="button" id="designSelectorDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 12.5px; border-width: 1.5px;">
+                            <i class="fa-solid fa-palette text-primary"></i>
+                            <span id="currentDesignLabel">{{ $designs[$selectedDesign ?? 'purple_classic']['name_bn'] ?? 'ডিজাইন ১: ক্লাসিক পার্পল' }}</span>
+                        </button>
+                        <ul class="dropdown-menu shadow-lg border-0 p-2" aria-labelledby="designSelectorDropdown" style="min-width: 250px; border-radius: 14px; z-index: 1060;">
+                            <li class="dropdown-header small text-muted fw-bold text-uppercase px-2 py-1">
+                                <i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i>{{ __('আইডি কার্ড ডিজাইন পরিবর্তন') }}
+                            </li>
+                            @foreach($designs as $dKey => $dCfg)
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center justify-content-between rounded-3 py-2 px-2.5 design-select-item {{ $dKey === ($selectedDesign ?? 'purple_classic') ? 'active fw-bold' : '' }}" 
+                                       href="javascript:void(0);" 
+                                       data-design="{{ $dKey }}"
+                                       data-title="{{ $dCfg['name_bn'] }}">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="rounded-circle shadow-sm" style="width: 15px; height: 15px; background: {{ $dCfg['gradient_css'] }}; display: inline-block; border: 1px solid #fff;"></span>
+                                            <span>{{ $dCfg['name_bn'] }}</span>
+                                        </div>
+                                        <i class="fa-solid fa-check check-icon text-primary {{ $dKey === ($selectedDesign ?? 'purple_classic') ? '' : 'd-none' }}" style="font-size: 12px;"></i>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
 
                 {{-- Status Pills --}}
@@ -553,7 +633,7 @@
                             <i class="fa-solid fa-circle-check me-1"></i> {{ __('প্রধান শিক্ষকের স্বাক্ষর সক্রিয়') }}
                         </span>
                     @else
-                        <a href="{{ route('user.profile') }}" class="badge bg-warning-subtle text-warning fw-bold px-3 py-2 rounded-pill small text-decoration-none" title="{{ __('স্বাক্ষর আপলোড করতে ক্লিক করুন') }}">
+                        <a href="{{ route('user.profile', ['tenant' => $tenantSlug]) }}" class="badge bg-warning-subtle text-warning fw-bold px-3 py-2 rounded-pill small text-decoration-none" title="{{ __('স্বাক্ষর আপলোড করতে ক্লিক করুন') }}">
                             <i class="fa-solid fa-circle-exclamation me-1"></i> {{ __('ডিফল্ট স্বাক্ষর (আপলোড করুন)') }}
                         </a>
                     @endif
@@ -597,7 +677,7 @@
                             
                             {{-- ── FRONT SIDE ── --}}
                             <div class="card-side-wrapper card-front-side">
-                                <div class="card-container">
+                                <div class="card-container theme-{{ $selectedDesign ?? 'purple_classic' }}">
                                     <div class="dot-pattern"></div>
                                     <div class="top-header-shape"></div>
                                     
@@ -672,7 +752,7 @@
 
                             {{-- ── BACK SIDE ── --}}
                             <div class="card-side-wrapper card-back-side">
-                                <div class="card-container">
+                                <div class="card-container theme-{{ $selectedDesign ?? 'purple_classic' }}">
                                     <div class="dot-pattern"></div>
                                     <div class="back-top-bar"></div>
 
@@ -763,14 +843,15 @@
             </span>
         </div>
         <div style="height: 18px; width: 1px; background: rgba(255,255,255,0.2);"></div>
-        <a href="{{ route('students.idcard.download', ['tenant' => auth()->user()->school->slug, 'class_id' => $class_id]) }}" 
+        <a href="{{ route('students.idcard.download', ['tenant' => $tenantSlug, 'class_id' => $class_id, 'design' => $selectedDesign ?? 'purple_classic']) }}" 
+           id="floatingDownloadBtn"
            class="btn btn-primary btn-sm px-4 py-1.5 rounded-pill fw-bold shadow">
             <i class="fa-solid fa-file-arrow-down me-1.5"></i> {{ __('ডাউনলোড') }}
         </a>
     </div>
 @endif
 
-@push('scripts')
+@section('customJs')
 <script>
     $(document).ready(function() {
         // Realtime search filter
@@ -817,7 +898,41 @@
             $('.card-front-side').addClass('d-none');
             $('.card-back-side').removeClass('d-none');
         });
+
+        // ── Multi-Design Switcher ──
+        let currentDesign = '{{ $selectedDesign ?? 'purple_classic' }}';
+
+        function setPreviewDesign(designKey, designTitle) {
+            currentDesign = designKey;
+            
+            // 1. Update active item in dropdown
+            $('.design-select-item').removeClass('active fw-bold');
+            $('.design-select-item[data-design="' + designKey + '"]').addClass('active fw-bold');
+            $('.design-select-item .check-icon').addClass('d-none');
+            $('.design-select-item[data-design="' + designKey + '"] .check-icon').removeClass('d-none');
+            $('#currentDesignLabel').text(designTitle);
+
+            // 2. Update all card-container theme classes dynamically
+            $('.card-container').each(function() {
+                this.className = this.className.replace(/\btheme-\S+/g, '').trim() + ' theme-' + designKey;
+            });
+
+            // 3. Update download URLs
+            const baseDownloadUrl = "{{ route('students.idcard.download', ['tenant' => $tenantSlug, 'class_id' => $class_id]) }}";
+            const fullUrl = baseDownloadUrl + '?design=' + designKey;
+            $('#btnDownloadPdf').attr('href', fullUrl);
+            $('#floatingDownloadBtn').attr('href', fullUrl);
+        }
+
+        $(document).on('click', '.design-select-item', function() {
+            const dKey = $(this).data('design');
+            const dTitle = $(this).data('title');
+            setPreviewDesign(dKey, dTitle);
+        });
+
+        // Initialize on page load
+        setPreviewDesign(currentDesign, "{{ $designs[$selectedDesign ?? 'purple_classic']['name_bn'] ?? 'ডিজাইন ১: ক্লাসিক পার্পল' }}");
     });
 </script>
-@endpush
+@endsection
 @endsection

@@ -21,7 +21,7 @@ use App\Http\Controllers\{
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
     SubscriptionPackageController, TestimonialController, EmployeeController, EventController, SupportTicketController,
-    BlogController, BlogCategoryController
+    BlogController, BlogCategoryController, IdCardDesignController
 };
 
 // Site Map 
@@ -205,6 +205,10 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::resource('blogs', BlogController::class);
         Route::patch('blog-categories/{category}/toggle', [BlogCategoryController::class, 'toggleStatus'])->name('blog-categories.toggle');
         Route::resource('blog-categories', BlogCategoryController::class);
+
+        // ID Card Designs
+        Route::patch('id-card-designs/{idCardDesign}/toggle', [IdCardDesignController::class, 'toggleStatus'])->name('id-card-designs.toggle');
+        Route::resource('id-card-designs', IdCardDesignController::class);
     });
 
     // --- 2. Employee ONLY Group ---

@@ -321,5 +321,6 @@
         });
     </script>
     @yield('customJs')
+    @stack('scripts')
 </body>
 </html>
