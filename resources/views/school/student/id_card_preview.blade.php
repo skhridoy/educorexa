@@ -217,7 +217,7 @@
             overflow: hidden;
             border: 0.5px solid #d1d5db;
             flex-shrink: 0;
-            border-radius: 9px;
+            border-radius: 5px;
             box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s ease;
         }
@@ -315,12 +315,11 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             text-transform: uppercase;
-            border-radius: 8px;
-            background: linear-gradient(90deg, #6a1b9a, #ad1457);
-            font-size: 9.5px;
+            
+            font-size: 10px;
             padding: 2.5px 8px;
             font-weight: 800;
-            color: #ffffff;
+            color: #6a1b9a;
             display: inline-block;
             white-space: nowrap;
             overflow: hidden;
@@ -452,7 +451,7 @@
             border-color: {{ $d['photo_border'] ?? $d['primary_color'] }};
         }
         .card-container.theme-{{ $slug }} .name {
-            background: {{ $d['badge_color'] ?? $d['primary_color'] }};
+            color: {{ $d['badge_color'] ?? $d['primary_color'] }};
             border: none;
         }
         .card-container.theme-{{ $slug }} .label,

@@ -53,13 +53,13 @@
 
         /* ── Standard ID Card Container (CR80 Standard: 153pt x 243pt) ── */
         .card-container {
-            width: 153pt;
-            height: 243pt;
+            width: 2.125in;
+            height: 3.375in;
             background: #ffffff;
             position: relative;
             overflow: hidden;
             border: 0.5px solid #d1d5db;
-            border-radius: 9px;
+            border-radius: 5px;
             text-align: left;
         }
 
@@ -106,7 +106,7 @@
             z-index: 3;
         }
         .front-signature img {
-            max-height: 18pt;
+            max-height: 13pt;
             max-width: 42pt;
             display: block;
             margin: 0 auto -2px auto;
@@ -287,7 +287,7 @@
                                             <table style="width: 153pt; border-collapse: collapse; margin: 0; padding: 0;" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                      <td align="center" style="padding: 0; text-align: center;">
-                                                        <div style="background-color: {{ $currentDesign['badge_color'] }}; border-radius: 7px; font-size: 9pt; padding: 2pt 8pt; font-weight: bold; color: #ffffff; display: inline-block; white-space: nowrap; overflow: hidden; text-transform: uppercase;">
+                                                        <div style=" font-size: 9pt; padding: 2pt 8pt; font-weight: bold; color: {{ $currentDesign['badge_color'] }}; display: inline-block; white-space: nowrap; overflow: hidden; text-transform: uppercase; margin-top: 3px;">
                                                             {{ $student->name }}
                                                         </div>
                                                     </td>
