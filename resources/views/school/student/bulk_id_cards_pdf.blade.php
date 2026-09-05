@@ -332,7 +332,7 @@
                                         </div>
 
                                         {{-- 3. Extra Info (Session, DOB, Valid Up To) --}}
-                                        <div style="position: absolute; top: 72pt; left: 0; width: 153pt; z-index: 2;">
+                                        <div style="position: absolute; top: 82pt; left: 0; width: 153pt; z-index: 2;">
                                             <table style="width: 137pt; margin: 0 8pt; border-collapse: collapse;" cellpadding="0" cellspacing="0">
                                                 <tr>
                                                     <td class="b-lbl">Session</td>
