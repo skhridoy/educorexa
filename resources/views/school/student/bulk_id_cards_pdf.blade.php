@@ -217,7 +217,7 @@
                                                 @endif
                                                 <tr>
                                                     <td align="center" style="padding: 2pt 6pt 0 6pt; text-align: center;">
-                                                        <div style="font-size: 9.5pt; font-weight: bold; text-transform: uppercase; color: #ffffff; line-height: 1.1; white-space: nowrap; overflow: hidden; text-align: center;">
+                                                        <div style="font-size: 9.5pt; font-weight: bold; text-transform: uppercase; color: #ffffff; line-height: 1.1; white-space: normal; overflow: wrap; text-align: center;">
                                                             {{ $studentSchoolName }}
                                                         </div>
                                                     </td>

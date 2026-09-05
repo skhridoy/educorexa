@@ -273,8 +273,8 @@
             text-transform: uppercase;
             font-weight: 800;
             line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
+            white-space: normal;
+            overflow: wrap;
             text-overflow: ellipsis;
         }
         .photo-border {
