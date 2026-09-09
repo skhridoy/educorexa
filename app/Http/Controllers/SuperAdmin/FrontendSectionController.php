@@ -69,9 +69,9 @@ class FrontendSectionController extends Controller
             $data['items'] = $filtered;
         }
         
-        // আগের কন্টেন্ট থেকে ইমেজ পাথ নিয়ে রাখা
+        // আগের কন্টেন্ট থেকে ইমেজ পাথ নিয়ে রাখা (null = blade fallback will apply)
         $oldContent = json_decode($section->content, true);
-        $data['image'] = $oldContent['image'] ?? 'frontend/img/hero.png';
+        $data['image'] = $oldContent['image'] ?? null;
 
         // যদি নতুন ক্রপ করা ইমেজ থাকে
         if ($request->filled('image')) {
@@ -82,9 +82,10 @@ class FrontendSectionController extends Controller
             list(, $imgData)      = explode(',', $imgData);
             $imgData = base64_decode($imgData);
 
-            // ফাইল নেম এবং পাথ সেট করা
-            $imageName = 'hero_' . time() . '.png';
-            $path = public_path('uploads/frontend/' . $imageName);
+            // Section key দিয়ে unique filename (e.g. hero_xxx.png, why_choose_us_xxx.png)
+            $prefix    = $section->key ?? 'section';
+            $imageName = $prefix . '_' . time() . '.png';
+            $path      = public_path('uploads/frontend/' . $imageName);
 
             // ফোল্ডার না থাকলে তৈরি করা
             if (!file_exists(public_path('uploads/frontend'))) {
@@ -93,9 +94,13 @@ class FrontendSectionController extends Controller
 
             // ফাইল সেভ করা
             file_put_contents($path, $imgData);
-            
-            // পুরাতন ফাইল ডিলিট করা (যদি ডিফল্ট ইমেজ না হয়)
-            if (isset($oldContent['image']) && file_exists(public_path($oldContent['image'])) && !str_contains($oldContent['image'], 'default')) {
+
+            // পুরাতন ফাইল ডিলিট করা (ডিফল্ট বা uploads ছাড়া অন্য পাথ রাখব না)
+            if (
+                isset($oldContent['image']) &&
+                str_starts_with($oldContent['image'], 'uploads/frontend/') &&
+                file_exists(public_path($oldContent['image']))
+            ) {
                 unlink(public_path($oldContent['image']));
             }
 

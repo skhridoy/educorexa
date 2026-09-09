@@ -1,6 +1,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
@@ -18,12 +19,18 @@
 	
 	<style>
 		/* Font fallback for Bengali using Noto Sans Bengali (web font) */
-		body, p, span, div, a, li, td, th, label, input, button {
-			font-family: 'Inter', 'Noto Sans Bengali', sans-serif !important;
+		body, p, a, li, td, th, label, input, button, textarea, select {
+			font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
 		}
 		
 		h1, h2, h3, h4, h5, h6, 
 		.edu-page-title, .edu-panel-ttl, .page-title, .table-title {
-			font-family: 'Outfit', 'Noto Sans Bengali', sans-serif !important;
+			font-family: 'Outfit', 'Noto Sans Bengali', sans-serif;
+		}
+
+		/* Preserve icon fonts — Bootstrap Icons needs its own font-face on <i> elements */
+		i[class^="bi"],
+		i[class*=" bi"] {
+			font-family: "bootstrap-icons" !important;
 		}
 	</style>
