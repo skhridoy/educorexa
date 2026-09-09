@@ -132,8 +132,8 @@ class Student extends Model
     ];
 
     /**
-     * Generate unique student ID per school starting from STD-[year(2 digit)]1001
-     * e.g. STD-261001, STD-261002, etc.
+     * Generate unique student ID per school starting from [year(2 digit)]1001
+     * e.g. 261001, 261002, etc. (digit only, no prefix)
      */
     public static function generateStudentId($schoolId, $academicYear = null): string
     {
@@ -142,7 +142,7 @@ class Student extends Model
         } else {
             $yearPart = date('y');
         }
-        $prefix = 'STD-' . $yearPart;
+        $prefix = $yearPart;
 
         $lastSerial = self::where('school_id', $schoolId)
             ->where('student_id', 'like', $prefix . '%')

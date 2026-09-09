@@ -36,9 +36,9 @@ class StudentsImport implements ToCollection, WithHeadingRow
         }
 
         $yearPart = substr($academicYear->name, -2);
-        $prefix   = 'STD-' . $yearPart;
+        $prefix   = $yearPart;
 
-        // ───── School-scoped max serial for student_id generation (STD-[yy]1001+) ─────
+        // ───── School-scoped max serial for student_id generation ([yy]1001+) ─────
         $lastSerial = Student::where('school_id', $schoolId)
             ->where('student_id', 'like', $prefix . '%')
             ->selectRaw("MAX(CAST(SUBSTRING(student_id, -4) AS UNSIGNED)) as max_serial")
