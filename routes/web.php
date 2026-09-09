@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     HolidayController, ContactMessageController, SchoolSubCategoryController, 
     MainContactMsgController, ReviewController,
     RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController,
-    ExamRoutineController, InboundMessageController
+    ExamRoutineController, InboundMessageController,
+    RepresentativeController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -51,6 +52,10 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::get('/blogs', [HomeController::class, 'blogs'])->name('main.blogs');
     Route::get('/blog/{slug}', [HomeController::class, 'blogDetails'])->name('main.blog.details');
     Route::post('/contact-submit', [MainContactMsgController::class, 'store'])->name('contact.store');
+
+    // --- Representative Registration (Public) ---
+    Route::get('/join-as-representative', [RepresentativeController::class, 'showForm'])->name('representative.register.form');
+    Route::post('/join-as-representative', [RepresentativeController::class, 'store'])->name('representative.register.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
     Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('locations.divisions');

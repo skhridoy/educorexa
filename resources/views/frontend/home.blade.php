@@ -13,9 +13,13 @@
             @if(view()->exists('frontend.partials.' . $section->key))
                 @include('frontend.partials.' . $section->key)
             @endif
+
+            {{-- Hero section-এর পরেই Representative Marketing Section দেখাবে --}}
+            @if($section->key === 'hero')
+                @include('frontend.partials.representative')
+            @endif
         @endforeach
     @else
         <p class="text-center py-5">No sections found in database.</p>
     @endif
 @endsection
-
