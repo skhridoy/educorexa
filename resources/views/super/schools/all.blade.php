@@ -153,12 +153,27 @@
                                         </button>
                                     </form>
                                 @endif
+                                @can('school.delete')
                                 <form action="{{ route('manage.schools.destroy', $school->id) }}" method="POST">
                                     @csrf @method('DELETE')
                                     <button type="button" class="act-btn del" onclick="confirmDelete(this)" title="Delete">
                                         <i data-feather="trash-2" style="width:15px;height:15px;"></i>
                                     </button>
                                 </form>
+                                @else
+                                    @php
+                                        $pendingReq = \App\Models\SchoolDeleteRequest::where('school_id', $school->id)->where('status', 'pending')->first();
+                                    @endphp
+                                    @if($pendingReq)
+                                        <span class="badge bg-warning-subtle text-warning fw-semibold px-2 py-1" style="font-size:0.75rem;" title="ডিলিট রিকোয়েস্ট পেন্ডিং আছে">
+                                            পেন্ডিং রিকোয়েস্ট
+                                        </span>
+                                    @else
+                                        <button type="button" class="act-btn del" onclick="openDeleteRequestModal({{ $school->id }}, '{{ addslashes($school->name) }}')" title="ডিলিট রিকোয়েস্ট পাঠান">
+                                            <i data-feather="trash-2" style="width:15px;height:15px;"></i>
+                                        </button>
+                                    @endif
+                                @endcan
                             </div>
                         </td>
                     </tr>
@@ -175,6 +190,40 @@
         </div>
     </div>
 </div>
+
+{{-- Delete Request Modal for Representatives / Non-admin --}}
+<div class="modal fade" id="deleteRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:18px;border:none;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>স্কুল ডিলিট রিকোয়েস্ট
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="deleteRequestForm" method="POST">
+                @csrf
+                <div class="modal-body py-4">
+                    <p class="text-muted mb-3" style="font-size:0.92rem;">
+                        আপনি <strong id="modalSchoolName" class="text-dark"></strong> স্কুলটি ডিলিট করার জন্য সুপার এডমিন বা HR এর কাছে রিকোয়েস্ট পাঠাচ্ছেন। ডিলিট করার সুনির্দিষ্ট কারণ উল্লেখ করুন:
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">ডিলিট করার কারণ <span class="text-danger">*</span></label>
+                        <textarea name="reason" class="form-control" rows="4"
+                                  placeholder="যেমন: স্কুল কর্তৃপক্ষ সেবা বাতিল করেছে বা ভুলবশত খোলা হয়েছিল..."
+                                  style="border-radius:12px;border-color:#cbd5e1;" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius:10px;">বাতিল</button>
+                    <button type="submit" class="btn btn-danger px-4 fw-semibold" style="border-radius:10px;">
+                        রিকোয়েস্ট পাঠান
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('customJs')
@@ -185,9 +234,18 @@ function confirmDelete(btn) {
         confirmButtonText:'Yes, delete' })
         .then(r => { if(r.isConfirmed) btn.closest('form').submit(); });
 }
+function openDeleteRequestModal(schoolId, schoolName) {
+    document.getElementById('modalSchoolName').innerText = schoolName;
+    document.getElementById('deleteRequestForm').action = '/representative/request-delete/' + schoolId;
+    new bootstrap.Modal(document.getElementById('deleteRequestModal')).show();
+}
 @if(session('success'))
 Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:3000,timerProgressBar:true})
     .fire({icon:'success',title:"{{ session('success') }}"});
+@endif
+@if(session('error'))
+Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:4000,timerProgressBar:true})
+    .fire({icon:'error',title:"{{ session('error') }}"});
 @endif
 </script>
 @endsection

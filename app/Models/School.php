@@ -104,7 +104,9 @@ class School extends Model
         'division',
         'district',
         'upazila',
+        'representative_id', // Representative employee ID
     ];
+
 
     protected $casts = [
         'inbound_webhook_enabled' => 'boolean',
@@ -251,5 +253,11 @@ class School extends Model
     public function footerSetting()
     {
         return $this->hasOne(FooterSetting::class, 'school_id');
+    }
+
+    // 🔹 School belongs to a Representative Employee
+    public function representative()
+    {
+        return $this->belongsTo(Employee::class, 'representative_id');
     }
 }

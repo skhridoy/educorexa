@@ -55,6 +55,27 @@
                             </div>
                             @error('slug') <p class="text-danger small mt-2">{{ $message }}</p> @enderror
                         </div>
+
+                        @if(auth()->user()->hasRole('super_admin') && isset($representatives) && $representatives->count() > 0)
+                        <div class="mb-3">
+                            <label class="edu-label">Representative (Optional)</label>
+                            <select name="representative_id" class="form-select edu-input @error('representative_id') is-invalid @enderror">
+                                <option value="">-- No Representative / Direct --</option>
+                                @foreach($representatives as $rep)
+                                    <option value="{{ $rep->id }}" {{ old('representative_id') == $rep->id ? 'selected' : '' }}>
+                                        {{ $rep->user->name ?? 'Representative #' . $rep->id }} ({{ $rep->phone_personal ?? $rep->user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('representative_id') <p class="text-danger small mt-2">{{ $message }}</p> @enderror
+                        </div>
+                        @elseif(auth()->user()->role === 'employee' && auth()->user()->employee)
+                        <div class="mb-3 p-3 rounded" style="background:#f0fdf4;border:1px solid #bbf7d0;">
+                            <span class="text-success small fw-semibold">
+                                <i class="fa-solid fa-user-check me-1"></i> এই স্কুলটি আপনার ({{ auth()->user()->name }}) রেফারেন্সে যুক্ত হবে।
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

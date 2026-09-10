@@ -17,12 +17,14 @@ use App\Http\Controllers\{
     MainContactMsgController, ReviewController,
     RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController,
     ExamRoutineController, InboundMessageController,
-    RepresentativeController
+    RepresentativeController,
+    RepresentativeDashboardController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
     SubscriptionPackageController, TestimonialController, EmployeeController, EventController, SupportTicketController,
-    BlogController, BlogCategoryController, IdCardDesignController
+    BlogController, BlogCategoryController, IdCardDesignController,
+    SchoolDeleteRequestController
 };
 
 // Site Map 
@@ -91,6 +93,10 @@ Route::domain(config('app.main_domain'))->group(function () {
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') {
             return redirect()->route('super.dashboard');
         } elseif ($user->hasRole('employee')) {
+            // school.manage permission থাকলে representative dashboard-এ যাবে
+            if ($user->can('school.manage')) {
+                return redirect()->route('rep.dashboard');
+            }
             return redirect()->route('employee.dashboard');
         } elseif ($user->hasRole('school_admin') || $user->role === 'school_admin') {
             $tenant = $user->school?->slug ?? '';
@@ -162,6 +168,13 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::post('/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('support.status');
             });
 
+            // School Delete Requests (Representative দের পাঠানো ডিলিট রিকোয়েস্ট)
+            Route::middleware(['permission:school.delete'])->group(function () {
+                Route::get('/school-delete-requests', [SchoolDeleteRequestController::class, 'index'])->name('school.delete-requests.index');
+                Route::post('/school-delete-requests/{id}/approve', [SchoolDeleteRequestController::class, 'approve'])->name('school.delete-requests.approve');
+                Route::post('/school-delete-requests/{id}/reject', [SchoolDeleteRequestController::class, 'reject'])->name('school.delete-requests.reject');
+            });
+
         });
 
         Route::middleware(['permission:settings.manage'])->group(function () {
@@ -216,9 +229,20 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::resource('id-card-designs', IdCardDesignController::class);
     });
 
-    // --- 2. Employee ONLY Group ---
+    // --- 2. Employee ONLY Group (General Employee Dashboard) ---
     Route::middleware(['auth'])->prefix('employee')->name('employee.')->group(function () {
         Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('dashboard');
+    });
+
+    // --- 3. Representative Portal ---
+    // school.manage permission আছে এমন employee-রা representative হিসেবে কাজ করবেন
+    Route::middleware(['auth', 'permission:school.manage'])->prefix('representative')->name('rep.')->group(function () {
+        Route::get('/dashboard', [RepresentativeDashboardController::class, 'dashboard'])->name('dashboard');
+        Route::get('/my-schools', [RepresentativeDashboardController::class, 'mySchools'])->name('schools.index');
+        Route::get('/register-school', [RepresentativeDashboardController::class, 'registerSchool'])->name('school.register');
+        Route::post('/register-school', [RepresentativeDashboardController::class, 'storeSchool'])->name('school.store');
+        Route::post('/request-delete/{school}', [RepresentativeDashboardController::class, 'requestDeleteSchool'])->name('school.delete.request');
+        Route::get('/commissions', [RepresentativeDashboardController::class, 'myCommissions'])->name('commissions');
     });
 });
 

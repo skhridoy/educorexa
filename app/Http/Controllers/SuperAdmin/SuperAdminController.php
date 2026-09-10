@@ -150,6 +150,12 @@ class SuperAdminController extends Controller
         $mainDomain = config('app.main_domain', 'schoolerp.test');
         $query = School::query();
 
+        // Representative / Employee check: যদি ইউজার employee হয় এবং super_admin না হয়, শুধু নিজের নিবন্ধিত স্কুল দেখাবে
+        $user = Auth::user();
+        if ($user && $user->role === 'employee' && $user->employee && !$user->hasRole('super_admin')) {
+            $query->where('representative_id', $user->employee->id);
+        }
+
         if ($request->filled('division')) {
             $query->where('division', $request->division);
         }
@@ -196,6 +202,10 @@ class SuperAdminController extends Controller
 
     public function destroy(School $school)
     {
+        $user = Auth::user();
+        if (!$user->hasRole('super_admin') && !$user->can('school.delete')) {
+            return redirect()->back()->with('error', 'আপনার সরাসরি স্কুল ডিলিট করার অনুমতি নেই। অনুগ্রহ করে ডিলিট রিকোয়েস্ট পাঠান।');
+        }
 
         $school->users()->delete(); // Delete associated users
         $school->delete();
@@ -208,18 +218,20 @@ class SuperAdminController extends Controller
     public function createSchool()
     {
         $mainDomain = config('app.main_domain', 'schoolerp.test');
-        return view('super.schools.create', compact('mainDomain'));
+        $representatives = \App\Models\Employee::with('user')->where('status', 'active')->get();
+        return view('super.schools.create', compact('mainDomain', 'representatives'));
     }
 
     public function schoolStore(Request $request)
     {
         $request->validate([
-            'school_name'    => 'required|string|max:255',
-            'slug'           => 'required|alpha_num|unique:schools,slug',
-            'admin_name'     => 'required|string|max:255',
-            'admin_email'    => 'required|email|unique:users,email',
-            'admin_mobile'   => ['required', 'regex:/^01[0-9]{9}$/'],
-            'admin_password' => 'required|min:8',
+            'school_name'       => 'required|string|max:255',
+            'slug'              => 'required|alpha_num|unique:schools,slug',
+            'admin_name'        => 'required|string|max:255',
+            'admin_email'       => 'required|email|unique:users,email',
+            'admin_mobile'      => ['required', 'regex:/^01[0-9]{9}$/'],
+            'admin_password'    => 'required|min:8',
+            'representative_id' => 'nullable|exists:employees,id',
         ]);
 
         // ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবল
@@ -232,15 +244,25 @@ class SuperAdminController extends Controller
 
             $appCode = School::generateAppCode();
 
+            $user = Auth::user();
+            $representativeId = null;
+            // যদি ইউজার employee (বা representative) হয়, তবে স্বয়ংক্রিয়ভাবে তার employee_id যুক্ত হবে
+            if ($user && $user->employee) {
+                $representativeId = $user->employee->id;
+            } elseif ($request->filled('representative_id')) {
+                $representativeId = $request->representative_id;
+            }
+
             $newSchool = School::create([
-                'name'      => $request->school_name,
-                'slug'      => strtolower($request->slug),
-                'app_code' => $appCode,
-                'email'     => $request->admin_email,
-                'phone'     => $request->admin_mobile,
-                'status'    => 'approved',
-                'is_active' => true,
+                'name'                   => $request->school_name,
+                'slug'                   => strtolower($request->slug),
+                'app_code'               => $appCode,
+                'email'                  => $request->admin_email,
+                'phone'                  => $request->admin_mobile,
+                'status'                 => 'approved',
+                'is_active'              => true,
                 'subscription_package_id' => $defaultPackage ? $defaultPackage->id : null,
+                'representative_id'      => $representativeId,
             ]);
 
             if ($defaultPackage) {
@@ -288,6 +310,10 @@ class SuperAdminController extends Controller
             }
         } catch (\Exception $e) {
             \Log::error("Direct Registration Mail Error: " . $e->getMessage());
+        }
+
+        if (Auth::user()?->role === 'employee') {
+            return redirect()->route('rep.schools.index')->with('success', 'স্কুল সফলভাবে তৈরি করা হয়েছে!');
         }
 
         return redirect()->route('manage.schools.all')->with('success', 'School created and activation email sent!');
