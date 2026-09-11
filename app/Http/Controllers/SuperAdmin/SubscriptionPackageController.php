@@ -25,12 +25,21 @@ class SubscriptionPackageController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'registration_commission_type' => 'nullable|in:flat,percentage',
+            'registration_commission_rate' => 'nullable|numeric|min:0',
+            'monthly_commission_type' => 'nullable|in:flat,percentage',
+            'monthly_commission_rate' => 'nullable|numeric|min:0',
             'duration' => 'required|string|in:monthly,yearly',
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
             'permissions' => 'nullable|array',
         ]);
+
+        $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';
+        $validated['registration_commission_rate'] = $request->registration_commission_rate ?? 0;
+        $validated['monthly_commission_type'] = $request->monthly_commission_type ?? 'flat';
+        $validated['monthly_commission_rate'] = $request->monthly_commission_rate ?? 0;
 
         $validated['is_popular'] = $request->has('is_popular');
         $validated['is_active'] = $request->has('is_active');
@@ -61,7 +70,7 @@ class SubscriptionPackageController extends Controller
         SubscriptionPackage::create($validated);
 
         return redirect()->route('super.subscription-packages.index')
-            ->with('success', 'Subscription package created successfully.');
+            ->with('success', 'Subscription package created successfully with commission setup.');
     }
 
     public function edit(SubscriptionPackage $subscriptionPackage)
@@ -75,12 +84,21 @@ class SubscriptionPackageController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'registration_commission_type' => 'nullable|in:flat,percentage',
+            'registration_commission_rate' => 'nullable|numeric|min:0',
+            'monthly_commission_type' => 'nullable|in:flat,percentage',
+            'monthly_commission_rate' => 'nullable|numeric|min:0',
             'duration' => 'required|string|in:monthly,yearly',
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
             'permissions' => 'nullable|array',
         ]);
+
+        $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';
+        $validated['registration_commission_rate'] = $request->registration_commission_rate ?? 0;
+        $validated['monthly_commission_type'] = $request->monthly_commission_type ?? 'flat';
+        $validated['monthly_commission_rate'] = $request->monthly_commission_rate ?? 0;
 
         $validated['is_popular'] = $request->has('is_popular');
         $validated['is_active'] = $request->has('is_active');
@@ -111,7 +129,7 @@ class SubscriptionPackageController extends Controller
         $subscriptionPackage->update($validated);
 
         return redirect()->route('super.subscription-packages.index')
-            ->with('success', 'Subscription package updated successfully.');
+            ->with('success', 'Subscription package updated successfully with commission setup.');
     }
 
     public function destroy(SubscriptionPackage $subscriptionPackage)

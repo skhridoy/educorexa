@@ -64,12 +64,12 @@
                         </td>
                         <td style="padding: 18px 24px; text-align:right;">
                             <div class="d-inline-flex gap-1">
-                                <a href="{{ route('super.blog-categories.edit', $category->id) }}" class="act-btn" title="Edit" style="color:#4f46e5; background:#eef2ff;">
+                                <a href="{{ route('super.blog-categories.edit', $category->id) }}" class="act-btn" title="Edit">
                                     <i data-feather="edit-2" style="width:14px; height:14px;"></i>
                                 </a>
                                 <form action="{{ route('super.blog-categories.destroy', $category->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category? Blogs under this category will be marked uncategorized.');">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="act-btn del" title="Delete" style="color:#ef4444; background:#fef2f2;">
+                                    <button type="submit" class="act-btn del" title="Delete">
                                         <i data-feather="trash-2" style="width:14px; height:14px;"></i>
                                     </button>
                                 </form>

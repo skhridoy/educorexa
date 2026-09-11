@@ -27,7 +27,7 @@ class RepresentativeDashboardController extends Controller
 
     /**
      * Representative ড্যাশবোর্ড
-     * নিজের স্কুল সংখ্যা, মোট কমিশন, সাম্প্রতিক স্কুল দেখাবে
+     * নিজের স্কুল সংখ্যা, মোট কমিশন, মাসিক চার্ট, সাম্প্রতিক স্কুল ও ডিলিট রিকোয়েস্ট ট্র্যাকার
      */
     public function dashboard()
     {
@@ -39,34 +39,82 @@ class RepresentativeDashboardController extends Controller
                 ->with('error', 'Employee profile পাওয়া যায়নি।');
         }
 
-        // নিজের নিবন্ধিত স্কুলগুলো
-        $mySchools        = $employee->registeredSchools()->with('subscriptionPackage')->latest()->take(5)->get();
-        $totalMySchools   = $employee->registeredSchools()->count();
-        $approvedSchools  = $employee->registeredSchools()->where('status', 'approved')->count();
-        $pendingSchools   = $employee->registeredSchools()->where('status', 'pending')->count();
+        $mainDomain = config('app.main_domain', 'schoolerp.test');
 
-        // কমিশন হিসাব
-        $totalCommission  = $employee->calculateTotalCommission();
+        // নিজের নিবন্ধিত স্কুলগুলো (সর্বশেষ ৬টি)
+        $mySchools = $employee->registeredSchools()
+            ->with(['subscriptionPackage', 'subscriptions' => function($q) {
+                $q->where('status', 'active')->whereNotNull('paid_at');
+            }])
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(function ($school) use ($employee) {
+                $comm = $employee->calculateSchoolCommission($school);
+                $school->registration_commission = $comm['registration'];
+                $school->monthly_commission = $comm['monthly'];
+                $school->earned_commission = $comm['total'];
+                return $school;
+            });
 
-        // এই মাসের কমিশন হিসাব
-        $monthlyCommission = $this->calculateMonthlyCommission($employee);
+        // পরিসংখ্যান
+        $totalMySchools     = $employee->registeredSchools()->count();
+        $approvedSchools    = $employee->registeredSchools()->where('status', 'approved')->count();
+        $pendingSchools     = $employee->registeredSchools()->where('status', 'pending')->count();
+        $rejectedSchools    = $employee->registeredSchools()->where('status', 'rejected')->count();
+        $thisMonthSchools   = $employee->registeredSchools()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
 
-        // পেন্ডিং ডিলিট রিকোয়েস্ট
+        // সক্রিয় সাবস্ক্রিপশন সংখ্যা
+        $activeSubscriptionsCount = DB::table('school_subscriptions')
+            ->join('schools', 'schools.id', '=', 'school_subscriptions.school_id')
+            ->where('schools.representative_id', $employee->id)
+            ->where('school_subscriptions.status', 'active')
+            ->count();
+
+        // কমিশন হিসাব (২-ধাপ কমিশন: রেজিস্ট্রেশন + মাসিক রিকারিং)
+        $commBreakdown           = $employee->calculateTotalCommissionBreakdown();
+        $totalCommission         = $commBreakdown['total'];
+        $totalRegCommission      = $commBreakdown['registration'];
+        $totalMonthlyCommission  = $commBreakdown['monthly'];
+        $monthlyCommission       = $this->calculateMonthlyCommission($employee);
+
+        // পেন্ডিং ও সাম্প্রতিক ডিলিট রিকোয়েস্ট ট্র্যাকিং
         $pendingDeleteRequests = SchoolDeleteRequest::where('requested_by', $user->id)
             ->where('status', 'pending')
             ->count();
 
+        $myDeleteRequests = SchoolDeleteRequest::where('requested_by', $user->id)
+            ->with(['school', 'reviewer'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // গত ৬ মাসের ট্রেন্ড অ্যানালিটিক্স (চার্টের জন্য)
+        $chartData = $this->getSixMonthsTrend($employee);
+
+        // পেন্ডিং ডিলিট থাকা স্কুলের আইডি তালিকা (মডাল ও বাটনের জন্য)
+        $pendingDeleteSchoolIds = SchoolDeleteRequest::where('requested_by', $user->id)
+            ->where('status', 'pending')
+            ->pluck('school_id')
+            ->toArray();
+
         return view('representative.dashboard', compact(
             'user', 'employee', 'mySchools', 'totalMySchools',
-            'approvedSchools', 'pendingSchools', 'totalCommission',
-            'monthlyCommission', 'pendingDeleteRequests'
+            'approvedSchools', 'pendingSchools', 'rejectedSchools',
+            'thisMonthSchools', 'activeSubscriptionsCount',
+            'totalCommission', 'totalRegCommission', 'totalMonthlyCommission', 'monthlyCommission',
+            'pendingDeleteRequests', 'myDeleteRequests', 'chartData',
+            'pendingDeleteSchoolIds', 'mainDomain'
         ));
     }
 
     /**
-     * নিজের রেফারেন্সে নিবন্ধিত সব স্কুলের তালিকা
+     * নিজের রেফারেন্সে নিবন্ধিত সব স্কুলের তালিকা (সার্চ ও ফিল্টারসহ)
      */
-    public function mySchools()
+    public function mySchools(Request $request)
     {
         $user     = Auth::user();
         $employee = $this->getEmployee();
@@ -76,10 +124,33 @@ class RepresentativeDashboardController extends Controller
                 ->with('error', 'Employee profile পাওয়া যায়নি।');
         }
 
-        $schools = $employee->registeredSchools()
-            ->with(['subscriptionPackage', 'subscriptions'])
-            ->latest()
-            ->get();
+        $mainDomain = config('app.main_domain', 'schoolerp.test');
+
+        $query = $employee->registeredSchools()->with(['subscriptionPackage', 'subscriptions']);
+
+        // স্ট্যাটাস ফিল্টার
+        if ($request->filled('status') && in_array($request->status, ['approved', 'pending', 'rejected'])) {
+            $query->where('status', $request->status);
+        }
+
+        // সার্চ (নাম, সাবডোমেইন, অ্যাপ কোড, জেলা)
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('app_code', 'like', "%{$search}%")
+                  ->orWhere('district', 'like', "%{$search}%");
+            });
+        }
+
+        $schools = $query->latest()->get();
+
+        // স্ট্যাটাস কাউন্ট
+        $allCount      = $employee->registeredSchools()->count();
+        $approvedCount = $employee->registeredSchools()->where('status', 'approved')->count();
+        $pendingCount  = $employee->registeredSchools()->where('status', 'pending')->count();
+        $rejectedCount = $employee->registeredSchools()->where('status', 'rejected')->count();
 
         // প্রতিটি স্কুলের pending delete request আছে কিনা চেক
         $pendingDeleteSchoolIds = SchoolDeleteRequest::where('requested_by', $user->id)
@@ -88,26 +159,17 @@ class RepresentativeDashboardController extends Controller
             ->toArray();
 
         return view('representative.schools.index', compact(
-            'user', 'employee', 'schools', 'pendingDeleteSchoolIds'
+            'user', 'employee', 'schools', 'pendingDeleteSchoolIds',
+            'allCount', 'approvedCount', 'pendingCount', 'rejectedCount', 'mainDomain'
         ));
     }
 
     /**
-     * স্কুল নিবন্ধন ফর্ম দেখানো
+     * স্কুল নিবন্ধন (Super Admin এর বিদ্যমান স্কুল তৈরি পেজে রিডাইরেক্ট)
      */
     public function registerSchool()
     {
-        $user     = Auth::user();
-        $employee = $this->getEmployee();
-
-        if (!$employee) {
-            return redirect()->route('employee.dashboard')
-                ->with('error', 'Employee profile পাওয়া যায়নি।');
-        }
-
-        $packages = SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
-
-        return view('representative.schools.register', compact('user', 'employee', 'packages'));
+        return redirect()->route('manage.schools.create');
     }
 
     /**
@@ -279,52 +341,87 @@ class RepresentativeDashboardController extends Controller
             ->latest()
             ->get()
             ->map(function ($school) use ($employee) {
-                $schoolCommission = 0;
-                foreach ($school->subscriptions as $sub) {
-                    if ($employee->commission_type === 'percentage') {
-                        $schoolCommission += ($sub->amount * $employee->commission_rate) / 100;
-                    } else {
-                        $schoolCommission += $employee->commission_rate;
-                    }
-                }
-                $school->earned_commission = $schoolCommission;
+                $comm = $employee->calculateSchoolCommission($school);
+                $school->registration_commission = $comm['registration'];
+                $school->monthly_commission = $comm['monthly'];
+                $school->earned_commission = $comm['total'];
                 return $school;
             });
 
-        $totalCommission   = $schoolsWithCommission->sum('earned_commission');
-        $monthlyCommission = $this->calculateMonthlyCommission($employee);
-        $totalSchools      = $employee->registeredSchools()->count();
-        $approvedSchools   = $employee->registeredSchools()->where('status', 'approved')->count();
+        $commBreakdown          = $employee->calculateTotalCommissionBreakdown();
+        $totalCommission        = $commBreakdown['total'];
+        $totalRegCommission     = $commBreakdown['registration'];
+        $totalMonthlyCommission = $commBreakdown['monthly'];
+        $monthlyCommission      = $this->calculateMonthlyCommission($employee);
+        $totalSchools           = $employee->registeredSchools()->count();
+        $approvedSchools        = $employee->registeredSchools()->where('status', 'approved')->count();
 
         return view('representative.commissions.index', compact(
             'user', 'employee', 'schoolsWithCommission',
-            'totalCommission', 'monthlyCommission',
-            'totalSchools', 'approvedSchools'
+            'totalCommission', 'totalRegCommission', 'totalMonthlyCommission',
+            'monthlyCommission', 'totalSchools', 'approvedSchools'
         ));
     }
 
     /**
-     * এই মাসের কমিশন হিসাব
+     * নির্দিষ্ট মাসের কমিশন হিসাব (রেজিস্ট্রেশন কমিশন + সক্রিয় সাবস্ক্রিপশনের মাসিক কমিশন)
      */
-    private function calculateMonthlyCommission(Employee $employee): float
+    private function calculateMonthlyCommission(Employee $employee, $targetDate = null): float
     {
-        $schools = $employee->registeredSchools()->with(['subscriptions' => function ($q) {
+        $targetDate = $targetDate ? \Carbon\Carbon::parse($targetDate) : now();
+
+        $schools = $employee->registeredSchools()->with(['subscriptionPackage', 'subscriptions' => function ($q) use ($targetDate) {
             $q->where('status', 'active')
               ->whereNotNull('paid_at')
-              ->whereMonth('paid_at', now()->month)
-              ->whereYear('paid_at', now()->year);
+              ->whereMonth('paid_at', $targetDate->month)
+              ->whereYear('paid_at', $targetDate->year);
         }])->get();
 
         $total = 0;
         foreach ($schools as $school) {
-            foreach ($school->subscriptions as $sub) {
-                if ($employee->commission_type === 'percentage') {
-                    $total += ($sub->amount * $employee->commission_rate) / 100;
-                } else {
-                    $total += $employee->commission_rate;
+            // ১. রেজিস্ট্রেশন কমিশন (যদি এই নির্দিষ্ট মাসে স্কুলটি নিবন্ধিত বা অনুমোদিত হয়ে থাকে)
+            if ($school->created_at->year == $targetDate->year && $school->created_at->month == $targetDate->month) {
+                if (in_array($school->status, ['approved', 'active']) || $school->subscriptions()->whereNotNull('paid_at')->exists()) {
+                    $total += $employee->calculateRegistrationCommissionForSchool($school);
                 }
             }
+
+            // ২. এই মাসের পেইড সাবস্ক্রিপশনগুলোর জন্য মাসিক এক্সট্রা কমিশন
+            foreach ($school->subscriptions as $sub) {
+                $total += $employee->calculateMonthlyCommissionForSchool($school, (float)$sub->amount);
+            }
         }
-        return $total;
+        return round($total, 2);
+    }
+
+    /**
+     * বিগত ৬ মাসের ট্রেন্ড ডাটা (নিবন্ধিত স্কুল সংখ্যা ও অর্জিত কমিশন)
+     */
+    private function getSixMonthsTrend(Employee $employee): array
+    {
+        $labels = [];
+        $schoolsData = [];
+        $commissionData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $monthDate = now()->subMonths($i);
+            $labels[] = $monthDate->format('M Y');
+
+            // এই মাসে নিবন্ধিত স্কুল সংখ্যা
+            $schoolsCount = $employee->registeredSchools()
+                ->whereMonth('created_at', $monthDate->month)
+                ->whereYear('created_at', $monthDate->year)
+                ->count();
+            $schoolsData[] = $schoolsCount;
+
+            // এই মাসে অর্জিত মোট কমিশন (রেজিস্ট্রেশন + মাসিক)
+            $commissionData[] = $this->calculateMonthlyCommission($employee, $monthDate);
+        }
+
+        return [
+            'labels'      => $labels,
+            'schools'     => $schoolsData,
+            'commissions' => $commissionData,
+        ];
     }
 }

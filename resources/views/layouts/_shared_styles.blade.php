@@ -27,19 +27,37 @@
 .edu-table tbody tr:hover td { background:#fafbff; }
 
 /* Buttons */
-.btn-edu { display:inline-flex; align-items:center; gap:7px; font-weight:600; font-size:0.875rem; padding:9px 18px; border-radius:10px; border:none; text-decoration:none; transition:all 0.15s; cursor:pointer; }
-.btn-edu-primary { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; box-shadow:0 4px 12px rgba(79,70,229,0.3); }
-.btn-edu-primary:hover { color:#fff; transform:translateY(-1px); box-shadow:0 6px 16px rgba(79,70,229,0.4); }
-.btn-edu-light   { background:#f8fafc; color:#64748b; border:1px solid #e2e8f0; }
-.btn-edu-light:hover { background:#eef2ff; color:#4f46e5; }
-.btn-edu-danger  { background:#fef2f2; color:#ef4444; border:1px solid #fecaca; }
-.btn-edu-danger:hover { background:#ef4444; color:#fff; }
+.btn-edu { display:inline-flex; align-items:center; gap:7px; font-weight:600; font-size:0.875rem; padding:9px 20px; border-radius:10px; border:2px solid transparent; text-decoration:none; transition:all 0.2s ease; cursor:pointer; letter-spacing:0.01em; }
+
+/* Primary — filled gradient */
+.btn-edu-primary { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(79,70,229,0.28); }
+.btn-edu-primary:hover { color:#fff; transform:translateY(-1px); box-shadow:0 6px 20px rgba(79,70,229,0.4); }
+
+/* Edit / secondary — outline style */
+.btn-edu-outline { background:transparent; color:#4f46e5; border:2px solid #4f46e5; border-radius:10px; }
+.btn-edu-outline:hover { background:#4f46e5; color:#fff; box-shadow:0 4px 12px rgba(79,70,229,0.25); transform:translateY(-1px); }
+
+/* Light — subtle outline */
+.btn-edu-light { background:transparent; color:#64748b; border:2px solid #e2e8f0; border-radius:10px; }
+.btn-edu-light:hover { background:transparent; color:#4f46e5; border-color:#4f46e5; }
+
+/* Update / success outline */
+.btn-edu-success-outline { background:transparent; color:#16a34a; border:2px solid #16a34a; border-radius:10px; }
+.btn-edu-success-outline:hover { background:#16a34a; color:#fff; box-shadow:0 4px 12px rgba(22,163,74,0.25); transform:translateY(-1px); }
+
+/* Danger outline */
+.btn-edu-danger { background:transparent; color:#ef4444; border:2px solid #ef4444; border-radius:10px; }
+.btn-edu-danger:hover { background:#ef4444; color:#fff; box-shadow:0 4px 12px rgba(239,68,68,0.25); }
+
+/* Update button (form submit) */
+.btn-edu-update { background:transparent; color:#4f46e5; border:2px solid #4f46e5; border-radius:10px; font-weight:700; }
+.btn-edu-update:hover { background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(79,70,229,0.35); transform:translateY(-1px); }
 
 /* Icon action buttons */
-.act-btn { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:#64748b; transition:all 0.15s; text-decoration:none; cursor:pointer; }
-.act-btn:hover       { background:#eef2ff; color:#4f46e5; }
-.act-btn.del:hover   { background:#fef2f2; color:#ef4444; }
-.act-btn.succ:hover  { background:#f0fdf4; color:#16a34a; }
+.act-btn { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px; border:2px solid #e2e8f0; background:transparent; color:#64748b; transition:all 0.2s ease; text-decoration:none; cursor:pointer; }
+.act-btn:hover       { border-color:#4f46e5; background:transparent; color:#4f46e5; transform:translateY(-1px); box-shadow:0 3px 8px rgba(79,70,229,0.15); }
+.act-btn.del:hover   { border-color:#ef4444; background:transparent; color:#ef4444; box-shadow:0 3px 8px rgba(239,68,68,0.15); }
+.act-btn.succ:hover  { border-color:#16a34a; background:transparent; color:#16a34a; box-shadow:0 3px 8px rgba(22,163,74,0.15); }
 
 /* Badges */
 .badge-indigo  { background:#eef2ff; color:#4f46e5; font-weight:700; font-size:0.72rem; padding:4px 10px; border-radius:20px; }

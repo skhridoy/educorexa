@@ -150,10 +150,18 @@ class SuperAdminController extends Controller
         $mainDomain = config('app.main_domain', 'schoolerp.test');
         $query = School::query();
 
-        // Representative / Employee check: যদি ইউজার employee হয় এবং super_admin না হয়, শুধু নিজের নিবন্ধিত স্কুল দেখাবে
+        // Representative / Employee check: যদি ইউজার employee বা representative হয় এবং super_admin না হয়, শুধু নিজের নিবন্ধিত স্কুল দেখাবে
         $user = Auth::user();
-        if ($user && $user->role === 'employee' && $user->employee && !$user->hasRole('super_admin')) {
-            $query->where('representative_id', $user->employee->id);
+        $isRep = $user && !$user->hasRole('super_admin') && (
+            $user->hasRole('Representative') || 
+            $user->role === 'Representative' || 
+            $user->role === 'employee' || 
+            $user->employee
+        );
+
+        if ($isRep) {
+            $employeeId = $user->employee?->id ?? 0;
+            $query->where('representative_id', $employeeId);
         }
 
         if ($request->filled('division')) {
@@ -164,15 +172,22 @@ class SuperAdminController extends Controller
         }
 
         $schools = $query->with('subscriptionPackage')->latest()->get();
-        $divisions = School::whereNotNull('division')->where('division', '!=', '')
+
+        // Location summaries scoped if representative
+        $baseLocationQuery = School::query();
+        if ($isRep) {
+            $baseLocationQuery->where('representative_id', $user->employee?->id ?? 0);
+        }
+
+        $divisions = (clone $baseLocationQuery)->whereNotNull('division')->where('division', '!=', '')
             ->distinct()->orderBy('division')->pluck('division');
-        $districts = School::whereNotNull('district')->where('district', '!=', '')
+        $districts = (clone $baseLocationQuery)->whereNotNull('district')->where('district', '!=', '')
             ->when($request->division, fn ($q) => $q->where('division', $request->division))
             ->distinct()->orderBy('district')->pluck('district');
-        $divisionSummary = School::select('division', DB::raw('COUNT(*) as total'))
+        $divisionSummary = (clone $baseLocationQuery)->select('division', DB::raw('COUNT(*) as total'))
             ->whereNotNull('division')->where('division', '!=', '')
             ->groupBy('division')->orderByDesc('total')->get();
-        $districtSummary = School::select('district', 'division', DB::raw('COUNT(*) as total'))
+        $districtSummary = (clone $baseLocationQuery)->select('district', 'division', DB::raw('COUNT(*) as total'))
             ->whereNotNull('district')->where('district', '!=', '')
             ->groupBy('district', 'division')->orderByDesc('total')->take(10)->get();
 
@@ -184,6 +199,18 @@ class SuperAdminController extends Controller
 
     public function rejectSchool(School $school)
     {
+        $user = Auth::user();
+        $isRep = $user && !$user->hasRole('super_admin') && (
+            $user->hasRole('Representative') || 
+            $user->role === 'Representative' || 
+            $user->role === 'employee' || 
+            $user->employee
+        );
+
+        if ($isRep) {
+            return redirect()->back()->with('error', 'আপনার সরাসরি স্কুল বাতিল বা ডিঅ্যাক্টিভ করার অনুমতি নেই।');
+        }
+
         $school->status = 'rejected';
         $school->is_active = false;
         $school->save();
@@ -203,7 +230,15 @@ class SuperAdminController extends Controller
     public function destroy(School $school)
     {
         $user = Auth::user();
-        if (!$user->hasRole('super_admin') && !$user->can('school.delete')) {
+        $isRep = $user && !$user->hasRole('super_admin') && (
+            $user->hasRole('Representative') || 
+            $user->role === 'Representative' || 
+            $user->role === 'employee' || 
+            $user->employee
+        );
+
+        // Representative-রা কখনোই সরাসরি ডিলিট করতে পারবে না, কেবল ডিলিট রিকোয়েস্ট পাঠাতে পারবে
+        if ($isRep || (!$user->hasRole('super_admin') && !$user->can('school.delete'))) {
             return redirect()->back()->with('error', 'আপনার সরাসরি স্কুল ডিলিট করার অনুমতি নেই। অনুগ্রহ করে ডিলিট রিকোয়েস্ট পাঠান।');
         }
 
@@ -312,7 +347,15 @@ class SuperAdminController extends Controller
             \Log::error("Direct Registration Mail Error: " . $e->getMessage());
         }
 
-        if (Auth::user()?->role === 'employee') {
+        $currentUser = Auth::user();
+        $isRepUser = $currentUser && !$currentUser->hasRole('super_admin') && (
+            $currentUser->hasRole('Representative') || 
+            $currentUser->role === 'Representative' || 
+            $currentUser->role === 'employee' || 
+            $currentUser->employee
+        );
+
+        if ($isRepUser) {
             return redirect()->route('rep.schools.index')->with('success', 'স্কুল সফলভাবে তৈরি করা হয়েছে!');
         }
 

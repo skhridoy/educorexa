@@ -49,33 +49,44 @@ class AppServiceProvider extends ServiceProvider
 
         // ভিউ কম্পোজার ব্যবহার করে সব ভিউতে ডাটা পাস করা
         View::composer('*', function ($view) {
-            // ১. টেন্যান্ট বা স্কুলের ডাটা আনা
-            $tenant = Request::route('tenant');
-            $school = null;
-            if ($tenant) {
-                $school = School::where('slug', $tenant)->first();
-            }
-            
-            // ২. সাইট সেটিংস ডাটা আনা (আপনার এই অংশটি এখন সব পেজে কাজ করবে)
-            $setting = null;
-            if (Schema::hasTable('site_settings')) {
-                $setting = SiteSetting::first();
-            }
+            try {
+                // ১. টেন্যান্ট বা স্কুলের ডাটা আনা
+                $tenant = Request::route('tenant');
+                $school = null;
+                if ($tenant) {
+                    $school = School::where('slug', $tenant)->first();
+                }
+                
+                // ২. সাইট সেটিংস ডাটা আনা
+                $setting = null;
+                if (Schema::hasTable('site_settings')) {
+                    $setting = SiteSetting::first();
+                }
 
-            // যদি ডাটাবেজে সেটিংস না থাকে, তবে একটি ডিফল্ট অবজেক্ট দেওয়া
-            if (!$setting) {
-                $setting = (object) [
-                    'site_name' => 'EduCorexa',
-                    'footer_text' => 'All Rights Reserved',
-                    'favicon' => 'frontend/img/favicon.ico' // ডিফল্ট পাথ
-                ];
-            }
+                // যদি ডাটাবেজে সেটিংস না থাকে, তবে একটি ডিফল্ট অবজেক্ট দেওয়া
+                if (!$setting) {
+                    $setting = (object) [
+                        'site_name' => 'EduCorexa',
+                        'footer_text' => 'All Rights Reserved',
+                        'favicon' => 'frontend/img/favicon.ico'
+                    ];
+                }
 
-            // ভিউতে ডাটা পাঠানো
-            $view->with([
-                'school' => $school,
-                'setting' => $setting
-            ]);
+                $view->with([
+                    'school' => $school,
+                    'setting' => $setting
+                ]);
+            } catch (\Throwable $e) {
+                // ডাটাবেজ বা এরর ভিউ রেন্ডারিংয়ের সময় যাতে ক্র্যাশ না করে
+                $view->with([
+                    'school' => null,
+                    'setting' => (object) [
+                        'site_name' => 'EduCorexa',
+                        'footer_text' => 'All Rights Reserved',
+                        'favicon' => 'frontend/img/favicon.ico'
+                    ]
+                ]);
+            }
         });
     }
 }

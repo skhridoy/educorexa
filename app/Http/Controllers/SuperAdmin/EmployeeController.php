@@ -27,38 +27,13 @@ class EmployeeController extends Controller
                                ->take(5)
                                ->get();
 
-        // Representative ফিচার: school.manage permission আছে কিনা চেক
-        $isRepresentative = $user->can('school.manage');
-        $mySchools        = null;
-        $totalMySchools   = 0;
-        $totalCommission  = 0;
-        $monthlyCommission = 0;
-
-        if ($isRepresentative && $employee) {
-            $mySchools       = $employee->registeredSchools()->with('subscriptionPackage')->latest()->take(5)->get();
-            $totalMySchools  = $employee->registeredSchools()->count();
-            $totalCommission = $employee->calculateTotalCommission();
-
-            // এই মাসের কমিশন হিসাব
-            $schools = $employee->registeredSchools()->with(['subscriptions' => function ($q) {
-                $q->where('status', 'active')->whereNotNull('paid_at')
-                  ->whereMonth('paid_at', now()->month)->whereYear('paid_at', now()->year);
-            }])->get();
-            foreach ($schools as $school) {
-                foreach ($school->subscriptions as $sub) {
-                    if ($employee->commission_type === 'percentage') {
-                        $monthlyCommission += ($sub->amount * $employee->commission_rate) / 100;
-                    } else {
-                        $monthlyCommission += $employee->commission_rate;
-                    }
-                }
-            }
+        // Representative ফিচার: school.manage permission থাকলে সরাসরি Representative ড্যাশবোর্ডে রিডাইরেক্ট
+        if ($user->can('school.manage') && $employee) {
+            return redirect()->route('rep.dashboard');
         }
 
         return view('super.employee.dashboard', compact(
-            'user', 'employee', 'totalSchools', 'upcomingEvents',
-            'isRepresentative', 'mySchools', 'totalMySchools',
-            'totalCommission', 'monthlyCommission'
+            'user', 'employee', 'totalSchools', 'upcomingEvents'
         ));
     }
 
@@ -128,9 +103,11 @@ public function store(Request $request) {
             'address'         => $request->address ?? null,
             'joining_date'    => $request->joining_date,
             'salary'          => $request->salary,
-            'status'          => 'active',
-            'commission_type' => $request->commission_type ?? 'flat',
-            'commission_rate' => $request->commission_rate ?? 0,
+            'status'                  => 'active',
+            'commission_type'         => $request->commission_type ?? 'flat',
+            'commission_rate'         => $request->commission_rate ?? 0,
+            'monthly_commission_type' => $request->monthly_commission_type ?? 'flat',
+            'monthly_commission_rate' => $request->monthly_commission_rate ?? 0,
         ]);
 
         // ৪. ইমেইল ডাটা
@@ -158,6 +135,12 @@ public function store(Request $request) {
         return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
     }
 }
+
+    // --- শো মেথড (সরাসরি এডিটে রিডাইরেক্ট করবে) ---
+    public function show($id)
+    {
+        return redirect()->route('super.employees.edit', $id);
+    }
 
     // --- এডিট মেথড ---
     public function edit($id)
@@ -207,9 +190,11 @@ public function store(Request $request) {
                 'address'        => $request->address,
                 'joining_date'   => $request->joining_date,
                 'salary'         => $request->salary,
-                'status'         => $request->status ?? 'active',
-                'commission_type' => $request->commission_type ?? $employee->commission_type,
-                'commission_rate' => $request->commission_rate ?? $employee->commission_rate,
+                'status'                  => $request->status ?? 'active',
+                'commission_type'         => $request->commission_type ?? $employee->commission_type,
+                'commission_rate'         => $request->commission_rate ?? $employee->commission_rate,
+                'monthly_commission_type' => $request->monthly_commission_type ?? $employee->monthly_commission_type ?? 'flat',
+                'monthly_commission_rate' => $request->monthly_commission_rate ?? $employee->monthly_commission_rate ?? 0,
             ]);
 
             DB::commit();

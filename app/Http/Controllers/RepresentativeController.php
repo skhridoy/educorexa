@@ -48,21 +48,11 @@ class RepresentativeController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Find the 'employee' role for representatives
-            $role = Role::where('role_type', 'employee')
-                        ->where('name', '!=', 'super_admin')
-                        ->first();
-
-            if (!$role) {
-                // Fallback: try any employee-type role
-                $role = Role::where('name', 'employee')->first();
-            }
-
-            if (!$role) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'সিস্টেম কনফিগারেশন সমস্যা। অনুগ্রহ করে পরে চেষ্টা করুন।');
-            }
+            // 1. Representative রোল নির্ধারণ করা (পারমিশন রোলের কনফিগারেশন অনুযায়ী স্বয়ংক্রিয়ভাবে পাবে)
+            $role = Role::firstOrCreate(
+                ['name' => 'Representative', 'guard_name' => 'web'],
+                ['role_type' => 'employee']
+            );
 
             // 2. Generate auto password
             $plainPassword = 'Rep@' . rand(10000, 99999);

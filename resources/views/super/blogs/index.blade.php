@@ -66,12 +66,12 @@
 
                 <div style="padding:16px 24px; background:#fafbff; border-top:1px solid #f8fafc; display:flex; justify-content:space-between; align-items:center; border-radius:0 0 16px 16px;">
                     <div class="d-flex gap-1">
-                        <a href="{{ route('super.blogs.edit', $blog->id) }}" class="act-btn" title="Edit" style="color:#4f46e5; background:#eef2ff;">
+                        <a href="{{ route('super.blogs.edit', $blog->id) }}" class="act-btn" title="Edit">
                             <i data-feather="edit-2" style="width:14px; height:14px;"></i>
                         </a>
                         <form action="{{ route('super.blogs.destroy', $blog->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this blog post?');">
                             @csrf @method('DELETE')
-                            <button type="submit" class="act-btn del" title="Delete" style="color:#ef4444; background:#fef2f2;">
+                            <button type="submit" class="act-btn del" title="Delete">
                                 <i data-feather="trash-2" style="width:14px; height:14px;"></i>
                             </button>
                         </form>

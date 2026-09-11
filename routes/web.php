@@ -92,7 +92,7 @@ Route::domain(config('app.main_domain'))->group(function () {
         $user = auth()->user();
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') {
             return redirect()->route('super.dashboard');
-        } elseif ($user->hasRole('employee')) {
+        } elseif ($user->hasRole('employee') || $user->role === 'employee' || $user->employee) {
             // school.manage permission থাকলে representative dashboard-এ যাবে
             if ($user->can('school.manage')) {
                 return redirect()->route('rep.dashboard');

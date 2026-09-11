@@ -149,7 +149,7 @@
                                     </a>
                                     @endcan
                                     @can('employee.delete')
-                                    <a href="{{ route('super.employees.destroy', $user->id) }}" class="action-btn danger" id="deleteEmployee" title="Delete">
+                                    <a href="{{ route('super.employees.destroy', $user->id) }}" class="action-btn danger delete-employee" title="Delete">
                                         <i data-feather="trash-2" style="width:15px;height:15px;"></i>
                                     </a>
                                     @endcan
@@ -177,7 +177,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(function() {
-        $(document).on('click', '#deleteEmployee', function(e) {
+        $(document).on('click', '.delete-employee, #deleteEmployee', function(e) {
             e.preventDefault();
             var link = $(this).attr("href");
             Swal.fire({
@@ -190,7 +190,24 @@
                 confirmButtonText: 'Yes, delete',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
-                if (result.isConfirmed) { window.location.href = link; }
+                if (result.isConfirmed) {
+                    var form = $('<form>', {
+                        'method': 'POST',
+                        'action': link
+                    });
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_token',
+                        'value': '{{ csrf_token() }}'
+                    }));
+                    form.append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_method',
+                        'value': 'DELETE'
+                    }));
+                    $('body').append(form);
+                    form.submit();
+                }
             });
         });
 

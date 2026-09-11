@@ -33,8 +33,8 @@
             <li class="edu-nav-category">Main</li>
 
             <li class="edu-nav-item">
-                <a href="{{ $isSuperAdmin ? route('super.dashboard') : route('employee.dashboard') }}"
-                   class="edu-nav-link {{ Request::is('super-admin/dashboard*') || Request::is('employee/dashboard*') ? 'active' : '' }}">
+                <a href="{{ $isSuperAdmin ? route('super.dashboard') : ($user->can('school.manage') ? route('rep.dashboard') : route('employee.dashboard')) }}"
+                   class="edu-nav-link {{ Request::is('super-admin/dashboard*') || Request::is('representative/dashboard*') || Request::is('employee/dashboard*') ? 'active' : '' }}">
                     <i data-feather="grid"></i>
                     <span>Dashboard</span>
                 </a>
@@ -63,19 +63,48 @@
             </li>
             @endif
 
-            {{-- MANAGEMENT --}}
-            @can('school.manage')
+            {{-- REPRESENTATIVE PORTAL (For Employee Representative) --}}
+            @if(!$isSuperAdmin && ($user->role === 'employee' || $user->role === 'Representative' || $user->hasRole('Representative') || $user->employee) && $user->can('school.manage'))
+            <li class="edu-nav-category">Representative</li>
+            <li class="edu-nav-item">
+                <a href="{{ route('rep.dashboard') }}" class="edu-nav-link {{ Request::is('representative/dashboard*') ? 'active' : '' }}">
+                    <i data-feather="pie-chart"></i>
+                    <span>Rep Dashboard</span>
+                </a>
+            </li>
+            <li class="edu-nav-item">
+                <a href="{{ route('rep.schools.index') }}" class="edu-nav-link {{ Request::is('representative/my-schools*') ? 'active' : '' }}">
+                    <i data-feather="book-open"></i>
+                    <span>My Schools</span>
+                </a>
+            </li>
+            <li class="edu-nav-item">
+                <a href="{{ route('manage.schools.create') }}" class="edu-nav-link {{ Request::is('*/schools/create') ? 'active' : '' }}">
+                    <i data-feather="plus-circle"></i>
+                    <span>Register School</span>
+                </a>
+            </li>
+            <li class="edu-nav-item">
+                <a href="{{ route('rep.commissions') }}" class="edu-nav-link {{ Request::is('representative/commissions*') ? 'active' : '' }}">
+                    <i data-feather="dollar-sign"></i>
+                    <span>Commissions</span>
+                </a>
+            </li>
+            @endif
+
+            {{-- MANAGEMENT (For Super Admin or Non-Representative Staff) --}}
+            @if(($isSuperAdmin || (!$user->hasRole('Representative') && $user->role !== 'Representative' && !$user->employee)) && $user->can('school.manage'))
             <li class="edu-nav-category">Management</li>
 
             <li class="edu-nav-item">
-                <a class="edu-nav-link edu-has-submenu {{ $isSchoolMenuOpen ? 'active' : '' }}"
+                <a class="edu-nav-link edu-has-submenu {{ $isSchoolMenuOpen || Request::is('manage/school-delete-requests*') ? 'active' : '' }}"
                    data-bs-toggle="collapse" href="#schoolsMenu" role="button"
-                   aria-expanded="{{ $isSchoolMenuOpen ? 'true' : 'false' }}">
+                   aria-expanded="{{ $isSchoolMenuOpen || Request::is('manage/school-delete-requests*') ? 'true' : 'false' }}">
                     <i data-feather="home"></i>
                     <span>Manage Schools</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
-                <div class="collapse {{ $isSchoolMenuOpen ? 'show' : '' }}" id="schoolsMenu">
+                <div class="collapse {{ $isSchoolMenuOpen || Request::is('manage/school-delete-requests*') ? 'show' : '' }}" id="schoolsMenu">
                     <ul class="edu-sub-nav">
                         <li><a href="{{ route('manage.schools.all') }}"
                                class="edu-sub-link {{ Request::is('*/schools/all') ? 'active' : '' }}">All Schools</a></li>
@@ -85,12 +114,26 @@
                         <li><a href="{{ route('manage.schools.create') }}"
                                class="edu-sub-link {{ Request::is('*/schools/create') ? 'active' : '' }}">Create School</a></li>
                         @endcan
+                        @can('school.delete')
+                        @php
+                            $pendingDelReqCount = \App\Models\SchoolDeleteRequest::where('status', 'pending')->count();
+                        @endphp
+                        <li>
+                            <a href="{{ route('manage.school.delete-requests.index') }}"
+                               class="edu-sub-link d-flex justify-content-between align-items-center {{ Request::is('manage/school-delete-requests*') ? 'active' : '' }}">
+                                <span>Delete Requests</span>
+                                @if($pendingDelReqCount > 0)
+                                    <span class="badge bg-danger rounded-pill" style="font-size:0.7rem;padding:2px 6px;">{{ $pendingDelReqCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        @endcan
                         <li><a href="{{ route('manage.pro-email.index') }}"
                                class="edu-sub-link {{ Request::is('manage/professional-emails*') ? 'active' : '' }}">Email Requests</a></li>
                     </ul>
                 </div>
             </li>
-            @endcan
+            @endif
 
             {{-- SYSTEM --}}
             @if($isSuperAdmin || $user->can('contact.messages.view'))

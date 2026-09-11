@@ -116,6 +116,59 @@
                     </div>
                 </div>
 
+                {{-- Divider --}}
+                <div style="border-top:1px solid #f1f5f9;margin-bottom:24px;"></div>
+
+                {{-- Section: Commission Settings --}}
+                <div style="margin-bottom:24px;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0;">Representative Commission Settings (প্রতিনিধি কমিশন কনফিগারেশন)</p>
+                        <span class="badge" style="background:#eef2ff;color:#6366f1;font-size:0.75rem;">ঐচ্ছিক / ডিফল্ট</span>
+                    </div>
+                    <p class="text-muted small mb-3">সাবস্ক্রিপশন প্যাকেজে কোনো নির্দিষ্ট কমিশন কনফিগার না থাকলে প্রতিনিধির জন্য এই ডিফল্ট কমিশন কার্যকর হবে।</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                                <span class="badge mb-2" style="background:#4f46e5;color:#fff;font-size:0.75rem;">১. নতুন স্কুল রেজিস্ট্রেশন কমিশন</span>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label" style="font-size:0.8rem;font-weight:600;color:#374151;">কমিশন ধরন</label>
+                                        <select name="commission_type" class="form-select" style="border-radius:10px;border-color:#e2e8f0;font-size:0.85rem;padding:8px 12px;">
+                                            <option value="flat" {{ old('commission_type', 'flat') == 'flat' ? 'selected' : '' }}>ফ্ল্যাট (৳ টাকা)</option>
+                                            <option value="percentage" {{ old('commission_type') == 'percentage' ? 'selected' : '' }}>শতাংশ (% পারসেন্টেজ)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label" style="font-size:0.8rem;font-weight:600;color:#374151;">কমিশন রেট</label>
+                                        <input type="number" step="0.01" min="0" name="commission_rate" class="form-control" placeholder="0.00" value="{{ old('commission_rate', '0.00') }}"
+                                               style="border-radius:10px;border-color:#e2e8f0;font-size:0.85rem;padding:8px 12px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                                <span class="badge mb-2" style="background:#059669;color:#fff;font-size:0.75rem;">২. প্রতি মাসের এক্সট্রা কমিশন</span>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label" style="font-size:0.8rem;font-weight:600;color:#374151;">কমিশন ধরন</label>
+                                        <select name="monthly_commission_type" class="form-select" style="border-radius:10px;border-color:#e2e8f0;font-size:0.85rem;padding:8px 12px;">
+                                            <option value="flat" {{ old('monthly_commission_type', 'flat') == 'flat' ? 'selected' : '' }}>ফ্ল্যাট (৳ টাকা)</option>
+                                            <option value="percentage" {{ old('monthly_commission_type') == 'percentage' ? 'selected' : '' }}>শতাংশ (% পারসেন্টেজ)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label" style="font-size:0.8rem;font-weight:600;color:#374151;">কমিশন রেট</label>
+                                        <input type="number" step="0.01" min="0" name="monthly_commission_rate" class="form-control" placeholder="0.00" value="{{ old('monthly_commission_rate', '0.00') }}"
+                                               style="border-radius:10px;border-color:#e2e8f0;font-size:0.85rem;padding:8px 12px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Submit --}}
                 <div style="border-top:1px solid #f1f5f9;padding-top:20px;display:flex;gap:12px;">
                     <button type="submit"

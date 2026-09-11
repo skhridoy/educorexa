@@ -117,6 +117,72 @@
                     </div>
                 </div>
 
+                {{-- Section: Representative Commission Setup --}}
+                <div class="pkg-section mb-4">
+                    <div class="pkg-section-header">
+                        <div class="pkg-section-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h6 class="pkg-section-title">Representative Commission Setup (প্রতিনিধি কমিশন সেটিংস)</h6>
+                            <p class="pkg-section-sub">প্রতিনিধিদের জন্য নতুন স্কুল রেজিস্ট্রেশন কমিশন এবং প্রতি মাসের রিকারিং কমিশন নির্ধারণ করুন</p>
+                        </div>
+                    </div>
+                    <div class="pkg-section-body">
+                        <div class="row g-4">
+                            {{-- 1. Registration Commission --}}
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="badge" style="background:#4f46e5;color:#fff;font-size:0.75rem;">১. রেজিস্ট্রেশন কমিশন</span>
+                                        <small class="text-muted fw-semibold">(এককালীন)</small>
+                                    </div>
+                                    <p class="small text-muted mb-3">নতুন কোনো স্কুল এই প্যাকেজে নিবন্ধিত হলে প্রতিনিধিকে এই কমিশন দেওয়া হবে।</p>
+                                    <div class="row g-2">
+                                        <div class="col-sm-6">
+                                            <label class="edu-label">কমিশন টাইপ</label>
+                                            <select name="registration_commission_type" class="form-select edu-input">
+                                                <option value="flat" {{ old('registration_commission_type', $subscriptionPackage->registration_commission_type ?? 'flat') == 'flat' ? 'selected' : '' }}>ফ্ল্যাট (৳ টাকা)</option>
+                                                <option value="percentage" {{ old('registration_commission_type', $subscriptionPackage->registration_commission_type ?? '') == 'percentage' ? 'selected' : '' }}>শতাংশ (% পারসেন্টেজ)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="edu-label">কমিশন রেট / পরিমাণ</label>
+                                            <input type="number" step="0.01" min="0" name="registration_commission_rate" class="form-control edu-input"
+                                                placeholder="e.g. 500 বা 10" value="{{ old('registration_commission_rate', $subscriptionPackage->registration_commission_rate ?? '0.00') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- 2. Monthly Commission --}}
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="badge" style="background:#059669;color:#fff;font-size:0.75rem;">২. মাসিক এক্সট্রা কমিশন</span>
+                                        <small class="text-muted fw-semibold">(প্রতি মাসে রিকারিং)</small>
+                                    </div>
+                                    <p class="small text-muted mb-3">এই প্যাকেজধারী স্কুলের সাবস্ক্রিপশন সচল থাকা সাপেক্ষে প্রতিনিধি প্রতি মাসে এই কমিশন পাবেন।</p>
+                                    <div class="row g-2">
+                                        <div class="col-sm-6">
+                                            <label class="edu-label">কমিশন টাইপ</label>
+                                            <select name="monthly_commission_type" class="form-select edu-input">
+                                                <option value="flat" {{ old('monthly_commission_type', $subscriptionPackage->monthly_commission_type ?? 'flat') == 'flat' ? 'selected' : '' }}>ফ্ল্যাট (৳ টাকা)</option>
+                                                <option value="percentage" {{ old('monthly_commission_type', $subscriptionPackage->monthly_commission_type ?? '') == 'percentage' ? 'selected' : '' }}>শতাংশ (% পারসেন্টেজ)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="edu-label">কমিশন রেট / পরিমাণ</label>
+                                            <input type="number" step="0.01" min="0" name="monthly_commission_rate" class="form-control edu-input"
+                                                placeholder="e.g. 100 বা 5" value="{{ old('monthly_commission_rate', $subscriptionPackage->monthly_commission_rate ?? '0.00') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Section 3: Features --}}
                 <div class="pkg-section mb-4">
                     <div class="pkg-section-header">
@@ -579,12 +645,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.97);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid #e2e8f0;
     z-index: 1050;
-    padding: 14px 24px;
+    padding: 10px 16px;
     box-shadow: 0 -4px 24px rgba(79,70,229,.08);
 }
 .pkg-action-inner {
@@ -593,42 +659,64 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 .pkg-cancel-btn {
-    padding: 10px 24px;
-    border: 1.5px solid #e2e8f0;
+    padding: 8px 18px;
+    border: 2px solid #cbd5e1;
     border-radius: 10px;
     color: #64748b;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    background: #fff;
+    background: transparent;
     transition: all .2s;
+    white-space: nowrap;
 }
-.pkg-cancel-btn:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+.pkg-cancel-btn:hover { border-color: #94a3b8; color: #1e293b; background: transparent; }
 
 .pkg-create-btn {
-    padding: 12px 32px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
+    padding: 8px 22px;
+    background: transparent;
+    color: #4f46e5;
+    border: 2px solid #4f46e5;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     cursor: pointer;
     transition: all .2s;
-    box-shadow: 0 4px 16px rgba(79,70,229,.35);
-    letter-spacing: .3px;
+    letter-spacing: .2px;
+    white-space: nowrap;
 }
 .pkg-create-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(79,70,229,.45);
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(79,70,229,.3);
 }
 .pkg-create-btn:active { transform: translateY(0); }
 
+/* Mobile: full-width stacked buttons */
+@media (max-width: 575px) {
+    .pkg-action-bar { padding: 10px 12px; }
+    .pkg-action-inner { gap: 8px; width: 100%; }
+    .pkg-cancel-btn {
+        flex: 1;
+        text-align: center;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    .pkg-create-btn {
+        flex: 2;
+        text-align: center;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+}
+
 /* Spacer so content isn't hidden behind sticky bar */
-.page-content { padding-bottom: 90px !important; }
+.page-content { padding-bottom: 80px !important; }
 </style>
 
 <script>

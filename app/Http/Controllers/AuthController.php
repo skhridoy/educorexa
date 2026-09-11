@@ -87,9 +87,12 @@ class AuthController extends Controller
                 return redirect()->route('super.dashboard');
             }
 
-            // ২. এমপ্লয়ি চেক (Spatie Role Type)
+            // ২. এমপ্লয়ি চেক (Spatie Role Type অথবা employee প্রোফাইল)
             $role = Role::where('name', $user->role)->first();
-            if ($role && $role->role_type === 'employee') {
+            if (($role && $role->role_type === 'employee') || $user->role === 'employee' || $user->employee) {
+                if ($user->can('school.manage')) {
+                    return redirect()->route('rep.dashboard');
+                }
                 return redirect()->route('employee.dashboard');
             }
 

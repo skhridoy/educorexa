@@ -11,11 +11,20 @@
 @endsection
 
 @section('content')
+@php
+    $authUser = auth()->user();
+    $isRepUser = $authUser && !$authUser->hasRole('super_admin') && (
+        $authUser->hasRole('Representative') || 
+        $authUser->role === 'Representative' || 
+        $authUser->role === 'employee' || 
+        $authUser->employee
+    );
+@endphp
 <div class="page-content">
     <ul class="edu-bc">
-        <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ $isRepUser ? route('rep.dashboard') : route('super.dashboard') }}">Dashboard</a></li>
         <li><span>/</span></li>
-        <li><a href="{{ route('manage.schools.all') }}">Schools</a></li>
+        <li><a href="{{ $isRepUser ? route('rep.schools.index') : route('manage.schools.all') }}">Schools</a></li>
         <li><span>/</span></li>
         <li class="active">Add New School</li>
     </ul>
@@ -69,7 +78,7 @@
                             </select>
                             @error('representative_id') <p class="text-danger small mt-2">{{ $message }}</p> @enderror
                         </div>
-                        @elseif(auth()->user()->role === 'employee' && auth()->user()->employee)
+                        @elseif($isRepUser)
                         <div class="mb-3 p-3 rounded" style="background:#f0fdf4;border:1px solid #bbf7d0;">
                             <span class="text-success small fw-semibold">
                                 <i class="fa-solid fa-user-check me-1"></i> এই স্কুলটি আপনার ({{ auth()->user()->name }}) রেফারেন্সে যুক্ত হবে।
