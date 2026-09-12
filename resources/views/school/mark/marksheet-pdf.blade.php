@@ -18,10 +18,10 @@
             line-height: 1.25;
         }
         .page-border {
-            border: 2.5px solid #1e3a8a;
-            padding: 10px 12px;
+            border: 1.5px solid #475569;
+            padding: 10px 12px 30px 12px;
             position: relative;
-            min-height: 1045px;
+            min-height: 1040px;
         }
 
         /* ── WATERMARK ── */
@@ -43,7 +43,7 @@
             height: auto;
             margin-top: -190px;
             margin-left: -190px;
-            opacity: 0.07;
+            opacity: 0.06;
         }
 
         /* ── HEADER ── */
@@ -53,33 +53,33 @@
         .hdr-text { text-align: center; vertical-align: middle; padding: 0 4px; }
         .school-title {
             font-family: 'Helvetica Neue', 'Arial Black', Arial, sans-serif;
-            font-size: 25px;
+            font-size: 24px;
             font-weight: 900;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
             margin: 0 0 2px 0;
             text-transform: uppercase;
             color: #1e3a8a;
         }
         .exam-title {
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: bold;
             margin: 0 0 1px 0;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            color: #0284c7;
+            color: #2563eb;
         }
         .class-sub {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: bold;
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 0.2px;
-            color: #475569;
+            color: #64748b;
         }
         .hdr-grade { width: 120px; vertical-align: middle; }
-        .hdr-grade table { width: 100%; border-collapse: collapse; font-size: 8px; text-align: center; }
-        .hdr-grade th, .hdr-grade td { border: 1px solid #cbd5e1; padding: 1px 1.5px; }
-        .hdr-grade th { font-weight: bold; background: #1e3a8a; color: #ffffff; }
+        .hdr-grade table { width: 100%; border-collapse: collapse; font-size: 8px; text-align: center; border: 1px solid #cbd5e1; }
+        .hdr-grade th, .hdr-grade td { border: 1px solid #e2e8f0; padding: 1px 1.5px; }
+        .hdr-grade th { font-weight: bold; background: #f1f5f9; color: #1e3a8a; }
         .hdr-grade td.grd-pass { color: #15803d; font-weight: bold; }
         .hdr-grade td.grd-fail { color: #dc2626; font-weight: bold; }
 
@@ -91,18 +91,18 @@
             margin: 3px 0 4px 0;
         }
         .sinfo td { vertical-align: top; padding: 0.5px 2px; }
-        .lbl { font-weight: bold; white-space: nowrap; color: #1e40af; }
-        .val-text { color: #0f172a; }
-        .val-gpa { color: #2563eb; font-weight: bold; }
+        .lbl { font-weight: 600; white-space: nowrap; color: #2563eb; }
+        .val-text { color: #1e293b; }
+        .val-gpa { color: #1e40af; font-weight: bold; }
         .val-grade { color: #15803d; font-weight: bold; }
-        .val-merit { color: #7c3aed; font-weight: bold; }
-        .val-marks { color: #d97706; font-weight: bold; }
+        .val-merit { color: #6d28d9; font-weight: bold; }
+        .val-marks { color: #b45309; font-weight: bold; }
 
         .info-card {
-            border: 1px solid #93c5fd;
+            border: 1px solid #cbd5e1;
             padding: 4px 6px;
-            background: #f8fafc;
-            border-radius: 4px;
+            background: #fafbfc;
+            border-radius: 3px;
         }
         .info-card table {
             width: 100%;
@@ -115,67 +115,69 @@
         .banner {
             text-align: center;
             font-weight: bold;
-            font-size: 11.5px;
+            font-size: 11px;
             margin: 8px 0 5px 0;
-            letter-spacing: 0.7px;
+            letter-spacing: 0.6px;
             text-transform: uppercase;
-            padding: 4px 10px;
-            background: #1e3a8a;
-            color: #ffffff;
-            border: 1px solid #1e3a8a; 
-            border-radius: 4px;
+            padding: 3.5px 8px;
+            background: #f8fafc;
+            color: #1e3a8a;
+            border: 1px solid #cbd5e1; 
+            border-left: 3px solid #2563eb;
+            border-right: 3px solid #2563eb;
+            border-radius: 3px;
         }
 
         /* ── MARKS TABLE ── */
         .mt { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 5px; }
         .mt th, .mt td { border: 1px solid #cbd5e1; padding: 2.5px 1.5px; text-align: center; height: 14px; }
-        .mt th { font-weight: bold; text-transform: uppercase; font-size: 10.5px; }
-        .mt-th-top { background-color: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a !important; }
-        .mt-th-sub { background-color: #2563eb; color: #ffffff; border: 1px solid #1d4ed8 !important; }
-        .tl { text-align: left; padding-left: 6px !important; font-size: 10.5px; font-weight: bold; color: #1e3a8a; }
-        .code-col { color: #4338ca; font-weight: bold; }
+        .mt th { font-weight: bold; text-transform: uppercase; font-size: 10px; }
+        .mt-th-top { background-color: #f1f5f9; color: #1e3a8a; border: 1px solid #cbd5e1 !important; }
+        .mt-th-sub { background-color: #f8fafc; color: #334155; border: 1px solid #cbd5e1 !important; }
+        .tl { text-align: left; padding-left: 6px !important; font-size: 10.5px; font-weight: 600; color: #1e3a8a; }
+        .code-col { color: #475569; font-weight: 600; }
         .grade-pass { color: #15803d; font-weight: bold; }
         .grade-fail { color: #dc2626; font-weight: bold; }
-        .gpa-cell { background-color: #f8fafc; color: #1e40af; font-weight: 900; font-size: 12px; }
+        .gpa-cell { background-color: #fafbfc; color: #1e3a8a; font-weight: bold; font-size: 11px; }
         .bd { font-weight: bold; }
 
         /* ── BOTTOM AREA ── */
         .bot { width: 100%; border-collapse: collapse; margin-top: 3px; }
         .bot td { vertical-align: top; padding: 0; }
-        .bx { border: 1px solid #94a3b8; }
+        .bx { border: 1px solid #cbd5e1; }
         .bxh {
-            text-align: center; font-weight: bold; font-size: 10px;
-            padding: 2px; border-bottom: 1px solid #94a3b8; text-transform: uppercase;
-            background: #1e3a8a; color: #ffffff;
+            text-align: center; font-weight: bold; font-size: 9.5px;
+            padding: 2px; border-bottom: 1px solid #cbd5e1; text-transform: uppercase;
+            background: #f1f5f9; color: #1e3a8a;
         }
         .bxsh {
-            text-align: center; font-size: 10px; padding: 1.5px;
-            border-bottom: 1px solid #cbd5e1; font-weight: bold;
-            color: #1e40af; background: #f8fafc;
+            text-align: center; font-size: 9.5px; padding: 1.5px;
+            border-bottom: 1px solid #e2e8f0; font-weight: bold;
+            color: #334155; background: #fafbfc;
         }
-        .mt2 { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; }
-        .mt2 td { border: 1px solid #cbd5e1; padding: 1.5px 2px; height: 12px; }
+        .mt2 { width: 100%; border-collapse: collapse; text-align: center; font-size: 9.5px; }
+        .mt2 td { border: 1px solid #e2e8f0; padding: 1.5px 2px; height: 12px; }
 
         /* ── SIGNATURE ── */
         .footer-sig {
             position: absolute;
-            bottom: 30px;
-            left: 12px;
-            right: 12px;
+            bottom: 40px;
+            left: 14px;
+            right: 14px;
         }
         .sig { width: 100%; border-collapse: collapse; margin: 0; }
-        .sig td { text-align: center; font-size: 9.5px; font-weight: bold; color: #334155; }
-        .sig-line { border-top: 1.5px dotted #64748b; display: inline-block; width: 150px; padding-top: 4px; color: #1e293b; }
+        .sig td { text-align: center; font-size: 9.5px; font-weight: bold; color: #475569; }
+        .sig-line { border-top: 1px dotted #94a3b8; display: inline-block; width: 150px; padding-top: 4px; color: #1e293b; }
 
         /* ── SOFTWARE BRANDING ── */
         .software-branding {
             position: absolute;
-            bottom: 8px;
-            left: 12px;
-            right: 12px;
+            bottom: 12px;
+            left: 14px;
+            right: 14px;
             text-align: center;
-            font-size: 8.5px;
-            color: #64748b;
+            font-size: 8px;
+            color: #94a3b8;
             letter-spacing: 0.4px;
             font-style: italic;
         }
