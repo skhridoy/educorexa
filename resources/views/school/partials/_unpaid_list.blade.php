@@ -110,13 +110,84 @@
 </div>
 
 {{-- Ajax Pagination Wrapper --}}
-<div class="pt-3 pb-2 px-3 d-flex flex-wrap justify-content-between align-items-center unpaid-pagination-wrapper gap-2 border-top">
-    <div style="font-size: 0.74rem; color: #64748b; font-weight: 500;">
+<div class="pt-3 pb-2 px-3 d-flex flex-column flex-sm-row justify-content-between align-items-center unpaid-pagination-wrapper gap-2 border-top">
+    <div class="unpaid-pagination-info text-center text-sm-start" style="font-size: 0.74rem; color: #64748b; font-weight: 500;">
         {{ __('Showing') }} <span class="fw-bold text-dark">{{ $unpaidList->firstItem() ?? 0 }}</span> {{ __('to') }} <span class="fw-bold text-dark">{{ $unpaidList->lastItem() ?? 0 }}</span> {{ __('of') }} <span class="fw-bold text-dark">{{ $unpaidList->total() }}</span> {{ __('results') }}
     </div>
-    <div id="unpaidPaginationLinks">
-        {!! $unpaidList->links('pagination::bootstrap-4') !!}
-    </div>
+
+    @if($unpaidList->hasPages())
+        @php
+            $currentPage = $unpaidList->currentPage();
+            $lastPage = $unpaidList->lastPage();
+
+            if ($lastPage <= 3) {
+                $startPage = 1;
+                $endPage = $lastPage;
+            } else {
+                if ($currentPage <= 1) {
+                    $startPage = 1;
+                    $endPage = 3;
+                } elseif ($currentPage >= $lastPage) {
+                    $startPage = $lastPage - 2;
+                    $endPage = $lastPage;
+                } else {
+                    $startPage = $currentPage - 1;
+                    $endPage = $currentPage + 1;
+                }
+            }
+        @endphp
+
+        <div id="unpaidPaginationLinks" class="d-flex justify-content-center">
+            {{-- Desktop Pagination (Tablets & Desktop) --}}
+            <div class="d-none d-md-block">
+                {!! $unpaidList->links('pagination::bootstrap-4') !!}
+            </div>
+
+            {{-- Mobile Responsive 3-Page Sliding Pagination --}}
+            <div class="d-block d-md-none">
+                <ul class="pagination pagination-sm mb-0 align-items-center justify-content-center">
+                    {{-- Previous Page Button --}}
+                    @if ($unpaidList->onFirstPage())
+                        <li class="page-item disabled" aria-disabled="true">
+                            <span class="page-link mobile-page-btn"><i class="fa-solid fa-chevron-left"></i></span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link mobile-page-btn" href="{{ $unpaidList->previousPageUrl() }}" rel="prev" title="{{ __('Previous') }}">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </a>
+                        </li>
+                    @endif
+
+                    {{-- 3 Sliding Page Numbers --}}
+                    @for ($p = $startPage; $p <= $endPage; $p++)
+                        @if ($p == $currentPage)
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link mobile-page-btn fw-bold">{{ $p }}</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link mobile-page-btn" href="{{ $unpaidList->url($p) }}">{{ $p }}</a>
+                            </li>
+                        @endif
+                    @endfor
+
+                    {{-- Next Page Button --}}
+                    @if ($unpaidList->hasMorePages())
+                        <li class="page-item">
+                            <a class="page-link mobile-page-btn" href="{{ $unpaidList->nextPageUrl() }}" rel="next" title="{{ __('Next') }}">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    @else
+                        <li class="page-item disabled" aria-disabled="true">
+                            <span class="page-link mobile-page-btn"><i class="fa-solid fa-chevron-right"></i></span>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+        </div>
+    @endif
 </div>
 
 @else
@@ -133,20 +204,73 @@
 <style>
     .unpaid-pagination-wrapper .pagination {
         margin-bottom: 0;
+        gap: 3px;
     }
     .unpaid-pagination-wrapper .page-link {
-        padding: 3px 8px;
+        padding: 4px 9px;
         font-size: 0.74rem;
-        border-radius: 5px;
-        margin: 0 2px;
+        border-radius: 6px;
+        margin: 0 1px;
         border: 1.5px solid #e2e8f0;
         color: #475569;
         background: transparent;
+        transition: all 0.15s ease;
+    }
+    .unpaid-pagination-wrapper .page-link:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+        border-color: #cbd5e1;
     }
     .unpaid-pagination-wrapper .page-item.active .page-link {
-        background: transparent !important;
+        background: #4f46e5 !important;
         border: 1.5px solid #4f46e5 !important;
-        color: #4f46e5 !important;
-        box-shadow: none !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25) !important;
+    }
+    .unpaid-pagination-wrapper .mobile-page-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+    .unpaid-pagination-wrapper .mobile-page-btn i {
+        font-size: 10px;
+    }
+    .unpaid-pagination-wrapper .page-item.disabled .page-link {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: transparent !important;
+    }
+    
+    /* Dark mode support */
+    [data-bs-theme="dark"] .unpaid-pagination-wrapper .page-link,
+    body.dark-mode .unpaid-pagination-wrapper .page-link {
+        border-color: #334155;
+        color: #cbd5e1;
+        background: transparent;
+    }
+    [data-bs-theme="dark"] .unpaid-pagination-wrapper .page-link:hover,
+    body.dark-mode .unpaid-pagination-wrapper .page-link:hover {
+        background: #1e293b;
+        color: #f8fafc;
+    }
+    [data-bs-theme="dark"] .unpaid-pagination-wrapper .page-item.active .page-link,
+    body.dark-mode .unpaid-pagination-wrapper .page-item.active .page-link {
+        background: #4f46e5 !important;
+        border-color: #4f46e5 !important;
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .unpaid-pagination-info,
+    body.dark-mode .unpaid-pagination-info {
+        color: #94a3b8 !important;
+    }
+    [data-bs-theme="dark"] .unpaid-pagination-info .text-dark,
+    body.dark-mode .unpaid-pagination-info .text-dark {
+        color: #f1f5f9 !important;
     }
 </style>

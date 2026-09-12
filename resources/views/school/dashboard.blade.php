@@ -381,7 +381,8 @@ $(document).ready(function() {
         e.preventDefault();
         let url = $(this).attr('href');
         if(url) {
-            let page = url.split('page=')[1];
+            let match = url.match(/[?&]page=(\d+)/);
+            let page = match ? match[1] : 1;
             let month = $('#unpaidMonthFilter').val();
             loadUnpaidList(month, page);
         }
