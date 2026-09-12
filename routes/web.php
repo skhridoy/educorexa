@@ -166,6 +166,7 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::post('/support-tickets/{id}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
                 Route::get('/support-tickets/{id}/fetch-replies', [SupportTicketController::class, 'fetchReplies'])->name('support.fetch');
                 Route::post('/support-tickets/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('support.status');
+                Route::delete('/support-tickets/{id}', [SupportTicketController::class, 'destroy'])->name('support.destroy');
             });
 
             // School Delete Requests (Representative দের পাঠানো ডিলিট রিকোয়েস্ট)

@@ -1,13 +1,14 @@
 @extends('layouts.main')
 
 @section('customCSS')
+@include('layouts._shared_styles')
 <style>
     /* Premium Chat Layout */
     .chat-wrapper {
         background: #ffffff;
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.05);
-        border: 1px solid #f1f5f9;
+        border: 1.5px solid #f1f5f9;
         overflow: hidden;
     }
     
@@ -21,27 +22,42 @@
         background: #f8fafc;
     }
 
+    /* Priority & Status Badges */
+    .priority-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-transform: capitalize;
+    }
+    .priority-high { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
+    .priority-medium { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+    .priority-low { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+
     /* Bubble Styles - Refined for Academic Elite */
     .msg-bubble {
-        padding: 12px 18px;
+        padding: 14px 18px;
         border-radius: 18px;
         width: fit-content;
         max-width: 75%;
         position: relative;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Outfit', 'Inter', sans-serif;
         line-height: 1.5;
         font-size: 0.92rem;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
 
-    /* School Messages (Left - Greyish) */
+    /* School Messages (Left - White) */
     .msg-school {
         align-self: flex-start;
         background: #ffffff;
-        color: #334155;
+        color: #1e293b;
         border-bottom-left-radius: 4px;
-        border: 1px solid #e2e8f0;
+        border: 1.5px solid #e2e8f0;
     }
 
     /* Super Admin Messages (Right - Indigo) */
@@ -54,7 +70,7 @@
     }
 
     .msg-info {
-        font-size: 0.65rem;
+        font-size: 0.68rem;
         margin-bottom: 4px;
         font-weight: 700;
         text-transform: uppercase;
@@ -66,29 +82,29 @@
 
     .msg-content { word-break: break-word; }
 
-    .msg-time { font-size: 0.62rem; margin-top: 6px; opacity: 0.7; }
+    .msg-time { font-size: 0.65rem; margin-top: 6px; opacity: 0.75; }
     .msg-school .msg-time { text-align: left; color: #94a3b8; }
-    .msg-system .msg-time { text-align: right; color: rgba(255,255,255,0.8); }
+    .msg-system .msg-time { text-align: right; color: rgba(255,255,255,0.85); }
 
     /* Footer - Restored Footer Design */
     .reply-area {
         background: #ffffff;
-        padding: 15px 25px;
+        padding: 16px 24px;
         border-top: 1px solid #f1f5f9;
     }
     .reply-box-wrapper {
         display: flex;
         align-items: center;
         gap: 12px;
-        background: #f1f5f9;
-        padding: 5px 8px;
+        background: #f8fafc;
+        padding: 6px 10px;
         border-radius: 30px;
-        border: 1px solid #e2e8f0;
+        border: 1.5px solid #e2e8f0;
     }
     .reply-box-wrapper:focus-within {
         border-color: #4f46e5;
         background: #fff;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
     }
 
     .reply-input-field {
@@ -97,20 +113,20 @@
     .reply-input-field textarea {
         border: none;
         resize: none;
-        padding: 8px 5px;
-        font-size: 0.9rem;
+        padding: 8px 6px;
+        font-size: 0.92rem;
         background: transparent;
         width: 100%;
         color: #1e293b;
         display: block;
-        max-height: 80px;
+        max-height: 90px;
     }
     .reply-input-field textarea:focus { box-shadow: none; outline: none; }
 
     /* Circle Buttons */
     .btn-circle {
-        width: 38px;
-        height: 38px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -120,47 +136,122 @@
         cursor: pointer;
     }
     .btn-chat-send { background: #4f46e5; color: white; }
-    .btn-chat-send:hover { transform: scale(1.05); background: #4338ca; }
-    .btn-chat-attach { background: #fff; color: #64748b; border: 1px solid #e2e8f0; }
-    .btn-chat-attach:hover { color: #4f46e5; background: #f8fafc; }
+    .btn-chat-send:hover { transform: scale(1.05); background: #4338ca; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+    .btn-chat-attach { background: #fff; color: #64748b; border: 1.5px solid #e2e8f0; }
+    .btn-chat-attach:hover { color: #4f46e5; background: #f8fafc; border-color: #c7d2fe; }
 
     #file-preview {
         display: none;
-        padding: 6px 15px;
+        padding: 8px 16px;
         background: #eff6ff;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        font-size: 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        font-size: 0.8rem;
         color: #1d4ed8;
         border-left: 3px solid #3b82f6;
     }
 
     @media (max-width: 768px) {
-        .msg-bubble { max-width: 88%; }
-        .chat-container { padding: 15px; }
+        .msg-bubble { max-width: 90%; }
+        .chat-container { padding: 16px; }
+        .show-header-wrap {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 14px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
 <div class="page-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-1" style="font-family: 'Outfit';">Support Ticket</h4>
-            <p class="text-muted small mb-0"><i data-feather="hash" class="icon-sm"></i> {{ $ticket->ticket_id }} • {{ $ticket->school->name }}</p>
+    <div class="container-fluid">
+
+        {{-- ===== BREADCRUMB ===== --}}
+        <ul class="edu-bc">
+            <li><a href="{{ route('super.dashboard') }}">Dashboard</a></li>
+            <li><span>/</span></li>
+            <li><a href="{{ route('manage.support.index') }}">Support Desk</a></li>
+            <li><span>/</span></li>
+            <li class="active">#{{ $ticket->ticket_id }}</li>
+        </ul>
+
+        {{-- ===== HEADER ===== --}}
+        <div class="d-flex justify-content-between align-items-center mb-4 show-header-wrap">
+            <div>
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                    <h3 class="fw-bold mb-0 text-dark" style="font-family: 'Outfit';">
+                        {{ $ticket->subject }}
+                    </h3>
+                    <span class="badge-id">#{{ $ticket->ticket_id }}</span>
+                    <span class="priority-pill priority-{{ $ticket->priority }}">
+                        {{ $ticket->priority }} Priority
+                    </span>
+                </div>
+                <p class="text-muted small mb-0 d-flex align-items-center gap-2 flex-wrap">
+                    <span><i class="fa-solid fa-school text-primary me-1"></i><strong>{{ $ticket->school->name ?? 'General' }}</strong></span>
+                    <span>•</span>
+                    <span><i class="fa-regular fa-user me-1"></i>{{ $ticket->user->name ?? 'School Admin' }} ({{ $ticket->user->email ?? '' }})</span>
+                    <span>•</span>
+                    <span><i class="fa-regular fa-clock me-1"></i>{{ $ticket->created_at->format('d M Y, h:i A') }}</span>
+                </p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('manage.support.index') }}" class="btn-edu btn-edu-light">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+
+                {{-- Status Changer Dropdown --}}
+                <div class="dropdown">
+                    <button class="btn-edu btn-edu-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-circle-dot me-1"></i> {{ ucfirst($ticket->status) }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 supp-actions-menu">
+                        <li>
+                            <form action="{{ route('manage.support.status', $ticket->id) }}" method="POST" class="m-0">
+                                @csrf
+                                <input type="hidden" name="status" value="open">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-primary {{ $ticket->status === 'open' ? 'fw-bold' : '' }}">
+                                    <i class="fa-solid fa-envelope-open-text" style="width:16px;"></i>
+                                    <span>Mark as Open</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('manage.support.status', $ticket->id) }}" method="POST" class="m-0">
+                                @csrf
+                                <input type="hidden" name="status" value="pending">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-warning {{ $ticket->status === 'pending' ? 'fw-bold' : '' }}">
+                                    <i class="fa-solid fa-clock-rotate-left" style="width:16px;"></i>
+                                    <span>Mark as Pending</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('manage.support.status', $ticket->id) }}" method="POST" class="m-0">
+                                @csrf
+                                <input type="hidden" name="status" value="resolved">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-success {{ $ticket->status === 'resolved' ? 'fw-bold' : '' }}">
+                                    <i class="fa-solid fa-check-double" style="width:16px;"></i>
+                                    <span>Mark as Resolved</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('manage.support.status', $ticket->id) }}" method="POST" class="m-0">
+                                @csrf
+                                <input type="hidden" name="status" value="closed">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-secondary {{ $ticket->status === 'closed' ? 'fw-bold' : '' }}">
+                                    <i class="fa-solid fa-folder-closed" style="width:16px;"></i>
+                                    <span>Mark as Closed</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="dropdown">
-            <button class="btn btn-white btn-sm shadow-sm rounded-pill px-3 dropdown-toggle" data-bs-toggle="dropdown">
-                {{ ucfirst($ticket->status) }}
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                <li><form action="{{ route('manage.support.status', $ticket->id) }}" method="POST">@csrf <input type="hidden" name="status" value="open"><button class="dropdown-item">Open</button></form></li>
-                <li><form action="{{ route('manage.support.status', $ticket->id) }}" method="POST">@csrf <input type="hidden" name="status" value="pending"><button class="dropdown-item">Pending</button></form></li>
-                <li><form action="{{ route('manage.support.status', $ticket->id) }}" method="POST">@csrf <input type="hidden" name="status" value="resolved"><button class="dropdown-item">Resolved</button></form></li>
-                <li><form action="{{ route('manage.support.status', $ticket->id) }}" method="POST">@csrf <input type="hidden" name="status" value="closed"><button class="dropdown-item text-danger">Closed</button></form></li>
-            </ul>
-        </div>
-    </div>
 
     <div class="chat-wrapper">
         <div class="chat-container" id="chatContainer">
@@ -213,6 +304,7 @@
                 </form>
             </div>
         @endif
+    </div>
     </div>
 </div>
 @endsection

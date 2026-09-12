@@ -10,10 +10,45 @@ use Illuminate\Support\Facades\Auth;
 
 class SupportTicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = SupportTicket::with('school')->latest()->paginate(20);
-        return view('super.support.index', compact('tickets'));
+        $query = SupportTicket::with(['school', 'user', 'replies']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->where('ticket_id', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%")
+                  ->orWhereHas('school', function($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $tickets = $query->latest()->paginate(15)->withQueryString();
+
+        $stats = [
+            'total'    => SupportTicket::count(),
+            'open'     => SupportTicket::where('status', 'open')->count(),
+            'pending'  => SupportTicket::where('status', 'pending')->count(),
+            'resolved' => SupportTicket::where('status', 'resolved')->count(),
+            'closed'   => SupportTicket::where('status', 'closed')->count(),
+            'unread'   => SupportTicket::where('is_read_by_super', false)->count(),
+        ];
+
+        return view('super.support.index', compact('tickets', 'stats'));
     }
 
     public function show($id)
@@ -110,6 +145,6 @@ class SupportTicketController extends Controller
     public function destroy($id)
     {
         SupportTicket::findOrFail($id)->delete();
-        return redirect()->route('super.support.index')->with('success', 'Ticket deleted successfully!');
+        return redirect()->route('manage.support.index')->with('success', 'Ticket deleted successfully!');
     }
 }
