@@ -373,4 +373,30 @@ class DashboardController extends Controller
             'totalExpected' => (float)$summary->total_expected
         ]);
     }
+
+    public function markNotificationsRead()
+    {
+        $user = auth()->user();
+        if ($user && method_exists($user, 'unreadNotifications')) {
+            $user->unreadNotifications->markAsRead();
+        }
+        return response()->json(['status' => 'success', 'unread_count' => 0]);
+    }
+
+    public function readNotificationAndRedirect(Request $request, $tenant, $id = null)
+    {
+        $notifId = $id ?? $tenant;
+        $user = auth()->user();
+        if ($user) {
+            $notification = $user->notifications()->where('id', $notifId)->first();
+            if ($notification) {
+                $notification->markAsRead();
+                $link = $notification->data['link'] ?? null;
+                if ($link && $link !== '#') {
+                    return redirect($link);
+                }
+            }
+        }
+        return redirect()->back();
+    }
 }

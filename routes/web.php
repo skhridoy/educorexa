@@ -360,6 +360,10 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                 Route::post('/send-unpaid-reminder/{id}', [DashboardController::class, 'sendFeeReminder'])->name('school.unpaid.remind');
 
 
+                // School Notifications
+                Route::post('/notifications/mark-read', [DashboardController::class, 'markNotificationsRead'])->name('school.notifications.markRead');
+                Route::get('/notifications/{id}/read-go', [DashboardController::class, 'readNotificationAndRedirect'])->name('school.notifications.readAndGo');
+
                 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('school.logout');
                 Route::middleware(['auth', 'permission:system.settings'])->group(function () {
                     Route::get('/school-settings/school-info', [SchoolRegisterController::class, 'edit'])->name('admin.school.info-edit');
