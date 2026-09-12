@@ -89,116 +89,141 @@
         </div>
 
         {{-- ===== MOBILE CARDS (visible < md) ===== --}}
-        <div class="d-md-none px-3 pb-3 pt-2">
+        <div class="sch-mobile-list d-block d-md-none">
             @forelse($schools as $school)
-            <div class="sch-m-card">
+            <div class="sch-mobile-card">
                 {{-- Card Header --}}
-                <div class="sch-m-card-hd">
-                    <div class="sch-m-avatar">{{ strtoupper(substr($school->name, 0, 1)) }}</div>
-                    <div class="sch-m-info">
+                <div class="sch-m-header">
+                    <div class="sch-m-avatar-wrap">
+                        <div class="sch-m-avatar">{{ strtoupper(substr($school->name, 0, 1)) }}</div>
+                    </div>
+                    <div class="sch-m-title-area">
                         <div class="sch-m-name">{{ $school->name }}</div>
-                        <div class="sch-m-loc">
-                            <i class="fa-solid fa-location-dot" style="font-size:10px;color:#94a3b8;"></i>
+                        <div class="sch-m-top-meta">
+                            @if($school->is_active)
+                                <span class="status-badge active"><span class="status-dot"></span> Active</span>
+                            @else
+                                <span class="status-badge inactive"><span class="status-dot"></span> Inactive</span>
+                            @endif
+                            <span class="role-badge"><i class="fa-solid fa-box me-1"></i>{{ $school->subscriptionPackage->name ?? 'No Package' }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Three-dot action dropdown menu (Mobile) --}}
+                    <div class="dropdown sch-m-dropdown">
+                        <button type="button" class="btn-m-dots" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 sch-actions-menu">
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark" href="http://{{ $school->slug }}.{{ $mainDomain }}" target="_blank">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-primary" style="width:16px;"></i>
+                                    <span>ওয়েবসাইট ভিজিট</span>
+                                </a>
+                            </li>
+                            @if(!$isRepUser)
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-indigo" href="javascript:void(0)" onclick="openChangePackageModal({{ $school->id }}, '{{ addslashes($school->name) }}', {{ $school->subscription_package_id ?? 'null' }})">
+                                    <i class="fa-solid fa-cube text-primary" style="width:16px;"></i>
+                                    <span>প্যাকেজ পরিবর্তন</span>
+                                </a>
+                            </li>
+                            <li>
+                                @if($school->is_active)
+                                <form action="{{ route('manage.schools.reject', $school->id) }}" method="POST" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-warning">
+                                        <i class="fa-solid fa-ban text-warning" style="width:16px;"></i>
+                                        <span>নিষ্ক্রিয় করুন</span>
+                                    </button>
+                                </form>
+                                @else
+                                <form action="{{ route('manage.schools.approve', $school->id) }}" method="POST" class="m-0">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-success">
+                                        <i class="fa-solid fa-check text-success" style="width:16px;"></i>
+                                        <span>অনুমোদন করুন</span>
+                                    </button>
+                                </form>
+                                @endif
+                            </li>
+                            @can('school.delete')
+                            <li>
+                                <form action="{{ route('manage.schools.destroy', $school->id) }}" method="POST" class="m-0">
+                                    @csrf @method('DELETE')
+                                    <button type="button" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" onclick="confirmDelete(this)">
+                                        <i class="fa-solid fa-trash-can" style="width:16px;"></i>
+                                        <span>ডিলিট করুন</span>
+                                    </button>
+                                </form>
+                            </li>
+                            @endcan
+                            @else
+                            @php
+                                $pendingReq = \App\Models\SchoolDeleteRequest::where('school_id', $school->id)->where('status', 'pending')->first();
+                            @endphp
+                            @if(!$pendingReq && $school->status === 'approved')
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" href="javascript:void(0)" onclick="openDeleteRequestModal({{ $school->id }}, '{{ addslashes($school->name) }}')">
+                                    <i class="fa-solid fa-trash-can" style="width:16px;"></i>
+                                    <span>ডিলিট রিকোয়েস্ট</span>
+                                </a>
+                            </li>
+                            @endif
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+
+                {{-- Card Details Grid --}}
+                <div class="sch-m-details-grid">
+                    <div class="sch-m-detail-item">
+                        <span class="sch-m-detail-label">
+                            <i class="fa-solid fa-location-dot text-danger"></i> লোকেশন
+                        </span>
+                        <span class="sch-m-detail-val">
                             {{ $school->district ?: '—' }}{{ $school->division ? ', '.$school->division : '' }}
-                        </div>
+                        </span>
                     </div>
-                    @if($school->is_active)
-                        <span class="sch-m-pill sch-m-pill-active">Active</span>
-                    @else
-                        <span class="sch-m-pill sch-m-pill-inactive">Inactive</span>
-                    @endif
-                </div>
 
-                {{-- Meta rows --}}
-                <div class="sch-m-meta">
-                    <div class="sch-m-meta-row">
-                        <span class="sch-m-meta-lbl"><i class="fa-solid fa-box me-1"></i>Package</span>
-                        <span class="sch-m-meta-val">{{ $school->subscriptionPackage->name ?? 'No Package' }}</span>
+                    <div class="sch-m-detail-item">
+                        <span class="sch-m-detail-label">
+                            <i class="fa-solid fa-globe text-primary"></i> ডোমেন
+                        </span>
+                        <span class="sch-m-detail-val">
+                            <a href="http://{{ $school->slug }}.{{ $mainDomain }}" target="_blank" class="text-primary text-decoration-none fw-bold">
+                                {{ $school->slug }}.{{ $mainDomain }}
+                            </a>
+                        </span>
                     </div>
+
                     @if($school->email)
-                    <div class="sch-m-meta-row">
-                        <span class="sch-m-meta-lbl"><i class="fa-solid fa-envelope me-1"></i>Email</span>
-                        <span class="sch-m-meta-val" style="font-size:0.78rem;">{{ $school->email }}</span>
+                    <div class="sch-m-detail-item" style="grid-column: 1 / -1;">
+                        <span class="sch-m-detail-label">
+                            <i class="fa-solid fa-envelope text-indigo"></i> এডমিন ইমেইল
+                        </span>
+                        <span class="sch-m-detail-val">
+                            <a href="mailto:{{ $school->email }}" class="text-secondary text-decoration-none">{{ $school->email }}</a>
+                        </span>
                     </div>
                     @endif
-                    <div class="sch-m-meta-row">
-                        <span class="sch-m-meta-lbl"><i class="fa-solid fa-globe me-1"></i>Domain</span>
-                        <a href="http://{{ $school->slug }}.{{ $mainDomain }}" target="_blank" class="sch-m-domain">
-                            {{ $school->slug }}.{{ $mainDomain }}
-                            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i>
-                        </a>
+
+                    @if($school->representative?->user)
+                    <div class="sch-m-detail-item" style="grid-column: 1 / -1;">
+                        <span class="sch-m-detail-label">
+                            <i class="fa-solid fa-id-badge text-muted"></i> রিপ্রেজেন্টেটিভ
+                        </span>
+                        <span class="sch-m-detail-val text-dark fw-bold">
+                            {{ $school->representative->user->name }}
+                        </span>
                     </div>
-                </div>
-
-                {{-- Actions --}}
-                <div class="sch-m-actions">
-                    @if(!$isRepUser)
-                        {{-- Package Change Dropdown --}}
-                        <div class="dropdown flex-1">
-                            <button class="sch-m-btn-pkg dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fa-solid fa-cube me-1"></i>Change Plan
-                            </button>
-                            <ul class="dropdown-menu shadow border-0 rounded-4 p-2">
-                                <li class="px-2 py-1 small fw-bold text-muted border-bottom mb-1">Change Plan</li>
-                                @foreach($packages as $pkg)
-                                <li>
-                                    <form action="{{ route('manage.schools.change-package', $school->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="package_id" value="{{ $pkg->id }}">
-                                        <button type="submit" class="dropdown-item rounded-3 {{ $school->subscription_package_id == $pkg->id ? 'active' : '' }}">
-                                            {{ $pkg->name }} (৳{{ number_format($pkg->price) }})
-                                        </button>
-                                    </form>
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        {{-- Approve/Reject --}}
-                        @if($school->is_active)
-                            <form action="{{ route('manage.schools.reject', $school->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="sch-m-icon-btn sch-m-icon-warn" title="Deactivate">
-                                    <i class="fa-solid fa-ban" style="font-size:13px;"></i>
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('manage.schools.approve', $school->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="sch-m-icon-btn sch-m-icon-succ" title="Approve">
-                                    <i class="fa-solid fa-check" style="font-size:13px;"></i>
-                                </button>
-                            </form>
-                        @endif
-
-                        @can('school.delete')
-                        <form action="{{ route('manage.schools.destroy', $school->id) }}" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="button" class="sch-m-icon-btn sch-m-icon-del" onclick="confirmDelete(this)" title="Delete">
-                                <i class="fa-solid fa-trash" style="font-size:13px;"></i>
-                            </button>
-                        </form>
-                        @endcan
-                    @else
-                        @php
-                            $pendingReq = \App\Models\SchoolDeleteRequest::where('school_id', $school->id)->where('status', 'pending')->first();
-                        @endphp
-                        @if($pendingReq)
-                            <span class="sch-m-pill sch-m-pill-warn">পেন্ডিং রিকোয়েস্ট</span>
-                        @elseif($school->status === 'approved')
-                            <button type="button" class="sch-m-btn-del-req" onclick="openDeleteRequestModal({{ $school->id }}, '{{ addslashes($school->name) }}')">
-                                <i class="fa-solid fa-trash me-1" style="font-size:11px;"></i>ডিলিট রিকোয়েস্ট
-                            </button>
-                        @else
-                            <span class="text-muted small">—</span>
-                        @endif
                     @endif
                 </div>
             </div>
             @empty
-            <div class="edu-empty">
-                <i class="fa-solid fa-school-flag"></i>
-                <p>No schools registered yet.</p>
+            <div class="sch-empty-state text-center py-5">
+                <i class="fa-solid fa-school-flag fa-2x mb-2 d-block" style="color:#cbd5e1;"></i>
+                <span style="color:#94a3b8;font-size:0.875rem;">No schools registered yet.</span>
             </div>
             @endforelse
         </div>
@@ -327,6 +352,40 @@
     </div>
 </div>
 
+{{-- Change Package Modal (Mobile) --}}
+<div class="modal fade" id="changePackageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:18px;border:none;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fa-solid fa-cube text-primary me-2"></i>প্যাকেজ পরিবর্তন
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="changePackageForm" method="POST">
+                @csrf
+                <div class="modal-body py-3">
+                    <p class="text-muted small mb-3">
+                        স্কুল: <strong id="modalPackageSchoolName" class="text-dark"></strong>
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">প্যাকেজ নির্বাচন করুন <span class="text-danger">*</span></label>
+                        <select name="package_id" id="modalPackageSelect" class="form-select edu-input" required>
+                            @foreach($packages as $pkg)
+                                <option value="{{ $pkg->id }}">{{ $pkg->name }} (৳{{ number_format($pkg->price) }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">বাতিল</button>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">সংরক্ষণ করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {{-- Delete Request Modal --}}
 <div class="modal fade" id="deleteRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -422,161 +481,155 @@
 .sch-pkg-btn:hover { border-color: #4f46e5; color: #4f46e5; }
 
 /* ========================================
-   MOBILE CARD STYLES
+   MOBILE RESPONSIVE CARD VIEW (< 768px)
    ======================================== */
-.sch-m-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+.sch-mobile-list {
     padding: 14px;
-    margin-bottom: 12px;
-    transition: box-shadow 0.2s, transform 0.2s;
-}
-.sch-m-card:hover { box-shadow: 0 6px 20px rgba(79,70,229,0.1); transform: translateY(-1px); }
-
-/* Card Header */
-.sch-m-card-hd {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
+}
+.sch-mobile-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1.5px solid #f1f5f9;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(15,23,42,0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+}
+.sch-mobile-card:active {
+    transform: scale(0.99);
+}
+.sch-m-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     margin-bottom: 12px;
+}
+.sch-m-avatar-wrap {
+    flex-shrink: 0;
 }
 .sch-m-avatar {
-    width: 38px; height: 38px;
-    border-radius: 10px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #eef2ff, #c7d2fe);
     color: #4f46e5;
     font-weight: 800;
-    font-size: 1rem;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.sch-m-info { flex: 1; min-width: 0; }
-.sch-m-name {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.sch-m-loc { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
-
-/* Status Pills */
-.sch-m-pill {
-    display: inline-flex;
+    font-size: 1.15rem;
+    display: flex;
     align-items: center;
-    padding: 3px 9px;
-    border-radius: 20px;
+    justify-content: center;
+    border: 2px solid #e0e7ff;
+}
+.sch-m-title-area {
+    flex-grow: 1;
+    min-width: 0;
+}
+.sch-m-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 3px;
+    line-height: 1.25;
+}
+.sch-m-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.sch-m-dropdown {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.btn-m-dots {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-m-dots:hover, .btn-m-dots:focus, .btn-m-dots[aria-expanded="true"] {
+    background: #eef2ff;
+    color: #4f46e5;
+    border-color: #c7d2fe;
+}
+.sch-actions-menu {
+    border-radius: 14px;
+    padding: 6px;
+    min-width: 175px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.14), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid #f1f5f9 !important;
+    z-index: 1050;
+}
+.sch-actions-menu .dropdown-item {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+.sch-actions-menu .dropdown-item:hover {
+    background: #f8fafc;
+}
+.sch-m-details-grid {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    border: 1px solid #f1f5f9;
+}
+.sch-m-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sch-m-detail-label {
     font-size: 0.68rem;
     font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.sch-m-pill-active   { background: #dcfce7; color: #15803d; }
-.sch-m-pill-inactive { background: #f1f5f9; color: #64748b; }
-.sch-m-pill-warn     { background: #fef3c7; color: #92400e; }
-
-/* Meta Rows */
-.sch-m-meta { margin-bottom: 12px; }
-.sch-m-meta-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px solid #f8fafc;
-    gap: 8px;
-}
-.sch-m-meta-row:last-child { border-bottom: none; }
-.sch-m-meta-lbl {
-    font-size: 0.72rem;
     color: #94a3b8;
-    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.sch-m-meta-val {
-    font-size: 0.8rem;
-    color: #475569;
-    font-weight: 600;
-    text-align: right;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.sch-m-domain {
-    font-size: 0.75rem;
-    color: #4f46e5;
-    font-weight: 600;
-    text-decoration: none;
     display: flex;
     align-items: center;
     gap: 4px;
 }
-
-/* Card Actions */
-.sch-m-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-top: 10px;
-    border-top: 1px solid #f1f5f9;
-}
-
-/* Package change button (mobile) */
-.sch-m-btn-pkg {
-    flex: 1;
-    background: transparent;
-    border: 2px solid #4f46e5;
-    color: #4f46e5;
-    border-radius: 10px;
-    font-size: 0.78rem;
+.sch-m-detail-val {
+    font-size: 0.82rem;
     font-weight: 600;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
+    color: #334155;
+    word-break: break-all;
 }
-.sch-m-btn-pkg:hover { background: #4f46e5; color: #fff; box-shadow: 0 3px 10px rgba(79,70,229,0.2); }
-
-/* Icon action buttons (mobile) */
-.sch-m-icon-btn {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    border: 2px solid;
-    background: transparent;
+.status-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    gap: 5px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
 }
-.sch-m-icon-warn { color: #d97706; border-color: #fbbf24; }
-.sch-m-icon-warn:hover { background: #d97706; color: #fff; border-color: #d97706; }
-.sch-m-icon-succ { color: #16a34a; border-color: #86efac; }
-.sch-m-icon-succ:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
-.sch-m-icon-del  { color: #ef4444; border-color: #fca5a5; }
-.sch-m-icon-del:hover  { background: #ef4444; color: #fff; border-color: #ef4444; box-shadow: 0 3px 10px rgba(239,68,68,0.25); }
-
-/* Delete request button (mobile for reps) */
-.sch-m-btn-del-req {
-    background: transparent;
-    border: 2px solid #ef4444;
-    color: #ef4444;
-    border-radius: 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 7px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
+.status-badge.active { background: #dcfce7; color: #16a34a; }
+.status-badge.inactive { background: #fee2e2; color: #ef4444; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.role-badge {
+    background: #f1f5f9; color: #475569;
+    font-weight: 600; font-size: 0.72rem;
+    padding: 3px 9px; border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
 }
-.sch-m-btn-del-req:hover { background: #ef4444; color: #fff; }
-
-/* Mobile empty card gap */
-.d-md-none .edu-empty { padding: 40px 16px; }
 </style>
 @endsection
 

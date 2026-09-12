@@ -85,24 +85,102 @@
 
 .pkg-m-header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
-.pkg-m-title {
+.pkg-m-avatar-wrap {
+    flex-shrink: 0;
+}
+.pkg-m-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #eef2ff, #c7d2fe);
+    color: #4f46e5;
+    font-weight: 800;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e0e7ff;
+}
+.pkg-m-title-area {
+    flex-grow: 1;
+    min-width: 0;
+}
+.pkg-m-name {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
-    font-size: 1.2rem;
-    color: #0f172a;
+    font-size: 1.05rem;
+    color: #1e293b;
+    margin-bottom: 4px;
     line-height: 1.25;
 }
-.pkg-m-badges {
+.pkg-m-top-meta {
     display: flex;
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
-    margin-top: 6px;
+}
+.pkg-m-dropdown {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.btn-m-dots {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.btn-m-dots:hover, .btn-m-dots:focus, .btn-m-dots[aria-expanded="true"] {
+    background: #eef2ff;
+    color: #4f46e5;
+    border-color: #c7d2fe;
+}
+.pkg-actions-menu {
+    border-radius: 14px;
+    padding: 6px;
+    min-width: 160px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.14), 0 8px 10px -6px rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid #f1f5f9 !important;
+    z-index: 1050;
+}
+.pkg-actions-menu .dropdown-item {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+.pkg-actions-menu .dropdown-item:hover {
+    background: #f8fafc;
+}
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+.status-badge.active { background: #dcfce7; color: #16a34a; }
+.status-badge.inactive { background: #fee2e2; color: #ef4444; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.role-badge {
+    background: #f1f5f9; color: #475569;
+    font-weight: 600; font-size: 0.72rem;
+    padding: 3px 9px; border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
 }
 
 .pkg-m-price-box {
@@ -161,7 +239,7 @@
     border: 1px solid #e0e7ff;
     border-radius: 14px;
     padding: 12px 14px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
 }
 .pkg-m-comm-title {
     font-size: 0.72rem;
@@ -191,56 +269,6 @@
 .pkg-m-comm-val {
     font-weight: 700;
     font-size: 0.88rem;
-}
-
-/* Actions */
-.pkg-m-actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding-top: 10px;
-    border-top: 1px solid #f1f5f9;
-}
-.pkg-m-btn-edit {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: transparent;
-    color: #4f46e5 !important;
-    font-weight: 600;
-    font-size: 0.78rem;
-    padding: 7px 12px;
-    border-radius: 10px;
-    border: 2px solid #4f46e5;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-.pkg-m-btn-edit:hover, .pkg-m-btn-edit:active {
-    background: #4f46e5;
-    color: #ffffff !important;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(79,70,229,0.22);
-}
-.pkg-m-btn-del {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    color: #ef4444;
-    border-radius: 10px;
-    border: 2px solid #ef4444;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-.pkg-m-btn-del:hover, .pkg-m-btn-del:active {
-    background: #ef4444;
-    color: #ffffff;
-    box-shadow: 0 3px 10px rgba(239,68,68,0.22);
 }
 
 /* Empty State on Mobile */
@@ -414,14 +442,22 @@
                 <div class="pkg-mobile-list">
                     @foreach($packages as $package)
                     <div class="pkg-m-card {{ $package->is_popular ? 'is-popular' : '' }}">
-                        {{-- Top Header: Title & Badges --}}
+                        {{-- Top Header: Avatar, Title, Badges & Three-dot Dropdown --}}
                         <div class="pkg-m-header">
-                            <div>
-                                <div class="pkg-m-title">{{ $package->name }}</div>
-                                <div class="pkg-m-badges">
-                                    <span class="badge-gray" style="font-size:0.72rem;">
-                                        <i class="fa-solid fa-calendar-days me-1"></i>{{ ucfirst($package->duration) }}
-                                    </span>
+                            <div class="pkg-m-avatar-wrap">
+                                <div class="pkg-m-avatar">
+                                    <i class="fa-solid fa-box-open"></i>
+                                </div>
+                            </div>
+                            <div class="pkg-m-title-area">
+                                <div class="pkg-m-name">{{ $package->name }}</div>
+                                <div class="pkg-m-top-meta">
+                                    @if($package->is_active)
+                                        <span class="status-badge active"><span class="status-dot"></span> Active</span>
+                                    @else
+                                        <span class="status-badge inactive"><span class="status-dot"></span> Inactive</span>
+                                    @endif
+                                    <span class="role-badge"><i class="fa-solid fa-calendar-days me-1"></i>{{ ucfirst($package->duration) }}</span>
                                     @if($package->is_popular)
                                         <span class="badge-amber" style="font-size:0.72rem;">
                                             <i class="fa-solid fa-star" style="font-size:9px;"></i> Popular
@@ -429,12 +465,29 @@
                                     @endif
                                 </div>
                             </div>
-                            <div>
-                                @if($package->is_active)
-                                    <span class="badge-green">Active</span>
-                                @else
-                                    <span class="badge-red">Inactive</span>
-                                @endif
+
+                            {{-- Three-dot action dropdown menu (Mobile) --}}
+                            <div class="dropdown pkg-m-dropdown">
+                                <button type="button" class="btn-m-dots" data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 pkg-actions-menu">
+                                    <li>
+                                        <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-dark" href="{{ route('super.subscription-packages.edit', $package->id) }}">
+                                            <i class="fa-solid fa-pen-to-square text-primary" style="width:16px;"></i>
+                                            <span>এডিট করুন</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('super.subscription-packages.destroy', $package->id) }}" method="POST" class="m-0">
+                                            @csrf @method('DELETE')
+                                            <button type="button" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger" onclick="confirmDel(this)">
+                                                <i class="fa-solid fa-trash-can" style="width:16px;"></i>
+                                                <span>ডিলিট করুন</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
 
@@ -506,19 +559,6 @@
                                     </span>
                                 </div>
                             </div>
-                        </div>
-
-                        {{-- Card Actions --}}
-                        <div class="pkg-m-actions">
-                            <a href="{{ route('super.subscription-packages.edit', $package->id) }}" class="pkg-m-btn-edit">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit Package
-                            </a>
-                            <form action="{{ route('super.subscription-packages.destroy', $package->id) }}" method="POST" class="d-inline">
-                                @csrf @method('DELETE')
-                                <button type="button" class="pkg-m-btn-del" onclick="confirmDel(this)" title="Delete Package">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </form>
                         </div>
                     </div>
                     @endforeach
