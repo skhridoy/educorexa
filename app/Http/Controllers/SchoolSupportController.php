@@ -11,20 +11,44 @@ use Illuminate\Support\Str;
 
 class SchoolSupportController extends Controller
 {
-    public function index($tenant)
+    public function index(Request $request, $tenant)
     {
         $school = DB::table('schools')->where('slug', $tenant)->first();
         if (!$school) abort(404);
 
-        $tickets = SupportTicket::where('school_id', $school->id)
-            ->latest()
-            ->paginate(10);
+        $query = SupportTicket::with('replies')->where('school_id', $school->id);
+
+        if ($request->filled('status')) {
+            if ($request->status === 'open_pending') {
+                $query->whereIn('status', ['open', 'pending']);
+            } else {
+                $query->where('status', $request->status);
+            }
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->where('ticket_id', 'like', "%{$search}%")
+                  ->orWhere('subject', 'like', "%{$search}%");
+            });
+        }
+
+        $tickets = $query->latest()->paginate(10)->withQueryString();
 
         $totalTickets    = SupportTicket::where('school_id', $school->id)->count();
         $openTickets     = SupportTicket::where('school_id', $school->id)->whereIn('status', ['open', 'pending'])->count();
         $resolvedTickets = SupportTicket::where('school_id', $school->id)->where('status', 'resolved')->count();
+        $closedTickets   = SupportTicket::where('school_id', $school->id)->where('status', 'closed')->count();
+        $unreadReplies   = SupportTicket::where('school_id', $school->id)->where('is_read_by_school', false)->count();
 
-        return view('school.support.index', compact('tickets', 'tenant', 'totalTickets', 'openTickets', 'resolvedTickets'));
+        return view('school.support.index', compact(
+            'tickets', 'tenant', 'totalTickets', 'openTickets', 'resolvedTickets', 'closedTickets', 'unreadReplies'
+        ));
     }
 
     public function create($tenant)
