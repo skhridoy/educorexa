@@ -11,6 +11,7 @@ class MainContactMsg extends Model
         'phone',
         'school_name',
         'message',
+        'ip_address',
         'is_read',
     ];
     

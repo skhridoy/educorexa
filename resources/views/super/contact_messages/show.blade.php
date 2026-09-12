@@ -174,7 +174,7 @@
                         </div>
 
                         <div class="row g-3 mb-5">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="info-card">
                                     <div class="info-icon">
                                         <i data-feather="phone" style="width:18px;"></i>
@@ -185,7 +185,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="info-card">
                                     <div class="info-icon">
                                         <i data-feather="calendar" style="width:18px;"></i>
@@ -193,6 +193,17 @@
                                     <div>
                                         <div class="text-slate-400 small fw-bold text-uppercase" style="font-size:0.65rem;">Time Received</div>
                                         <div class="fw-bold text-slate-800">{{ $message->created_at->format('h:i A') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-card">
+                                    <div class="info-icon">
+                                        <i data-feather="globe" style="width:18px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-slate-400 small fw-bold text-uppercase" style="font-size:0.65rem;">Sender IP</div>
+                                        <div class="fw-bold text-slate-800">{{ $message->ip_address ?? 'Not recorded' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -234,6 +245,11 @@
                     <div class="stat-item d-flex align-items-center justify-content-between">
                         <span class="text-slate-400 small">Wait Time</span>
                         <span class="fw-bold">{{ $message->created_at->diffForHumans(null, true) }}</span>
+                    </div>
+
+                    <div class="stat-item d-flex align-items-center justify-content-between">
+                        <span class="text-slate-400 small">IP Address</span>
+                        <span class="fw-bold badge bg-white text-dark font-monospace px-2 py-1">{{ $message->ip_address ?? 'N/A' }}</span>
                     </div>
 
                     <div class="stat-item d-flex align-items-center justify-content-between">

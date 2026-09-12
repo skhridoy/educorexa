@@ -10,14 +10,24 @@
 
     {{-- ===== BRAND ===== --}}
     <div class="edu-sidebar-header">
-        <a href="{{ route('main.home') }}" class="edu-brand">
-            <div class="edu-brand-icon">
-                {{ strtoupper(substr($setting->site_name ?? 'E', 0, 1)) }}
-            </div>
-            <div>
-                <div class="edu-brand-name">{{ $setting->site_name ?? 'EduCorexa' }}</div>
-                <div class="edu-brand-sub">Admin Portal</div>
-            </div>
+        <a href="{{ route('main.home') }}" class="edu-brand d-flex align-items-center gap-2">
+            @if(isset($setting) && !empty($setting->logo_wide))
+                <img src="{{ asset($setting->logo_wide) }}" alt="{{ $setting->site_name ?? 'EduCorexa' }}" class="edu-brand-logo" style="max-height:36px; max-width:145px; object-fit:contain;">
+            @elseif(isset($setting) && !empty($setting->logo_square))
+                <img src="{{ asset($setting->logo_square) }}" alt="{{ $setting->site_name ?? 'EduCorexa' }}" class="edu-brand-logo" style="width:36px; height:36px; border-radius:10px; object-fit:cover;">
+                <div class="edu-brand-text">
+                    <div class="edu-brand-name">{{ $setting->site_name ?? 'EduCorexa' }}</div>
+                    <div class="edu-brand-sub">Admin Portal</div>
+                </div>
+            @else
+                <div class="edu-brand-icon">
+                    {{ strtoupper(substr($setting->site_name ?? 'E', 0, 1)) }}
+                </div>
+                <div class="edu-brand-text">
+                    <div class="edu-brand-name">{{ $setting->site_name ?? 'EduCorexa' }}</div>
+                    <div class="edu-brand-sub">Admin Portal</div>
+                </div>
+            @endif
         </a>
         {{-- Mobile Close Button --}}
         <div class="sidebar-toggler not-active d-lg-none ms-auto" style="cursor:pointer; color:var(--text-faint);">

@@ -174,6 +174,46 @@
                                           onfocus="this.style.borderColor='#0061A8'" onblur="this.style.borderColor='#e2e8f0'">{{ old('why_join') }}</textarea>
                             </div>
 
+                            {{-- Password --}}
+                            <div class="col-md-6">
+                                <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;">
+                                    পাসওয়ার্ড <span style="color:#ef4444;">*</span>
+                                </label>
+                                <div style="position:relative;">
+                                    <i class="bi bi-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none;"></i>
+                                    <input type="password" name="password" id="repPassword" required
+                                           placeholder="••••••••"
+                                           style="width:100%;border:1.5px solid {{ $errors->has('password') ? '#ef4444' : '#e2e8f0' }};border-radius:10px;padding:11px 42px 11px 38px;font-size:14px;color:#1e293b;outline:none;transition:border-color 0.2s;"
+                                           onfocus="this.style.borderColor='#0061A8'" onblur="this.style.borderColor='{{ $errors->has('password') ? '#ef4444' : '#e2e8f0' }}'">
+                                    <button type="button" onclick="togglePassword('repPassword','repPassIcon')"
+                                            style="position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;padding:2px 4px;line-height:1;">
+                                        <i class="bi bi-eye" id="repPassIcon"></i>
+                                    </button>
+                                </div>
+                                @error('password')<span style="font-size:11.5px;color:#ef4444;margin-top:4px;display:block;">{{ $message }}</span>@enderror
+                            </div>
+
+                            {{-- Confirm Password --}}
+                            <div class="col-md-6">
+                                <label style="display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;">
+                                    পাসওয়ার্ড নিশ্চিত করুন <span style="color:#ef4444;">*</span>
+                                </label>
+                                <div style="position:relative;">
+                                    <i class="bi bi-lock-fill" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none;"></i>
+                                    <input type="password" name="password_confirmation" id="repPasswordConfirm" required
+                                           placeholder="••••••••"
+                                           style="width:100%;border:1.5px solid {{ $errors->has('password_confirmation') ? '#ef4444' : '#e2e8f0' }};border-radius:10px;padding:11px 42px 11px 38px;font-size:14px;color:#1e293b;outline:none;transition:border-color 0.2s;"
+                                           onfocus="this.style.borderColor='#0061A8'" onblur="this.style.borderColor='{{ $errors->has('password_confirmation') ? '#ef4444' : '#e2e8f0' }}'"
+                                           oninput="checkPasswordMatch()">
+                                    <button type="button" onclick="togglePassword('repPasswordConfirm','repConfirmIcon')"
+                                            style="position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;padding:2px 4px;line-height:1;">
+                                        <i class="bi bi-eye" id="repConfirmIcon"></i>
+                                    </button>
+                                </div>
+                                <span id="passMatchMsg" style="font-size:11.5px;margin-top:4px;display:none;"></span>
+                                @error('password_confirmation')<span style="font-size:11.5px;color:#ef4444;margin-top:4px;display:block;">{{ $message }}</span>@enderror
+                            </div>
+
                             {{-- Terms --}}
                             <div class="col-12">
                                 <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:#475569;line-height:1.5;">
@@ -251,6 +291,34 @@ document.getElementById('repForm').addEventListener('submit', function() {
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;display:inline-block;"></i> প্রক্রিয়াকরণ হচ্ছে...';
 });
+
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+}
+
+function checkPasswordMatch() {
+    const pass    = document.getElementById('repPassword').value;
+    const confirm = document.getElementById('repPasswordConfirm').value;
+    const msg     = document.getElementById('passMatchMsg');
+    if (confirm === '') { msg.style.display = 'none'; return; }
+    if (pass === confirm) {
+        msg.style.display = 'block';
+        msg.style.color   = '#16a34a';
+        msg.textContent   = '✓ পাসওয়ার্ড মিলেছে';
+    } else {
+        msg.style.display = 'block';
+        msg.style.color   = '#ef4444';
+        msg.textContent   = '✗ পাসওয়ার্ড মিলছে না';
+    }
+}
 </script>
 <style>
 @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }

@@ -60,10 +60,24 @@
 <div id="ec-overlay" class="ec-overlay"></div>
 
 {{-- Mobile slide-in menu --}}
-<div id="ec-drawer" class="ec-drawer">
     <div class="ec-drawer__head">
-        <span class="ec-drawer__logo">edu<span>corexa</span></span>
-        <button id="ec-drawer-close" class="ec-drawer__close">
+        <a href="{{ url('/') }}" class="ec-drawer__brand">
+            @if(isset($setting) && isset($setting->logo_wide) && $setting->logo_wide)
+                <img src="{{ asset($setting->logo_wide) }}" alt="{{ $setting->site_name ?? 'EduCorexa' }}" class="ec-logo-img">
+            @elseif(isset($setting) && isset($setting->logo_square) && $setting->logo_square)
+                <img src="{{ asset($setting->logo_square) }}" alt="{{ $setting->site_name ?? 'EduCorexa' }}" class="ec-logo-img-square">
+                <span class="ec-drawer__logo">{{ $setting->site_name ?? 'edu' }}<span>corexa</span></span>
+            @else
+                <span class="ec-logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
+                </span>
+                <span class="ec-drawer__logo">edu<span>corexa</span></span>
+            @endif
+        </a>
+        <button id="ec-drawer-close" class="ec-drawer__close" aria-label="Close menu">
             <i class="bi bi-x-lg"></i>
         </button>
     </div>
@@ -337,10 +351,48 @@
     padding: 16px 20px;
     border-bottom: 1px solid #f1f5f9;
     flex-shrink: 0;
+    gap: 12px;
+}
+.ec-drawer__brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none !important;
+    max-width: calc(100% - 46px);
+}
+.ec-drawer__brand .ec-logo-img {
+    height: 36px;
+    max-width: 170px;
+    object-fit: contain;
+}
+.ec-drawer__brand .ec-logo-img-square {
+    height: 36px;
+    width: 36px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.ec-drawer__brand .ec-logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #0061A8, #0080d4) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(0, 97, 168, 0.25);
+    padding: 7px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.ec-drawer__brand .ec-logo-icon svg {
+    stroke: #fff !important;
+    width: 100%;
+    height: 100%;
 }
 .ec-drawer__logo {
     font-size: 19px; font-weight: 900; font-style: italic;
     letter-spacing: -0.4px; color: #1e293b;
+    line-height: 1;
 }
 .ec-drawer__logo span { color: #0061A8; }
 .ec-drawer__close {

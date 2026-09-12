@@ -28,21 +28,25 @@ class RepresentativeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:255',
-            'email'      => 'required|email|unique:users,email',
-            'phone'      => 'required|string|max:20',
-            'district'   => 'required|string|max:100',
-            'address'    => 'nullable|string|max:500',
-            'experience' => 'nullable|string|max:50',
-            'why_join'   => 'nullable|string|max:1000',
-            'agree'      => 'accepted',
+            'name'                  => 'required|string|max:255',
+            'email'                 => 'required|email|unique:users,email',
+            'phone'                 => 'required|string|max:20',
+            'district'              => 'required|string|max:100',
+            'address'               => 'nullable|string|max:500',
+            'experience'            => 'nullable|string|max:50',
+            'why_join'              => 'nullable|string|max:1000',
+            'password'              => 'required|string|min:8|confirmed',
+            'agree'                 => 'accepted',
         ], [
-            'name.required'      => 'আপনার পূর্ণ নাম দিন।',
-            'email.required'     => 'ইমেইল ঠিকানা দিন।',
-            'email.unique'       => 'এই ইমেইল ঠিকানা ইতিমধ্যে নিবন্ধিত।',
-            'phone.required'     => 'মোবাইল নম্বর দিন।',
-            'district.required'  => 'জেলার নাম দিন।',
-            'agree.accepted'     => 'শর্তাবলীতে সম্মতি দিন।',
+            'name.required'              => 'আপনার পূর্ণ নাম দিন।',
+            'email.required'             => 'ইমেইল ঠিকানা দিন।',
+            'email.unique'               => 'এই ইমেইল ঠিকানা ইতিমধ্যে নিবন্ধিত।',
+            'phone.required'             => 'মোবাইল নম্বর দিন।',
+            'district.required'          => 'জেলার নাম দিন।',
+            'password.required'          => 'পাসওয়ার্ড দিন।',
+            'password.min'               => 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+            'password.confirmed'         => 'পাসওয়ার্ড নিশ্চিতকরণ মিলছে না।',
+            'agree.accepted'             => 'শর্তাবলীতে সম্মতি দিন।',
         ]);
 
         try {
@@ -54,8 +58,8 @@ class RepresentativeController extends Controller
                 ['role_type' => 'employee']
             );
 
-            // 2. Generate auto password
-            $plainPassword = 'Rep@' . rand(10000, 99999);
+            // 2. Use user-provided password
+            $plainPassword = $request->password;
 
             // 3. Create user account
             $user = User::create([
@@ -116,9 +120,26 @@ class RepresentativeController extends Controller
 
             try {
                 Mail::to($request->email)->send(new EmployeeRegistrationMail($details));
-                $successMsg = 'রেজিস্ট্রেশন সফল হয়েছে! আপনার ইমেইলে লগইন তথ্য পাঠানো হয়েছে।';
+                $successMsg = 'রেজিস্ট্রেশন সফল হয়েছে! আপনার ইমেইলে স্বাগত বার্তা পাঠানো হয়েছে। এখন লগইন করুন।';
             } catch (\Exception $mailEx) {
                 $successMsg = 'রেজিস্ট্রেশন সফল হয়েছে! কিন্তু ইমেইল পাঠাতে সমস্যা হয়েছে। অনুগ্রহ করে আমাদের সাথে যোগাযোগ করুন।';
+            }
+
+            // Super Admin-দের নোটিফিকেশন পাঠানো
+            try {
+                $superAdmins = User::whereHas('roles', function($q) {
+                    $q->where('name', 'super_admin');
+                })->orWhere('role', 'super_admin')->get();
+
+                foreach ($superAdmins as $admin) {
+                    $admin->notify(new \App\Notifications\SuperAdminNotification([
+                        'message' => "নতুন রিপ্রেজেন্টেটিভ রেজিস্টার করেছেন: {$request->name} (জেলা: {$request->district})",
+                        'icon'    => 'user-check',
+                        'link'    => route('super.employees.index'),
+                    ]));
+                }
+            } catch (\Exception $notifEx) {
+                \Log::error("Super admin notification error: " . $notifEx->getMessage());
             }
 
             return redirect()->route('representative.register.form')

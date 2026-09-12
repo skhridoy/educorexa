@@ -65,6 +65,23 @@ class SchoolSubscriptionController extends Controller
             'payment_submitted_at' => $validated['payment_submitted_at'],
         ]);
 
+        // Super Admin-দের নোটিফিকেশন পাঠানো
+        try {
+            $superAdmins = \App\Models\User::whereHas('roles', function($q) {
+                $q->where('name', 'super_admin');
+            })->orWhere('role', 'super_admin')->get();
+
+            foreach ($superAdmins as $admin) {
+                $admin->notify(new \App\Notifications\SuperAdminNotification([
+                    'message' => "নতুন সাবস্ক্রিপশন পেমেন্ট: {$school->name} (৳ " . number_format($subscription->amount) . " via " . strtoupper($validated['payment_method']) . ")",
+                    'icon'    => 'credit-card',
+                    'link'    => route('subscription-payments.index'),
+                ]));
+            }
+        } catch (\Exception $notifEx) {
+            \Log::error("Payment notification error: " . $notifEx->getMessage());
+        }
+
         return redirect()->route('school.pricing', ['tenant' => $school->slug])
             ->with('success', 'Payment details submitted. The Super Admin will verify your transaction.');
     }

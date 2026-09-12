@@ -152,6 +152,11 @@
                                     <div class="text-muted small d-flex align-items-center gap-1">
                                         <i data-feather="phone" style="width:12px; height:12px;"></i> {{ $msg->phone }}
                                     </div>
+                                    @if($msg->ip_address)
+                                    <div class="text-muted small d-flex align-items-center gap-1" title="Sender IP Address">
+                                        <i data-feather="globe" style="width:12px; height:12px;"></i> IP: {{ $msg->ip_address }}
+                                    </div>
+                                    @endif
                                     @if($msg->email)
                                     <div class="text-muted small d-flex align-items-center gap-1">
                                         <i data-feather="mail" style="width:12px; height:12px;"></i> {{ $msg->email }}

@@ -227,6 +227,9 @@ Route::domain(config('app.main_domain'))->group(function () {
         // ID Card Designs
         Route::patch('id-card-designs/{idCardDesign}/toggle', [IdCardDesignController::class, 'toggleStatus'])->name('id-card-designs.toggle');
         Route::resource('id-card-designs', IdCardDesignController::class);
+
+        // Notifications
+        Route::post('/notifications/mark-read', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.markRead');
     });
 
     // --- 2. Employee ONLY Group (General Employee Dashboard) ---
