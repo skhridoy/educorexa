@@ -116,76 +116,8 @@
     </div>
 
     @if($unpaidList->hasPages())
-        @php
-            $currentPage = $unpaidList->currentPage();
-            $lastPage = $unpaidList->lastPage();
-
-            if ($lastPage <= 3) {
-                $startPage = 1;
-                $endPage = $lastPage;
-            } else {
-                if ($currentPage <= 1) {
-                    $startPage = 1;
-                    $endPage = 3;
-                } elseif ($currentPage >= $lastPage) {
-                    $startPage = $lastPage - 2;
-                    $endPage = $lastPage;
-                } else {
-                    $startPage = $currentPage - 1;
-                    $endPage = $currentPage + 1;
-                }
-            }
-        @endphp
-
         <div id="unpaidPaginationLinks" class="d-flex justify-content-center">
-            {{-- Desktop Pagination (Tablets & Desktop) --}}
-            <div class="d-none d-md-block">
-                {!! $unpaidList->links('pagination::bootstrap-4') !!}
-            </div>
-
-            {{-- Mobile Responsive 3-Page Sliding Pagination --}}
-            <div class="d-block d-md-none">
-                <ul class="pagination pagination-sm mb-0 align-items-center justify-content-center">
-                    {{-- Previous Page Button --}}
-                    @if ($unpaidList->onFirstPage())
-                        <li class="page-item disabled" aria-disabled="true">
-                            <span class="page-link mobile-page-btn"><i class="fa-solid fa-chevron-left"></i></span>
-                        </li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link mobile-page-btn" href="{{ $unpaidList->previousPageUrl() }}" rel="prev" title="{{ __('Previous') }}">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </a>
-                        </li>
-                    @endif
-
-                    {{-- 3 Sliding Page Numbers --}}
-                    @for ($p = $startPage; $p <= $endPage; $p++)
-                        @if ($p == $currentPage)
-                            <li class="page-item active" aria-current="page">
-                                <span class="page-link mobile-page-btn fw-bold">{{ $p }}</span>
-                            </li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link mobile-page-btn" href="{{ $unpaidList->url($p) }}">{{ $p }}</a>
-                            </li>
-                        @endif
-                    @endfor
-
-                    {{-- Next Page Button --}}
-                    @if ($unpaidList->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link mobile-page-btn" href="{{ $unpaidList->nextPageUrl() }}" rel="next" title="{{ __('Next') }}">
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    @else
-                        <li class="page-item disabled" aria-disabled="true">
-                            <span class="page-link mobile-page-btn"><i class="fa-solid fa-chevron-right"></i></span>
-                        </li>
-                    @endif
-                </ul>
-            </div>
+            {!! $unpaidList->links('pagination::bootstrap-4') !!}
         </div>
     @endif
 </div>
