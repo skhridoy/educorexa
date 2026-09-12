@@ -60,7 +60,7 @@
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-1">
                                     @if(!$school->is_active)
-                                        <form action="{{ route('super.schools.approve', $school->id) }}" method="POST">
+                                        <form action="{{ route('manage.schools.approve', $school->id) }}" method="POST">
                                             @csrf @method('PUT')
                                             <button type="submit" class="act-btn" title="Approve" style="color:#10b981; background:#ecfdf5;">
                                                 <i data-feather="check-circle" style="width:14px;"></i>

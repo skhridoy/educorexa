@@ -287,7 +287,7 @@
 
                         {{-- Recent Schools in All Tab --}}
                         @foreach($recentSchools->take(2) as $sch)
-                        <a href="{{ route('super.schools.all') }}" class="notice-item">
+                        <a href="{{ route('manage.schools.all') }}" class="notice-item">
                             <div class="notice-item-icon" style="background:#e0f2fe; color:#0284c7;">
                                 <i class="fa-solid fa-school"></i>
                             </div>
@@ -362,7 +362,7 @@
                     {{-- TAB 3: SCHOOLS ONLY --}}
                     <div class="notice-tab-pane d-none" id="notice-pane-schools">
                         @forelse($recentSchools as $sch)
-                        <a href="{{ route('super.schools.all') }}" class="notice-item">
+                        <a href="{{ route('manage.schools.all') }}" class="notice-item">
                             <div class="notice-item-icon" style="background:#e0f2fe; color:#0284c7;">
                                 <i class="fa-solid fa-school"></i>
                             </div>
@@ -430,7 +430,7 @@
                     <a href="{{ route('super.subscription-payments.index') }}" class="small fw-bold text-primary text-decoration-none" style="font-size:0.75rem;">
                         <i class="fa-solid fa-credit-card me-1"></i>পেমেন্ট তালিকা
                     </a>
-                    <a href="{{ route('super.schools.all') }}" class="small fw-bold text-secondary text-decoration-none" style="font-size:0.75rem;">
+                    <a href="{{ route('manage.schools.all') }}" class="small fw-bold text-secondary text-decoration-none" style="font-size:0.75rem;">
                         <i class="fa-solid fa-school me-1"></i>সকল স্কুল
                     </a>
                     <a href="{{ route('super.employees.index') }}" class="small fw-bold text-dark text-decoration-none" style="font-size:0.75rem;">
