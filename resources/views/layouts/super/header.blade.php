@@ -43,8 +43,8 @@
         $unreadInquiries = collect();
     }
 
-    // সর্বমোট নোটিস কাউন্ট
-    $totalNoticeBadge = $unreadCount + $pendingPaymentCount + ($unreadInquiries ? $unreadInquiries->count() : 0);
+    // নোটিস কাউন্ট (শুধুমাত্র অপঠিত নোটিফিকেশন যা ভিউ/রিড করলে মাইনাস হবে)
+    $totalNoticeBadge = $unreadCount;
 @endphp
 
 <style>
@@ -232,7 +232,7 @@
                         সবগুলো
                     </button>
                     <button type="button" class="notice-tab-btn" data-tab="payments">
-                        💳 পেমেন্ট @if($pendingPaymentCount > 0)<span class="notice-tab-dot"></span>@endif
+                        💳 পেমেন্ট @if($pendingPaymentCount > 0)<span class="badge rounded-pill bg-warning text-dark ms-1" style="font-size:0.65rem; padding: 2px 6px;">{{ $pendingPaymentCount }}</span>@endif
                     </button>
                     <button type="button" class="notice-tab-btn" data-tab="schools">
                         🏫 নতুন স্কুল
@@ -248,14 +248,17 @@
                     {{-- TAB 1: ALL NOTICES --}}
                     <div class="notice-tab-pane" id="notice-pane-all">
                         {{-- Database unread notifications first --}}
-                        @foreach($unreadNotifications->take(4) as $notification)
-                        <a href="{{ $notification->data['link'] ?? '#' }}" class="notice-item">
+                        @foreach($unreadNotifications->take(6) as $notification)
+                        <a href="{{ route('super.notifications.readAndGo', $notification->id) }}" class="notice-item notice-unread-item" style="background:#f8faff; border-left:3px solid #4f46e5;">
                             <div class="notice-item-icon" style="background:#eef2ff; color:#4f46e5;">
-                                <i class="fa-solid fa-bell"></i>
+                                <i class="fa-solid fa-{{ $notification->data['icon'] ?? 'bell' }}"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <div class="notice-item-title">{{ $notification->data['message'] ?? 'New notification' }}</div>
-                                <div class="notice-item-time">
+                                <div class="d-flex align-items-center justify-content-between gap-1">
+                                    <div class="notice-item-title fw-bold" style="color:#1e1b4b;">{{ $notification->data['message'] ?? 'নতুন নোটিফিকেশন' }}</div>
+                                    <span class="badge" style="font-size:0.62rem; background:#e0e7ff; color:#4338ca; border-radius:6px; padding:2px 6px;">নতুন</span>
+                                </div>
+                                <div class="notice-item-time" style="color:#6366f1;">
                                     <i class="fa-regular fa-clock" style="font-size:0.65rem;"></i> {{ $notification->created_at->diffForHumans() }}
                                 </div>
                             </div>
@@ -470,11 +473,33 @@
                         }).then(r => r.json()).then(data => {
                             const badge = document.getElementById('noticeBadgeCounter');
                             if (badge) badge.style.display = 'none';
+                            document.querySelectorAll('.notice-unread-item').forEach(function(el) {
+                                el.style.background = '#fff';
+                                el.style.borderLeft = 'none';
+                                const newBadge = el.querySelector('.badge');
+                                if (newBadge) newBadge.remove();
+                            });
                             markBtn.innerHTML = '<i class="fa-solid fa-check text-success me-1"></i>Done';
                             markBtn.disabled = true;
                         }).catch(err => console.log(err));
                     });
                 }
+
+                // Client-side instant decrement on unread notice click
+                document.querySelectorAll('.notice-unread-item').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        const badge = document.getElementById('noticeBadgeCounter');
+                        if (badge) {
+                            let current = parseInt(badge.textContent.trim()) || 1;
+                            current = Math.max(0, current - 1);
+                            if (current === 0) {
+                                badge.style.display = 'none';
+                            } else {
+                                badge.textContent = current > 9 ? '9+' : current;
+                            }
+                        }
+                    });
+                });
             });
         </script>
 

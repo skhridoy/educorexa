@@ -230,6 +230,8 @@ Route::domain(config('app.main_domain'))->group(function () {
 
         // Notifications
         Route::post('/notifications/mark-read', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.markRead');
+        Route::get('/notifications/{id}/read-go', [SuperAdminController::class, 'readNotificationAndRedirect'])->name('notifications.readAndGo');
+        Route::post('/notifications/{id}/read', [SuperAdminController::class, 'markSingleNotificationRead'])->name('notifications.markSingle');
     });
 
     // --- 2. Employee ONLY Group (General Employee Dashboard) ---

@@ -431,9 +431,42 @@ class SuperAdminController extends Controller
 
     public function markNotificationsRead() 
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        $user = auth()->user();
+        if ($user && method_exists($user, 'unreadNotifications')) {
+            $user->unreadNotifications->markAsRead();
+        }
         
-        return response()->json(['status' => 'success']);
+        return response()->json(['status' => 'success', 'unread_count' => 0]);
+    }
+
+    public function readNotificationAndRedirect($id)
+    {
+        $user = auth()->user();
+        if ($user) {
+            $notification = $user->notifications()->where('id', $id)->first();
+            if ($notification) {
+                $notification->markAsRead();
+                $link = $notification->data['link'] ?? route('super.dashboard');
+                return redirect($link);
+            }
+        }
+        return redirect()->route('super.dashboard');
+    }
+
+    public function markSingleNotificationRead($id)
+    {
+        $user = auth()->user();
+        if ($user) {
+            $notification = $user->notifications()->where('id', $id)->first();
+            if ($notification) {
+                $notification->markAsRead();
+                return response()->json([
+                    'status' => 'success',
+                    'unread_count' => $user->unreadNotifications()->count()
+                ]);
+            }
+        }
+        return response()->json(['status' => 'error'], 404);
     }
     public function approveEmployee(Request $request, $employeeId) {
         $employee = Employee::findOrFail($employeeId);
