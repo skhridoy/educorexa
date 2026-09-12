@@ -5,36 +5,46 @@
                  ? asset('uploads/' . $folder . '/' . $user->photo)
                  : asset('assets/images/profile.webp');
 
-    // ১. ডাটাবেজ নোটিফিকেশন
-    $unreadNotifications = ($user && method_exists($user, 'unreadNotifications')) ? $user->unreadNotifications : collect();
-    $unreadCount = $unreadNotifications->count();
+    try {
+        // ১. ডাটাবেজ নোটিফিকেশন
+        $unreadNotifications = ($user && method_exists($user, 'unreadNotifications')) ? $user->unreadNotifications : collect();
+        $unreadCount = $unreadNotifications ? $unreadNotifications->count() : 0;
 
-    // ২. লাইভ পেমেন্ট সংক্রান্ত তথ্য (Payments)
-    $recentPayments = \App\Models\SchoolSubscription::with(['school', 'package'])
-        ->whereNotNull('payment_submitted_at')
-        ->orWhere('status', 'pending')
-        ->latest('updated_at')
-        ->take(6)
-        ->get();
-    $pendingPaymentCount = $recentPayments->where('status', 'pending')->count();
+        // ২. লাইভ পেমেন্ট সংক্রান্ত তথ্য (Payments)
+        $recentPayments = \App\Models\SchoolSubscription::with(['school', 'package'])
+            ->whereNotNull('payment_submitted_at')
+            ->orWhere('status', 'pending')
+            ->latest('updated_at')
+            ->take(6)
+            ->get();
+        $pendingPaymentCount = $recentPayments->where('status', 'pending')->count();
 
-    // ৩. নতুন স্কুল রেজিস্ট্রেশন (Schools)
-    $recentSchools = \App\Models\School::with('representative.user')
-        ->latest('created_at')
-        ->take(6)
-        ->get();
+        // ৩. নতুন স্কুল রেজিস্ট্রেশন (Schools)
+        $recentSchools = \App\Models\School::with('representative.user')
+            ->latest('created_at')
+            ->take(6)
+            ->get();
 
-    // ৪. নতুন এমপ্লয়ি ও রিপ্রেজেন্টেটিভ এক্টিভিটি (Employees)
-    $recentEmployees = \App\Models\Employee::with('user')
-        ->latest('created_at')
-        ->take(6)
-        ->get();
+        // ৪. নতুন এমপ্লয়ি ও রিপ্রেজেন্টেটিভ এক্টিভিটি (Employees)
+        $recentEmployees = \App\Models\Employee::with('user')
+            ->latest('created_at')
+            ->take(6)
+            ->get();
 
-    // ৫. কন্টাক্ট মেসেজ লিড (Contact Inquiries)
-    $unreadInquiries = \App\Models\MainContactMsg::where('is_read', false)->latest()->take(4)->get();
+        // ৫. কন্টাক্ট মেসেজ লিড (Contact Inquiries)
+        $unreadInquiries = \App\Models\MainContactMsg::where('is_read', false)->latest()->take(4)->get();
+    } catch (\Throwable $e) {
+        $unreadNotifications = collect();
+        $unreadCount = 0;
+        $recentPayments = collect();
+        $pendingPaymentCount = 0;
+        $recentSchools = collect();
+        $recentEmployees = collect();
+        $unreadInquiries = collect();
+    }
 
     // সর্বমোট নোটিস কাউন্ট
-    $totalNoticeBadge = $unreadCount + $pendingPaymentCount + $unreadInquiries->count();
+    $totalNoticeBadge = $unreadCount + $pendingPaymentCount + ($unreadInquiries ? $unreadInquiries->count() : 0);
 @endphp
 
 <style>
@@ -254,7 +264,7 @@
 
                         {{-- Recent Payments in All Tab --}}
                         @foreach($recentPayments->take(2) as $pay)
-                        <a href="{{ route('subscription-payments.index') }}" class="notice-item">
+                        <a href="{{ route('super.subscription-payments.index') }}" class="notice-item">
                             <div class="notice-item-icon" style="background:{{ $pay->status === 'pending' ? '#fef3c7' : '#dcfce7' }}; color:{{ $pay->status === 'pending' ? '#d97706' : '#16a34a' }};">
                                 <i class="fa-solid fa-credit-card"></i>
                             </div>
@@ -319,7 +329,7 @@
                     {{-- TAB 2: PAYMENTS ONLY --}}
                     <div class="notice-tab-pane d-none" id="notice-pane-payments">
                         @forelse($recentPayments as $pay)
-                        <a href="{{ route('subscription-payments.index') }}" class="notice-item">
+                        <a href="{{ route('super.subscription-payments.index') }}" class="notice-item">
                             <div class="notice-item-icon" style="background:{{ $pay->status === 'pending' ? '#fef3c7' : '#dcfce7' }}; color:{{ $pay->status === 'pending' ? '#d97706' : '#16a34a' }};">
                                 <i class="fa-solid fa-money-bill-transfer"></i>
                             </div>
@@ -417,7 +427,7 @@
 
                 {{-- Footer Links --}}
                 <div class="p-2 px-3 bg-light border-top text-center d-flex justify-content-between align-items-center">
-                    <a href="{{ route('subscription-payments.index') }}" class="small fw-bold text-primary text-decoration-none" style="font-size:0.75rem;">
+                    <a href="{{ route('super.subscription-payments.index') }}" class="small fw-bold text-primary text-decoration-none" style="font-size:0.75rem;">
                         <i class="fa-solid fa-credit-card me-1"></i>পেমেন্ট তালিকা
                     </a>
                     <a href="{{ route('super.schools.all') }}" class="small fw-bold text-secondary text-decoration-none" style="font-size:0.75rem;">

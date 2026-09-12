@@ -75,7 +75,7 @@ class SchoolSubscriptionController extends Controller
                 $admin->notify(new \App\Notifications\SuperAdminNotification([
                     'message' => "নতুন সাবস্ক্রিপশন পেমেন্ট: {$school->name} (৳ " . number_format($subscription->amount) . " via " . strtoupper($validated['payment_method']) . ")",
                     'icon'    => 'credit-card',
-                    'link'    => route('subscription-payments.index'),
+                    'link'    => route('super.subscription-payments.index'),
                 ]));
             }
         } catch (\Exception $notifEx) {

@@ -60,6 +60,7 @@
 <div id="ec-overlay" class="ec-overlay"></div>
 
 {{-- Mobile slide-in menu --}}
+<div id="ec-drawer" class="ec-drawer">
     <div class="ec-drawer__head">
         <a href="{{ url('/') }}" class="ec-drawer__brand">
             @if(isset($setting) && isset($setting->logo_wide) && $setting->logo_wide)
