@@ -102,7 +102,7 @@
         }
         .sinfo td { vertical-align: top; padding: 0.5px 2px; }
         .lbl { font-weight: 600; white-space: nowrap; color: #2563eb; }
-        .val-text { color: #1e293b; }
+        .val-text { color: #1e293b; margin-left: 5px!important;}
         .val-gpa { color: #1e40af; font-weight: bold; }
         .val-grade { color: #15803d; font-weight: bold; }
         .val-merit { color: #6d28d9; font-weight: bold; }
@@ -270,11 +270,11 @@
                 <td style="width: 50%; padding-right: 4px;">
                     <div class="info-card">
                         <table>
-                            <tr><td style="width: 55px;" class="lbl">NAME</td><td class="val-text">: {{ strtoupper($student->name) }}</td></tr>
-                            <tr><td class="lbl">FATHER</td><td class="val-text">: {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
-                            <tr><td class="lbl">MOTHER</td><td class="val-text">: {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
-                            <tr><td class="lbl">SID</td><td class="val-text">: {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
-                            <tr><td class="lbl">DOB</td><td class="val-text">: {{ $formattedDOB }}</td></tr>
+                            <tr><td style="width: 100px;" class="lbl">NAME OF STUDENT</td><td class="val-text"> : {{ strtoupper($student->name) }}</td></tr>
+                            <tr><td class="lbl">FATHER'S NAME</td><td class="val-text"> : {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
+                            <tr><td class="lbl">MOTHER'S NAME</td><td class="val-text"> : {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
+                            <tr><td class="lbl">STUDENT ID</td><td class="val-text"> : {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
+                            <tr><td class="lbl">DATE OF BIRTH</td><td class="val-text"> : {{ $formattedDOB }}</td></tr>
                         </table>
                     </div>
                 </td>

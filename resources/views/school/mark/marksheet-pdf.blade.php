@@ -237,11 +237,11 @@
         <td style="width: 50%; padding-right: 4px;">
             <div class="info-card">
                 <table>
-                    <tr><td style="width: 55px;" class="lbl">NAME</td><td class="val-text">: {{ strtoupper($student->name) }}</td></tr>
-                    <tr><td class="lbl">FATHER</td><td class="val-text">: {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
-                    <tr><td class="lbl">MOTHER</td><td class="val-text">: {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
-                    <tr><td class="lbl">SID</td><td class="val-text">: {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
-                    <tr><td class="lbl">DOB</td><td class="val-text">: {{ $formattedDOB }}</td></tr>
+                    <tr><td style="width: 55px;" class="lbl">NAME OF STUDENT</td><td class="val-text"> : {{ strtoupper($student->name) }}</td></tr>
+                    <tr><td class="lbl">FATHER'S NAME</td><td class="val-text"> : {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
+                    <tr><td class="lbl">MOTHER'S NAME</td><td class="val-text"> : {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
+                    <tr><td class="lbl">STUDENT ID</td><td class="val-text"> : {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
+                    <tr><td class="lbl">DATE OF BIRTH</td><td class="val-text"> : {{ $formattedDOB }}</td></tr>
                 </table>
             </div>
         </td>
