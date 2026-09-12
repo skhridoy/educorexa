@@ -731,6 +731,11 @@
                         </table>
                     </div>
                 </div>
+
+                {{-- Software Branding --}}
+                <div class="text-center py-2 text-muted fst-italic" style="font-size: 0.8rem; letter-spacing: 0.4px;">
+                    This marksheet genereted by educorexa erp solution
+                </div>
             </div>
         </div>
 

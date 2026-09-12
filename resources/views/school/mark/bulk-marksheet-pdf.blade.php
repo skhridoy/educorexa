@@ -12,7 +12,8 @@
         body {
             font-family: Helvetica, Arial, sans-serif;
             font-size: 10px;
-            color: #000;
+            color: #1e293b;
+            background: #ffffff;
             margin: 0; padding: 0;
             line-height: 1.25;
         }
@@ -27,7 +28,7 @@
             page-break-after: avoid;
         }
         .page-border {
-            border: 2px solid #000;
+            border: 2.5px solid #1e3a8a;
             padding: 10px 12px;
             position: relative;
             min-height: 1045px;
@@ -62,19 +63,20 @@
         .hdr-text { text-align: center; vertical-align: middle; padding: 0 4px; }
         .school-title {
             font-family: 'Helvetica Neue', 'Arial Black', Arial, sans-serif;
-            font-size: 26px;
+            font-size: 25px;
             font-weight: 900;
             letter-spacing: 0.6px;
             margin: 0 0 2px 0;
             text-transform: uppercase;
-            color: #111;
+            color: #1e3a8a;
         }
         .exam-title {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: bold;
             margin: 0 0 1px 0;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+            color: #0284c7;
         }
         .class-sub {
             font-size: 11px;
@@ -82,11 +84,14 @@
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 0.2px;
+            color: #475569;
         }
         .hdr-grade { width: 120px; vertical-align: middle; }
         .hdr-grade table { width: 100%; border-collapse: collapse; font-size: 8px; text-align: center; }
-        .hdr-grade th, .hdr-grade td { border: 1px solid #000; padding: 1px 1.5px; }
-        .hdr-grade th { font-weight: bold; background: #eee; }
+        .hdr-grade th, .hdr-grade td { border: 1px solid #cbd5e1; padding: 1px 1.5px; }
+        .hdr-grade th { font-weight: bold; background: #1e3a8a; color: #ffffff; }
+        .hdr-grade td.grd-pass { color: #15803d; font-weight: bold; }
+        .hdr-grade td.grd-fail { color: #dc2626; font-weight: bold; }
 
         /* ── STUDENT INFO (2 PARTS) ── */
         .sinfo {
@@ -96,17 +101,23 @@
             margin: 3px 0 4px 0;
         }
         .sinfo td { vertical-align: top; padding: 0.5px 2px; }
-        .lbl { font-weight: bold; white-space: nowrap; }
+        .lbl { font-weight: bold; white-space: nowrap; color: #1e40af; }
+        .val-text { color: #0f172a; }
+        .val-gpa { color: #2563eb; font-weight: bold; }
+        .val-grade { color: #15803d; font-weight: bold; }
+        .val-merit { color: #7c3aed; font-weight: bold; }
+        .val-marks { color: #d97706; font-weight: bold; }
 
         .info-card {
-            border: 1px solid #000;
+            border: 1px solid #93c5fd;
             padding: 4px 6px;
-            background: transparent;
+            background: #f8fafc;
+            border-radius: 4px;
         }
         .info-card table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 10.5px;
         }
         .info-card td { padding: 1px 0; }
 
@@ -114,36 +125,46 @@
         .banner {
             text-align: center;
             font-weight: bold;
-            font-size: 12px;
-            margin: 10px 0 5px 0;
+            font-size: 11.5px;
+            margin: 8px 0 5px 0;
             letter-spacing: 0.7px;
             text-transform: uppercase;
-            padding: 5px 10px;
-            border: 1px solid #000; 
-            border-radius: 5px;
+            padding: 4px 10px;
+            background: #1e3a8a;
+            color: #ffffff;
+            border: 1px solid #1e3a8a; 
+            border-radius: 4px;
         }
 
         /* ── MARKS TABLE ── */
-        .mt { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 5px; }
-        .mt th, .mt td { border: 1px solid #000; padding: 2.5px 1.5px; text-align: center; height: 14px; }
-        .mt th { font-weight: bold; text-transform: uppercase; font-size: 11px; }
-        .tl { text-align: left; padding-left: 6px !important; font-size: 11px; font-weight: bold; color: #111; }
+        .mt { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 5px; }
+        .mt th, .mt td { border: 1px solid #cbd5e1; padding: 2.5px 1.5px; text-align: center; height: 14px; }
+        .mt th { font-weight: bold; text-transform: uppercase; font-size: 10.5px; }
+        .mt-th-top { background-color: #1e3a8a; color: #ffffff; border: 1px solid #1e3a8a !important; }
+        .mt-th-sub { background-color: #2563eb; color: #ffffff; border: 1px solid #1d4ed8 !important; }
+        .tl { text-align: left; padding-left: 6px !important; font-size: 10.5px; font-weight: bold; color: #1e3a8a; }
+        .code-col { color: #4338ca; font-weight: bold; }
+        .grade-pass { color: #15803d; font-weight: bold; }
+        .grade-fail { color: #dc2626; font-weight: bold; }
+        .gpa-cell { background-color: #f8fafc; color: #1e40af; font-weight: 900; font-size: 12px; }
         .bd { font-weight: bold; }
 
         /* ── BOTTOM AREA ── */
         .bot { width: 100%; border-collapse: collapse; margin-top: 3px; }
         .bot td { vertical-align: top; padding: 0; }
-        .bx { border: 1px solid #000; }
+        .bx { border: 1px solid #94a3b8; }
         .bxh {
             text-align: center; font-weight: bold; font-size: 10px;
-            padding: 2px; border-bottom: 1px solid #000; text-transform: uppercase;
+            padding: 2px; border-bottom: 1px solid #94a3b8; text-transform: uppercase;
+            background: #1e3a8a; color: #ffffff;
         }
         .bxsh {
             text-align: center; font-size: 10px; padding: 1.5px;
-            border-bottom: 1px solid #000; font-weight: bold;
+            border-bottom: 1px solid #cbd5e1; font-weight: bold;
+            color: #1e40af; background: #f8fafc;
         }
         .mt2 { width: 100%; border-collapse: collapse; text-align: center; font-size: 10px; }
-        .mt2 td { border: 1px solid #000; padding: 1.5px 2px; height: 12px; }
+        .mt2 td { border: 1px solid #cbd5e1; padding: 1.5px 2px; height: 12px; }
 
         /* ── SIGNATURE ── */
         .footer-sig {
@@ -153,8 +174,21 @@
             right: 12px;
         }
         .sig { width: 100%; border-collapse: collapse; margin: 0; }
-        .sig td { text-align: center; font-size: 10px; font-weight: bold; }
-        .sig-line { border-top: 1px dotted #000; display: inline-block; width: 150px; padding-top: 4px; }
+        .sig td { text-align: center; font-size: 9.5px; font-weight: bold; color: #334155; }
+        .sig-line { border-top: 1.5px dotted #64748b; display: inline-block; width: 150px; padding-top: 4px; color: #1e293b; }
+
+        /* ── SOFTWARE BRANDING ── */
+        .software-branding {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            right: 12px;
+            text-align: center;
+            font-size: 8.5px;
+            color: #64748b;
+            letter-spacing: 0.4px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -189,6 +223,7 @@
     }
     $sec = is_object($student->section) ? ($student->section->name ?? '') : ($student->section ?? '');
 @endphp
+
 <div class="page-sheet">
     @if(!empty($watermarkLogo ?? $instituteLogo))
     <div class="watermark">
@@ -212,13 +247,13 @@
                     <table>
                         <thead><tr><th>Range</th><th>Grade</th><th>GP</th></tr></thead>
                         <tbody>
-                            <tr><td>80-100</td><td class="bd">A+</td><td>5.00</td></tr>
-                            <tr><td>70-79</td><td class="bd">A</td><td>4.00</td></tr>
-                            <tr><td>60-69</td><td class="bd">A-</td><td>3.50</td></tr>
-                            <tr><td>50-59</td><td class="bd">B</td><td>3.00</td></tr>
-                            <tr><td>40-49</td><td class="bd">C</td><td>2.00</td></tr>
-                            <tr><td>33-39</td><td class="bd">D</td><td>1.00</td></tr>
-                            <tr><td>00-32</td><td class="bd">F</td><td>0.00</td></tr>
+                            <tr><td>80-100</td><td class="grd-pass">A+</td><td>5.00</td></tr>
+                            <tr><td>70-79</td><td class="grd-pass">A</td><td>4.00</td></tr>
+                            <tr><td>60-69</td><td class="grd-pass">A-</td><td>3.50</td></tr>
+                            <tr><td>50-59</td><td class="grd-pass">B</td><td>3.00</td></tr>
+                            <tr><td>40-49</td><td class="grd-pass">C</td><td>2.00</td></tr>
+                            <tr><td>33-39</td><td class="grd-pass">D</td><td>1.00</td></tr>
+                            <tr><td>00-32</td><td class="grd-fail">F</td><td>0.00</td></tr>
                         </tbody>
                     </table>
                 </td>
@@ -226,55 +261,53 @@
         </table>
 
         <div class="banner">STUDENT'S INFORMATION</div>
+
         {{-- 2. STUDENT INFO --}}
         <table class="sinfo">
             <tr>
-                {{-- PART 1: LEFT SIDE (50%) --}}
                 <td style="width: 50%; padding-right: 4px;">
                     <div class="info-card">
                         <table>
-                            <tr><td style="width: 55px;" class="lbl">NAME</td><td>: {{ strtoupper($student->name) }}</td></tr>
-                            <tr><td class="lbl">FATHER</td><td>: {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
-                            <tr><td class="lbl">MOTHER</td><td>: {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
-                            <tr><td class="lbl">SID</td><td>: {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
-                            <tr><td class="lbl">DOB</td><td>: {{ $formattedDOB }}</td></tr>
+                            <tr><td style="width: 55px;" class="lbl">NAME</td><td class="val-text">: {{ strtoupper($student->name) }}</td></tr>
+                            <tr><td class="lbl">FATHER</td><td class="val-text">: {{ strtoupper($student->fathers_name ?? 'N/A') }}</td></tr>
+                            <tr><td class="lbl">MOTHER</td><td class="val-text">: {{ strtoupper($student->mothers_name ?? 'N/A') }}</td></tr>
+                            <tr><td class="lbl">SID</td><td class="val-text">: {{ $displayCustomId ?? ($student->student_id ?? $student->id) }}</td></tr>
+                            <tr><td class="lbl">DOB</td><td class="val-text">: {{ $formattedDOB }}</td></tr>
                         </table>
                     </div>
                 </td>
-
-                {{-- PART 2: RIGHT SIDE (50%) --}}
                 <td style="width: 50%;">
                     <div class="info-card">
                         <table>
                             <tr>
                                 <td style="width: 48px;" class="lbl">CLASS</td>
-                                <td>: {{ strtoupper($class->name) }}</td>
+                                <td class="val-text">: {{ strtoupper($class->name) }}</td>
                                 <td style="width: 65px;" class="lbl">ROLL NO</td>
-                                <td>: {{ $displayRoll ?? $student->roll }}</td>
+                                <td class="val-text">: {{ $displayRoll ?? $student->roll }}</td>
                             </tr>
                             <tr>
                                 <td class="lbl">SECTION</td>
-                                <td>: {{ strtoupper($sec) }}</td>
+                                <td class="val-text">: {{ strtoupper($sec) }}</td>
                                 <td class="lbl">GPA</td>
-                                <td>: {{ $numericGpa ?? '0.00' }}</td>
+                                <td class="val-gpa">: {{ $numericGpa ?? '0.00' }}</td>
                             </tr>
                             <tr>
                                 <td class="lbl">GROUP</td>
-                                <td>: {{ strtoupper($grp !== '' ? $grp : 'GENERAL') }}</td>
+                                <td class="val-text">: {{ strtoupper($grp !== '' ? $grp : 'GENERAL') }}</td>
                                 <td class="lbl">GRADE</td>
-                                <td>: {{ $finalGrade ?? 'F' }}</td>
+                                <td class="val-grade">: {{ $finalGrade ?? 'F' }}</td>
                             </tr>
                             <tr>
                                 <td class="lbl">SHIFT</td>
-                                <td>: {{ strtoupper($student->shift ?? 'DAY') }}</td>
+                                <td class="val-text">: {{ strtoupper($student->shift ?? 'DAY') }}</td>
                                 <td class="lbl">MERIT</td>
-                                <td>: {{ $meritPosition }}{{ in_array($meritPosition % 100,[11,12,13]) ? 'TH' : (match($meritPosition % 10){1=>'ST',2=>'ND',3=>'RD',default=>'TH'}) }}</td>
+                                <td class="val-merit">: {{ $meritPosition }}{{ in_array($meritPosition % 100,[11,12,13]) ? 'TH' : (match($meritPosition % 10){1=>'ST',2=>'ND',3=>'RD',default=>'TH'}) }}</td>
                             </tr>
                             <tr>
                                 <td class="lbl">BOARD</td>
-                                <td>: {{ strtoupper($student->board ?? 'DINAJPUR') }}</td>
+                                <td class="val-text">: {{ strtoupper($student->board ?? 'DINAJPUR') }}</td>
                                 <td class="lbl">TOTAL MARK</td>
-                                <td>: {{ $totalMarks }}</td>
+                                <td class="val-marks">: {{ $totalMarks }}</td>
                             </tr>
                         </table>
                     </div>
@@ -289,19 +322,19 @@
         <table class="mt">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width: 6%;">CODE</th>
-                    <th rowspan="2" style="width: 36%;">SUBJECT</th>
-                    <th colspan="7" style="text-align: center;">{{ strtoupper($exam->name) }}</th>
-                    <th rowspan="2" style="width: 6%;">GPA</th>
+                    <th rowspan="2" class="mt-th-top" style="width: 6%;">CODE</th>
+                    <th rowspan="2" class="mt-th-top" style="width: 36%;">SUBJECT</th>
+                    <th colspan="7" class="mt-th-top" style="text-align: center;">{{ strtoupper($exam->name) }}</th>
+                    <th rowspan="2" class="mt-th-top" style="width: 6%;">GPA</th>
                 </tr>
                 <tr>
-                    <th style="width: 5%;">CQ</th>
-                    <th style="width: 5%;">MCQ</th>
-                    <th style="width: 7%;">CA/Prac.</th>
-                    <th style="width: 7%;">Total</th>
-                    <th style="width: 6%;">High.</th>
-                    <th style="width: 6%;">GP</th>
-                    <th style="width: 7%;">Grade</th>
+                    <th class="mt-th-sub" style="width: 5%;">CQ</th>
+                    <th class="mt-th-sub" style="width: 5%;">MCQ</th>
+                    <th class="mt-th-sub" style="width: 7%;">CA/Prac.</th>
+                    <th class="mt-th-sub" style="width: 7%;">Total</th>
+                    <th class="mt-th-sub" style="width: 6%;">High.</th>
+                    <th class="mt-th-sub" style="width: 6%;">GP</th>
+                    <th class="mt-th-sub" style="width: 7%;">Grade</th>
                 </tr>
             </thead>
             <tbody>
@@ -323,32 +356,32 @@
                                 $cpM = $cp1 . ($cp2 !== '' ? ($cp1 !== '' ? '+' : '') . $cp2 : '');
                             @endphp
                             <tr>
-                                <td>{{ $res['subject_code'] }}</td>
+                                <td class="code-col">{{ $res['subject_code'] }}</td>
                                 <td class="tl" style="text-align: left;">{{ strtoupper($res['subject_name']) }}</td>
                                 <td>{{ ($res['cq'] ?? null) !== null ? $fmt($res['cq']) : '' }}</td>
                                 <td>{{ ($res['mcq'] ?? null) !== null ? $fmt($res['mcq']) : '' }}</td>
                                 <td rowspan="2" style="vertical-align: middle;">{{ $cpM }}</td>
-                                <td rowspan="2" style="vertical-align: middle;">{{ $fmt($res['combined_marks'] ?? '') }}</td>
+                                <td rowspan="2" style="vertical-align: middle; font-weight: bold;">{{ $fmt($res['combined_marks'] ?? '') }}</td>
                                 <td style="vertical-align: middle;">{{ is_numeric($res['highest_mark'] ?? null) && $res['highest_mark'] > 0 ? $fmt($res['highest_mark']) : '' }}</td>
-                                <td rowspan="2" style="vertical-align: middle;">{{ number_format($res['point'] ?? 0, 1) }}</td>
-                                <td rowspan="2"  style="vertical-align: middle;">{{ $res['grade'] ?? '-' }}</td>
+                                <td rowspan="2" style="vertical-align: middle; font-weight: bold;">{{ number_format($res['point'] ?? 0, 1) }}</td>
+                                <td rowspan="2" class="{{ ($res['grade'] ?? '') == 'F' ? 'grade-fail' : 'grade-pass' }}" style="vertical-align: middle;">{{ $res['grade'] ?? '-' }}</td>
 
                                 @if($i === 0)
-                                    <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center;">
+                                    <td rowspan="{{ $mcount }}" class="gpa-cell" style="vertical-align: middle; text-align: center;">
                                         {{ $numericGpa ?? '0.00' }}
                                     </td>
                                 @endif
                             </tr>
                         @else
                             <tr>
-                                <td>{{ $res['subject_code'] }}</td>
+                                <td class="code-col">{{ $res['subject_code'] }}</td>
                                 <td class="tl" style="text-align: left;">{{ strtoupper($res['subject_name']) }}</td>
                                 <td>{{ ($res['cq'] ?? null) !== null ? $fmt($res['cq']) : '' }}</td>
                                 <td>{{ ($res['mcq'] ?? null) !== null ? $fmt($res['mcq']) : '' }}</td>
-                                <td style="vertical-align: middle;">{{ is_numeric($res['highest_mark'] ?? null) && $res['highest_mark'] > 0 ? $fmt($res['highest_mark']) : '' }}</td>
+                                <td style="vertical-align: middle;">{{ $nx && is_numeric($nx['highest_mark'] ?? null) && $nx['highest_mark'] > 0 ? $fmt($nx['highest_mark']) : '' }}</td>
 
                                 @if($i === 0)
-                                    <td rowspan="{{ $mcount }}" style="vertical-align: middle; font-size: 11px; text-align: center;">
+                                    <td rowspan="{{ $mcount }}" class="gpa-cell" style="vertical-align: middle; text-align: center;">
                                         {{ $numericGpa ?? '0.00' }}
                                     </td>
                                 @endif
@@ -361,18 +394,18 @@
                             $cp  = trim($caS . ($prS !== '' ? ($caS !== '' ? '/' : '') . $prS : ''));
                         @endphp
                         <tr>
-                            <td>{{ $res['subject_code'] }}</td>
+                            <td class="code-col">{{ $res['subject_code'] }}</td>
                             <td class="tl" style="text-align: left;">{{ strtoupper($res['subject_name']) }}</td>
                             <td>{{ ($res['cq'] ?? null) !== null ? $fmt($res['cq']) : (($res['marks'] ?? null) !== null && ($res['mcq'] ?? null) === null && ($res['practical'] ?? null) === null ? $fmt($res['marks']) : '') }}</td>
                             <td>{{ ($res['mcq'] ?? null) !== null ? $fmt($res['mcq']) : '' }}</td>
                             <td>{{ $cp }}</td>
-                            <td >{{ ($res['marks'] ?? null) !== null ? $fmt($res['marks']) : '—' }}</td>
+                            <td style="font-weight: bold;">{{ ($res['marks'] ?? null) !== null ? $fmt($res['marks']) : '—' }}</td>
                             <td>{{ !empty($res['highest_mark']) ? $fmt($res['highest_mark']) : '' }}</td>
-                            <td >{{ number_format($res['point'] ?? 0, 1) }}</td>
-                            <td >{{ $res['grade'] ?? '-' }}</td>
+                            <td style="font-weight: bold;">{{ number_format($res['point'] ?? 0, 1) }}</td>
+                            <td class="{{ ($res['grade'] ?? '') == 'F' ? 'grade-fail' : 'grade-pass' }}">{{ $res['grade'] ?? '-' }}</td>
 
                             @if($i === 0)
-                                <td rowspan="{{ $mcount }}" class="bd" style="vertical-align: middle; font-size: 11px; text-align: center;">
+                                <td rowspan="{{ $mcount }}" class="gpa-cell" style="vertical-align: middle; text-align: center;">
                                     {{ $numericGpa ?? '0.00' }}
                                 </td>
                             @endif
@@ -404,6 +437,11 @@
                     </td>
                 </tr>
             </table>
+        </div>
+
+        {{-- 6. SOFTWARE BRANDING --}}
+        <div class="software-branding">
+            This marksheet genereted by educorexa erp solution
         </div>
     </div>
 </div>

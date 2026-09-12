@@ -395,4 +395,9 @@
         Download Marksheet (PDF)
     </a>
 
+    {{-- Software Branding --}}
+    <div class="text-center pt-2 text-muted fst-italic" style="font-size: 0.76rem; letter-spacing: 0.3px;">
+        This marksheet genereted by educorexa erp solution
+    </div>
+
 </div>
