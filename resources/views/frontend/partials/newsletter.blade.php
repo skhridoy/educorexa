@@ -1,5 +1,5 @@
 <!-- Newsletter Section -->
-<section class="py-16 md:py-20 px-4 md:px-8">
+<section id="newsletter" class="py-16 md:py-20 px-4 md:px-8">
     <div class="max-w-7xl mx-auto bg-surface-container-high rounded-2xl md:rounded-[40px] p-8 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12">
         <div class="max-w-lg space-y-3 md:space-y-4 text-center lg:text-left w-full lg:w-auto">
             <h2 class="font-headline-lg text-2xl md:text-3xl text-on-background">সর্বশেষ আপডেট পেতে সাবস্ক্রাইব করুন</h2>

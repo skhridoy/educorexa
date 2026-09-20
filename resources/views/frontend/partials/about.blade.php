@@ -95,7 +95,7 @@
     .x-small { font-size: 0.75rem; }
 
     /* আগের সেই স্টাইলিশ ইমেজ রোটেশন */
-    .about-visual-container { padding: 40px; }
+    .about-visual-container { padding: 30px 20px; }
     .main-img-box { 
         transform: rotate(-2deg); 
         transition: 0.5s; 
@@ -105,10 +105,10 @@
 
     /* ফ্লোটিং কার্ড পজিশন */
     .floating-badge {
-        position: absolute; top: 0; right: 0; z-index: 2; min-width: 180px;
+        position: absolute; top: 5px; right: -5px; z-index: 2; min-width: 170px;
     }
     .floating-badge-bottom {
-        position: absolute; bottom: 0; left: 0; z-index: 2; min-width: 180px;
+        position: absolute; bottom: 5px; left: -5px; z-index: 2; min-width: 170px;
     }
     .icon-circle {
         width: 45px; height: 45px; border-radius: 50%;

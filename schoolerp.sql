@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3307
--- Generation Time: Jun 23, 2026 at 07:03 AM
+-- Host: 127.0.0.1
+-- Generation Time: Sep 20, 2026 at 05:09 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -66,7 +66,7 @@ CREATE TABLE `academicyears` (
 --
 
 INSERT INTO `academicyears` (`id`, `school_id`, `name`, `start_date`, `end_date`, `is_active`, `deleted_at`, `created_at`, `updated_at`) VALUES
-(1, 1, '2026', '2026-01-01', '2026-12-31', 1, NULL, '2026-06-19 14:17:01', '2026-06-19 14:17:05');
+(1, 1, '2026', '2026-01-01', '2026-12-31', 1, NULL, '2026-08-21 12:05:53', '2026-08-21 12:05:58');
 
 -- --------------------------------------------------------
 
@@ -113,9 +113,39 @@ CREATE TABLE `assign_classes` (
   `subject_id` bigint(20) UNSIGNED NOT NULL,
   `full_mark` varchar(255) DEFAULT NULL,
   `pass_mark` varchar(255) DEFAULT NULL,
+  `theory_full_mark` decimal(8,2) DEFAULT NULL,
+  `theory_pass_mark` decimal(8,2) DEFAULT NULL,
+  `practical_full_mark` decimal(8,2) DEFAULT NULL,
+  `practical_pass_mark` decimal(8,2) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `assign_classes`
+--
+
+INSERT INTO `assign_classes` (`id`, `school_id`, `school_category_id`, `school_sub_category_id`, `class_id`, `subject_id`, `full_mark`, `pass_mark`, `theory_full_mark`, `theory_pass_mark`, `practical_full_mark`, `practical_pass_mark`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 1, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 12:11:12', '2026-08-21 12:11:12'),
+(2, 1, 1, 1, 1, 2, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 12:11:32', '2026-08-21 12:11:32'),
+(3, 1, 1, 1, 1, 3, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 12:11:47', '2026-08-21 12:11:47'),
+(4, 1, 1, 1, 2, 1, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 12:12:04', '2026-08-21 12:12:04'),
+(5, 1, 1, 1, 2, 2, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 12:16:18', '2026-08-21 12:16:18'),
+(6, 1, 2, 2, 6, 1, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 13:43:22', '2026-08-21 13:43:22'),
+(7, 1, 2, 2, 6, 4, '50', '17', NULL, NULL, NULL, NULL, '2026-08-21 13:43:38', '2026-08-21 13:43:38'),
+(8, 1, 2, 2, 6, 2, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 13:43:54', '2026-08-21 13:43:54'),
+(9, 1, 2, 2, 6, 5, '50', '17', NULL, NULL, NULL, NULL, '2026-08-21 13:44:15', '2026-08-21 13:44:15'),
+(10, 1, 2, 2, 6, 3, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 13:44:32', '2026-08-21 13:44:32'),
+(11, 1, 2, 2, 6, 6, '100', '33', NULL, NULL, NULL, NULL, '2026-08-21 14:43:32', '2026-08-21 14:43:32'),
+(12, 1, 3, NULL, 9, 1, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:47:26', '2026-08-22 18:47:26'),
+(13, 1, 3, NULL, 9, 2, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:47:42', '2026-08-22 18:47:42'),
+(14, 1, 3, NULL, 9, 3, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:47:55', '2026-08-22 18:47:55'),
+(15, 1, 3, 3, 9, 11, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:50:36', '2026-08-22 18:50:36'),
+(16, 1, 3, 3, 9, 8, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:50:52', '2026-08-22 18:50:52'),
+(17, 1, 3, 3, 9, 7, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:51:09', '2026-08-22 18:51:09'),
+(18, 1, 3, 4, 9, 6, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:51:23', '2026-08-22 18:51:23'),
+(19, 1, 3, 4, 9, 9, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:51:36', '2026-08-22 18:51:36'),
+(20, 1, 3, 4, 9, 10, '100', '33', NULL, NULL, NULL, NULL, '2026-08-22 18:51:51', '2026-08-22 18:51:51');
 
 -- --------------------------------------------------------
 
@@ -129,7 +159,7 @@ CREATE TABLE `attendances` (
   `student_id` bigint(20) UNSIGNED NOT NULL,
   `class_id` bigint(20) UNSIGNED NOT NULL,
   `section_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `teacher_id` bigint(20) UNSIGNED NOT NULL,
+  `teacher_id` bigint(20) UNSIGNED DEFAULT NULL,
   `date` date NOT NULL,
   `status` enum('present','absent','late') NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -161,12 +191,12 @@ CREATE TABLE `blogs` (
 --
 
 INSERT INTO `blogs` (`id`, `title`, `slug`, `image`, `blog_category_id`, `category`, `author`, `content`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'স্মার্ট স্কুল ম্যানেজমেন্ট সিস্টেমের সুবিধা ও কার্যকারিতা', 'smart-school-management-system-benefits', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop', 1, 'শিক্ষা প্রযুক্তি', 'এডমিন', 'একটি আধুনিক ও প্রযুক্তি নির্ভর শিক্ষা প্রতিষ্ঠান পরিচালনায় ইআরপি সফটওয়্যারের ভূমিকা অপরিসীম। এটি শিক্ষক, শিক্ষার্থী এবং অভিভাবকদের কাজের সমন্বয় সহজ করে। ডিজিটাল অ্যাটেনডেন্স থেকে শুরু করে অনলাইন ফি আদায়, রেজাল্ট শিট প্রস্তুত করা সহ স্কুলের প্রতিদিনের কার্যক্রমকে স্বয়ংক্রিয় ও নির্ভুল করে তোলে।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(2, 'শিক্ষার্থীদের মনোযোগ বৃদ্ধিতে শিক্ষকদের ভূমিকা', 'teachers-role-in-boosting-student-focus', 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=800&auto=format&fit=crop', 2, 'পরামর্শ', 'ফারহানা রহমান', 'শ্রেণীকক্ষে শিক্ষার্থীদের মনোযোগ আকর্ষণ ও তা ধরে রাখা প্রতিটি শিক্ষকের জন্যই একটি বড় চ্যালেঞ্জ। আধুনিক শিক্ষা পদ্ধতিতে মুখস্থ বিদ্যার চেয়ে ইন্টারেক্টিভ লার্নিং বা প্রশ্নোত্তরের মাধ্যমে পাঠদান করা বেশি কার্যকর। এছাড়া মাঝে মাঝে ছোট গ্রুপ স্টাডি বা কুইজের আয়োজন করলে শিক্ষার্থীরা পড়ালেখায় বেশি মনোযোগী হয়।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(3, 'নতুন শিক্ষাবর্ষের বার্ষিক ক্রীড়া প্রতিযোগিতা ও পুরষ্কার বিতরণী', 'annual-sports-competition-new-academic-year', 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800&auto=format&fit=crop', 3, 'ইভেন্ট', 'ক্রীড়া শিক্ষক', 'উৎসাহ ও উদ্দীপনার মধ্য দিয়ে উদযাপিত হলো আমাদের প্রতিষ্ঠানের বার্ষিক ক্রীড়া প্রতিযোগিতা। শিক্ষার্থীরা বিভিন্ন খেলাধূলায় অংশ নিয়ে তাদের প্রতিভা প্রদর্শন করেছে। প্রতিযোগিতা শেষে স্কুলের অধ্যক্ষ মহোদয় বিজয়ী শিক্ষার্থীদের হাতে মেডেল ও চ্যাম্পিয়ন ট্রফি তুলে দেন।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(4, 'ডিজিটাল ক্লাসরুম যেভাবে পাঠদানকে সহজ করছে', 'how-digital-classrooms-simplify-teaching', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop', 4, 'ডিজিটাল শিক্ষা', 'সাকিব আল হাসান', 'প্রজেক্টর ও মাল্টিমিডিয়া ক্লাসরুমের ব্যবহার শিক্ষার্থীদের পড়া সহজে বুঝতে এবং দীর্ঘক্ষণ মনে রাখতে দারুণ সহায়তা করছে। জটিল বৈজ্ঞানিক ফর্মুলা বা ঐতিহাসিক ঘটনাগুলো ভিডিও চিত্রের মাধ্যমে দেখানোর ফলে শিক্ষার্থীরা ক্লাসের পড়া দ্রুত আত্মস্থ করতে পারছে, যা ঐতিহ্যবাহী পাঠদানের চেয়ে অনেক বেশি কার্যকর।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(5, 'অভিভাবক-শিক্ষক সভা: শিক্ষার্থীদের সার্বিক উন্নয়ন নিশ্চিতকরণ', 'parent-teacher-meeting-ensuring-student-growth', 'https://images.unsplash.com/photo-1544531516-a5e34e2d3df3?q=80&w=800&auto=format&fit=crop', 5, 'নোটিশ', 'অধ্যক্ষ', 'শিক্ষার্থীদের পড়ালেখার মানোন্নয়ন ও আচরণগত উন্নতির লক্ষ্যে অভিভাবক ও শিক্ষক মতবিনিময় সভার আয়োজন করা হয়েছিল। সভায় শিক্ষকদের পক্ষ থেকে শিক্ষার্থীদের দুর্বলতা ও শক্তিগুলো তুলে ধরা হয় এবং অভিভাবকেরা তাদের মূল্যবান মতামত শেয়ার করেন। সম্মিলিত প্রচেষ্টায় শিক্ষার্থীদের আগামী দিনে এগিয়ে নেওয়ার সিদ্ধান্ত গৃহীত হয়।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(6, 'পরীক্ষার ভীতি দূর করার ৫টি সহজ বৈজ্ঞানিক উপায়', '5-scientific-ways-to-reduce-exam-fear', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=800&auto=format&fit=crop', 6, 'শিক্ষার্থী কর্নার', 'ডা. আরমান হোসেন', 'পরীক্ষার আগে মানসিক চাপ কমানো এবং স্মৃতিশক্তি বৃদ্ধির জন্য কার্যকরী কিছু বৈজ্ঞানিক টিপস রয়েছে। প্রথমত, নিয়মিত ও পর্যাপ্ত ঘুম নিশ্চিত করা। দ্বিতীয়ত, পড়ার মাঝে ছোট বিরতি (পোমোডোরো টেকনিক) নেওয়া। তৃতীয়ত, গ্রুপ ডিসকাশন করা এবং quarto, রিভিশনের জন্য ফ্ল্যাশকার্ড ব্যবহার করা।', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42');
+(1, 'স্মার্ট স্কুল ম্যানেজমেন্ট সিস্টেমের সুবিধা ও কার্যকারিতা', 'smart-school-management-system-benefits', 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=800&auto=format&fit=crop', 1, 'শিক্ষা প্রযুক্তি', 'এডমিন', 'একটি আধুনিক ও প্রযুক্তি নির্ভর শিক্ষা প্রতিষ্ঠান পরিচালনায় ইআরপি সফটওয়্যারের ভূমিকা অপরিসীম। এটি শিক্ষক, শিক্ষার্থী এবং অভিভাবকদের কাজের সমন্বয় সহজ করে। ডিজিটাল অ্যাটেনডেন্স থেকে শুরু করে অনলাইন ফি আদায়, রেজাল্ট শিট প্রস্তুত করা সহ স্কুলের প্রতিদিনের কার্যক্রমকে স্বয়ংক্রিয় ও নির্ভুল করে তোলে।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(2, 'শিক্ষার্থীদের মনোযোগ বৃদ্ধিতে শিক্ষকদের ভূমিকা', 'teachers-role-in-boosting-student-focus', 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=800&auto=format&fit=crop', 2, 'পরামর্শ', 'ফারহানা রহমান', 'শ্রেণীকক্ষে শিক্ষার্থীদের মনোযোগ আকর্ষণ ও তা ধরে রাখা প্রতিটি শিক্ষকের জন্যই একটি বড় চ্যালেঞ্জ। আধুনিক শিক্ষা পদ্ধতিতে মুখস্থ বিদ্যার চেয়ে ইন্টারেক্টিভ লার্নিং বা প্রশ্নোত্তরের মাধ্যমে পাঠদান করা বেশি কার্যকর। এছাড়া মাঝে মাঝে ছোট গ্রুপ স্টাডি বা কুইজের আয়োজন করলে শিক্ষার্থীরা পড়ালেখায় বেশি মনোযোগী হয়।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(3, 'নতুন শিক্ষাবর্ষের বার্ষিক ক্রীড়া প্রতিযোগিতা ও পুরষ্কার বিতরণী', 'annual-sports-competition-new-academic-year', 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800&auto=format&fit=crop', 3, 'ইভেন্ট', 'ক্রীড়া শিক্ষক', 'উৎসাহ ও উদ্দীপনার মধ্য দিয়ে উদযাপিত হলো আমাদের প্রতিষ্ঠানের বার্ষিক ক্রীড়া প্রতিযোগিতা। শিক্ষার্থীরা বিভিন্ন খেলাধূলায় অংশ নিয়ে তাদের প্রতিভা প্রদর্শন করেছে। প্রতিযোগিতা শেষে স্কুলের অধ্যক্ষ মহোদয় বিজয়ী শিক্ষার্থীদের হাতে মেডেল ও চ্যাম্পিয়ন ট্রফি তুলে দেন।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(4, 'ডিজিটাল ক্লাসরুম যেভাবে পাঠদানকে সহজ করছে', 'how-digital-classrooms-simplify-teaching', 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop', 4, 'ডিজিটাল শিক্ষা', 'সাকিব আল হাসান', 'প্রজেক্টর ও মাল্টিমিডিয়া ক্লাসরুমের ব্যবহার শিক্ষার্থীদের পড়া সহজে বুঝতে এবং দীর্ঘক্ষণ মনে রাখতে দারুণ সহায়তা করছে। জটিল বৈজ্ঞানিক ফর্মুলা বা ঐতিহাসিক ঘটনাগুলো ভিডিও চিত্রের মাধ্যমে দেখানোর ফলে শিক্ষার্থীরা ক্লাসের পড়া দ্রুত আত্মস্থ করতে পারছে, যা ঐতিহ্যবাহী পাঠদানের চেয়ে অনেক বেশি কার্যকর।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(5, 'অভিভাবক-শিক্ষক সভা: শিক্ষার্থীদের সার্বিক উন্নয়ন নিশ্চিতকরণ', 'parent-teacher-meeting-ensuring-student-growth', 'https://images.unsplash.com/photo-1544531516-a5e34e2d3df3?q=80&w=800&auto=format&fit=crop', 5, 'নোটিশ', 'অধ্যক্ষ', 'শিক্ষার্থীদের পড়ালেখার মানোন্নয়ন ও আচরণগত উন্নতির লক্ষ্যে অভিভাবক ও শিক্ষক মতবিনিময় সভার আয়োজন করা হয়েছিল। সভায় শিক্ষকদের পক্ষ থেকে শিক্ষার্থীদের দুর্বলতা ও শক্তিগুলো তুলে ধরা হয় এবং অভিভাবকেরা তাদের মূল্যবান মতামত শেয়ার করেন। সম্মিলিত প্রচেষ্টায় শিক্ষার্থীদের আগামী দিনে এগিয়ে নেওয়ার সিদ্ধান্ত গৃহীত হয়।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(6, 'পরীক্ষার ভীতি দূর করার ৫টি সহজ বৈজ্ঞানিক উপায়', '5-scientific-ways-to-reduce-exam-fear', 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=800&auto=format&fit=crop', 6, 'শিক্ষার্থী কর্নার', 'ডা. আরমান হোসেন', 'পরীক্ষার আগে মানসিক চাপ কমানো এবং স্মৃতিশক্তি বৃদ্ধির জন্য কার্যকরী কিছু বৈজ্ঞানিক টিপস রয়েছে। প্রথমত, নিয়মিত ও পর্যাপ্ত ঘুম নিশ্চিত করা। দ্বিতীয়ত, পড়ার মাঝে ছোট বিরতি (পোমোডোরো টেকনিক) নেওয়া। তৃতীয়ত, গ্রুপ ডিসকাশন করা এবং quarto, রিভিশনের জন্য ফ্ল্যাশকার্ড ব্যবহার করা।', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41');
 
 -- --------------------------------------------------------
 
@@ -188,12 +218,12 @@ CREATE TABLE `blog_categories` (
 --
 
 INSERT INTO `blog_categories` (`id`, `name`, `slug`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'শিক্ষা প্রযুক্তি (EdTech)', 'edtech', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(2, 'পরামর্শ (Tips/Guides)', 'tips-guides', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(3, 'ইভেন্ট (Events)', 'events', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(4, 'ডিজিটাল শিক্ষা (Digital Learning)', 'digital-learning', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(5, 'নোটিশ (Announcements)', 'announcements', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42'),
-(6, 'শিক্ষার্থী কর্নার (Student Corner)', 'student-corner', 1, '2026-06-22 20:25:42', '2026-06-22 20:25:42');
+(1, 'শিক্ষা প্রযুক্তি (EdTech)', 'edtech', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(2, 'পরামর্শ (Tips/Guides)', 'tips-guides', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(3, 'ইভেন্ট (Events)', 'events', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(4, 'ডিজিটাল শিক্ষা (Digital Learning)', 'digital-learning', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(5, 'নোটিশ (Announcements)', 'announcements', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(6, 'শিক্ষার্থী কর্নার (Student Corner)', 'student-corner', 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41');
 
 -- --------------------------------------------------------
 
@@ -212,7 +242,7 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('educorexa-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:7:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"group_name\";s:1:\"d\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";s:1:\"j\";s:9:\"role_type\";s:1:\"m\";s:9:\"school_id\";}s:11:\"permissions\";a:81:{i:0;a:5:{s:1:\"a\";i:1;s:1:\"b\";s:20:\"academic-year.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:1;a:5:{s:1:\"a\";i:2;s:1:\"b\";s:15:\"category.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:2;a:5:{s:1:\"a\";i:3;s:1:\"b\";s:19:\"sub-category.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:3;a:5:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"class.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:4;a:5:{s:1:\"a\";i:5;s:1:\"b\";s:14:\"section.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:5;a:5:{s:1:\"a\";i:6;s:1:\"b\";s:14:\"subject.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:6;a:5:{s:1:\"a\";i:7;s:1:\"b\";s:14:\"assign.subject\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:7;a:5:{s:1:\"a\";i:8;s:1:\"b\";s:13:\"class.routine\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:8;a:5:{s:1:\"a\";i:9;s:1:\"b\";s:15:\"syllabus.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:9;a:5:{s:1:\"a\";i:10;s:1:\"b\";s:11:\"lesson.view\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:10;a:5:{s:1:\"a\";i:11;s:1:\"b\";s:13:\"lesson.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:11;a:5:{s:1:\"a\";i:12;s:1:\"b\";s:15:\"homework.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:12;a:5:{s:1:\"a\";i:13;s:1:\"b\";s:13:\"syllabus.view\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:13;a:5:{s:1:\"a\";i:14;s:1:\"b\";s:17:\"syllabus.download\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:14;a:5:{s:1:\"a\";i:15;s:1:\"b\";s:15:\"syllabus.upload\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:15;a:5:{s:1:\"a\";i:16;s:1:\"b\";s:15:\"syllabus.delete\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:16;a:5:{s:1:\"a\";i:17;s:1:\"b\";s:16:\"syllabus.approve\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:17;a:5:{s:1:\"a\";i:18;s:1:\"b\";s:15:\"syllabus.reject\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:18;a:5:{s:1:\"a\";i:19;s:1:\"b\";s:22:\"syllabus.view_rejected\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:19;a:5:{s:1:\"a\";i:20;s:1:\"b\";s:22:\"syllabus.view_approved\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:20;a:5:{s:1:\"a\";i:21;s:1:\"b\";s:16:\"admission.manage\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:21;a:5:{s:1:\"a\";i:22;s:1:\"b\";s:13:\"student.index\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:22;a:5:{s:1:\"a\";i:23;s:1:\"b\";s:14:\"student.create\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:23;a:5:{s:1:\"a\";i:24;s:1:\"b\";s:12:\"student.edit\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:24;a:5:{s:1:\"a\";i:25;s:1:\"b\";s:14:\"student.delete\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:25;a:5:{s:1:\"a\";i:26;s:1:\"b\";s:14:\"student.manage\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:26;a:5:{s:1:\"a\";i:27;s:1:\"b\";s:14:\"student.idcard\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:27;a:5:{s:1:\"a\";i:28;s:1:\"b\";s:17:\"student.promotion\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:28;a:5:{s:1:\"a\";i:29;s:1:\"b\";s:14:\"teacher.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:29;a:5:{s:1:\"a\";i:30;s:1:\"b\";s:14:\"assign.teacher\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:30;a:5:{s:1:\"a\";i:31;s:1:\"b\";s:15:\"employee.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:31;a:5:{s:1:\"a\";i:32;s:1:\"b\";s:18:\"designation.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:32;a:5:{s:1:\"a\";i:33;s:1:\"b\";s:14:\"payroll.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:33;a:5:{s:1:\"a\";i:34;s:1:\"b\";s:12:\"leave.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:34;a:5:{s:1:\"a\";i:35;s:1:\"b\";s:17:\"attendance.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:35;a:5:{s:1:\"a\";i:36;s:1:\"b\";s:17:\"attendance.report\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:36;a:5:{s:1:\"a\";i:37;s:1:\"b\";s:14:\"payroll.report\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:37;a:5:{s:1:\"a\";i:38;s:1:\"b\";s:12:\"staff.report\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:38;a:5:{s:1:\"a\";i:39;s:1:\"b\";s:12:\"staff.idcard\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:39;a:5:{s:1:\"a\";i:40;s:1:\"b\";s:15:\"staff.promotion\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:40;a:5:{s:1:\"a\";i:41;s:1:\"b\";s:14:\"staff.transfer\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:41;a:5:{s:1:\"a\";i:42;s:1:\"b\";s:17:\"staff.termination\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:42;a:5:{s:1:\"a\";i:43;s:1:\"b\";s:11:\"staff.leave\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:43;a:5:{s:1:\"a\";i:44;s:1:\"b\";s:16:\"staff.attendance\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:44;a:5:{s:1:\"a\";i:45;s:1:\"b\";s:13:\"staff.payroll\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:45;a:5:{s:1:\"a\";i:46;s:1:\"b\";s:14:\"holiday.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:46;a:5:{s:1:\"a\";i:47;s:1:\"b\";s:11:\"exam.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:47;a:5:{s:1:\"a\";i:48;s:1:\"b\";s:11:\"mark.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:48;a:5:{s:1:\"a\";i:49;s:1:\"b\";s:15:\"exam.admit_card\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:49;a:5:{s:1:\"a\";i:50;s:1:\"b\";s:10:\"fee.manage\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:50;a:5:{s:1:\"a\";i:51;s:1:\"b\";s:11:\"fee.collect\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:51;a:5:{s:1:\"a\";i:52;s:1:\"b\";s:10:\"fee.report\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:52;a:5:{s:1:\"a\";i:53;s:1:\"b\";s:13:\"notice.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:53;a:5:{s:1:\"a\";i:54;s:1:\"b\";s:13:\"slider.manage\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:54;a:5:{s:1:\"a\";i:55;s:1:\"b\";s:14:\"gallery.manage\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:55;a:5:{s:1:\"a\";i:56;s:1:\"b\";s:14:\"message.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:56;a:5:{s:1:\"a\";i:57;s:1:\"b\";s:8:\"sms.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:57;a:5:{s:1:\"a\";i:58;s:1:\"b\";s:10:\"email.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:58;a:5:{s:1:\"a\";i:59;s:1:\"b\";s:13:\"whatsapp.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:59;a:5:{s:1:\"a\";i:60;s:1:\"b\";s:17:\"newsletter.manage\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:60;a:5:{s:1:\"a\";i:61;s:1:\"b\";s:15:\"system.settings\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:61;a:5:{s:1:\"a\";i:62;s:1:\"b\";s:13:\"school.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:62;a:5:{s:1:\"a\";i:63;s:1:\"b\";s:13:\"school.create\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:63;a:5:{s:1:\"a\";i:64;s:1:\"b\";s:14:\"school.approve\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:64;a:5:{s:1:\"a\";i:65;s:1:\"b\";s:15:\"frontend.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:65;a:5:{s:1:\"a\";i:66;s:1:\"b\";s:13:\"school.reject\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:66;a:5:{s:1:\"a\";i:67;s:1:\"b\";s:13:\"school.delete\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:67;a:5:{s:1:\"a\";i:68;s:1:\"b\";s:15:\"settings.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:68;a:5:{s:1:\"a\";i:69;s:1:\"b\";s:18:\"super.roles.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:69;a:5:{s:1:\"a\";i:70;s:1:\"b\";s:21:\"contact.messages.view\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:70;a:5:{s:1:\"a\";i:71;s:1:\"b\";s:19:\"testimonial.approve\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:71;a:5:{s:1:\"a\";i:72;s:1:\"b\";s:14:\"support.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:72;a:5:{s:1:\"a\";i:73;s:1:\"b\";s:18:\"support.bot.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:73;a:5:{s:1:\"a\";i:74;s:1:\"b\";s:8:\"Academic\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:74;a:5:{s:1:\"a\";i:75;s:1:\"b\";s:21:\"Students & Admissions\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:75;a:5:{s:1:\"a\";i:76;s:1:\"b\";s:10:\"Staff & HR\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:76;a:5:{s:1:\"a\";i:77;s:1:\"b\";s:18:\"Attendance & Exams\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:77;a:5:{s:1:\"a\";i:78;s:1:\"b\";s:14:\"Finance (Fees)\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:78;a:5:{s:1:\"a\";i:79;s:1:\"b\";s:23:\"Website & Communication\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:79;a:5:{s:1:\"a\";i:80;s:1:\"b\";s:8:\"Settings\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}i:80;a:5:{s:1:\"a\";i:81;s:1:\"b\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"c\";N;s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:8;}}}s:5:\"roles\";a:2:{i:0;a:5:{s:1:\"a\";i:1;s:1:\"b\";s:11:\"super_admin\";s:1:\"d\";s:3:\"web\";s:1:\"j\";s:8:\"employee\";s:1:\"m\";N;}i:1;a:5:{s:1:\"a\";i:8;s:1:\"b\";s:12:\"school_admin\";s:1:\"d\";s:3:\"web\";s:1:\"j\";s:12:\"school_staff\";s:1:\"m\";N;}}}', 1782246865);
+('educorexa-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:7:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"group_name\";s:1:\"d\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";s:1:\"j\";s:9:\"role_type\";s:1:\"m\";s:9:\"school_id\";}s:11:\"permissions\";a:82:{i:0;a:5:{s:1:\"a\";i:1;s:1:\"b\";s:20:\"academic-year.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:1;a:5:{s:1:\"a\";i:2;s:1:\"b\";s:15:\"category.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:2;a:5:{s:1:\"a\";i:3;s:1:\"b\";s:19:\"sub-category.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:3;a:5:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"class.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:4;a:5:{s:1:\"a\";i:5;s:1:\"b\";s:14:\"section.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:5;a:5:{s:1:\"a\";i:6;s:1:\"b\";s:14:\"subject.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:6;a:5:{s:1:\"a\";i:7;s:1:\"b\";s:14:\"assign.subject\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:7;a:5:{s:1:\"a\";i:8;s:1:\"b\";s:13:\"class.routine\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:8;a:5:{s:1:\"a\";i:9;s:1:\"b\";s:15:\"syllabus.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:9;a:5:{s:1:\"a\";i:10;s:1:\"b\";s:11:\"lesson.view\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:10;a:5:{s:1:\"a\";i:11;s:1:\"b\";s:13:\"lesson.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:11;a:5:{s:1:\"a\";i:12;s:1:\"b\";s:15:\"homework.manage\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:12;a:5:{s:1:\"a\";i:13;s:1:\"b\";s:13:\"syllabus.view\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:13;a:5:{s:1:\"a\";i:14;s:1:\"b\";s:17:\"syllabus.download\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:14;a:5:{s:1:\"a\";i:15;s:1:\"b\";s:15:\"syllabus.upload\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:15;a:5:{s:1:\"a\";i:16;s:1:\"b\";s:15:\"syllabus.delete\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:16;a:5:{s:1:\"a\";i:17;s:1:\"b\";s:16:\"syllabus.approve\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:17;a:5:{s:1:\"a\";i:18;s:1:\"b\";s:15:\"syllabus.reject\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:18;a:5:{s:1:\"a\";i:19;s:1:\"b\";s:22:\"syllabus.view_rejected\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:19;a:5:{s:1:\"a\";i:20;s:1:\"b\";s:22:\"syllabus.view_approved\";s:1:\"c\";s:8:\"Academic\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:20;a:5:{s:1:\"a\";i:21;s:1:\"b\";s:16:\"admission.manage\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:21;a:5:{s:1:\"a\";i:22;s:1:\"b\";s:13:\"student.index\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:22;a:5:{s:1:\"a\";i:23;s:1:\"b\";s:14:\"student.create\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:23;a:5:{s:1:\"a\";i:24;s:1:\"b\";s:12:\"student.edit\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:24;a:5:{s:1:\"a\";i:25;s:1:\"b\";s:14:\"student.delete\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:25;a:5:{s:1:\"a\";i:26;s:1:\"b\";s:14:\"student.manage\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:26;a:5:{s:1:\"a\";i:27;s:1:\"b\";s:14:\"student.idcard\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:27;a:5:{s:1:\"a\";i:28;s:1:\"b\";s:17:\"student.promotion\";s:1:\"c\";s:21:\"Students & Admissions\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:28;a:5:{s:1:\"a\";i:29;s:1:\"b\";s:14:\"teacher.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:29;a:5:{s:1:\"a\";i:30;s:1:\"b\";s:14:\"assign.teacher\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:30;a:5:{s:1:\"a\";i:31;s:1:\"b\";s:15:\"employee.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:31;a:5:{s:1:\"a\";i:32;s:1:\"b\";s:18:\"designation.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:32;a:5:{s:1:\"a\";i:33;s:1:\"b\";s:14:\"payroll.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:33;a:5:{s:1:\"a\";i:34;s:1:\"b\";s:12:\"leave.manage\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:34;a:5:{s:1:\"a\";i:35;s:1:\"b\";s:17:\"attendance.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:35;a:5:{s:1:\"a\";i:36;s:1:\"b\";s:17:\"attendance.report\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:36;a:5:{s:1:\"a\";i:37;s:1:\"b\";s:14:\"payroll.report\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:37;a:5:{s:1:\"a\";i:38;s:1:\"b\";s:12:\"staff.report\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:38;a:5:{s:1:\"a\";i:39;s:1:\"b\";s:12:\"staff.idcard\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:39;a:5:{s:1:\"a\";i:40;s:1:\"b\";s:15:\"staff.promotion\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:40;a:5:{s:1:\"a\";i:41;s:1:\"b\";s:14:\"staff.transfer\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:41;a:5:{s:1:\"a\";i:42;s:1:\"b\";s:17:\"staff.termination\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:42;a:5:{s:1:\"a\";i:43;s:1:\"b\";s:11:\"staff.leave\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:43;a:5:{s:1:\"a\";i:44;s:1:\"b\";s:16:\"staff.attendance\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:44;a:5:{s:1:\"a\";i:45;s:1:\"b\";s:13:\"staff.payroll\";s:1:\"c\";s:10:\"Staff & HR\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:45;a:5:{s:1:\"a\";i:46;s:1:\"b\";s:20:\"attendance.analytics\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:46;a:5:{s:1:\"a\";i:47;s:1:\"b\";s:14:\"holiday.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:47;a:5:{s:1:\"a\";i:48;s:1:\"b\";s:11:\"exam.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:48;a:5:{s:1:\"a\";i:49;s:1:\"b\";s:11:\"mark.manage\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:49;a:5:{s:1:\"a\";i:50;s:1:\"b\";s:15:\"exam.admit_card\";s:1:\"c\";s:18:\"Attendance & Exams\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:50;a:5:{s:1:\"a\";i:51;s:1:\"b\";s:10:\"fee.manage\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:51;a:5:{s:1:\"a\";i:52;s:1:\"b\";s:11:\"fee.collect\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:52;a:5:{s:1:\"a\";i:53;s:1:\"b\";s:10:\"fee.report\";s:1:\"c\";s:14:\"Finance (Fees)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:53;a:5:{s:1:\"a\";i:54;s:1:\"b\";s:13:\"notice.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:54;a:5:{s:1:\"a\";i:55;s:1:\"b\";s:13:\"slider.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:55;a:5:{s:1:\"a\";i:56;s:1:\"b\";s:14:\"gallery.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:56;a:5:{s:1:\"a\";i:57;s:1:\"b\";s:14:\"message.manage\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:57;a:5:{s:1:\"a\";i:58;s:1:\"b\";s:8:\"sms.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:58;a:5:{s:1:\"a\";i:59;s:1:\"b\";s:10:\"email.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:59;a:5:{s:1:\"a\";i:60;s:1:\"b\";s:13:\"whatsapp.send\";s:1:\"c\";s:23:\"Website & Communication\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:60;a:5:{s:1:\"a\";i:61;s:1:\"b\";s:17:\"newsletter.manage\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:61;a:5:{s:1:\"a\";i:62;s:1:\"b\";s:15:\"system.settings\";s:1:\"c\";s:8:\"Settings\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:8;}}i:62;a:5:{s:1:\"a\";i:63;s:1:\"b\";s:13:\"school.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:9;}}i:63;a:5:{s:1:\"a\";i:64;s:1:\"b\";s:13:\"school.create\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:9;}}i:64;a:5:{s:1:\"a\";i:65;s:1:\"b\";s:14:\"school.approve\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:65;a:5:{s:1:\"a\";i:66;s:1:\"b\";s:15:\"frontend.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:66;a:5:{s:1:\"a\";i:67;s:1:\"b\";s:13:\"school.reject\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:67;a:5:{s:1:\"a\";i:68;s:1:\"b\";s:13:\"school.delete\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:68;a:5:{s:1:\"a\";i:69;s:1:\"b\";s:15:\"settings.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:69;a:5:{s:1:\"a\";i:70;s:1:\"b\";s:18:\"super.roles.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:70;a:5:{s:1:\"a\";i:71;s:1:\"b\";s:21:\"contact.messages.view\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:71;a:5:{s:1:\"a\";i:72;s:1:\"b\";s:19:\"testimonial.approve\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:72;a:5:{s:1:\"a\";i:73;s:1:\"b\";s:14:\"support.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:73;a:5:{s:1:\"a\";i:74;s:1:\"b\";s:18:\"support.bot.manage\";s:1:\"c\";s:43:\"SaaS Management (Super Admin/Employee Only)\";s:1:\"d\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:74;a:4:{s:1:\"a\";i:83;s:1:\"b\";s:12:\"batch.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:75;a:4:{s:1:\"a\";i:84;s:1:\"b\";s:23:\"coaching.student.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:76;a:4:{s:1:\"a\";i:85;s:1:\"b\";s:23:\"coaching.teacher.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:77;a:4:{s:1:\"a\";i:86;s:1:\"b\";s:26:\"coaching.attendance.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:78;a:4:{s:1:\"a\";i:87;s:1:\"b\";s:20:\"coaching.exam.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:79;a:4:{s:1:\"a\";i:88;s:1:\"b\";s:20:\"coaching.mark.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:80;a:4:{s:1:\"a\";i:89;s:1:\"b\";s:19:\"coaching.fee.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}i:81;a:4:{s:1:\"a\";i:90;s:1:\"b\";s:22:\"coaching.notice.manage\";s:1:\"c\";s:15:\"Coaching Center\";s:1:\"d\";s:3:\"web\";}}s:5:\"roles\";a:3:{i:0;a:5:{s:1:\"a\";i:1;s:1:\"b\";s:11:\"super_admin\";s:1:\"d\";s:3:\"web\";s:1:\"j\";s:8:\"employee\";s:1:\"m\";N;}i:1;a:5:{s:1:\"a\";i:8;s:1:\"b\";s:12:\"school_admin\";s:1:\"d\";s:3:\"web\";s:1:\"j\";s:12:\"school_staff\";s:1:\"m\";N;}i:2;a:5:{s:1:\"a\";i:9;s:1:\"b\";s:14:\"Representative\";s:1:\"d\";s:3:\"web\";s:1:\"j\";s:8:\"employee\";s:1:\"m\";N;}}}', 1789233040);
 
 -- --------------------------------------------------------
 
@@ -248,7 +278,15 @@ CREATE TABLE `classes` (
 --
 
 INSERT INTO `classes` (`id`, `school_id`, `name`, `code`, `description`, `created_at`, `updated_at`, `school_category_id`) VALUES
-(1, 1, 'One', '01', NULL, '2026-06-19 14:29:05', '2026-06-19 14:29:05', 1);
+(1, 1, 'One', '01', NULL, '2026-08-21 12:07:21', '2026-08-21 12:07:21', 1),
+(2, 1, 'Two', '02', NULL, '2026-08-21 12:07:46', '2026-08-21 12:07:46', 1),
+(3, 1, 'Three', '03', NULL, '2026-08-21 12:07:57', '2026-08-21 12:07:57', 1),
+(4, 1, 'Four', '04', NULL, '2026-08-21 12:08:16', '2026-08-21 12:08:16', 1),
+(5, 1, 'Five', '05', NULL, '2026-08-21 12:08:29', '2026-08-21 12:08:29', 1),
+(6, 1, 'Six', '06', NULL, '2026-08-21 12:08:48', '2026-08-21 12:09:10', 2),
+(7, 1, 'Seven', '07', NULL, '2026-08-21 12:09:02', '2026-08-21 12:09:02', 2),
+(8, 1, 'Eight', '08', NULL, '2026-08-21 12:09:22', '2026-08-21 12:09:22', 2),
+(9, 1, 'Nine', '09', NULL, '2026-08-22 18:47:07', '2026-08-22 18:47:07', 3);
 
 -- --------------------------------------------------------
 
@@ -270,6 +308,16 @@ CREATE TABLE `communication_settings` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `communication_settings`
+--
+
+INSERT INTO `communication_settings` (`id`, `school_id`, `event`, `email_enabled`, `sms_enabled`, `whatsapp_enabled`, `email_template`, `sms_template`, `whatsapp_template`, `created_at`, `updated_at`) VALUES
+(1, 1, 'fee_reminder', 0, 0, 0, 'Dear [student_name],\n\nThis is a friendly reminder that your [fee_name] for the month of [month] amounting to ৳[fee_amount] is currently unpaid.\n\nPlease pay at your earliest convenience.\n\nThank you,\n[school_name]', 'Dear [student_name], your [fee_name] of ৳[fee_amount] for [month] is unpaid. Please pay soon. - [school_name]', 'Dear [student_name],\nYour [fee_name] of ৳[fee_amount] for [month] is unpaid.\nPlease pay soon.\n- [school_name]', '2026-08-21 21:44:38', '2026-08-21 21:44:38'),
+(2, 1, 'attendance', 0, 0, 0, 'Dear Parent,\n\nYour child [student_name] was marked [status] today ([date]).\n\nRegards,\n[school_name]', 'Dear Parent, [student_name] is [status] today ([date]). - [school_name]', 'Dear Parent,\n[student_name] is [status] today ([date]).\n- [school_name]', '2026-08-21 21:44:38', '2026-08-21 21:44:38'),
+(3, 1, 'notice', 0, 0, 0, 'Dear [student_name],\n\nNotice: [notice_title]\n\nPlease check the portal for more details.\n\nRegards,\n[school_name]', 'Notice: [notice_title]. Check portal for details. - [school_name]', 'Dear [student_name],\n*Notice:* [notice_title]\nPlease check the portal for details.\n- [school_name]', '2026-08-21 21:44:38', '2026-08-21 21:44:38'),
+(4, 1, 'result_published', 0, 0, 0, 'Dear [student_name],\n\nThe result for [exam_name] has been published. Please check the student portal.\n\nRegards,\n[school_name]', 'Result for [exam_name] of [student_name] has been published. Please check the portal. - [school_name]', 'Dear [student_name],\nThe result for [exam_name] has been published. Please check the portal.\n- [school_name]', '2026-09-03 16:58:07', '2026-09-03 16:58:07');
+
 -- --------------------------------------------------------
 
 --
@@ -290,6 +338,18 @@ CREATE TABLE `contact_messages` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `email_logs`
+--
+
+CREATE TABLE `email_logs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `employees`
 --
 
@@ -302,10 +362,21 @@ CREATE TABLE `employees` (
   `address` text DEFAULT NULL,
   `joining_date` date DEFAULT NULL,
   `salary` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `commission_type` enum('flat','percentage') NOT NULL DEFAULT 'flat',
+  `commission_rate` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `monthly_commission_type` enum('flat','percentage') NOT NULL DEFAULT 'flat',
+  `monthly_commission_rate` decimal(10,2) NOT NULL DEFAULT 0.00,
   `status` varchar(255) NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`id`, `user_id`, `employee_id`, `designation`, `phone_personal`, `address`, `joining_date`, `salary`, `commission_type`, `commission_rate`, `monthly_commission_type`, `monthly_commission_rate`, `status`, `created_at`, `updated_at`) VALUES
+(1, 16, 'REP-2026001', 'Sales Representative', '01766236788', 'জেলা: Nilphamari | ঠিকানা: sff we ff | কারণ: ffsfwf dvv', '2026-09-10', 0.00, 'flat', 0.00, 'flat', 0.00, 'active', '2026-09-10 04:54:11', '2026-09-10 04:54:11');
 
 -- --------------------------------------------------------
 
@@ -347,6 +418,71 @@ CREATE TABLE `exams` (
   `published_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `exams`
+--
+
+INSERT INTO `exams` (`id`, `school_id`, `school_category_id`, `year_id`, `name`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`, `is_published`, `published_at`) VALUES
+(1, 1, 2, 1, 'Half Yearly Exam', '2026-07-01', '2026-07-16', 0, '2026-08-21 12:25:04', '2026-08-21 13:48:31', 1, NULL),
+(2, 1, 1, 1, 'First Term Exam', '2026-04-18', '2026-04-29', 0, '2026-08-21 12:28:28', '2026-08-21 12:46:57', 1, NULL),
+(3, 1, 1, 1, 'প্রাক-নির্বাচনী পরীক্ষা (Pre-Test Exam)', '2026-07-22', '2026-07-30', 0, '2026-08-21 12:34:28', '2026-08-21 12:46:34', 0, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_categories`
+--
+
+CREATE TABLE `exam_categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `exam_id` bigint(20) UNSIGNED NOT NULL,
+  `school_category_id` bigint(20) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_categories`
+--
+
+INSERT INTO `exam_categories` (`id`, `exam_id`, `school_category_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, '2026-08-28 19:19:06', '2026-08-28 19:19:06'),
+(2, 2, 1, '2026-08-28 19:19:06', '2026-08-28 19:19:06'),
+(3, 3, 1, '2026-08-28 19:19:06', '2026-08-28 19:19:06'),
+(4, 1, 3, '2026-08-28 19:24:50', '2026-08-28 19:24:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exam_routines`
+--
+
+CREATE TABLE `exam_routines` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `academic_year_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_id` bigint(20) UNSIGNED NOT NULL,
+  `class_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `subject_id` bigint(20) UNSIGNED NOT NULL,
+  `exam_date` date NOT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `exam_routines`
+--
+
+INSERT INTO `exam_routines` (`id`, `school_id`, `academic_year_id`, `exam_id`, `class_id`, `subject_id`, `exam_date`, `start_time`, `end_time`, `created_at`, `updated_at`) VALUES
+(4, 1, 1, 1, 6, 1, '2026-08-22', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38'),
+(5, 1, 1, 1, 6, 4, '2026-08-23', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38'),
+(6, 1, 1, 1, 6, 2, '2026-08-24', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38'),
+(7, 1, 1, 1, 6, 5, '2026-08-25', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38'),
+(8, 1, 1, 1, 6, 3, '2026-08-26', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38'),
+(9, 1, 1, 1, 6, 6, '2026-08-27', NULL, NULL, '2026-08-22 14:42:38', '2026-08-22 14:42:38');
+
 -- --------------------------------------------------------
 
 --
@@ -386,8 +522,16 @@ CREATE TABLE `fee_amounts` (
 --
 
 INSERT INTO `fee_amounts` (`id`, `school_id`, `fee_head_id`, `class_id`, `school_category_id`, `school_sub_category_id`, `amount`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, 1, NULL, 1000.00, '2026-06-19 14:37:08', '2026-06-19 14:37:08'),
-(2, 1, 2, 1, 1, 1, 500.00, '2026-06-19 14:40:24', '2026-06-19 14:40:24');
+(1, 1, 1, 1, 1, NULL, 200.00, '2026-08-30 07:47:53', '2026-08-30 07:47:53'),
+(2, 1, 1, 2, 1, NULL, 200.00, '2026-08-30 07:47:53', '2026-08-30 07:47:53'),
+(3, 1, 1, 3, 1, NULL, 250.00, '2026-08-30 07:47:53', '2026-08-30 07:47:53'),
+(4, 1, 1, 4, 1, NULL, 250.00, '2026-08-30 07:47:53', '2026-08-30 07:47:53'),
+(5, 1, 1, 5, 1, NULL, 300.00, '2026-08-30 07:47:53', '2026-08-30 07:47:53'),
+(6, 1, 2, 1, 1, NULL, 1000.00, '2026-09-04 16:22:01', '2026-09-04 16:22:01'),
+(7, 1, 2, 2, 1, NULL, 1000.00, '2026-09-04 16:22:01', '2026-09-04 16:22:01'),
+(8, 1, 2, 3, 1, NULL, 1200.00, '2026-09-04 16:22:01', '2026-09-04 16:22:01'),
+(9, 1, 2, 4, 1, NULL, 1300.00, '2026-09-04 16:22:01', '2026-09-04 16:22:01'),
+(10, 1, 2, 5, 1, NULL, 1500.00, '2026-09-04 16:22:01', '2026-09-04 16:22:01');
 
 -- --------------------------------------------------------
 
@@ -409,8 +553,8 @@ CREATE TABLE `fee_heads` (
 --
 
 INSERT INTO `fee_heads` (`id`, `school_id`, `name`, `type`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Admission Fee', 'recurring', '2026-06-19 14:36:55', '2026-06-19 14:36:55'),
-(2, 1, 'Tution Fee', 'monthly', '2026-06-19 14:40:05', '2026-06-19 14:40:05');
+(1, 1, 'Exam Fee', 'recurring', '2026-08-30 07:47:08', '2026-08-30 07:47:08'),
+(2, 1, 'Admission Fee', 'recurring', '2026-09-02 11:35:52', '2026-09-02 11:35:52');
 
 -- --------------------------------------------------------
 
@@ -453,15 +597,15 @@ CREATE TABLE `frontend_sections` (
 --
 
 INSERT INTO `frontend_sections` (`id`, `key`, `title`, `status`, `content`, `order`, `created_at`, `updated_at`) VALUES
-(1, 'hero', 'Hero Section', 1, NULL, 1, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(2, 'features', 'Features Section', 1, NULL, 2, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(3, 'why_choose_us', 'Why Choose Us', 1, NULL, 3, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(4, 'setup-section', 'Setup Section', 1, NULL, 4, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(5, 'pricing', 'Pricing Table', 1, NULL, 5, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(6, 'about', 'About Us', 1, NULL, 6, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(7, 'testimonials', 'Testimonials', 1, NULL, 7, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(8, 'contact', 'Contact Section', 1, NULL, 8, '2026-06-19 07:38:47', '2026-06-19 07:38:47'),
-(9, 'blogs', 'Blog Slider', 1, '\"{\\\"badge_text\\\":\\\"\\\\u0986\\\\u09ae\\\\u09be\\\\u09a6\\\\u09c7\\\\u09b0 \\\\u09ac\\\\u09cd\\\\u09b2\\\\u0997 \\\\u0993 \\\\u0996\\\\u09ac\\\\u09b0\\\",\\\"title\\\":\\\"\\\\u09b8\\\\u09b0\\\\u09cd\\\\u09ac\\\\u09b6\\\\u09c7\\\\u09b7 \\\\u0986\\\\u09aa\\\\u09a1\\\\u09c7\\\\u099f \\\\u0993 \\\\u09b6\\\\u09bf\\\\u0995\\\\u09cd\\\\u09b7\\\\u09be\\\\u09ae\\\\u09c2\\\\u09b2\\\\u0995 \\\\u09aa\\\\u09cd\\\\u09b0\\\\u09ac\\\\u09a8\\\\u09cd\\\\u09a7\\\",\\\"description\\\":\\\"\\\\u0986\\\\u09ae\\\\u09be\\\\u09a6\\\\u09c7\\\\u09b0 \\\\u09aa\\\\u09cd\\\\u09b0\\\\u09a4\\\\u09bf\\\\u09b7\\\\u09cd\\\\u09a0\\\\u09be\\\\u09a8\\\\u09c7\\\\u09b0 \\\\u09b8\\\\u09b0\\\\u09cd\\\\u09ac\\\\u09b6\\\\u09c7\\\\u09b7 \\\\u0996\\\\u09ac\\\\u09b0, \\\\u0998\\\\u099f\\\\u09a8\\\\u09be \\\\u098f\\\\u09ac\\\\u0982 \\\\u09b6\\\\u09bf\\\\u0995\\\\u09cd\\\\u09b7\\\\u09be\\\\u09ae\\\\u09c2\\\\u09b2\\\\u0995 \\\\u09ac\\\\u09cd\\\\u09b2\\\\u0997 \\\\u09aa\\\\u09cb\\\\u09b8\\\\u09cd\\\\u099f\\\\u0997\\\\u09c1\\\\u09b2\\\\u09cb \\\\u098f\\\\u0996\\\\u09be\\\\u09a8\\\\u09c7 \\\\u09aa\\\\u09dc\\\\u09c1\\\\u09a8\\\\u0964\\\"}\"', 9, '2026-06-22 19:42:43', '2026-06-22 19:42:43');
+(1, 'hero', 'Hero Section', 1, NULL, 1, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(2, 'features', 'Features Section', 1, NULL, 2, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(3, 'why_choose_us', 'Why Choose Us', 1, NULL, 3, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(4, 'setup-section', 'Setup Section', 1, NULL, 4, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(5, 'pricing', 'Pricing Table', 1, NULL, 5, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(6, 'about', 'About Us', 1, NULL, 6, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(7, 'testimonials', 'Testimonials', 1, NULL, 7, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(8, 'contact', 'Contact Section', 1, NULL, 8, '2026-08-21 11:51:41', '2026-08-21 11:51:41'),
+(9, 'blogs', 'Blog Slider', 1, '\"{\\\"badge_text\\\":\\\"\\\\u0986\\\\u09ae\\\\u09be\\\\u09a6\\\\u09c7\\\\u09b0 \\\\u09ac\\\\u09cd\\\\u09b2\\\\u0997 \\\\u0993 \\\\u0996\\\\u09ac\\\\u09b0\\\",\\\"title\\\":\\\"\\\\u09b8\\\\u09b0\\\\u09cd\\\\u09ac\\\\u09b6\\\\u09c7\\\\u09b7 \\\\u0986\\\\u09aa\\\\u09a1\\\\u09c7\\\\u099f \\\\u0993 \\\\u09b6\\\\u09bf\\\\u0995\\\\u09cd\\\\u09b7\\\\u09be\\\\u09ae\\\\u09c2\\\\u09b2\\\\u0995 \\\\u09aa\\\\u09cd\\\\u09b0\\\\u09ac\\\\u09a8\\\\u09cd\\\\u09a7\\\",\\\"description\\\":\\\"\\\\u0986\\\\u09ae\\\\u09be\\\\u09a6\\\\u09c7\\\\u09b0 \\\\u09aa\\\\u09cd\\\\u09b0\\\\u09a4\\\\u09bf\\\\u09b7\\\\u09cd\\\\u09a0\\\\u09be\\\\u09a8\\\\u09c7\\\\u09b0 \\\\u09b8\\\\u09b0\\\\u09cd\\\\u09ac\\\\u09b6\\\\u09c7\\\\u09b7 \\\\u0996\\\\u09ac\\\\u09b0, \\\\u0998\\\\u099f\\\\u09a8\\\\u09be \\\\u098f\\\\u09ac\\\\u0982 \\\\u09b6\\\\u09bf\\\\u0995\\\\u09cd\\\\u09b7\\\\u09be\\\\u09ae\\\\u09c2\\\\u09b2\\\\u0995 \\\\u09ac\\\\u09cd\\\\u09b2\\\\u0997 \\\\u09aa\\\\u09cb\\\\u09b8\\\\u09cd\\\\u099f\\\\u0997\\\\u09c1\\\\u09b2\\\\u09cb \\\\u098f\\\\u0996\\\\u09be\\\\u09a8\\\\u09c7 \\\\u09aa\\\\u09dc\\\\u09c1\\\\u09a8\\\\u0964\\\"}\"', 9, '2026-08-21 11:51:41', '2026-08-21 11:51:41');
 
 -- --------------------------------------------------------
 
@@ -476,6 +620,68 @@ CREATE TABLE `holidays` (
   `date` date NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `id_card_designs`
+--
+
+CREATE TABLE `id_card_designs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `header_shape` varchar(255) DEFAULT NULL,
+  `gradient_bar` varchar(255) DEFAULT NULL,
+  `pattern` varchar(255) DEFAULT NULL,
+  `primary_color` varchar(255) NOT NULL DEFAULT '#6a1b9a',
+  `badge_color` varchar(255) NOT NULL DEFAULT '#6a1b9a',
+  `label_color` varchar(255) NOT NULL DEFAULT '#7b1fa2',
+  `photo_border_color` varchar(255) NOT NULL DEFAULT '#ab47bc',
+  `back_header_bg` varchar(255) NOT NULL DEFAULT '#f3e5f5',
+  `back_header_text` varchar(255) NOT NULL DEFAULT '#6a1b9a',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `id_card_designs`
+--
+
+INSERT INTO `id_card_designs` (`id`, `name`, `slug`, `header_shape`, `gradient_bar`, `pattern`, `primary_color`, `badge_color`, `label_color`, `photo_border_color`, `back_header_bg`, `back_header_text`, `is_active`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 'Classic Purple', 'purple_classic', 'assets/images/id_card/designs/purple_classic/header_shape.png', 'assets/images/id_card/designs/purple_classic/gradient_bar.png', 'assets/images/id_card/designs/purple_classic/pattern.png', '#6a1b9a', '#841778', '#6a1b9a', '#6a1b9a', '#f3e8ff', '#6a1b9a', 1, 1, '2026-09-05 06:29:03', '2026-09-05 06:32:27'),
+(2, 'Royal Navy & Gold', 'navy_gold', 'assets/images/id_card/designs/navy_gold/header_shape.png', 'assets/images/id_card/designs/navy_gold/gradient_bar.png', 'assets/images/id_card/designs/navy_gold/pattern.png', '#1e40af', '#0f172a', '#1e40af', '#1e40af', '#e0e7ff', '#1e3a8a', 1, 2, '2026-09-05 06:29:03', '2026-09-05 06:29:03'),
+(3, 'Emerald Academic', 'emerald_wave', 'assets/images/id_card/designs/emerald_wave/header_shape.png', 'assets/images/id_card/designs/emerald_wave/gradient_bar.png', 'assets/images/id_card/designs/emerald_wave/pattern.png', '#059669', '#065f46', '#047857', '#059669', '#ecfdf5', '#065f46', 1, 3, '2026-09-05 06:29:03', '2026-09-05 06:29:03'),
+(4, 'Modern Cyan & Indigo', 'cyan_modern', 'assets/images/id_card/designs/cyan_modern/header_shape.png', 'assets/images/id_card/designs/cyan_modern/gradient_bar.png', 'assets/images/id_card/designs/cyan_modern/pattern.png', '#0284c7', '#0369a1', '#0284c7', '#0284c7', '#e0f2fe', '#0369a1', 1, 4, '2026-09-05 06:29:03', '2026-09-05 06:29:03'),
+(5, 'Regal Maroon & Ruby', 'maroon_regal', 'assets/images/id_card/designs/maroon_regal/header_shape.png', 'assets/images/id_card/designs/maroon_regal/gradient_bar.png', 'assets/images/id_card/designs/maroon_regal/pattern.png', '#be123c', '#881337', '#9f1239', '#be123c', '#ffe4e6', '#9f1239', 1, 5, '2026-09-05 06:29:03', '2026-09-05 06:29:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inbound_messages`
+--
+
+CREATE TABLE `inbound_messages` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `mailbox_type` varchar(20) NOT NULL,
+  `recipient_email` varchar(255) NOT NULL,
+  `message_id` varchar(255) DEFAULT NULL,
+  `sender_name` varchar(255) DEFAULT NULL,
+  `sender_email` varchar(255) NOT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body_text` longtext DEFAULT NULL,
+  `body_html` longtext DEFAULT NULL,
+  `headers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`headers`)),
+  `received_at` timestamp NULL DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `status` varchar(20) NOT NULL DEFAULT 'open',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -546,6 +752,7 @@ CREATE TABLE `main_contact_msgs` (
   `phone` varchar(255) NOT NULL,
   `school_name` varchar(255) DEFAULT NULL,
   `message` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -579,10 +786,40 @@ CREATE TABLE `marks` (
   `exam_id` bigint(20) UNSIGNED NOT NULL,
   `class_id` bigint(20) UNSIGNED NOT NULL,
   `marks` int(11) NOT NULL,
+  `cq` decimal(8,2) DEFAULT NULL,
+  `mcq` decimal(8,2) DEFAULT NULL,
+  `practical` decimal(8,2) DEFAULT NULL,
   `status` enum('present','absent') NOT NULL DEFAULT 'present',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `marks`
+--
+
+INSERT INTO `marks` (`id`, `school_id`, `academic_year_id`, `student_id`, `subject_id`, `exam_id`, `class_id`, `marks`, `cq`, `mcq`, `practical`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 2, 1, 80, 56.00, 24.00, NULL, 'present', '2026-08-21 12:47:17', '2026-08-21 21:16:45'),
+(2, 1, 1, 4, 1, 1, 6, 80, 61.00, 19.00, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(3, 1, 1, 4, 2, 1, 6, 78, 78.00, NULL, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(4, 1, 1, 4, 3, 1, 6, 79, 56.00, 23.00, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(5, 1, 1, 5, 1, 1, 6, 79, 54.00, 25.00, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(6, 1, 1, 5, 2, 1, 6, 80, 80.00, NULL, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(7, 1, 1, 5, 3, 1, 6, 71, 51.00, 20.00, NULL, 'present', '2026-08-21 13:48:19', '2026-08-21 15:38:09'),
+(8, 1, 1, 4, 4, 1, 6, 34, 23.00, 11.00, NULL, 'present', '2026-08-21 13:55:17', '2026-08-21 15:38:09'),
+(9, 1, 1, 4, 5, 1, 6, 43, NULL, NULL, NULL, 'present', '2026-08-21 13:55:17', '2026-08-21 13:56:51'),
+(10, 1, 1, 5, 4, 1, 6, 38, 26.00, 12.00, NULL, 'present', '2026-08-21 13:56:51', '2026-08-21 15:38:09'),
+(11, 1, 1, 5, 5, 1, 6, 42, NULL, NULL, NULL, 'present', '2026-08-21 13:56:51', '2026-08-21 13:56:51'),
+(12, 1, 1, 4, 6, 1, 6, 76, 55.00, 21.00, NULL, 'present', '2026-08-21 14:44:55', '2026-08-21 14:44:58'),
+(13, 1, 1, 5, 6, 1, 6, 80, 57.00, 23.00, NULL, 'present', '2026-08-21 14:45:02', '2026-08-21 14:45:06'),
+(14, 1, 1, 3, 1, 2, 1, 89, 67.00, 22.00, NULL, 'present', '2026-08-21 21:10:25', '2026-08-21 21:17:14'),
+(15, 1, 1, 2, 1, 2, 1, 78, 57.00, 21.00, NULL, 'present', '2026-08-21 21:16:31', '2026-08-21 21:16:36'),
+(16, 1, 1, 1, 2, 2, 1, 84, 84.00, NULL, NULL, 'present', '2026-08-21 21:22:46', '2026-08-21 21:22:47'),
+(17, 1, 1, 2, 2, 2, 1, 79, 79.00, NULL, NULL, 'present', '2026-08-21 21:22:51', '2026-08-21 21:22:52'),
+(18, 1, 1, 3, 2, 2, 1, 68, 68.00, NULL, NULL, 'present', '2026-08-21 21:22:54', '2026-08-21 21:22:55'),
+(19, 1, 1, 1, 3, 2, 1, 89, 89.00, NULL, NULL, 'present', '2026-08-21 21:23:19', '2026-08-21 21:23:19'),
+(20, 1, 1, 2, 3, 2, 1, 85, 85.00, NULL, NULL, 'present', '2026-08-21 21:23:20', '2026-08-21 21:23:21'),
+(21, 1, 1, 3, 3, 2, 1, 86, 86.00, NULL, NULL, 'present', '2026-08-21 21:23:23', '2026-08-21 21:23:24');
 
 -- --------------------------------------------------------
 
@@ -680,9 +917,44 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (77, '2026_05_16_143500_create_communication_settings_table', 1),
 (78, '2026_05_27_000000_create_main_newsletters_table', 1),
 (79, '2026_06_05_132630_add_receipt_no_to_student_fees_table', 1),
-(80, '2026_06_23_000000_create_blogs_table', 2),
-(81, '2026_06_23_000001_create_blog_categories_table', 3),
-(82, '2026_06_23_000002_add_blog_category_id_to_blogs_table', 3);
+(80, '2026_06_23_000000_create_blogs_table', 1),
+(81, '2026_06_23_000001_create_blog_categories_table', 1),
+(82, '2026_06_23_000002_add_blog_category_id_to_blogs_table', 1),
+(83, '2026_08_06_000001_add_app_code_to_schools_table', 1),
+(84, '2026_08_08_000001_update_unique_key_in_teachers_table', 1),
+(85, '2026_08_09_233003_add_admission_settings_and_ref_columns', 1),
+(86, '2026_08_10_000001_add_admission_academic_year_id_to_schools_table', 1),
+(87, '2026_08_21_150305_add_cq_mcq_practical_to_marks_table', 2),
+(88, '2026_08_22_132638_create_exam_routines_table', 3),
+(89, '2026_08_22_000000_create_exam_routines_table', 4),
+(90, '2026_08_28_201308_create_exam_categories_table', 5),
+(91, '2026_08_30_000001_add_bangla_columns_to_students_table', 6),
+(92, '2026_08_30_000002_make_teacher_id_nullable_in_attendances_table', 7),
+(93, '2026_08_30_000003_update_unique_key_in_students_table', 8),
+(94, '2026_08_30_230444_create_email_logs_table', 8),
+(95, '2026_08_31_190321_add_detailed_marks_to_assign_classes_table', 9),
+(96, '2026_09_02_175050_fix_fee_heads_unique_constraint', 10),
+(97, '2026_09_03_000001_add_sms_settings_to_schools_table', 11),
+(98, '2026_09_03_000002_create_inbound_messages_table', 12),
+(99, '2026_09_03_000003_add_inbound_webhook_settings', 13),
+(100, '2026_09_03_000004_add_imap_settings', 14),
+(101, '2026_09_03_000005_add_profile_to_subscription_packages', 15),
+(102, '2026_09_04_000001_make_student_section_nullable', 16),
+(103, '2026_09_04_000003_add_institution_database_metadata', 16),
+(104, '2026_09_04_000004_add_provisioning_status_to_schools', 17),
+(105, '2026_09_04_000006_add_coaching_permissions', 18),
+(106, '2026_09_04_000007_create_school_subscriptions_table', 19),
+(107, '2026_09_04_000008_add_manual_payment_fields_to_school_subscriptions', 20),
+(108, '2026_09_04_000009_add_payment_settings_to_site_settings', 21),
+(109, '2026_09_04_000010_add_location_fields_to_schools_table', 22),
+(110, '2026_09_04_000009_create_student_fee_concessions_and_update_student_fees', 23),
+(111, '2026_09_05_103042_add_signature_to_schools_and_users_tables', 24),
+(112, '2026_09_05_122133_create_id_card_designs_table', 25),
+(113, '2026_09_10_000001_add_representative_id_to_schools_table', 26),
+(114, '2026_09_10_000002_add_commission_fields_to_employees_table', 26),
+(115, '2026_09_10_000003_create_school_delete_requests_table', 26),
+(116, '2026_09_11_230500_add_commission_setup_to_packages_and_employees', 27),
+(117, '2026_09_12_000001_add_ip_address_to_main_contact_msgs_table', 28);
 
 -- --------------------------------------------------------
 
@@ -714,19 +986,18 @@ CREATE TABLE `model_has_roles` (
 
 INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`) VALUES
 (1, 'App\\Models\\User', 1),
-(7, 'App\\Models\\User', 3),
-(7, 'App\\Models\\User', 4),
-(7, 'App\\Models\\User', 5),
+(6, 'App\\Models\\User', 3),
+(6, 'App\\Models\\User', 4),
 (7, 'App\\Models\\User', 6),
 (7, 'App\\Models\\User', 7),
 (7, 'App\\Models\\User', 8),
 (7, 'App\\Models\\User', 9),
 (7, 'App\\Models\\User', 10),
-(7, 'App\\Models\\User', 11),
-(7, 'App\\Models\\User', 12),
 (7, 'App\\Models\\User', 13),
 (7, 'App\\Models\\User', 14),
-(8, 'App\\Models\\User', 2);
+(8, 'App\\Models\\User', 2),
+(8, 'App\\Models\\User', 15),
+(9, 'App\\Models\\User', 16);
 
 -- --------------------------------------------------------
 
@@ -761,6 +1032,13 @@ CREATE TABLE `notices` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `notices`
+--
+
+INSERT INTO `notices` (`id`, `school_id`, `title`, `description`, `file`, `notice_date`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 1, 'testinng', 'gfdgsgdsg  frghrhgdfg', 'uploads/schools/demo/notices/1787331968_testinng.pdf', '2026-08-21', 1, '2026-08-21 22:06:08', '2026-08-21 22:06:08');
+
 -- --------------------------------------------------------
 
 --
@@ -783,7 +1061,7 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `type`, `notifiable_type`, `notifiable_id`, `data`, `read_at`, `created_at`, `updated_at`) VALUES
-('7448a721-9e89-4eb8-ab08-6777945b5de6', 'App\\Notifications\\SuperAdminNotification', 'App\\Models\\User', 1, '{\"message\":\"New School Registered: Demo School and College\",\"icon\":\"home\",\"link\":\"http:\\/\\/schoolerp.test\\/manage\\/schools\\/pending\"}', NULL, '2026-06-19 08:05:46', '2026-06-19 08:05:46');
+('252424af-4ef6-4ee9-9f12-8ac3387f14c9', 'App\\Notifications\\SuperAdminNotification', 'App\\Models\\User', 1, '{\"message\":\"New School Registered: Study Point Coaching Center\",\"icon\":\"home\",\"link\":\"http:\\/\\/schoolerp.test\\/manage\\/schools\\/pending\"}', NULL, '2026-09-03 18:57:30', '2026-09-03 18:57:30');
 
 -- --------------------------------------------------------
 
@@ -817,87 +1095,88 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `name`, `group_name`, `guard_name`, `created_at`, `updated_at`) VALUES
-(1, 'academic-year.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(2, 'category.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(3, 'sub-category.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(4, 'class.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(5, 'section.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(6, 'subject.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(7, 'assign.subject', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(8, 'class.routine', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(9, 'syllabus.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(10, 'lesson.view', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(11, 'lesson.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(12, 'homework.manage', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(13, 'syllabus.view', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(14, 'syllabus.download', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(15, 'syllabus.upload', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(16, 'syllabus.delete', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(17, 'syllabus.approve', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(18, 'syllabus.reject', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(19, 'syllabus.view_rejected', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(20, 'syllabus.view_approved', 'Academic', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(21, 'admission.manage', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(22, 'student.index', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(23, 'student.create', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(24, 'student.edit', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(25, 'student.delete', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(26, 'student.manage', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(27, 'student.idcard', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(28, 'student.promotion', 'Students & Admissions', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(29, 'teacher.manage', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(30, 'assign.teacher', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(31, 'employee.manage', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(32, 'designation.manage', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(33, 'payroll.manage', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(34, 'leave.manage', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(35, 'attendance.manage', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(36, 'attendance.report', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(37, 'payroll.report', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(38, 'staff.report', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(39, 'staff.idcard', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(40, 'staff.promotion', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(41, 'staff.transfer', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(42, 'staff.termination', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(43, 'staff.leave', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(44, 'staff.attendance', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(45, 'staff.payroll', 'Staff & HR', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(46, 'holiday.manage', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(47, 'exam.manage', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(48, 'mark.manage', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(49, 'exam.admit_card', 'Attendance & Exams', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(50, 'fee.manage', 'Finance (Fees)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(51, 'fee.collect', 'Finance (Fees)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(52, 'fee.report', 'Finance (Fees)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(53, 'notice.manage', 'Website & Communication', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(54, 'slider.manage', 'Settings', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(55, 'gallery.manage', 'Settings', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(56, 'message.manage', 'Website & Communication', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(57, 'sms.send', 'Website & Communication', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(58, 'email.send', 'Website & Communication', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(59, 'whatsapp.send', 'Website & Communication', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(60, 'newsletter.manage', 'Settings', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(61, 'system.settings', 'Settings', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(62, 'school.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(63, 'school.create', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(64, 'school.approve', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(65, 'frontend.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(66, 'school.reject', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(67, 'school.delete', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(68, 'settings.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(69, 'super.roles.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(70, 'contact.messages.view', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(71, 'testimonial.approve', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(72, 'support.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(73, 'support.bot.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(74, 'Academic', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(75, 'Students & Admissions', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(76, 'Staff & HR', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(77, 'Attendance & Exams', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(78, 'Finance (Fees)', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(79, 'Website & Communication', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(80, 'Settings', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20'),
-(81, 'SaaS Management (Super Admin/Employee Only)', NULL, 'web', '2026-06-19 08:10:20', '2026-06-19 08:10:20');
+(1, 'academic-year.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(2, 'category.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(3, 'sub-category.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(4, 'class.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(5, 'section.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(6, 'subject.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(7, 'assign.subject', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(8, 'class.routine', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(9, 'syllabus.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(10, 'lesson.view', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(11, 'lesson.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(12, 'homework.manage', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(13, 'syllabus.view', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(14, 'syllabus.download', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(15, 'syllabus.upload', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(16, 'syllabus.delete', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(17, 'syllabus.approve', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(18, 'syllabus.reject', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(19, 'syllabus.view_rejected', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(20, 'syllabus.view_approved', 'Academic', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(21, 'admission.manage', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(22, 'student.index', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(23, 'student.create', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(24, 'student.edit', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(25, 'student.delete', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(26, 'student.manage', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(27, 'student.idcard', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(28, 'student.promotion', 'Students & Admissions', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(29, 'teacher.manage', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(30, 'assign.teacher', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(31, 'employee.manage', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(32, 'designation.manage', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(33, 'payroll.manage', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(34, 'leave.manage', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(35, 'attendance.manage', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(36, 'attendance.report', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(37, 'payroll.report', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(38, 'staff.report', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(39, 'staff.idcard', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(40, 'staff.promotion', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(41, 'staff.transfer', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(42, 'staff.termination', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(43, 'staff.leave', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(44, 'staff.attendance', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(45, 'staff.payroll', 'Staff & HR', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(46, 'attendance.analytics', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(47, 'holiday.manage', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(48, 'exam.manage', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(49, 'mark.manage', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(50, 'exam.admit_card', 'Attendance & Exams', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(51, 'fee.manage', 'Finance (Fees)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(52, 'fee.collect', 'Finance (Fees)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(53, 'fee.report', 'Finance (Fees)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(54, 'notice.manage', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(55, 'slider.manage', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-09-05 04:01:12'),
+(56, 'gallery.manage', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-09-05 04:01:12'),
+(57, 'message.manage', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(58, 'sms.send', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(59, 'email.send', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(60, 'whatsapp.send', 'Website & Communication', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(61, 'newsletter.manage', 'Settings', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(62, 'system.settings', 'Settings', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(63, 'school.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(64, 'school.create', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(65, 'school.approve', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(66, 'frontend.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(67, 'school.reject', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(68, 'school.delete', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(69, 'settings.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(70, 'super.roles.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(71, 'contact.messages.view', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(72, 'testimonial.approve', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(73, 'support.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(74, 'support.bot.manage', 'SaaS Management (Super Admin/Employee Only)', 'web', '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(83, 'batch.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(84, 'coaching.student.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(85, 'coaching.teacher.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(86, 'coaching.attendance.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(87, 'coaching.exam.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(88, 'coaching.mark.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(89, 'coaching.fee.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35'),
+(90, 'coaching.notice.manage', 'Coaching Center', 'web', '2026-09-03 18:50:35', '2026-09-03 18:50:35');
 
 -- --------------------------------------------------------
 
@@ -920,14 +1199,15 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `guard_name`, `role_type`, `created_at`, `updated_at`, `school_id`) VALUES
-(1, 'super_admin', 'web', 'employee', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(2, 'HR', 'web', 'employee', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(3, 'Marketing', 'web', 'employee', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(4, 'Support', 'web', 'employee', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(5, 'Accountant', 'web', 'employee', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(6, 'teacher', 'web', 'school_staff', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(7, 'student', 'web', 'school_staff', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL),
-(8, 'school_admin', 'web', 'school_staff', '2026-06-19 07:30:57', '2026-06-19 07:30:57', NULL);
+(1, 'super_admin', 'web', 'employee', '2026-08-21 11:51:40', '2026-08-21 11:51:41', NULL),
+(2, 'HR', 'web', 'employee', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(3, 'Marketing', 'web', 'employee', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(4, 'Support', 'web', 'employee', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(5, 'Accountant', 'web', 'employee', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(6, 'teacher', 'web', 'school_staff', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(7, 'student', 'web', 'school_staff', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(8, 'school_admin', 'web', 'school_staff', '2026-08-21 11:51:41', '2026-08-21 11:51:41', NULL),
+(9, 'Representative', 'web', 'employee', '2026-09-11 16:38:14', '2026-09-11 16:38:14', NULL);
 
 -- --------------------------------------------------------
 
@@ -1068,8 +1348,11 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 (61, 1),
 (61, 8),
 (62, 1),
+(62, 8),
 (63, 1),
+(63, 9),
 (64, 1),
+(64, 9),
 (65, 1),
 (66, 1),
 (67, 1),
@@ -1079,14 +1362,7 @@ INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
 (71, 1),
 (72, 1),
 (73, 1),
-(74, 8),
-(75, 8),
-(76, 8),
-(77, 8),
-(78, 8),
-(79, 8),
-(80, 8),
-(81, 8);
+(74, 1);
 
 -- --------------------------------------------------------
 
@@ -1119,8 +1395,14 @@ CREATE TABLE `routines` (
 
 CREATE TABLE `schools` (
   `id` bigint(20) UNSIGNED NOT NULL,
+  `representative_id` bigint(20) UNSIGNED DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `institution_type` varchar(20) NOT NULL DEFAULT 'school',
+  `database_group` varchar(20) NOT NULL DEFAULT 'school',
+  `database_mode` varchar(20) NOT NULL DEFAULT 'shared',
+  `provisioning_status` varchar(20) NOT NULL DEFAULT 'shared',
   `logo` varchar(255) DEFAULT NULL,
+  `signature` varchar(255) DEFAULT NULL,
   `mail_mailer` varchar(255) NOT NULL DEFAULT 'smtp',
   `mail_host` varchar(255) DEFAULT NULL,
   `mail_port` varchar(255) DEFAULT NULL,
@@ -1132,14 +1414,36 @@ CREATE TABLE `schools` (
   `whatsapp_api_provider` varchar(255) DEFAULT NULL,
   `whatsapp_api_key` varchar(255) DEFAULT NULL,
   `whatsapp_api_instance_id` varchar(255) DEFAULT NULL,
+  `sms_api_provider` varchar(255) DEFAULT NULL,
+  `sms_api_url` varchar(255) DEFAULT NULL,
+  `sms_api_key` varchar(255) DEFAULT NULL,
+  `sms_api_secret` varchar(255) DEFAULT NULL,
+  `sms_sender_id` varchar(255) DEFAULT NULL,
+  `inbound_webhook_secret` varchar(255) DEFAULT NULL,
+  `inbound_webhook_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `imap_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `imap_host` varchar(255) DEFAULT NULL,
+  `imap_port` smallint(5) UNSIGNED NOT NULL DEFAULT 993,
+  `imap_username` varchar(255) DEFAULT NULL,
+  `imap_password` text DEFAULT NULL,
+  `imap_encryption` varchar(255) NOT NULL DEFAULT 'ssl',
+  `imap_folder` varchar(255) NOT NULL DEFAULT 'INBOX',
   `favicon` varchar(255) DEFAULT NULL,
   `slug` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
+  `app_code` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `ein_number` varchar(255) DEFAULT NULL,
   `emis_code` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
+  `division` varchar(255) DEFAULT NULL,
+  `district` varchar(255) DEFAULT NULL,
+  `upazila` varchar(255) DEFAULT NULL,
   `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `is_admission_open` tinyint(1) NOT NULL DEFAULT 1,
+  `admission_closed_message` text DEFAULT NULL,
+  `admission_close_date` datetime DEFAULT NULL,
+  `admission_academic_year_id` bigint(20) UNSIGNED DEFAULT NULL,
   `subscription_package_id` bigint(20) UNSIGNED DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1154,8 +1458,8 @@ CREATE TABLE `schools` (
 -- Dumping data for table `schools`
 --
 
-INSERT INTO `schools` (`id`, `name`, `logo`, `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password`, `mail_encryption`, `mail_from_address`, `mail_from_name`, `whatsapp_api_provider`, `whatsapp_api_key`, `whatsapp_api_instance_id`, `favicon`, `slug`, `email`, `phone`, `ein_number`, `emis_code`, `address`, `status`, `subscription_package_id`, `is_active`, `created_at`, `updated_at`, `pro_email_status`, `pro_email_address`, `pro_email_password`, `pro_email_prefix`) VALUES
-(1, 'Demo School and College', 'uploads/schools/demo/logo/logo_1781882524.png', 'smtp', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'demo', 'demo@schoolerp.com', NULL, NULL, NULL, NULL, 'approved', 1, 1, '2026-06-19 08:05:44', '2026-06-19 15:22:04', 'none', NULL, NULL, NULL);
+INSERT INTO `schools` (`id`, `representative_id`, `name`, `institution_type`, `database_group`, `database_mode`, `provisioning_status`, `logo`, `signature`, `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password`, `mail_encryption`, `mail_from_address`, `mail_from_name`, `whatsapp_api_provider`, `whatsapp_api_key`, `whatsapp_api_instance_id`, `sms_api_provider`, `sms_api_url`, `sms_api_key`, `sms_api_secret`, `sms_sender_id`, `inbound_webhook_secret`, `inbound_webhook_enabled`, `imap_enabled`, `imap_host`, `imap_port`, `imap_username`, `imap_password`, `imap_encryption`, `imap_folder`, `favicon`, `slug`, `email`, `app_code`, `phone`, `ein_number`, `emis_code`, `address`, `division`, `district`, `upazila`, `status`, `is_admission_open`, `admission_closed_message`, `admission_close_date`, `admission_academic_year_id`, `subscription_package_id`, `is_active`, `created_at`, `updated_at`, `pro_email_status`, `pro_email_address`, `pro_email_password`, `pro_email_prefix`) VALUES
+(1, NULL, 'Demo International School College', 'school', 'school', 'shared', 'shared', 'uploads/schools/demo/logo/logo_1787403957.png', 'uploads/schools/demo/signatures/sig_1788583083_6a9b9caba6e67.jpg', 'smtp', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, 993, NULL, NULL, 'ssl', 'INBOX', NULL, 'demo', 'demo@schoolerp.test', 'SCH0001', NULL, '123456', '123456', NULL, 'Rangpur', 'Nilphamari', 'Nilphamari Sadar', 'approved', 1, NULL, NULL, NULL, 1, 1, '2026-08-21 11:53:08', '2026-09-05 05:52:49', 'none', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1177,7 +1481,28 @@ CREATE TABLE `school_categories` (
 --
 
 INSERT INTO `school_categories` (`id`, `school_id`, `name`, `exams_per_year`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Primary', 3, '2026-06-19 14:28:20', '2026-06-19 14:28:20');
+(1, 1, 'Primary', 3, '2026-08-21 12:06:26', '2026-08-21 12:06:26'),
+(2, 1, 'Junior Secondary', 2, '2026-08-21 12:06:42', '2026-08-21 12:06:42'),
+(3, 1, 'Secondary', 3, '2026-08-22 18:46:00', '2026-08-22 18:46:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `school_delete_requests`
+--
+
+CREATE TABLE `school_delete_requests` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `requested_by` bigint(20) UNSIGNED NOT NULL,
+  `reason` text DEFAULT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `reviewed_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `admin_note` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1200,6 +1525,42 @@ CREATE TABLE `school_overviews` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `school_subscriptions`
+--
+
+CREATE TABLE `school_subscriptions` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `subscription_package_id` bigint(20) UNSIGNED NOT NULL,
+  `status` enum('pending','trialing','active','expired','cancelled') NOT NULL DEFAULT 'pending',
+  `amount` decimal(12,2) NOT NULL,
+  `currency` varchar(3) NOT NULL DEFAULT 'BDT',
+  `payment_method` varchar(255) DEFAULT NULL,
+  `sender_number` varchar(20) DEFAULT NULL,
+  `trial_ends_at` timestamp NULL DEFAULT NULL,
+  `starts_at` timestamp NULL DEFAULT NULL,
+  `ends_at` timestamp NULL DEFAULT NULL,
+  `paid_at` timestamp NULL DEFAULT NULL,
+  `payment_reference` varchar(255) DEFAULT NULL,
+  `payment_submitted_at` timestamp NULL DEFAULT NULL,
+  `reviewed_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `school_subscriptions`
+--
+
+INSERT INTO `school_subscriptions` (`id`, `school_id`, `subscription_package_id`, `status`, `amount`, `currency`, `payment_method`, `sender_number`, `trial_ends_at`, `starts_at`, `ends_at`, `paid_at`, `payment_reference`, `payment_submitted_at`, `reviewed_by`, `reviewed_at`, `rejection_reason`, `created_at`, `updated_at`) VALUES
+(3, 1, 1, 'pending', 0.00, 'BDT', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-04 07:45:16', '2026-09-04 07:45:16'),
+(4, 1, 1, 'active', 0.00, 'BDT', 'bkash', '01977325525', NULL, '2026-09-04 12:05:56', '2027-09-04 12:05:56', '2026-09-04 12:05:56', 'FDFFASQ2', '2026-09-04 08:09:00', 1, '2026-09-04 12:05:56', NULL, '2026-09-04 12:04:24', '2026-09-04 12:05:56');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `school_sub_categories`
 --
 
@@ -1217,7 +1578,10 @@ CREATE TABLE `school_sub_categories` (
 --
 
 INSERT INTO `school_sub_categories` (`id`, `school_id`, `school_category_id`, `name`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'General', '2026-06-19 14:28:51', '2026-06-19 14:28:51');
+(1, 1, 1, 'General', '2026-08-21 12:06:54', '2026-08-21 12:06:54'),
+(2, 1, 2, 'General', '2026-08-21 12:07:05', '2026-08-21 12:07:05'),
+(3, 1, 3, 'Science', '2026-08-22 18:46:42', '2026-08-22 18:46:42'),
+(4, 1, 3, 'Humanities', '2026-08-22 18:46:50', '2026-08-22 18:46:50');
 
 -- --------------------------------------------------------
 
@@ -1239,7 +1603,7 @@ CREATE TABLE `sections` (
 --
 
 INSERT INTO `sections` (`id`, `school_id`, `name`, `description`, `created_at`, `updated_at`) VALUES
-(1, 1, 'A', 'This is demo section', '2026-06-19 14:29:20', '2026-06-19 14:29:20');
+(1, 1, 'A', NULL, '2026-08-21 12:09:34', '2026-08-21 12:09:34');
 
 -- --------------------------------------------------------
 
@@ -1255,6 +1619,14 @@ CREATE TABLE `sessions` (
   `payload` longtext NOT NULL,
   `last_activity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('qxvyFHh8XLlh2j29aDhkAN6Nd8EWopkx7GcjXU99', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiOWE2YXh0YnA3azBJRU5RbW5pZkNQa3NpdktwOWNKSnlZUGpha1FJeSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly9zY2hvb2xlcnAudGVzdC8/dj0xNzg5MjAwMDE0IjtzOjU6InJvdXRlIjtzOjk6Im1haW4uaG9tZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1789200015),
+('T4GEMeg5Qn37tvgdNpalvWRQdBsTtRvDn53PMC9u', 2, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNVJXaUpJMkl0TVNUZEFKd0VlcTNDNE5NTlhUM3RKWW1LT0FHT2hSMSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NjQ6Imh0dHA6Ly9kZW1vLnNjaG9vbGVycC50ZXN0L2J1bGstbWFya3NoZWV0LzEvMj9hY2FkZW1pY195ZWFyX2lkPTEiO3M6NToicm91dGUiO3M6MjA6Im1hcmtzLmJ1bGstbWFya3NoZWV0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Mjt9', 1789204343);
 
 -- --------------------------------------------------------
 
@@ -1280,9 +1652,30 @@ CREATE TABLE `site_settings` (
   `mail_encryption` varchar(255) DEFAULT NULL,
   `mail_from_address` varchar(255) DEFAULT NULL,
   `mail_from_name` varchar(255) DEFAULT NULL,
+  `inbound_webhook_secret` varchar(255) DEFAULT NULL,
+  `inbound_webhook_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `imap_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `imap_host` varchar(255) DEFAULT NULL,
+  `imap_port` smallint(5) UNSIGNED NOT NULL DEFAULT 993,
+  `imap_username` varchar(255) DEFAULT NULL,
+  `imap_password` text DEFAULT NULL,
+  `imap_encryption` varchar(255) NOT NULL DEFAULT 'ssl',
+  `imap_folder` varchar(255) NOT NULL DEFAULT 'INBOX',
   `address` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
+  `payment_mode` varchar(255) NOT NULL DEFAULT 'personal',
+  `bkash_personal_number` varchar(255) DEFAULT NULL,
+  `nagad_personal_number` varchar(255) DEFAULT NULL,
+  `bkash_merchant_number` varchar(255) DEFAULT NULL,
+  `bkash_merchant_id` varchar(255) DEFAULT NULL,
+  `bkash_api_key` text DEFAULT NULL,
+  `bkash_api_secret` text DEFAULT NULL,
+  `nagad_merchant_number` varchar(255) DEFAULT NULL,
+  `nagad_merchant_id` varchar(255) DEFAULT NULL,
+  `nagad_api_key` text DEFAULT NULL,
+  `nagad_api_secret` text DEFAULT NULL,
+  `manual_payment_instructions` text DEFAULT NULL,
   `footer_text` text DEFAULT NULL,
   `facebook_url` varchar(255) DEFAULT NULL,
   `twitter_url` varchar(255) DEFAULT NULL,
@@ -1296,8 +1689,8 @@ CREATE TABLE `site_settings` (
 -- Dumping data for table `site_settings`
 --
 
-INSERT INTO `site_settings` (`id`, `site_name`, `meta_title`, `meta_description`, `meta_keywords`, `logo_wide`, `logo_square`, `favicon`, `og_image`, `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password`, `mail_encryption`, `mail_from_address`, `mail_from_name`, `address`, `phone`, `email`, `footer_text`, `facebook_url`, `twitter_url`, `instagram_url`, `linkedin_url`, `created_at`, `updated_at`) VALUES
-(1, 'EduCorexa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'smtp', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'support@educorexa.com', 'All Rights Reserved', NULL, NULL, NULL, NULL, '2026-06-19 07:38:46', '2026-06-19 07:38:46');
+INSERT INTO `site_settings` (`id`, `site_name`, `meta_title`, `meta_description`, `meta_keywords`, `logo_wide`, `logo_square`, `favicon`, `og_image`, `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password`, `mail_encryption`, `mail_from_address`, `mail_from_name`, `inbound_webhook_secret`, `inbound_webhook_enabled`, `imap_enabled`, `imap_host`, `imap_port`, `imap_username`, `imap_password`, `imap_encryption`, `imap_folder`, `address`, `phone`, `email`, `payment_mode`, `bkash_personal_number`, `nagad_personal_number`, `bkash_merchant_number`, `bkash_merchant_id`, `bkash_api_key`, `bkash_api_secret`, `nagad_merchant_number`, `nagad_merchant_id`, `nagad_api_key`, `nagad_api_secret`, `manual_payment_instructions`, `footer_text`, `facebook_url`, `twitter_url`, `instagram_url`, `linkedin_url`, `created_at`, `updated_at`) VALUES
+(1, 'EduCorexa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'smtp', NULL, 465, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 'mail.educorexa.com', 993, 'info@educorexa.com', 'eyJpdiI6InpkMHU4OGRLZGtESGpnak5aTDNiSkE9PSIsInZhbHVlIjoiRUlKSkVsRjFlUm1RWURGdGY0NHA0aml2NWJpVVVBRjVoTW5RZ2lEaEVzRT0iLCJtYWMiOiJkYjVlNGFlN2YwMmY4NmVmZjlkMzg0MjcyNzJlYWYyYzhjYWQ2ZTVhM2QwY2VhNzAyYzNlMDg2NTBiM2FhZWUzIiwidGFnIjoiIn0=', 'ssl', 'INBOX', NULL, NULL, 'support@educorexa.com', 'personal', '01846295608', '01846295608', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Testing', 'All Rights Reserved', NULL, NULL, NULL, NULL, '2026-08-21 11:51:41', '2026-09-04 07:45:05');
 
 -- --------------------------------------------------------
 
@@ -1317,6 +1710,13 @@ CREATE TABLE `sliders` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `sliders`
+--
+
+INSERT INTO `sliders` (`id`, `school_id`, `title`, `subtitle`, `image`, `order_by`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, NULL, NULL, 'uploads/schools/demo/sliders/1788450588_6a99971c9cf0e.jpg', 0, 1, '2026-09-03 15:49:48', '2026-09-03 15:49:48');
+
 -- --------------------------------------------------------
 
 --
@@ -1327,17 +1727,23 @@ CREATE TABLE `students` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `user_id` bigint(20) UNSIGNED DEFAULT NULL,
   `school_id` bigint(20) UNSIGNED NOT NULL,
+  `admission_id` bigint(20) UNSIGNED DEFAULT NULL,
   `academic_year_id` bigint(20) UNSIGNED NOT NULL,
   `class_id` bigint(20) UNSIGNED NOT NULL,
   `school_category_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `section_id` bigint(20) UNSIGNED NOT NULL,
+  `section_id` bigint(20) UNSIGNED DEFAULT NULL,
   `student_id` varchar(255) NOT NULL,
   `roll` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
+  `name_bn` varchar(255) DEFAULT NULL,
   `previous_school` varchar(255) DEFAULT NULL,
+  `previous_school_bn` varchar(255) DEFAULT NULL,
   `previous_class` varchar(255) DEFAULT NULL,
+  `previous_class_bn` varchar(255) DEFAULT NULL,
   `fathers_name` varchar(255) DEFAULT NULL,
+  `fathers_name_bn` varchar(255) DEFAULT NULL,
   `mothers_name` varchar(255) DEFAULT NULL,
+  `mothers_name_bn` varchar(255) DEFAULT NULL,
   `father_nid` varchar(255) DEFAULT NULL,
   `mother_nid` varchar(255) DEFAULT NULL,
   `student_birth_nid` varchar(255) DEFAULT NULL,
@@ -1352,6 +1758,7 @@ CREATE TABLE `students` (
   `admission_date` date DEFAULT NULL,
   `blood_group` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
+  `address_bn` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `school_sub_category_id` bigint(20) UNSIGNED DEFAULT NULL
@@ -1361,19 +1768,14 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`id`, `user_id`, `school_id`, `academic_year_id`, `class_id`, `school_category_id`, `section_id`, `student_id`, `roll`, `name`, `previous_school`, `previous_class`, `fathers_name`, `mothers_name`, `father_nid`, `mother_nid`, `student_birth_nid`, `contact_number`, `password`, `photo`, `status`, `created_by`, `religion`, `gender`, `date_of_birth`, `admission_date`, `blood_group`, `address`, `created_at`, `updated_at`, `school_sub_category_id`) VALUES
-(1, 3, 1, 1, 1, 1, 1, 'STD-261001', 1, 'Sagor Hossain', NULL, NULL, 'Jalal Ahmed', 'Sufia Begum', NULL, NULL, NULL, '1712345678', '$2y$12$NQyaLzeYIhn2joTzfO.go.rP4b1uQPwfBdnBe73jw2slW6bXb4kc.', NULL, 'active', 2, 'Islam', 'Male', '2012-05-10', NULL, 'A+', 'Nilphamari', '2026-06-19 14:36:01', '2026-06-19 14:36:01', 1),
-(2, 4, 1, 1, 1, 1, 1, 'STD-261002', 2, 'Sumaiya Akter', NULL, NULL, 'Karim Ali', 'Amena Bibi', NULL, NULL, NULL, '1812345678', '$2y$12$Q1g1wsTtIWwGdtSchNFVH.DWSsuSChgIxf4oc7nXWHntWkOZ/q4Qy', NULL, 'active', 2, 'Islam', 'Female', '2013-03-20', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:01', '2026-06-19 14:36:01', 1),
-(3, 5, 1, 1, 1, 1, 1, 'STD-261003', 3, 'Manos Kumar', NULL, NULL, 'Rakib Ahmed', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$2ZJMjzAVeEgoeUVZMnNzWuahpH9GZxHy.JpdTao3Cis09dDedfFwq', NULL, 'active', 2, 'Hinduism', 'Male', '2013-03-21', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:02', '2026-06-19 14:36:02', 1),
-(4, 6, 1, 1, 1, 1, 1, 'STD-261004', 4, 'Noyon Roy', NULL, NULL, 'Puspo Roy', 'Shyamoli Rani', NULL, NULL, NULL, '1812345678', '$2y$12$pqrMkAhwobEXfD0wDNSavOffnHutLw1pVbMqiG9KxJeOUBOvdmX/m', NULL, 'active', 2, 'Hinduism', 'Male', '2013-03-22', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:02', '2026-06-19 14:36:02', 1),
-(5, 7, 1, 1, 1, 1, 1, 'STD-261005', 5, 'Nobonita Rani', NULL, NULL, 'Rabbani Islam', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$Nb.8tEtDzzL5kbx6fJTvre6BbokRevnqkPcCMdQTOUfaBrUSI56GC', NULL, 'active', 2, 'Hinduism', 'Female', '2013-03-23', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:03', '2026-06-19 14:36:03', 1),
-(6, 8, 1, 1, 1, 1, 1, 'STD-261006', 6, 'Kamrun Nahar', NULL, NULL, 'Rahim', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$seWOdR48.lFwE9RZQPNoP.5Ii3QQQBmfDXjK19dKucThUxovhT4/e', NULL, 'active', 2, 'Islam', 'Female', '2013-03-24', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:03', '2026-06-19 14:36:03', 1),
-(7, 9, 1, 1, 1, 1, 1, 'STD-261007', 7, 'Manun Islam', NULL, NULL, 'Jalal Ahmed', 'Sufia Begum', NULL, NULL, NULL, '1712345678', '$2y$12$08rOeEJzkoyoQSV2ic8/M.2ZGSlj.DYfEIxh0k9b6W2YjZj4R8mty', NULL, 'active', 2, 'Islam', 'Male', '2012-05-10', NULL, 'A+', 'Nilphamari', '2026-06-19 14:36:04', '2026-06-19 14:36:04', 1),
-(8, 10, 1, 1, 1, 1, 1, 'STD-261008', 8, 'Limu Akter', NULL, NULL, 'Karim Ali', 'Amena Bibi', NULL, NULL, NULL, '1812345678', '$2y$12$S4wuk.1BGuF3yIFGGm8DdOY3.a3U9NBkp8xxvFXyTYQQkXmwfl65K', NULL, 'active', 2, 'Islam', 'Female', '2013-03-20', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:04', '2026-06-19 14:36:04', 1),
-(9, 11, 1, 1, 1, 1, 1, 'STD-261009', 9, 'Antor Kumar', NULL, NULL, 'Rakib Ahmed', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$TpdclVyA.yZEqXyDBicsteYmw2cbzHlpZX2g3JEmMDW8qDoFxjgWa', NULL, 'active', 2, 'Hinduism', 'Male', '2013-03-21', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:05', '2026-06-19 14:36:05', 1),
-(10, 12, 1, 1, 1, 1, 1, 'STD-261010', 10, 'Niranjan Roy', NULL, NULL, 'Puspo Roy', 'Shyamoli Rani', NULL, NULL, NULL, '1812345678', '$2y$12$4P6ehJU/89l4p4yJfUXkwOvEA4tiqwX808c9VpGagUPVMXdpzUNaO', NULL, 'active', 2, 'Hinduism', 'Male', '2013-03-22', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:05', '2026-06-19 14:36:05', 1),
-(11, 13, 1, 1, 1, 1, 1, 'STD-261011', 11, 'Kabita Rani', NULL, NULL, 'Rabbani Islam', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$EQxuvxkkSXBqaGwEzKzuI.Y0sdSMbFIwp9nq4Kq4mP/0Wlvx6lije', NULL, 'active', 2, 'Hinduism', 'Female', '2013-03-23', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:06', '2026-06-19 14:36:06', 1),
-(12, 14, 1, 1, 1, 1, 1, 'STD-261012', 12, 'Ajmin Akter', NULL, NULL, 'Rahim', 'Sumi Akter', NULL, NULL, NULL, '1812345678', '$2y$12$m3pOdNiGY.hnUUrTR1CA0./rJTB.Wu2d0TZNzQS.PGL/ymB7k9KB6', NULL, 'active', 2, 'Islam', 'Female', '2013-03-24', NULL, 'O+', 'Nilphamari', '2026-06-19 14:36:06', '2026-06-19 14:36:06', 1);
+INSERT INTO `students` (`id`, `user_id`, `school_id`, `admission_id`, `academic_year_id`, `class_id`, `school_category_id`, `section_id`, `student_id`, `roll`, `name`, `name_bn`, `previous_school`, `previous_school_bn`, `previous_class`, `previous_class_bn`, `fathers_name`, `fathers_name_bn`, `mothers_name`, `mothers_name_bn`, `father_nid`, `mother_nid`, `student_birth_nid`, `contact_number`, `password`, `photo`, `status`, `created_by`, `religion`, `gender`, `date_of_birth`, `admission_date`, `blood_group`, `address`, `address_bn`, `created_at`, `updated_at`, `school_sub_category_id`) VALUES
+(1, 6, 1, NULL, 1, 1, 1, 1, '261001', 1, 'Sumon Roy', NULL, NULL, NULL, NULL, NULL, 'Srinibas', NULL, 'Suborna', NULL, NULL, NULL, NULL, '1835625627', '$2y$12$Og15fxuU8j1jj2sQ8U1xie4zqojSkzaxRdHgtgvaz48Pn/VEhFxWW', NULL, 'active', 1, 'Hindu', 'Male', '2019-01-12', NULL, 'O+', 'Nilphamari', NULL, '2026-08-21 12:45:06', '2026-08-21 12:45:06', 1),
+(2, 7, 1, NULL, 1, 1, 1, 1, '261002', 2, 'Choin Roy', NULL, NULL, NULL, NULL, NULL, 'Binoy Roy', NULL, 'Sima Rani', NULL, NULL, NULL, NULL, '1735625627', '$2y$12$bj32oDA53ijSeNNYVcLSL.ewtuXzW1orLRZ/UZzPRhLDDuyYHFAMq', NULL, 'active', 1, 'Hindu', 'Male', '2019-01-12', NULL, 'O+', 'Nilphamari', NULL, '2026-08-21 13:06:23', '2026-08-21 13:06:23', 1),
+(3, 8, 1, NULL, 1, 1, 1, 1, '261003', 3, 'Sagor Hoassain', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01712452422', '$2y$12$0qwUhC4JoepF1raVqDfT9ulP7k0aElRXMbS1VWx5x9E5k2URP4uaK', NULL, 'active', 1, 'Islam', 'male', '2020-02-13', NULL, 'A+', 'Nilphamari', NULL, '2026-08-21 13:06:24', '2026-08-21 13:07:13', 1),
+(4, 9, 1, NULL, 1, 6, 2, 1, '261004', 1, 'Sagor Ray', NULL, NULL, NULL, NULL, NULL, 'Binoy Roy', NULL, 'Sima Rani', NULL, NULL, NULL, NULL, '1735626727', '$2y$12$nfkgLNBpowdjEqFNKASEUOmPD6T9HFNtPEPbzn0nx5itUyQMTuqwS', NULL, 'active', 2, 'Hindu', 'Male', '2019-01-12', NULL, 'O+', 'Nilphamari', NULL, '2026-08-21 13:46:24', '2026-08-21 13:46:24', 2),
+(5, 10, 1, NULL, 1, 6, 2, 1, '261005', 2, 'Shahinur Islam', NULL, NULL, NULL, NULL, NULL, 'Abul Islam', NULL, 'Aminaa Begum', NULL, NULL, NULL, NULL, '1712455422', '$2y$12$QOiVPs5AbrX2Rb01Yd2w6ePtiAa.7t4VaU6WkHj1dTJ0yJA1Ryg8m', NULL, 'active', 2, 'Islam', 'Male', '2020-02-13', NULL, 'A+', 'Nilphamari', NULL, '2026-08-21 13:46:24', '2026-08-21 13:46:24', 2),
+(8, 13, 1, NULL, 1, 9, 3, 1, '261006', 1, 'Simu Rani', NULL, NULL, NULL, NULL, NULL, 'Binoy Roy', NULL, 'Sima Rani', NULL, NULL, NULL, NULL, '1735626727', '$2y$12$t1/HZemhUM5YJKl.bXS5/.jCb../KoyulE3oMffAaV78SF/sWLBLu', NULL, 'active', 2, 'Hinduism', 'male', '2013-01-12', '2026-08-28', 'O+', 'Nilphamari', NULL, '2026-08-28 18:50:34', '2026-08-28 18:58:08', 4),
+(9, 14, 1, NULL, 1, 9, 3, 1, '261007', 2, 'Saiful Islam', 'সাইফুল ইসলাম', NULL, NULL, NULL, NULL, 'Abul Islam', 'আবুল ইসলাম', 'Aminaa Begum', 'আমিনা বেগম', NULL, NULL, NULL, '1712455422', '$2y$12$8VoXzaxgzXjo2ke030vmVeBE8obdYWVKu5CS1SYsC24bLP.BRfYCS', NULL, 'active', 2, 'Islam', 'male', '2013-02-13', '2026-08-28', 'A+', 'Nilphamari', 'নীলফামারী', '2026-08-28 18:50:34', '2026-08-30 08:02:36', 3);
 
 -- --------------------------------------------------------
 
@@ -1389,6 +1791,11 @@ CREATE TABLE `student_fees` (
   `student_id` bigint(20) UNSIGNED NOT NULL,
   `fee_head_id` bigint(20) UNSIGNED NOT NULL,
   `amount` decimal(10,2) NOT NULL,
+  `original_amount` decimal(10,2) DEFAULT NULL,
+  `discount_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `discount_percent` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `paid_amount` decimal(10,2) DEFAULT NULL,
+  `discount_note` varchar(255) DEFAULT NULL,
   `month` varchar(255) NOT NULL,
   `status` enum('paid','unpaid','partial') NOT NULL DEFAULT 'unpaid',
   `payment_method` varchar(255) DEFAULT 'cash',
@@ -1404,31 +1811,42 @@ CREATE TABLE `student_fees` (
 -- Dumping data for table `student_fees`
 --
 
-INSERT INTO `student_fees` (`id`, `school_id`, `school_category_id`, `school_sub_category_id`, `student_id`, `fee_head_id`, `amount`, `month`, `status`, `payment_method`, `receipt_no`, `collected_by`, `due_date`, `created_at`, `updated_at`, `fee_type_limit`) VALUES
-(1, 1, 1, 1, 1, 1, 1000.00, 'March-2026', 'paid', 'cash', 'R0619-67B4', 2, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:40:54', 'global'),
-(2, 1, 1, 1, 2, 1, 1000.00, 'March-2026', 'paid', 'cash', 'R0619-7F3C', 2, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 15:25:05', 'global'),
-(3, 1, 1, 1, 3, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(4, 1, 1, 1, 4, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(5, 1, 1, 1, 5, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(6, 1, 1, 1, 6, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(7, 1, 1, 1, 7, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(8, 1, 1, 1, 8, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(9, 1, 1, 1, 9, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(10, 1, 1, 1, 10, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(11, 1, 1, 1, 11, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(12, 1, 1, 1, 12, 1, 1000.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:37:25', '2026-06-19 14:37:25', 'global'),
-(13, 1, 1, 1, 1, 2, 500.00, 'March-2026', 'paid', 'cash', 'R0619-67B4', 2, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:54', 'global'),
-(14, 1, 1, 1, 2, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(15, 1, 1, 1, 3, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(16, 1, 1, 1, 4, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(17, 1, 1, 1, 5, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(18, 1, 1, 1, 6, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(19, 1, 1, 1, 7, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(20, 1, 1, 1, 8, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(21, 1, 1, 1, 9, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(22, 1, 1, 1, 10, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(23, 1, 1, 1, 11, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global'),
-(24, 1, 1, 1, 12, 2, 500.00, 'March-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-06-19 14:40:36', '2026-06-19 14:40:36', 'global');
+INSERT INTO `student_fees` (`id`, `school_id`, `school_category_id`, `school_sub_category_id`, `student_id`, `fee_head_id`, `amount`, `original_amount`, `discount_amount`, `discount_percent`, `paid_amount`, `discount_note`, `month`, `status`, `payment_method`, `receipt_no`, `collected_by`, `due_date`, `created_at`, `updated_at`, `fee_type_limit`) VALUES
+(1, 1, 1, 1, 1, 1, 200.00, NULL, 0.00, 0.00, NULL, NULL, 'August-2026', 'unpaid', 'cash', NULL, NULL, '2026-08-31', '2026-08-30 07:48:23', '2026-08-30 07:48:23', 'global'),
+(2, 1, 1, 1, 2, 1, 135.00, 200.00, 65.00, 10.00, 135.00, 'taka nai', 'August-2026', 'paid', 'cash', 'R0904-DB45', 2, '2026-08-31', '2026-08-30 07:48:23', '2026-09-04 12:34:07', 'global'),
+(3, 1, 1, 1, 3, 1, 200.00, NULL, 0.00, 0.00, NULL, NULL, 'August-2026', 'unpaid', 'cash', NULL, NULL, '2026-08-31', '2026-08-30 07:48:23', '2026-08-30 07:48:23', 'global'),
+(6, 1, 1, 1, 1, 2, 850.00, 1000.00, 150.00, 15.00, NULL, 'Test Merit Scholarship', 'June-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-09-04 16:22:37', '2026-09-04 16:22:37', 'global'),
+(7, 1, 1, 1, 2, 2, 1000.00, 1000.00, 0.00, 0.00, NULL, NULL, 'June-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-09-04 16:22:37', '2026-09-04 16:22:37', 'global'),
+(8, 1, 1, 1, 3, 2, 1000.00, 1000.00, 0.00, 0.00, NULL, NULL, 'June-2026', 'unpaid', 'cash', NULL, NULL, '2026-06-30', '2026-09-04 16:22:37', '2026-09-04 16:22:37', 'global');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_fee_concessions`
+--
+
+CREATE TABLE `student_fee_concessions` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `school_id` bigint(20) UNSIGNED NOT NULL,
+  `student_id` bigint(20) UNSIGNED NOT NULL,
+  `fee_head_id` bigint(20) UNSIGNED NOT NULL,
+  `discount_type` enum('fixed_amount','percentage','custom_fee') NOT NULL DEFAULT 'fixed_amount',
+  `discount_amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `discount_percent` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `custom_amount` decimal(10,2) DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `student_fee_concessions`
+--
+
+INSERT INTO `student_fee_concessions` (`id`, `school_id`, `student_id`, `fee_head_id`, `discount_type`, `discount_amount`, `discount_percent`, `custom_amount`, `note`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 2, 'fixed_amount', 150.00, 0.00, NULL, 'Test Merit Scholarship', 1, '2026-09-04 12:26:52', '2026-09-04 12:26:52'),
+(2, 1, 2, 1, 'fixed_amount', 50.00, 25.00, 150.00, 'Poor student', 1, '2026-09-04 12:30:44', '2026-09-04 12:30:44');
 
 -- --------------------------------------------------------
 
@@ -1466,6 +1884,24 @@ CREATE TABLE `subjects` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`id`, `school_id`, `school_category_id`, `school_sub_category_id`, `name`, `code`, `type`, `description`, `created_at`, `updated_at`) VALUES
+(1, 1, NULL, NULL, 'Bangla', '101', 'theory', NULL, '2026-08-21 12:09:49', '2026-08-21 12:09:49'),
+(2, 1, NULL, NULL, 'English', '103', 'theory', NULL, '2026-08-21 12:10:40', '2026-08-21 12:10:40'),
+(3, 1, NULL, NULL, 'Mathematics', '105', 'theory', NULL, '2026-08-21 12:10:53', '2026-08-21 12:10:53'),
+(4, 1, NULL, NULL, 'Bangla Second Paper', '102', 'theory', NULL, '2026-08-21 13:42:36', '2026-08-21 13:42:36'),
+(5, 1, NULL, NULL, 'English Second Paper', '104', 'theory', NULL, '2026-08-21 13:42:59', '2026-08-21 13:42:59'),
+(6, 1, NULL, NULL, 'Science', '127', 'theory', NULL, '2026-08-21 14:12:26', '2026-08-21 14:12:26'),
+(7, 1, NULL, NULL, 'Physics', '211', 'theory', NULL, '2026-08-22 18:48:18', '2026-08-22 18:48:18'),
+(8, 1, NULL, NULL, 'Bangladesh and Global Studies', '132', 'theory', NULL, '2026-08-22 18:48:51', '2026-08-22 18:48:51'),
+(9, 1, NULL, NULL, 'History', '201', 'theory', NULL, '2026-08-22 18:49:05', '2026-08-22 18:49:05'),
+(10, 1, NULL, NULL, 'Civies and  Citizen', '207', 'theory', NULL, '2026-08-22 18:49:34', '2026-08-22 18:49:34'),
+(11, 1, NULL, NULL, 'Higher Math', '255', 'theory_practical', NULL, '2026-08-22 18:49:55', '2026-08-31 13:13:50'),
+(12, 1, NULL, NULL, 'Agricultural', '245', 'theory_practical', NULL, '2026-08-22 18:50:10', '2026-08-31 13:13:35');
+
 -- --------------------------------------------------------
 
 --
@@ -1475,8 +1911,13 @@ CREATE TABLE `subjects` (
 CREATE TABLE `subscription_packages` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
+  `profile` varchar(255) NOT NULL DEFAULT 'school',
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `registration_commission_type` enum('flat','percentage') NOT NULL DEFAULT 'flat',
+  `registration_commission_rate` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `monthly_commission_type` enum('flat','percentage') NOT NULL DEFAULT 'flat',
+  `monthly_commission_rate` decimal(10,2) NOT NULL DEFAULT 0.00,
   `duration` varchar(255) NOT NULL DEFAULT 'monthly',
   `student_limit` int(11) DEFAULT NULL,
   `teacher_limit` int(11) DEFAULT NULL,
@@ -1492,8 +1933,9 @@ CREATE TABLE `subscription_packages` (
 -- Dumping data for table `subscription_packages`
 --
 
-INSERT INTO `subscription_packages` (`id`, `name`, `description`, `price`, `duration`, `student_limit`, `teacher_limit`, `features`, `permissions`, `is_popular`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Production', 'Testing package', 0.00, 'yearly', NULL, NULL, '[]', '{\"0\":\"academic-year.manage\",\"1\":\"category.manage\",\"2\":\"sub-category.manage\",\"3\":\"class.manage\",\"4\":\"section.manage\",\"5\":\"subject.manage\",\"6\":\"assign.subject\",\"7\":\"class.routine\",\"8\":\"syllabus.manage\",\"9\":\"lesson.view\",\"10\":\"lesson.manage\",\"11\":\"homework.manage\",\"12\":\"syllabus.view\",\"13\":\"syllabus.download\",\"14\":\"syllabus.upload\",\"15\":\"syllabus.delete\",\"16\":\"syllabus.approve\",\"17\":\"syllabus.reject\",\"18\":\"syllabus.view_rejected\",\"19\":\"syllabus.view_approved\",\"20\":\"admission.manage\",\"21\":\"student.index\",\"22\":\"student.create\",\"23\":\"student.edit\",\"24\":\"student.delete\",\"25\":\"student.manage\",\"26\":\"student.idcard\",\"27\":\"student.promotion\",\"28\":\"teacher.manage\",\"29\":\"employee.manage\",\"30\":\"designation.manage\",\"31\":\"payroll.manage\",\"32\":\"leave.manage\",\"33\":\"attendance.manage\",\"34\":\"attendance.report\",\"35\":\"payroll.report\",\"36\":\"staff.report\",\"37\":\"staff.idcard\",\"38\":\"staff.promotion\",\"39\":\"staff.transfer\",\"40\":\"staff.termination\",\"41\":\"staff.leave\",\"42\":\"staff.attendance\",\"43\":\"staff.payroll\",\"46\":\"holiday.manage\",\"47\":\"exam.manage\",\"48\":\"mark.manage\",\"49\":\"exam.admit_card\",\"50\":\"fee.manage\",\"51\":\"fee.collect\",\"52\":\"fee.report\",\"53\":\"notice.manage\",\"54\":\"slider.manage\",\"55\":\"gallery.manage\",\"56\":\"message.manage\",\"57\":\"sms.send\",\"58\":\"email.send\",\"59\":\"whatsapp.send\",\"60\":\"newsletter.manage\",\"61\":\"system.settings\",\"67\":\"profile.manage\"}', 0, 1, '2026-06-19 08:09:58', '2026-06-19 08:09:58');
+INSERT INTO `subscription_packages` (`id`, `name`, `profile`, `description`, `price`, `registration_commission_type`, `registration_commission_rate`, `monthly_commission_type`, `monthly_commission_rate`, `duration`, `student_limit`, `teacher_limit`, `features`, `permissions`, `is_popular`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Starter', 'school', NULL, 0.00, 'flat', 50.00, 'flat', 0.00, 'yearly', NULL, NULL, '[]', '{\"0\":\"academic-year.manage\",\"1\":\"category.manage\",\"2\":\"sub-category.manage\",\"3\":\"class.manage\",\"4\":\"section.manage\",\"5\":\"subject.manage\",\"6\":\"assign.subject\",\"7\":\"class.routine\",\"8\":\"syllabus.manage\",\"9\":\"lesson.view\",\"10\":\"lesson.manage\",\"11\":\"homework.manage\",\"12\":\"syllabus.view\",\"13\":\"syllabus.download\",\"14\":\"syllabus.upload\",\"15\":\"syllabus.delete\",\"16\":\"syllabus.approve\",\"17\":\"syllabus.reject\",\"18\":\"syllabus.view_rejected\",\"19\":\"syllabus.view_approved\",\"20\":\"admission.manage\",\"21\":\"student.index\",\"22\":\"student.create\",\"23\":\"student.edit\",\"24\":\"student.delete\",\"25\":\"student.manage\",\"26\":\"student.idcard\",\"27\":\"student.promotion\",\"28\":\"teacher.manage\",\"29\":\"assign.teacher\",\"30\":\"employee.manage\",\"31\":\"designation.manage\",\"32\":\"payroll.manage\",\"33\":\"leave.manage\",\"34\":\"staff.attendance\",\"35\":\"staff.leave\",\"36\":\"staff.payroll\",\"37\":\"payroll.report\",\"38\":\"staff.report\",\"39\":\"staff.idcard\",\"40\":\"staff.promotion\",\"41\":\"staff.transfer\",\"42\":\"staff.termination\",\"43\":\"attendance.manage\",\"44\":\"attendance.analytics\",\"45\":\"attendance.report\",\"46\":\"holiday.manage\",\"47\":\"exam.manage\",\"48\":\"mark.manage\",\"49\":\"fee.manage\",\"50\":\"fee.collect\",\"51\":\"fee.report\",\"52\":\"notice.manage\",\"53\":\"slider.manage\",\"54\":\"gallery.manage\",\"55\":\"newsletter.manage\",\"56\":\"system.settings\",\"60\":\"profile.manage\"}', 0, 1, '2026-08-21 13:24:53', '2026-09-11 17:12:11'),
+(2, 'Coaching Center', 'coaching', NULL, 500.00, 'flat', 0.00, 'flat', 0.00, 'monthly', NULL, NULL, '[]', '[\"student.create\",\"student.edit\",\"student.delete\",\"student.manage\",\"student.idcard\",\"teacher.manage\",\"assign.teacher\",\"employee.manage\",\"attendance.manage\",\"attendance.analytics\",\"attendance.report\",\"exam.manage\",\"mark.manage\",\"exam.admit_card\",\"fee.manage\",\"fee.collect\",\"fee.report\",\"batch.manage\",\"coaching.student.manage\",\"coaching.teacher.manage\",\"coaching.attendance.manage\",\"coaching.exam.manage\",\"coaching.notice.manage\",\"notice.manage\",\"system.settings\",\"profile.manage\",\"student.index\",\"class.manage\",\"subject.manage\",\"coaching.mark.manage\",\"coaching.fee.manage\"]', 0, 1, '2026-09-03 18:56:14', '2026-09-03 18:56:14');
 
 -- --------------------------------------------------------
 
@@ -1566,6 +2008,14 @@ CREATE TABLE `teachers` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `teachers`
+--
+
+INSERT INTO `teachers` (`id`, `school_id`, `teacher_id`, `name`, `subject_id`, `designation`, `father_name`, `mother_name`, `nid`, `date_of_birth`, `gender`, `email`, `phone`, `blood_group`, `joining_date`, `qualification`, `photo`, `facebook`, `twitter`, `linkedin`, `insta`, `address`, `created_at`, `updated_at`) VALUES
+(1, 1, 'TCH-261001', 'Rahim Uddin', 3, NULL, 'Karim Uddin', 'Fatema Begum', '1234567890', '1985-06-15', 'male', 'rahim@school.com', '01712345678', 'B+', '2024-01-10', 'M.Sc in Mathematics', NULL, NULL, NULL, NULL, NULL, 'Dhaka, Bangladesh', '2026-08-21 12:18:30', '2026-08-21 12:18:30'),
+(2, 1, 'TCH-261002', 'Salma Khatun', 2, NULL, 'Alam Hossain', 'Roksana Begum', '98765432101234567', '1990-03-22', 'female', 'salma@school.com', '01812345679', 'O+', '2024-02-15', 'M.A. in English', NULL, NULL, NULL, NULL, NULL, 'Chittagong, Bangladesh', '2026-08-21 12:18:30', '2026-08-21 12:18:30');
+
 -- --------------------------------------------------------
 
 --
@@ -1582,6 +2032,14 @@ CREATE TABLE `teacher_assign_subjects` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `teacher_assign_subjects`
+--
+
+INSERT INTO `teacher_assign_subjects` (`id`, `school_id`, `teacher_id`, `class_id`, `section_id`, `subject_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 1, 1, '2026-08-21 12:19:15', '2026-08-21 12:19:15'),
+(2, 1, 1, 2, 1, 1, '2026-08-21 12:19:38', '2026-08-21 12:19:38');
 
 -- --------------------------------------------------------
 
@@ -1622,6 +2080,7 @@ CREATE TABLE `users` (
   `linkedin` varchar(255) DEFAULT NULL,
   `insta` varchar(255) DEFAULT NULL,
   `photo` varchar(255) DEFAULT NULL,
+  `signature` varchar(255) DEFAULT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
@@ -1633,21 +2092,19 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `school_id`, `teacher_id`, `name`, `role`, `email`, `phone`, `facebook`, `twitter`, `linkedin`, `insta`, `photo`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, NULL, NULL, 'Super Admin', 'super_admin', 'superadmin@schoolerp.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$vfftSWuvOVReEqSR49vgJ.z4kw1UAMv6CVxx0ElzHBGXQN9287CdS', NULL, '2026-06-19 07:30:57', '2026-06-19 07:30:57'),
-(2, 1, NULL, 'Demo', 'school_admin', 'demo@schoolerp.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$TbFnhsAoaanauaSI1.mij.IbKUnVnZn22CpQ.UMAreCxLtHXhpWo2', NULL, '2026-06-19 08:05:44', '2026-06-19 08:05:44'),
-(3, 1, NULL, 'Sagor Hossain', 'student', 'STD-261001@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$2GEh4/YviUu/a3HZNdWhiebKsGO/tlswE/voW2xDNjZQNPH5QS7Ye', NULL, '2026-06-19 14:36:00', '2026-06-19 14:36:00'),
-(4, 1, NULL, 'Sumaiya Akter', 'student', 'STD-261002@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$pkG6mLnlVabsXO0v09SwVeGdxQyaz/nAggHThRfzN/mFjiLO/kdmq', NULL, '2026-06-19 14:36:01', '2026-06-19 14:36:01'),
-(5, 1, NULL, 'Manos Kumar', 'student', 'STD-261003@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$Byz8axEmVpFxT4RUIkJPRuqUa2FnAgUmW.peqmTNToNdPYitXDteS', NULL, '2026-06-19 14:36:01', '2026-06-19 14:36:01'),
-(6, 1, NULL, 'Noyon Roy', 'student', 'STD-261004@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$tfrx3RscRYnPOOlPdp.V6eo9WgH5FU72xJqEFR9H/FFcl2FJPUTE.', NULL, '2026-06-19 14:36:02', '2026-06-19 14:36:02'),
-(7, 1, NULL, 'Nobonita Rani', 'student', 'STD-261005@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$/EWAvuSJZEsark43e01p2OG4QlPAp3iiDLQsh0x/kJ59zYdxK0Kji', NULL, '2026-06-19 14:36:02', '2026-06-19 14:36:02'),
-(8, 1, NULL, 'Kamrun Nahar', 'student', 'STD-261006@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$kzGtSLNX.52uhydhP1R98uwSDYFpXtcCDow5Mrf5LM6evpnRhnYiy', NULL, '2026-06-19 14:36:03', '2026-06-19 14:36:03'),
-(9, 1, NULL, 'Manun Islam', 'student', 'STD-261007@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$Yu5QVfrI2m.9o2Bzv7aXvuhdEbRel7emNj8aTQMYzNwkFa9cPNagq', NULL, '2026-06-19 14:36:04', '2026-06-19 14:36:04'),
-(10, 1, NULL, 'Limu Akter', 'student', 'STD-261008@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$FKvFsk6ctJWp2946679IPexkAtx05cqrTuYVz3HCVyITozvGCFI8.', NULL, '2026-06-19 14:36:04', '2026-06-19 14:36:04'),
-(11, 1, NULL, 'Antor Kumar', 'student', 'STD-261009@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$wqs3t7WaAWeYxTNe6o32KOP2Xek/1VofqMa5oDE2Ijh/CW0pW3Rlq', NULL, '2026-06-19 14:36:05', '2026-06-19 14:36:05'),
-(12, 1, NULL, 'Niranjan Roy', 'student', 'STD-261010@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$RODU7mHKAc5SZKDfXm1cdu58TGVpGPvFd0.OY3OxE7VmdoTQk5TuO', NULL, '2026-06-19 14:36:05', '2026-06-19 14:36:05'),
-(13, 1, NULL, 'Kabita Rani', 'student', 'STD-261011@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$olt.YSarqPmyFa3hAVCdNu1ZDgebNvgKWLwyP5E0qgDergndD48ha', NULL, '2026-06-19 14:36:06', '2026-06-19 14:36:06'),
-(14, 1, NULL, 'Ajmin Akter', 'student', 'STD-261012@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$I.KjOYpf50mwi.3zxhVsfuppw8rCZRIprKKcg2QOfSJLtdXhFQe5y', NULL, '2026-06-19 14:36:06', '2026-06-19 14:36:06');
+INSERT INTO `users` (`id`, `school_id`, `teacher_id`, `name`, `role`, `email`, `phone`, `facebook`, `twitter`, `linkedin`, `insta`, `photo`, `signature`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, NULL, NULL, 'Super Admin', 'super_admin', 'superadmin@schoolerp.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$C73dNG0oFDqnmZQv7/9y8e0EFG9BC0fdcAxbKzR5esTaw8AWNdLF6', NULL, '2026-08-21 11:51:40', '2026-08-21 11:51:40'),
+(2, 1, NULL, 'Demo', 'school_admin', 'demo@schoolerp.test', NULL, NULL, NULL, NULL, NULL, NULL, 'uploads/schools/demo/signatures/sig_1788583083_6a9b9caba6e67.jpg', NULL, '$2y$12$MQwCn.fg.FCe666zfi8PY.8PCHEHhnZjHw.b8ycMb9B3qHYgl40g.', NULL, '2026-08-21 11:53:09', '2026-09-05 04:38:03'),
+(3, 1, NULL, 'Rahim Uddin', 'teacher', 'rahim@school.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$BEHBEJYVKHcRU5tB9NeTkuh9fjyldAhxv.cu/zAFIsCtDNTN00aHq', NULL, '2026-08-21 12:18:30', '2026-08-21 12:18:30'),
+(4, 1, NULL, 'Salma Khatun', 'teacher', 'salma@school.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$utzosoV332ETVumWeh1ZY.w4iwtXocsNLWVcKpgNgCFcO83J263me', NULL, '2026-08-21 12:18:31', '2026-08-21 12:18:31'),
+(6, 1, NULL, 'Sumon Roy', 'student', 'STD-261001@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$x7eLEZ4ejBzyZRUlXN8Wi.z.MhxO6xAkrZN4iIiEUUKKhpuwnoweq', NULL, '2026-08-21 12:45:06', '2026-08-21 12:45:06'),
+(7, 1, NULL, 'Choin Roy', 'student', 'STD-261002@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$jVAdRS5hhOc8L7EwJl6a1uimkK9WIoBKKahkJVJywrzqeJoff3oFm', NULL, '2026-08-21 13:06:23', '2026-08-21 13:06:23'),
+(8, 1, NULL, 'Sagor Hoassain', 'student', 'STD-261003@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$HGV5u.T76HJ0TrxRbWRBSuGaFkjSThPQdv3H/WiNfHGTk5HkGcfSq', NULL, '2026-08-21 13:06:24', '2026-08-21 13:06:24'),
+(9, 1, NULL, 'Sagor Ray', 'student', 'STD-261004@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$wLpsgRBDqPg4lT/Qd0i65eYhAk.4AIp3JcFHXSf2t5Ug.9qTFkafi', NULL, '2026-08-21 13:46:23', '2026-08-21 13:46:23'),
+(10, 1, NULL, 'Shahinur Islam', 'student', 'STD-261005@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$3NnFjFeGpauk0h5DF0Kr3ujo9L5l/.Z9DgeuPSCJm0eA.yGmtt2tO', NULL, '2026-08-21 13:46:24', '2026-08-21 13:46:24'),
+(13, 1, NULL, 'Simu Rani', 'student', 'STD-261006@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$PTLHx34mqZbOTkboZPT/CuPy1Ic3nBczmnj27zF2YSybxETAX4Rze', NULL, '2026-08-28 18:50:33', '2026-08-28 18:50:33'),
+(14, 1, NULL, 'Saiful Islam', 'student', 'STD-261007@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$5QnM3ny2wOx4Gsv1.fkh0eywUlnuObFlSMdil/u2Pxr5ACyV47r1i', NULL, '2026-08-28 18:50:34', '2026-08-28 18:50:34'),
+(16, NULL, NULL, 'Sagor Roy', 'Representative', 'kajolray2171@gmail.com', '01766236788', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$12$o.or/NobOt6GalbI7r8LWOYDMExalXEGn1ZnJ2MTLIr9MEHTxwlQ6', NULL, '2026-09-10 04:54:11', '2026-09-11 16:38:14');
 
 --
 -- Indexes for dumped tables
@@ -1747,6 +2204,12 @@ ALTER TABLE `contact_messages`
   ADD KEY `contact_messages_school_id_foreign` (`school_id`);
 
 --
+-- Indexes for table `email_logs`
+--
+ALTER TABLE `email_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `employees`
 --
 ALTER TABLE `employees`
@@ -1769,6 +2232,23 @@ ALTER TABLE `exams`
   ADD KEY `exams_year_id_foreign` (`year_id`);
 
 --
+-- Indexes for table `exam_categories`
+--
+ALTER TABLE `exam_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `exam_categories_exam_id_school_category_id_unique` (`exam_id`,`school_category_id`),
+  ADD KEY `exam_categories_school_category_id_foreign` (`school_category_id`);
+
+--
+-- Indexes for table `exam_routines`
+--
+ALTER TABLE `exam_routines`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `exam_routines_school_id_foreign` (`school_id`),
+  ADD KEY `exam_routines_exam_id_foreign` (`exam_id`),
+  ADD KEY `exam_routines_subject_id_foreign` (`subject_id`);
+
+--
 -- Indexes for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
@@ -1789,8 +2269,7 @@ ALTER TABLE `fee_amounts`
 --
 ALTER TABLE `fee_heads`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `fee_heads_school_id_name_unique` (`school_id`,`name`),
-  ADD UNIQUE KEY `fee_heads_name_unique` (`name`);
+  ADD UNIQUE KEY `fee_heads_school_id_name_unique` (`school_id`,`name`);
 
 --
 -- Indexes for table `footer_settings`
@@ -1811,6 +2290,21 @@ ALTER TABLE `frontend_sections`
 --
 ALTER TABLE `holidays`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `id_card_designs`
+--
+ALTER TABLE `id_card_designs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_card_designs_slug_unique` (`slug`);
+
+--
+-- Indexes for table `inbound_messages`
+--
+ALTER TABLE `inbound_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `inbound_messages_message_id_unique` (`message_id`),
+  ADD KEY `inbound_messages_school_id_mailbox_type_status_index` (`school_id`,`mailbox_type`,`status`);
 
 --
 -- Indexes for table `jobs`
@@ -1948,7 +2442,10 @@ ALTER TABLE `routines`
 ALTER TABLE `schools`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `schools_slug_unique` (`slug`),
-  ADD KEY `schools_subscription_package_id_foreign` (`subscription_package_id`);
+  ADD UNIQUE KEY `schools_app_code_unique` (`app_code`),
+  ADD KEY `schools_subscription_package_id_foreign` (`subscription_package_id`),
+  ADD KEY `schools_admission_academic_year_id_foreign` (`admission_academic_year_id`),
+  ADD KEY `schools_representative_id_foreign` (`representative_id`);
 
 --
 -- Indexes for table `school_categories`
@@ -1958,11 +2455,31 @@ ALTER TABLE `school_categories`
   ADD KEY `school_categories_school_id_foreign` (`school_id`);
 
 --
+-- Indexes for table `school_delete_requests`
+--
+ALTER TABLE `school_delete_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `school_delete_requests_school_id_foreign` (`school_id`),
+  ADD KEY `school_delete_requests_requested_by_foreign` (`requested_by`),
+  ADD KEY `school_delete_requests_reviewed_by_foreign` (`reviewed_by`);
+
+--
 -- Indexes for table `school_overviews`
 --
 ALTER TABLE `school_overviews`
   ADD PRIMARY KEY (`id`),
   ADD KEY `school_overviews_school_id_foreign` (`school_id`);
+
+--
+-- Indexes for table `school_subscriptions`
+--
+ALTER TABLE `school_subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `school_subscriptions_payment_reference_unique` (`payment_reference`),
+  ADD KEY `school_subscriptions_subscription_package_id_foreign` (`subscription_package_id`),
+  ADD KEY `school_subscriptions_school_id_status_index` (`school_id`,`status`),
+  ADD KEY `school_subscriptions_payment_reference_index` (`payment_reference`),
+  ADD KEY `school_subscriptions_reviewed_by_foreign` (`reviewed_by`);
 
 --
 -- Indexes for table `school_sub_categories`
@@ -2005,10 +2522,10 @@ ALTER TABLE `sliders`
 ALTER TABLE `students`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `students_school_id_student_id_unique` (`school_id`,`student_id`),
-  ADD UNIQUE KEY `students_student_id_unique` (`student_id`),
   ADD KEY `students_user_id_foreign` (`user_id`),
   ADD KEY `students_school_sub_category_id_foreign` (`school_sub_category_id`),
-  ADD KEY `students_school_category_id_foreign` (`school_category_id`);
+  ADD KEY `students_school_category_id_foreign` (`school_category_id`),
+  ADD KEY `students_admission_id_foreign` (`admission_id`);
 
 --
 -- Indexes for table `student_fees`
@@ -2016,6 +2533,15 @@ ALTER TABLE `students`
 ALTER TABLE `student_fees`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_student_billing` (`student_id`,`fee_head_id`,`month`);
+
+--
+-- Indexes for table `student_fee_concessions`
+--
+ALTER TABLE `student_fee_concessions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_student_head_concession` (`school_id`,`student_id`,`fee_head_id`),
+  ADD KEY `student_fee_concessions_student_id_foreign` (`student_id`),
+  ADD KEY `student_fee_concessions_fee_head_id_foreign` (`fee_head_id`);
 
 --
 -- Indexes for table `student_sessions`
@@ -2061,7 +2587,7 @@ ALTER TABLE `support_tickets`
 --
 ALTER TABLE `teachers`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `teachers_teacher_id_unique` (`teacher_id`),
+  ADD UNIQUE KEY `teachers_school_id_teacher_id_unique` (`school_id`,`teacher_id`),
   ADD UNIQUE KEY `teachers_school_id_email_unique` (`school_id`,`email`),
   ADD UNIQUE KEY `teachers_nid_unique` (`nid`),
   ADD UNIQUE KEY `teachers_email_unique` (`email`),
@@ -2119,7 +2645,7 @@ ALTER TABLE `admissions`
 -- AUTO_INCREMENT for table `assign_classes`
 --
 ALTER TABLE `assign_classes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `attendances`
@@ -2143,13 +2669,13 @@ ALTER TABLE `blog_categories`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `communication_settings`
 --
 ALTER TABLE `communication_settings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `contact_messages`
@@ -2158,10 +2684,16 @@ ALTER TABLE `contact_messages`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `email_logs`
+--
+ALTER TABLE `email_logs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -2173,7 +2705,19 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `exams`
 --
 ALTER TABLE `exams`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `exam_categories`
+--
+ALTER TABLE `exam_categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `exam_routines`
+--
+ALTER TABLE `exam_routines`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -2185,13 +2729,13 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `fee_amounts`
 --
 ALTER TABLE `fee_amounts`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `fee_heads`
 --
 ALTER TABLE `fee_heads`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `footer_settings`
@@ -2209,6 +2753,18 @@ ALTER TABLE `frontend_sections`
 -- AUTO_INCREMENT for table `holidays`
 --
 ALTER TABLE `holidays`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `id_card_designs`
+--
+ALTER TABLE `id_card_designs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `inbound_messages`
+--
+ALTER TABLE `inbound_messages`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -2239,13 +2795,13 @@ ALTER TABLE `main_newsletters`
 -- AUTO_INCREMENT for table `marks`
 --
 ALTER TABLE `marks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
 
 --
 -- AUTO_INCREMENT for table `newsletters`
@@ -2257,19 +2813,19 @@ ALTER TABLE `newsletters`
 -- AUTO_INCREMENT for table `notices`
 --
 ALTER TABLE `notices`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `routines`
@@ -2281,13 +2837,19 @@ ALTER TABLE `routines`
 -- AUTO_INCREMENT for table `schools`
 --
 ALTER TABLE `schools`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `school_categories`
 --
 ALTER TABLE `school_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `school_delete_requests`
+--
+ALTER TABLE `school_delete_requests`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `school_overviews`
@@ -2296,10 +2858,16 @@ ALTER TABLE `school_overviews`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `school_subscriptions`
+--
+ALTER TABLE `school_subscriptions`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `school_sub_categories`
 --
 ALTER TABLE `school_sub_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sections`
@@ -2317,19 +2885,25 @@ ALTER TABLE `site_settings`
 -- AUTO_INCREMENT for table `sliders`
 --
 ALTER TABLE `sliders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `student_fees`
 --
 ALTER TABLE `student_fees`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `student_fee_concessions`
+--
+ALTER TABLE `student_fee_concessions`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `student_sessions`
@@ -2341,13 +2915,13 @@ ALTER TABLE `student_sessions`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `subscription_packages`
 --
 ALTER TABLE `subscription_packages`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `support_replies`
@@ -2365,13 +2939,13 @@ ALTER TABLE `support_tickets`
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `teacher_assign_subjects`
 --
 ALTER TABLE `teacher_assign_subjects`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `testimonials`
@@ -2383,7 +2957,7 @@ ALTER TABLE `testimonials`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
@@ -2458,6 +3032,21 @@ ALTER TABLE `exams`
   ADD CONSTRAINT `exams_year_id_foreign` FOREIGN KEY (`year_id`) REFERENCES `academicyears` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `exam_categories`
+--
+ALTER TABLE `exam_categories`
+  ADD CONSTRAINT `exam_categories_exam_id_foreign` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_categories_school_category_id_foreign` FOREIGN KEY (`school_category_id`) REFERENCES `school_categories` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `exam_routines`
+--
+ALTER TABLE `exam_routines`
+  ADD CONSTRAINT `exam_routines_exam_id_foreign` FOREIGN KEY (`exam_id`) REFERENCES `exams` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_routines_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `exam_routines_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `fee_amounts`
 --
 ALTER TABLE `fee_amounts`
@@ -2469,6 +3058,12 @@ ALTER TABLE `fee_amounts`
 --
 ALTER TABLE `footer_settings`
   ADD CONSTRAINT `footer_settings_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `inbound_messages`
+--
+ALTER TABLE `inbound_messages`
+  ADD CONSTRAINT `inbound_messages_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `lesson_plans`
@@ -2543,6 +3138,8 @@ ALTER TABLE `routines`
 -- Constraints for table `schools`
 --
 ALTER TABLE `schools`
+  ADD CONSTRAINT `schools_admission_academic_year_id_foreign` FOREIGN KEY (`admission_academic_year_id`) REFERENCES `academicyears` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `schools_representative_id_foreign` FOREIGN KEY (`representative_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `schools_subscription_package_id_foreign` FOREIGN KEY (`subscription_package_id`) REFERENCES `subscription_packages` (`id`) ON DELETE SET NULL;
 
 --
@@ -2552,10 +3149,26 @@ ALTER TABLE `school_categories`
   ADD CONSTRAINT `school_categories_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `school_delete_requests`
+--
+ALTER TABLE `school_delete_requests`
+  ADD CONSTRAINT `school_delete_requests_requested_by_foreign` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `school_delete_requests_reviewed_by_foreign` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `school_delete_requests_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `school_overviews`
 --
 ALTER TABLE `school_overviews`
   ADD CONSTRAINT `school_overviews_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `school_subscriptions`
+--
+ALTER TABLE `school_subscriptions`
+  ADD CONSTRAINT `school_subscriptions_reviewed_by_foreign` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `school_subscriptions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `school_subscriptions_subscription_package_id_foreign` FOREIGN KEY (`subscription_package_id`) REFERENCES `subscription_packages` (`id`);
 
 --
 -- Constraints for table `school_sub_categories`
@@ -2574,9 +3187,18 @@ ALTER TABLE `sections`
 -- Constraints for table `students`
 --
 ALTER TABLE `students`
+  ADD CONSTRAINT `students_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `students_school_category_id_foreign` FOREIGN KEY (`school_category_id`) REFERENCES `school_categories` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `students_school_sub_category_id_foreign` FOREIGN KEY (`school_sub_category_id`) REFERENCES `school_sub_categories` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `students_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `student_fee_concessions`
+--
+ALTER TABLE `student_fee_concessions`
+  ADD CONSTRAINT `student_fee_concessions_fee_head_id_foreign` FOREIGN KEY (`fee_head_id`) REFERENCES `fee_heads` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_concessions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_fee_concessions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `student_sessions`

@@ -1,5 +1,5 @@
 <!-- CTA Section -->
-<section class="py-16 md:py-24 px-4 md:px-8">
+<section id="cta" class="py-16 md:py-24 px-4 md:px-8">
     <div class="max-w-7xl mx-auto hero-gradient rounded-2xl md:rounded-3xl p-8 md:p-24 text-center text-white relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
             <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">

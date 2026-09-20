@@ -1,6 +1,6 @@
 <!-- Footer Start -->
 <div class="container-fluid bg-navy text-white footer wow fadeIn" data-wow-delay="0.1s">
-    <div class="container py-5 px-lg-5">
+    <div class="container py-5">
         <div class="row g-5">
             <div class="col-md-6 col-lg-3">
                 <div class="site-logo mb-3">
@@ -81,7 +81,7 @@
     </div>
     
     {{-- Copyright Section --}}
-    <div class="container px-lg-5">
+    <div class="container">
         <div class="copyright border-top border-secondary py-4">
             <div class="row">
                 <div class="col-md-12 text-center small">
@@ -95,8 +95,8 @@
 <!-- Footer End -->
 
 <style>
-    .container-fluid{
-        background: linear-gradient(135deg, #95b4ec 0%, #4f7dce 100%);
+    .footer {
+        background: #002147;
         font-family: 'Poppins', sans-serif;
     }
 

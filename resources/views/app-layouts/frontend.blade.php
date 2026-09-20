@@ -164,6 +164,122 @@
             background: linear-gradient(135deg, #4648d4 0%, #8127cf 100%);
         }
     </style>
+
+    {{-- ================================================================
+         GLOBAL MARGIN / ALIGNMENT FIX
+         সব সেকশনের container, Tailwind max-w-*, navbar ও footer এর
+         বাম-ডান প্যাডিং এবং সর্বোচ্চ প্রস্থ এক করে দেওয়া হয়েছে।
+         ================================================================ --}}
+    <style>
+        /* ── সাইট-ওয়াইড কন্টেইনার ও মার্জিন টোকেন ── */
+        :root {
+            --site-max-width: 1280px;
+            --site-px: 36px;        /* ডেস্কটপ বাম-ডান প্যাডিং (navbar, sections ও footer সমান) */
+            --site-px-md: 24px;     /* ট্যাবলেট */
+            --site-px-sm: 16px;     /* মোবাইল */
+        }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        /* ── ১. Navbar Header Inner ── */
+        .ec-header__inner {
+            width: 100% !important;
+            max-width: var(--site-max-width) !important;
+            padding-left:  var(--site-px) !important;
+            padding-right: var(--site-px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ── ২. Bootstrap .container (Hero, Features, WhyChooseUs, About, Setup, Testimonials, Contact) ── */
+        .container {
+            width: 100% !important;
+            max-width: var(--site-max-width) !important;
+            padding-left:  var(--site-px) !important;
+            padding-right: var(--site-px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ── ৩. Tailwind সেকশন কন্টেইনার (Pricing, Blog) ── */
+        #pricing,
+        #blog {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        #pricing > .max-w-7xl,
+        #blog > .max-w-7xl {
+            width: 100% !important;
+            max-width: var(--site-max-width) !important;
+            padding-left:  var(--site-px) !important;
+            padding-right: var(--site-px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ── ৪. CTA ও Newsletter সেকশন ── */
+        #cta,
+        #newsletter {
+            width: 100% !important;
+            max-width: var(--site-max-width) !important;
+            padding-left:  var(--site-px) !important;
+            padding-right: var(--site-px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ── ৫. Footer কন্টেইনার ── */
+        .footer .container,
+        .footer .container.px-lg-5 {
+            width: 100% !important;
+            max-width: var(--site-max-width) !important;
+            padding-left:  var(--site-px) !important;
+            padding-right: var(--site-px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        /* ── ৬. About সেকশন ইনলাইন অতিরিক্ত মার্জিন রিসেট ── */
+        #about .ps-lg-5 {
+            padding-left: 0 !important;
+        }
+
+        /* ── রেসপনসিভ: ট্যাবলেট (≤ 991px) ── */
+        @media (max-width: 991px) {
+            .ec-header__inner,
+            .container,
+            #pricing > .max-w-7xl,
+            #blog > .max-w-7xl,
+            #cta,
+            #newsletter,
+            .footer .container {
+                padding-left:  var(--site-px-md) !important;
+                padding-right: var(--site-px-md) !important;
+            }
+        }
+
+        /* ── রেসপনসিভ: মোবাইল (≤ 575px) ── */
+        @media (max-width: 575px) {
+            .ec-header__inner,
+            .container,
+            #pricing > .max-w-7xl,
+            #blog > .max-w-7xl,
+            #cta,
+            #newsletter,
+            .footer .container {
+                padding-left:  var(--site-px-sm) !important;
+                padding-right: var(--site-px-sm) !important;
+            }
+        }
+    </style>
     @stack('custom-css')
 </head>
 
