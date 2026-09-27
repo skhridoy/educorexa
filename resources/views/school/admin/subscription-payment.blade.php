@@ -437,7 +437,12 @@
         document.getElementById('summaryTotalAmount').innerText = '৳' + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
         document.getElementById('summaryDurationText').innerText = months === 1 ? '1 Month' : `${months} Months`;
         document.getElementById('summaryPeriodSubtitle').innerText = `${label} Plan · ৳${monthlyPrice.toLocaleString()}/month`;
-        document.getElementById('summaryRateNote').innerText = `৳${monthlyPrice.toLocaleString()} × ${months} mo`;
+        const discountPct = parseFloat(selectedRadio.dataset.discount) || 0;
+        if (discountPct > 0) {
+            document.getElementById('summaryRateNote').innerText = `৳${monthlyPrice.toLocaleString()} × ${months} mo (${discountPct}% off)`;
+        } else {
+            document.getElementById('summaryRateNote').innerText = `৳${monthlyPrice.toLocaleString()} × ${months} mo`;
+        }
     }
 
     document.querySelectorAll('.period-card').forEach(function (card) {

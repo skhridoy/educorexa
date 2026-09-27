@@ -228,6 +228,60 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {{-- Multi-month Billing Period Discounts --}}
+                            <div class="p-3 mb-3 rounded-3" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge" style="background:#059669; color:#fff; font-size:0.75rem;">
+                                        <i class="fa-solid fa-tags me-1"></i> Multi-Month Discounts (কমিশন / ছাড়)
+                                    </span>
+                                    <small class="text-muted fw-semibold">৩, ৬ বা ১২ মাসের পেমেন্টে স্বয়ংক্রিয় ছাড় %</small>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="edu-label" style="font-size:0.8rem;">
+                                            Quarterly (৩ মাস) ছাড় (%)
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.1" min="0" max="100"
+                                                name="billing_discounts[quarterly]"
+                                                class="form-control edu-input"
+                                                placeholder="e.g. 5"
+                                                value="{{ old('billing_discounts.quarterly', 0) }}">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="pkg-field-hint" style="font-size:0.72rem;">০ দিলে কোনো ছাড় থাকবে না</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="edu-label" style="font-size:0.8rem;">
+                                            Half-Yearly (৬ মাস) ছাড় (%)
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.1" min="0" max="100"
+                                                name="billing_discounts[half_yearly]"
+                                                class="form-control edu-input"
+                                                placeholder="e.g. 10"
+                                                value="{{ old('billing_discounts.half_yearly', 0) }}">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="pkg-field-hint" style="font-size:0.72rem;">০ দিলে কোনো ছাড় থাকবে না</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="edu-label" style="font-size:0.8rem;">
+                                            Yearly (১২ মাস) ছাড় (%)
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="0.1" min="0" max="100"
+                                                name="billing_discounts[yearly]"
+                                                class="form-control edu-input"
+                                                placeholder="e.g. 20"
+                                                value="{{ old('billing_discounts.yearly', 0) }}">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <div class="pkg-field-hint" style="font-size:0.72rem;">০ দিলে কোনো ছাড় থাকবে না</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Quotas / Limits --}}
