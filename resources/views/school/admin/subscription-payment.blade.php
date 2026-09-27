@@ -10,6 +10,11 @@
     $selectedPeriod = old('billing_period', $subscription->billing_period ?: ($isFree ? $package->free_validity_period : 'monthly'));
     $baseDateCarbon = $baseDate ? \Illuminate\Support\Carbon::parse($baseDate) : now();
     $baseIso = $baseDateCarbon->toIso8601String();
+
+    // Billing period discount config
+    $discounts = $package->billing_discounts ?? [];
+    $periodDiscount = fn(string $p) => (float)($discounts[$p] ?? 0);
+    $discountedPrice = fn(float $base, float $pct) => $pct > 0 ? round($base * (1 - $pct / 100), 2) : $base;
 @endphp
 
 <div class="page-content">
@@ -147,59 +152,80 @@
                                     </label>
                                     <div class="billing-period-grid">
                                         {{-- Monthly --}}
+                                        @php $mDisc = $periodDiscount('monthly'); $mOrig = $monthlyPrice * 1; $mFinal = $discountedPrice($mOrig, $mDisc); @endphp
                                         <label class="period-card {{ $selectedPeriod === 'monthly' ? 'selected' : '' }}">
                                             <input type="radio" name="billing_period" value="monthly" class="d-none period-radio"
                                                 data-months="1"
-                                                data-total="{{ $monthlyPrice * 1 }}"
+                                                data-total="{{ $mFinal }}"
+                                                data-original="{{ $mOrig }}"
+                                                data-discount="{{ $mDisc }}"
                                                 data-label="Monthly"
                                                 {{ $selectedPeriod === 'monthly' ? 'checked' : '' }}>
                                             <div class="period-card-inner">
                                                 <div class="period-title">Monthly</div>
                                                 <div class="period-duration">1 Month</div>
-                                                <div class="period-price">৳{{ number_format($monthlyPrice * 1) }}</div>
+                                                <div class="period-price">৳{{ number_format($mFinal) }}</div>
                                             </div>
                                         </label>
 
                                         {{-- Quarterly --}}
+                                        @php $qDisc = $periodDiscount('quarterly'); $qOrig = $monthlyPrice * 3; $qFinal = $discountedPrice($qOrig, $qDisc); @endphp
                                         <label class="period-card {{ $selectedPeriod === 'quarterly' ? 'selected' : '' }}">
                                             <input type="radio" name="billing_period" value="quarterly" class="d-none period-radio"
                                                 data-months="3"
-                                                data-total="{{ $monthlyPrice * 3 }}"
+                                                data-total="{{ $qFinal }}"
+                                                data-original="{{ $qOrig }}"
+                                                data-discount="{{ $qDisc }}"
                                                 data-label="Quarterly"
                                                 {{ $selectedPeriod === 'quarterly' ? 'checked' : '' }}>
                                             <div class="period-card-inner">
+                                                @if($qDisc > 0)<span class="period-save-badge">Save {{ $qDisc }}%</span>@endif
                                                 <div class="period-title">Quarterly</div>
                                                 <div class="period-duration">3 Months</div>
-                                                <div class="period-price">৳{{ number_format($monthlyPrice * 3) }}</div>
+                                                @if($qDisc > 0)<div class="period-original-price">৳{{ number_format($qOrig) }}</div>@endif
+                                                <div class="period-price">৳{{ number_format($qFinal) }}</div>
                                             </div>
                                         </label>
 
                                         {{-- Half-Yearly --}}
+                                        @php $hDisc = $periodDiscount('half_yearly'); $hOrig = $monthlyPrice * 6; $hFinal = $discountedPrice($hOrig, $hDisc); @endphp
                                         <label class="period-card {{ $selectedPeriod === 'half_yearly' ? 'selected' : '' }}">
                                             <input type="radio" name="billing_period" value="half_yearly" class="d-none period-radio"
                                                 data-months="6"
-                                                data-total="{{ $monthlyPrice * 6 }}"
+                                                data-total="{{ $hFinal }}"
+                                                data-original="{{ $hOrig }}"
+                                                data-discount="{{ $hDisc }}"
                                                 data-label="Half-Yearly"
                                                 {{ $selectedPeriod === 'half_yearly' ? 'checked' : '' }}>
                                             <div class="period-card-inner">
+                                                @if($hDisc > 0)<span class="period-save-badge">Save {{ $hDisc }}%</span>@endif
                                                 <div class="period-title">Half-Yearly</div>
                                                 <div class="period-duration">6 Months</div>
-                                                <div class="period-price">৳{{ number_format($monthlyPrice * 6) }}</div>
+                                                @if($hDisc > 0)<div class="period-original-price">৳{{ number_format($hOrig) }}</div>@endif
+                                                <div class="period-price">৳{{ number_format($hFinal) }}</div>
                                             </div>
                                         </label>
 
                                         {{-- Yearly --}}
+                                        @php $yDisc = $periodDiscount('yearly'); $yOrig = $monthlyPrice * 12; $yFinal = $discountedPrice($yOrig, $yDisc); @endphp
                                         <label class="period-card {{ $selectedPeriod === 'yearly' ? 'selected' : '' }}">
                                             <input type="radio" name="billing_period" value="yearly" class="d-none period-radio"
                                                 data-months="12"
-                                                data-total="{{ $monthlyPrice * 12 }}"
+                                                data-total="{{ $yFinal }}"
+                                                data-original="{{ $yOrig }}"
+                                                data-discount="{{ $yDisc }}"
                                                 data-label="Yearly"
                                                 {{ $selectedPeriod === 'yearly' ? 'checked' : '' }}>
                                             <div class="period-card-inner">
-                                                <span class="period-badge">Best Value</span>
+                                                @if($yDisc > 0)
+                                                    <span class="period-save-badge best-value-badge">Best Value · Save {{ $yDisc }}%</span>
+                                                @else
+                                                    <span class="period-badge">Best Value</span>
+                                                @endif
                                                 <div class="period-title">Yearly</div>
                                                 <div class="period-duration">12 Months</div>
-                                                <div class="period-price">৳{{ number_format($monthlyPrice * 12) }}</div>
+                                                @if($yDisc > 0)<div class="period-original-price">৳{{ number_format($yOrig) }}</div>@endif
+                                                <div class="period-price">৳{{ number_format($yFinal) }}</div>
                                             </div>
                                         </label>
                                     </div>
@@ -242,8 +268,20 @@
                             {{-- 3. Sender Number --}}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Sender Mobile Number <span class="text-danger">*</span></label>
-                                <input type="text" name="sender_number" class="form-control" placeholder="01XXXXXXXXX" value="{{ old('sender_number') }}" required>
-                                <div class="form-text" style="font-size:11px;">The 11-digit mobile number from which the money was sent.</div>
+                                <div class="phone-input-wrap">
+                                    <span class="phone-prefix">+88</span>
+                                    <input type="text" name="sender_number" id="senderNumberInput"
+                                        class="form-control phone-input-field"
+                                        placeholder="01XXXXXXXXX"
+                                        value="{{ old('sender_number') }}"
+                                        maxlength="11"
+                                        inputmode="numeric"
+                                        autocomplete="tel"
+                                        required>
+                                    <span class="phone-status-icon" id="phoneStatusIcon"></span>
+                                </div>
+                                <div id="phoneValidationMsg" class="phone-validation-msg" style="display:none;"></div>
+                                <div class="form-text" style="font-size:11px;">বাংলাদেশের ১১ সংখ্যার মোবাইল নম্বর দিন (যে নম্বর থেকে পেমেন্ট পাঠানো হয়েছে)।</div>
                             </div>
 
                             {{-- 4. Transaction Reference --}}
@@ -308,7 +346,24 @@
     .period-card.selected .period-title { color:#1d4ed8; }
     .period-duration { font-size:12px; font-weight:600; color:#1e293b; margin:2px 0; }
     .period-price { font-size:15px; font-weight:800; color:#1d4ed8; }
+    .period-original-price { font-size:11px; color:#94a3b8; text-decoration:line-through; margin-bottom:1px; }
     .period-badge { position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:#f59e0b; color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; padding:2px 6px; border-radius:10px; letter-spacing:0.03em; white-space:nowrap; }
+    .period-save-badge { position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:#16a34a; color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; padding:2px 7px; border-radius:10px; letter-spacing:0.03em; white-space:nowrap; }
+    .best-value-badge { background: linear-gradient(135deg,#f59e0b,#d97706) !important; }
+    .period-card.selected .period-save-badge { box-shadow:0 2px 6px rgba(22,163,74,.4); }
+
+    /* Phone Number Input */
+    .phone-input-wrap { position:relative; display:flex; align-items:center; }
+    .phone-prefix { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:13px; font-weight:700; color:#64748b; pointer-events:none; z-index:2; }
+    .phone-input-field { padding-left:42px !important; padding-right:36px !important; letter-spacing:0.04em; font-size:15px; font-weight:600; }
+    .phone-status-icon { position:absolute; right:11px; top:50%; transform:translateY(-50%); font-size:16px; transition:all .2s; }
+    .phone-status-icon.valid   { color:#16a34a; }
+    .phone-status-icon.invalid { color:#dc2626; }
+    .phone-input-field.phone-valid   { border-color:#16a34a !important; background:#f0fdf4 !important; }
+    .phone-input-field.phone-invalid { border-color:#dc2626 !important; background:#fef2f2 !important; }
+    .phone-validation-msg { font-size:11.5px; font-weight:600; margin-top:5px; padding:6px 10px; border-radius:7px; display:flex; align-items:center; gap:6px; }
+    .phone-validation-msg.valid   { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+    .phone-validation-msg.invalid { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
 
     .method-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
     .method-option { position:relative; display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid #e2e8f0; border-radius:10px; cursor:pointer; transition:.2s; }
@@ -396,6 +451,77 @@
             }
         });
     });
+
+    // ── Phone number validation ──────────────────────────────────────────
+    const phoneInput  = document.getElementById('senderNumberInput');
+    const phoneIcon   = document.getElementById('phoneStatusIcon');
+    const phoneMsg    = document.getElementById('phoneValidationMsg');
+    const submitBtn   = document.querySelector('.submit-payment');
+    const BD_PHONE    = /^01[3-9]\d{8}$/;
+
+    function validatePhone() {
+        if (!phoneInput) return true;
+        const val = phoneInput.value.replace(/\s/g, '');
+        const isValid = BD_PHONE.test(val);
+        const isEmpty = val.length === 0;
+
+        phoneInput.classList.toggle('phone-valid',   isValid);
+        phoneInput.classList.toggle('phone-invalid', !isValid && !isEmpty);
+
+        if (isValid) {
+            phoneIcon.className = 'phone-status-icon valid';
+            phoneIcon.innerHTML = '✓';
+            phoneMsg.style.display = 'flex';
+            phoneMsg.className = 'phone-validation-msg valid';
+            phoneMsg.innerHTML = '✓ &nbsp;বৈধ বাংলাদেশী মোবাইল নম্বর';
+            if (submitBtn) submitBtn.disabled = false;
+        } else if (!isEmpty) {
+            phoneIcon.className = 'phone-status-icon invalid';
+            phoneIcon.innerHTML = '✕';
+            phoneMsg.style.display = 'flex';
+            phoneMsg.className = 'phone-validation-msg invalid';
+            if (val.length < 11) {
+                phoneMsg.innerHTML = '✕ &nbsp;নম্বরটি ' + val.length + ' ডিজিট — পূর্ণ ১১ ডিজিট দিন (01XXXXXXXXX)';
+            } else if (!val.startsWith('01')) {
+                phoneMsg.innerHTML = '✕ &nbsp;বাংলাদেশী নম্বর অবশ্যই 01 দিয়ে শুরু হতে হবে';
+            } else {
+                phoneMsg.innerHTML = '✕ &nbsp;সঠিক ফরম্যাট: 013, 014, 015, 016, 017, 018, 019 দিয়ে শুরু';
+            }
+            if (submitBtn) submitBtn.disabled = true;
+        } else {
+            phoneIcon.className = 'phone-status-icon';
+            phoneIcon.innerHTML = '';
+            phoneMsg.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            // Only allow digits
+            this.value = this.value.replace(/[^0-9]/g, '');
+            validatePhone();
+        });
+        phoneInput.addEventListener('blur', validatePhone);
+        validatePhone(); // initial check if old() value present
+    }
+
+    // Block form submit if phone invalid
+    const checkoutForm = document.getElementById('checkoutPaymentForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            if (phoneInput) {
+                const val = phoneInput.value.replace(/\s/g, '');
+                if (!BD_PHONE.test(val)) {
+                    e.preventDefault();
+                    validatePhone();
+                    phoneInput.focus();
+                    phoneInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return false;
+                }
+            }
+        });
+    }
 
     document.querySelectorAll('.copy-number').forEach(function (button) {
         button.addEventListener('click', function () {

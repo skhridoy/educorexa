@@ -53,11 +53,21 @@ class SubscriptionPackageController extends Controller
         if ($isFree) {
             $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
             $validated['available_billing_periods'] = [$validated['free_validity_period']];
+            $validated['billing_discounts'] = null;
         } else {
             $validated['duration'] = 'monthly'; // Monthly base price
             $validated['available_billing_periods'] = !empty($request->available_billing_periods)
                 ? array_values($request->available_billing_periods)
                 : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
+            // Parse billing discounts: quarterly, half_yearly, yearly
+            $discounts = [];
+            foreach (['quarterly' => 3, 'half_yearly' => 6, 'yearly' => 12] as $period => $months) {
+                $pct = (float) ($request->input("billing_discounts.$period") ?? 0);
+                if ($pct > 0 && $pct <= 100) {
+                    $discounts[$period] = $pct;
+                }
+            }
+            $validated['billing_discounts'] = !empty($discounts) ? $discounts : null;
         }
 
         $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';
@@ -135,11 +145,21 @@ class SubscriptionPackageController extends Controller
         if ($isFree) {
             $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
             $validated['available_billing_periods'] = [$validated['free_validity_period']];
+            $validated['billing_discounts'] = null;
         } else {
             $validated['duration'] = 'monthly';
             $validated['available_billing_periods'] = !empty($request->available_billing_periods)
                 ? array_values($request->available_billing_periods)
                 : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
+            // Parse billing discounts: quarterly, half_yearly, yearly
+            $discounts = [];
+            foreach (['quarterly' => 3, 'half_yearly' => 6, 'yearly' => 12] as $period => $months) {
+                $pct = (float) ($request->input("billing_discounts.$period") ?? 0);
+                if ($pct > 0 && $pct <= 100) {
+                    $discounts[$period] = $pct;
+                }
+            }
+            $validated['billing_discounts'] = !empty($discounts) ? $discounts : null;
         }
 
         $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';

@@ -18,6 +18,7 @@ class SubscriptionPackage extends Model
         'service_fee',
         'free_validity_period',
         'available_billing_periods',
+        'billing_discounts',
         'registration_commission_type',
         'registration_commission_rate',
         'monthly_commission_type',
@@ -37,6 +38,7 @@ class SubscriptionPackage extends Model
         'is_free' => 'boolean',
         'service_fee' => 'decimal:2',
         'available_billing_periods' => 'array',
+        'billing_discounts' => 'array',
         'registration_commission_rate' => 'decimal:2',
         'monthly_commission_rate' => 'decimal:2',
         'features' => 'array',
@@ -92,9 +94,18 @@ class SubscriptionPackage extends Model
     }
 
     /**
-     * Calculate price for a selected billing period.
+     * Get the configured discount percentage for a billing period (0 if none).
      */
-    public function calculatePriceForPeriod(string $period): float
+    public function getDiscountForPeriod(string $period): float
+    {
+        $discounts = $this->billing_discounts ?? [];
+        return (float) ($discounts[$period] ?? 0.0);
+    }
+
+    /**
+     * Get original (un-discounted) total price for a billing period.
+     */
+    public function getOriginalPriceForPeriod(string $period): float
     {
         if ($this->isFreePackage()) {
             return (float) ($this->service_fee ?? 0.0);
@@ -109,6 +120,25 @@ class SubscriptionPackage extends Model
         };
 
         return (float) ($this->price * $multiplier);
+    }
+
+    /**
+     * Calculate price for a selected billing period (with discount applied).
+     */
+    public function calculatePriceForPeriod(string $period): float
+    {
+        if ($this->isFreePackage()) {
+            return (float) ($this->service_fee ?? 0.0);
+        }
+
+        $original = $this->getOriginalPriceForPeriod($period);
+        $discountPct = $this->getDiscountForPeriod($period);
+
+        if ($discountPct > 0.0) {
+            return round($original * (1 - $discountPct / 100), 2);
+        }
+
+        return $original;
     }
 
     /**
