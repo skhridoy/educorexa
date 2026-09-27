@@ -14,25 +14,41 @@ class FrontendSectionSeeder extends Seeder
     // php artisan make:seeder FrontendSectionSeeder
     public function run(): void
     {
-        $sections = [
             ['key' => 'hero', 'title' => 'Hero Section', 'order' => 1],
-            ['key' => 'features', 'title' => 'Features Section', 'order' => 2],
-            ['key' => 'why_choose_us', 'title' => 'Why Choose Us', 'order' => 3],
-            ['key' => 'setup-section', 'title' => 'Setup Section', 'order' => 4],
-            ['key' => 'pricing', 'title' => 'Pricing Table', 'order' => 5],
-            ['key' => 'about', 'title' => 'About Us', 'order' => 6],
-            ['key' => 'testimonials', 'title' => 'Testimonials', 'order' => 7],
-            ['key' => 'contact', 'title' => 'Contact Section', 'order' => 8],
+            [
+                'key' => 'stats',
+                'title' => 'Stats Section',
+                'order' => 2,
+                'content' => json_encode([
+                    'schools_count'   => '৫০০+',
+                    'schools_label'   => 'স্কুল ও মাদ্রাসা',
+                    'students_count'  => '১,০০,০০০+',
+                    'students_label'  => 'সক্রিয় শিক্ষার্থী',
+                    'districts_count' => '৬৪',
+                    'districts_label' => 'জেলায় ব্যবহৃত',
+                    'support_value'   => '২৪/৭',
+                    'support_label'   => 'লাইভ সাপোর্ট',
+                ], JSON_UNESCAPED_UNICODE),
+            ],
+            ['key' => 'features', 'title' => 'Features Section', 'order' => 3],
+            ['key' => 'why_choose_us', 'title' => 'Why Choose Us', 'order' => 4],
+            ['key' => 'setup-section', 'title' => 'Setup Section', 'order' => 5],
+            ['key' => 'pricing', 'title' => 'Pricing Table', 'order' => 6],
+            ['key' => 'about', 'title' => 'About Us', 'order' => 7],
+            ['key' => 'testimonials', 'title' => 'Testimonials', 'order' => 8],
+            ['key' => 'contact', 'title' => 'Contact Section', 'order' => 9],
             [
                 'key' => 'blogs', 
                 'title' => 'Blog Slider', 
-                'order' => 9,
+                'order' => 10,
                 'content' => json_encode([
                     'badge_text' => 'আমাদের ব্লগ ও খবর',
                     'title' => 'সর্বশেষ আপডেট ও শিক্ষামূলক প্রবন্ধ',
                     'description' => 'আমাদের প্রতিষ্ঠানের সর্বশেষ খবর, ঘটনা এবং শিক্ষামূলক ব্লগ পোস্টগুলো এখানে পড়ুন।'
                 ])
             ],
+            ['key' => 'newsletter', 'title' => 'Newsletter Section', 'order' => 11],
+            ['key' => 'cta', 'title' => 'CTA Section', 'order' => 12],
         ];
 
         foreach ($sections as $section) {
