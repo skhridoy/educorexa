@@ -2,11 +2,9 @@
     use App\Models\FrontendSection;
     use App\Models\Blog;
 
-    $section = FrontendSection::where('key', 'blogs')->first();
-    $blogsContent = [];
-    if($section) {
-        $blogsContent = json_decode($section->content, true) ?? [];
-    }
+    $blogSec = $section ?? FrontendSection::where('key', 'blogs')->first();
+    $rawContent = $blogSec?->content;
+    $blogsContent = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 
     $badge = $blogsContent['badge_text'] ?? 'আমাদের ব্লগ ও খবর';
     $title = $blogsContent['title'] ?? 'সর্বশেষ আপডেট ও শিক্ষামূলক প্রবন্ধ';

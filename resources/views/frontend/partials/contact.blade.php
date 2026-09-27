@@ -1,7 +1,8 @@
 @php
     // ডাটাবেজ থেকে কন্টাক্ট সেকশনের ডাটা আনা
-    $section = \App\Models\FrontendSection::where('key', 'contact')->first();
-    $content = json_decode($section->content ?? '{}', true);
+    $contactSec = $section ?? \App\Models\FrontendSection::where('key', 'contact')->first();
+    $rawContent = $contactSec?->content;
+    $content = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 @endphp
 
 <section id="contact" class="py-5 bg-light">

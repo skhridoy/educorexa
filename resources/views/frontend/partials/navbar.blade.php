@@ -1,6 +1,7 @@
 @php
     $topBarSection = \App\Models\FrontendSection::where('key', 'top_bar')->first();
-    $topBarContent = $topBarSection ? json_decode($topBarSection->content, true) : [];
+    $rawTopContent = $topBarSection?->content;
+    $topBarContent = is_array($rawTopContent) ? $rawTopContent : (is_string($rawTopContent) ? (json_decode($rawTopContent, true) ?? []) : []);
 
     $support_phone  = $topBarContent['phone']         ?? ($setting->phone  ?? '+01844054129');
     $support_email  = $topBarContent['email']         ?? ($setting->email  ?? 'info@educorexa.com');

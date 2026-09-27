@@ -2,11 +2,9 @@
     use App\Models\FrontendSection;
     use App\Models\SubscriptionPackage;
 
-    $section = FrontendSection::where('key', 'pricing')->first();
-    $content = [];
-    if($section) {
-        $content = json_decode($section->content, true) ?? [];
-    }
+    $pricingSec = $section ?? FrontendSection::where('key', 'pricing')->first();
+    $rawContent = $pricingSec?->content;
+    $content = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
     $title       = $content['title']       ?? 'সাশ্রয়ী প্যাকেজ সমূহ';
     $description = $content['description'] ?? 'আপনার প্রতিষ্ঠানের আকার ও প্রয়োজন অনুযায়ী বেছে নিন সেরা প্যাকেজ।';
 

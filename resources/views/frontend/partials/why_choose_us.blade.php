@@ -1,8 +1,9 @@
 @php
     use Illuminate\Support\Str;
 
-    $section = \App\Models\FrontendSection::where('key', 'why_choose_us')->first();
-    $content = json_decode($section->content ?? '{}', true);
+    $sec = $section ?? \App\Models\FrontendSection::where('key', 'why_choose_us')->first();
+    $rawContent = $sec?->content;
+    $content = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 
     $title       = $content['title']       ?? 'কেন EduCorexa বেছে নেবেন?';
     $description = $content['description'] ?? 'আমরা শুধু একটি সফটওয়্যার দিই না — দিচ্ছি একটি পূর্ণাঙ্গ শিক্ষা ব্যবস্থাপনা ইকোসিস্টেম, যা আপনার প্রতিষ্ঠানকে ডিজিটাল যুগে নিয়ে যাবে।';

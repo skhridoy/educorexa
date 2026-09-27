@@ -2,11 +2,9 @@
     use App\Models\FrontendSection;
     use Illuminate\Support\Str;
 
-    $section = FrontendSection::where('key', 'features')->first();
-    $featuresContent = [];
-    if($section) {
-        $featuresContent = json_decode($section->content, true) ?? [];
-    }
+    $featSec = $section ?? FrontendSection::where('key', 'features')->first();
+    $rawContent = $featSec?->content;
+    $featuresContent = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 
     $title       = $featuresContent['title']       ?? 'আমাদের শক্তিশালী ফিচারসমূহ';
     $description = $featuresContent['description'] ?? 'একটি আধুনিক শিক্ষাপ্রতিষ্ঠানের জন্য প্রয়োজনীয় সকল সমাধান এক প্ল্যাটফর্মে।';

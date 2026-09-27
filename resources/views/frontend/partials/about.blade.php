@@ -1,6 +1,7 @@
 @php
-    $section = \App\Models\FrontendSection::where('key', 'about')->first();
-    $content = json_decode($section->content ?? '{}', true);
+    $aboutSec = $section ?? \App\Models\FrontendSection::where('key', 'about')->first();
+    $rawContent = $aboutSec?->content;
+    $content = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 @endphp
 
 <section id="about" class="py-5 bg-white overflow-hidden">

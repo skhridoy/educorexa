@@ -1,8 +1,9 @@
 {{-- ===== STATS / TRUST COUNTER SECTION ===== --}}
 @php
     use App\Models\FrontendSection;
-    $statsSection = FrontendSection::where('key', 'stats')->first();
-    $statsContent = $statsSection ? (json_decode($statsSection->content, true) ?? []) : [];
+    $statsSection = $section ?? FrontendSection::where('key', 'stats')->first();
+    $rawContent = $statsSection?->content;
+    $statsContent = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 
     // Counter values — editable from admin panel or fallback defaults
     $counters = [

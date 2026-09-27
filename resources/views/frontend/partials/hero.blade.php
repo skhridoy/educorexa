@@ -3,10 +3,8 @@
     use Illuminate\Support\Str;
 
     $heroSection = $section ?? FrontendSection::where('key', 'hero')->first();
-    $heroContent = [];
-    if ($heroSection) {
-        $heroContent = json_decode($heroSection->content, true) ?? [];
-    }
+    $rawContent  = $heroSection?->content;
+    $heroContent = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
 
     $title       = $heroContent['title']       ?? 'সবচেয়ে আধুনিক<br><span class="hero-title-highlight">শিক্ষা ব্যবস্থাপনা সফটওয়্যার</span>';
     $description = $heroContent['description'] ?? 'EduCorexa হলো স্কুল, কলেজ ও মাদ্রাসার জন্য সম্পূর্ণ ক্লাউড-ভিত্তিক শিক্ষা ব্যবস্থাপনা সিস্টেম — ভর্তি, হাজিরা, পরীক্ষা, ফি ও অভিভাবক যোগাযোগ এক জায়গায়।';

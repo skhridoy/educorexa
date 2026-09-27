@@ -1,6 +1,7 @@
 @php
-    $section = \App\Models\FrontendSection::where('key', 'setup-section')->first();
-    $content = $section ? (json_decode($section->content, true) ?? []) : [];
+    $setupSec = $section ?? \App\Models\FrontendSection::where('key', 'setup-section')->first();
+    $rawContent = $setupSec?->content;
+    $content = is_array($rawContent) ? $rawContent : (is_string($rawContent) ? (json_decode($rawContent, true) ?? []) : []);
     $title = $content['title'] ?? 'মাত্র ৩টি ধাপে শুরু করুন';
     $desc  = $content['description'] ?? 'কোনো টেকনিক্যাল নলেজ ছাড়াই মাত্র কয়েক মিনিটে আপনার স্কুলকে ডিজিটালাইজ করুন।';
 @endphp
