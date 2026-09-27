@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,13 +14,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::table('subscription_packages')
-            ->where('is_free', true)
-            ->where('price', '>', 0)
-            ->update([
-                'is_free'    => false,
-                'service_fee' => 0.00,
-            ]);
+        if (Schema::hasTable('subscription_packages') && Schema::hasColumn('subscription_packages', 'is_free') && Schema::hasColumn('subscription_packages', 'price')) {
+            DB::table('subscription_packages')
+                ->where('is_free', true)
+                ->where('price', '>', 0)
+                ->update([
+                    'is_free'    => false,
+                    'service_fee' => 0.00,
+                ]);
+        }
     }
 
     public function down(): void

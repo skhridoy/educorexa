@@ -13,7 +13,11 @@ return new class extends Migration
             Schema::table('subscription_packages', function (Blueprint $table) {
                 if (!Schema::hasColumn('subscription_packages', 'billing_discounts')) {
                     // JSON: {"quarterly": 5, "half_yearly": 10, "yearly": 20}
-                    $table->json('billing_discounts')->nullable()->after('available_billing_periods');
+                    if (Schema::hasColumn('subscription_packages', 'available_billing_periods')) {
+                        $table->json('billing_discounts')->nullable()->after('available_billing_periods');
+                    } else {
+                        $table->json('billing_discounts')->nullable();
+                    }
                 }
             });
         }
