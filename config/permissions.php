@@ -84,6 +84,7 @@ return [
         'Settings' => [
             'newsletter.manage'      => 'Manage Newsletter Subscribers',
             'system.settings'        => 'Manage System Settings',
+            'custom.domain'          => 'Custom Domain Setup',
         ],
 
         'SaaS Management (Super Admin/Employee Only)' => [
@@ -99,6 +100,7 @@ return [
             'testimonial.approve'    => 'Approve/Manage Testimonials',
             'support.manage'         => 'Manage School Support Tickets',
             'support.bot.manage'     => 'Manage Help Support Chat Bot',
+            'custom.domain.manage'   => 'Manage Custom Domains',
         ],
     ],
 ];

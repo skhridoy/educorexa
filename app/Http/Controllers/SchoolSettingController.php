@@ -211,4 +211,107 @@ class SchoolSettingController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Communication settings updated successfully!']);
     }
+
+    // ═══════════════════════════════════════════════════
+    // Custom Domain Management
+    // ═══════════════════════════════════════════════════
+
+    /**
+     * Custom Domain সেটআপ পেজ দেখাও
+     */
+    public function domainSetup()
+    {
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+        $school = \App\Models\School::findOrFail($schoolId);
+
+        // Permission চেক: custom.domain পারমিশন প্যাকেজে আছে কিনা
+        if (!$school->hasPackagePermission('custom.domain')) {
+            return view('school.setting.domain', compact('school'))->with('locked', true);
+        }
+
+        return view('school.setting.domain', compact('school'))->with('locked', false);
+    }
+
+    /**
+     * Custom Domain সংযুক্ত করার রিকোয়েস্ট সাবমিট করো
+     */
+    public function submitDomainRequest(\Illuminate\Http\Request $request)
+    {
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+        $school = \App\Models\School::findOrFail($schoolId);
+
+        // প্যাকেজ পারমিশন চেক
+        if (!$school->hasPackagePermission('custom.domain')) {
+            return back()->with('error', 'কাস্টম ডোমেইন ফিচারটি আপনার বর্তমান প্যাকেজে অন্তর্ভুক্ত নয়। প্রিমিয়াম প্যাকেজে আপগ্রেড করুন।');
+        }
+
+        // ইতিমধ্যে verified বা pending থাকলে নতুন রিকোয়েস্ট করা যাবে না
+        if (in_array($school->custom_domain_status, ['verified', 'pending'])) {
+            return back()->with('error', 'আপনার ডোমেইন রিকোয়েস্ট ইতিমধ্যে ' . $school->custom_domain_status . ' অবস্থায় আছে।');
+        }
+
+        $request->validate([
+            'custom_domain' => [
+                'required',
+                'string',
+                'max:253',
+                'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/',
+                \Illuminate\Validation\Rule::unique('schools', 'custom_domain')->ignore($school->id),
+            ],
+        ], [
+            'custom_domain.required' => 'ডোমেইন নাম আবশ্যক।',
+            'custom_domain.regex' => 'সঠিক ডোমেইন ফরম্যাট দিন (যেমন: school.example.com)',
+            'custom_domain.unique' => 'এই ডোমেইনটি ইতিমধ্যে অন্য স্কুলে ব্যবহৃত হচ্ছে।',
+        ]);
+
+        $domain = strtolower(trim($request->custom_domain));
+
+        // মূল ডোমেইন (app.main_domain) ব্লক করো
+        $mainDomain = config('app.main_domain');
+        if (str_ends_with($domain, $mainDomain)) {
+            return back()->with('error', 'মূল সিস্টেম ডোমেইন কাস্টম ডোমেইন হিসেবে ব্যবহার করা যাবে না।');
+        }
+
+        $school->update([
+            'custom_domain'        => $domain,
+            'custom_domain_status' => 'pending',
+            'custom_domain_reject_reason' => null,
+            'custom_domain_verified_at'   => null,
+            'custom_domain_ssl_status'    => 'pending',
+        ]);
+
+        // Super Admin-কে নোটিফিকেশন
+        $superAdmins = \App\Models\User::where('role', 'super_admin')->get();
+        foreach ($superAdmins as $admin) {
+            $admin->notify(new \App\Notifications\CustomDomainRequested($school));
+        }
+
+        return back()->with('success', 'কাস্টম ডোমেইন রিকোয়েস্ট সফলভাবে জমা হয়েছে! সুপার এডমিন শীঘ্রই রিভিউ করবেন।');
+    }
+
+    /**
+     * Pending বা rejected ডোমেইন রিকোয়েস্ট বাতিল করো (school admin)
+     */
+    public function cancelDomainRequest()
+    {
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+        $school = \App\Models\School::findOrFail($schoolId);
+
+        if ($school->custom_domain_status === 'verified') {
+            return back()->with('error', 'ভেরিফাইড ডোমেইন বাতিল করতে সুপার এডমিনের সাথে যোগাযোগ করুন।');
+        }
+
+        $school->update([
+            'custom_domain'               => null,
+            'custom_domain_status'        => 'none',
+            'custom_domain_reject_reason' => null,
+            'custom_domain_verified_at'   => null,
+            'custom_domain_ssl_status'    => null,
+        ]);
+
+        return back()->with('success', 'ডোমেইন রিকোয়েস্ট বাতিল করা হয়েছে।');
+    }
 }

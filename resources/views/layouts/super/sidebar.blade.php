@@ -2,7 +2,7 @@
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
     $isFrontendMenuOpen = Request::is('manage/frontend*') || Request::is('super-admin/blogs*') || Request::is('super-admin/blog-categories*');
-    $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*') || Request::is('manage/professional-emails*');
+    $isSchoolMenuOpen = Request::is('manage/schools*') || Request::is('*/schools*') || Request::is('manage/professional-emails*') || Request::is('super-admin/custom-domains*');
     $isSystemMenuOpen = Request::is('super-admin/roles*') || Request::is('super-admin/permissions*') || Request::is('settings*');
 @endphp
 
@@ -140,6 +140,20 @@
                         @endcan
                         <li><a href="{{ route('manage.pro-email.index') }}"
                                class="edu-sub-link {{ Request::is('manage/professional-emails*') ? 'active' : '' }}">Email Requests</a></li>
+                        @if($isSuperAdmin || $user->can('custom.domain.manage'))
+                        @php
+                            $pendingDomainCount = \App\Models\School::where('custom_domain_status', 'pending')->count();
+                        @endphp
+                        <li>
+                            <a href="{{ route('super.custom-domain.index') }}"
+                               class="edu-sub-link d-flex justify-content-between align-items-center {{ Request::is('super-admin/custom-domains*') ? 'active' : '' }}">
+                                <span>Custom Domains</span>
+                                @if($pendingDomainCount > 0)
+                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size:0.7rem;padding:2px 6px;">{{ $pendingDomainCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        @endif
                     </ul>
                 </div>
             </li>

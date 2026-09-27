@@ -171,7 +171,6 @@
             width: 95vw !important;
             max-width: 95vw !important;
         }
-    }
 </style>
 
 <nav class="navbar mb-0 shadow-sm border-bottom border-light" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1030;">
@@ -186,11 +185,12 @@
 
         {{-- Search Bar --}}
         <form class="search-form d-none d-lg-block" style="max-width:360px;width:100%;">
-            <div class="input-group">
-                <div class="input-group-text">
+            <div class="input-group" style="background:#f8fafc;border-radius:30px;border:1px solid #e2e8f0;overflow:hidden;">
+                <div class="input-group-text" style="background:transparent;border:none;padding:0 12px;color:#94a3b8;">
                     <i data-feather="search" style="width:16px;height:16px;"></i>
                 </div>
-                <input type="text" class="form-control" id="navbarForm" placeholder="{{ __('Search schools, settings...') }}">
+                <input type="text" class="form-control" id="navbarForm" placeholder="{{ __('Search schools, settings...') }}"
+                       style="background:transparent;border:none;box-shadow:none;font-size:0.875rem;color:var(--text-main);padding:10px 0;">
             </div>
         </form>
     </div>

@@ -13,7 +13,7 @@
     <div class="ec-reg-bg-glow ec-reg-bg-glow--2"></div>
 
     {{-- ── Top Hero / Breadcrumb Header ── --}}
-    <section class="ec-reg-hero">
+    <section class="ec-reg-hero mt-5">
         <div class="container">
             <div class="ec-reg-hero__inner text-center">
                 <div class="ec-reg-hero__badge">

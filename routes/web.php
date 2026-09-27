@@ -235,6 +235,15 @@ Route::domain(config('app.main_domain'))->group(function () {
         Route::post('/notifications/mark-read', [SuperAdminController::class, 'markNotificationsRead'])->name('notifications.markRead');
         Route::get('/notifications/{id}/read-go', [SuperAdminController::class, 'readNotificationAndRedirect'])->name('notifications.readAndGo');
         Route::post('/notifications/{id}/read', [SuperAdminController::class, 'markSingleNotificationRead'])->name('notifications.markSingle');
+
+        // Custom Domain Management
+        Route::prefix('custom-domains')->name('custom-domain.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'index'])->name('index');
+            Route::post('/{school}/approve', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'approve'])->name('approve');
+            Route::post('/{school}/reject', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'reject'])->name('reject');
+            Route::post('/{school}/disable', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'disable'])->name('disable');
+            Route::post('/{school}/reset', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'reset'])->name('reset');
+        });
     });
 
     // --- 2. Employee ONLY Group (General Employee Dashboard) ---
@@ -259,8 +268,14 @@ Route::domain(config('app.main_domain'))->group(function () {
 | Tenant (School) Routes
 |--------------------------------------------------------------------------
 */
-// School Routes
-Route::domain('{tenant}.' . config('app.main_domain'))
+// School Routes (Supports Subdomains and Custom Domains)
+$reqHost = request()->getHost();
+$mainDomain = config('app.main_domain');
+$schoolDomainPattern = (!empty($reqHost) && $reqHost !== $mainDomain && !str_ends_with($reqHost, '.' . $mainDomain))
+    ? '{tenant}'
+    : '{tenant}.' . $mainDomain;
+
+Route::domain($schoolDomainPattern)
     ->middleware(['identify.school'])
     ->scopeBindings()
     ->group(function () {
@@ -380,6 +395,11 @@ Route::domain('{tenant}.' . config('app.main_domain'))
                     // Communication Settings
                     Route::get('/school-settings/communication', [App\Http\Controllers\SchoolSettingController::class, 'communicationSetup'])->name('admin.school.communication');
                     Route::post('/school-settings/communication', [App\Http\Controllers\SchoolSettingController::class, 'updateCommunicationSetup'])->name('admin.school.communication.update');
+
+                    // Custom Domain Settings
+                    Route::get('/school-settings/domain', [App\Http\Controllers\SchoolSettingController::class, 'domainSetup'])->name('admin.school.domain');
+                    Route::post('/school-settings/domain/request', [App\Http\Controllers\SchoolSettingController::class, 'submitDomainRequest'])->name('admin.school.domain.request');
+                    Route::post('/school-settings/domain/cancel', [App\Http\Controllers\SchoolSettingController::class, 'cancelDomainRequest'])->name('admin.school.domain.cancel');
 
                     // School Roles Management
                     Route::middleware(['permission:system.settings'])->group(function () {

@@ -395,6 +395,35 @@
                         <li class="edu-sub-item"><a href="{{ route('admin.school.info-edit', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/school-info*') ? 'active' : '' }}">{{ __('General Settings') }}</a></li>
                         <li class="edu-sub-item"><a href="{{ route('admin.school.api-setup', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/api-setup*') ? 'active' : '' }}">{{ __('API & Gateway Setup') }}</a></li>
                         <li class="edu-sub-item"><a href="{{ route('admin.school.communication', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/communication*') ? 'active' : '' }}">{{ __('Communication Settings') }}</a></li>
+
+                        {{-- Custom Domain (পারমিশন ও প্যাকেজ নিয়ন্ত্রিত) --}}
+                        @if($user->hasRole('school_admin') || $user->role === 'school_admin')
+                            @if($hasFeature('custom.domain'))
+                                <li class="edu-sub-item">
+                                    <a href="{{ route('admin.school.domain', ['tenant' => $tenant]) }}"
+                                       class="edu-sub-link {{ Request::is('*/school-settings/domain*') ? 'active' : '' }} d-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-globe" style="font-size:10px; opacity:0.7;"></i>
+                                        <span>{{ __('Custom Domain') }}</span>
+                                        @if(optional($school)->custom_domain_status === 'verified')
+                                            <span class="badge bg-success ms-auto" style="font-size:7.5px; padding:2px 5px;">Active</span>
+                                        @elseif(optional($school)->custom_domain_status === 'pending')
+                                            <span class="badge bg-warning text-dark ms-auto" style="font-size:7.5px; padding:2px 5px;">Pending</span>
+                                        @elseif(optional($school)->custom_domain_status === 'rejected')
+                                            <span class="badge bg-danger ms-auto" style="font-size:7.5px; padding:2px 5px;">Rejected</span>
+                                        @endif
+                                    </a>
+                                </li>
+                            @elseif($isPremiumLocked('custom.domain'))
+                                <li class="edu-sub-item">
+                                    <a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link d-flex align-items-center gap-1" title="Upgrade to access Custom Domain">
+                                        <i class="fa-solid fa-crown me-1 text-warning" style="font-size:9px;"></i>
+                                        {{ __('Custom Domain') }}
+                                        <span class="badge bg-warning-subtle text-warning ms-auto" style="font-size:8px; padding:2px 5px;">PRO</span>
+                                    </a>
+                                </li>
+                            @endif
+                        @endif
+
                         @if($user->hasRole('school_admin'))
                             <li class="edu-sub-item"><a href="{{ route('school.roles.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/roles*') ? 'active' : '' }}">{{ __('Role & Permissions') }}</a></li>
                         @endif
@@ -404,6 +433,7 @@
                             <li class="edu-sub-item"><a href="{{ route('footer.edit', ['tenant' => $tenant]) }}" class="edu-sub-link">{{ __('Footer Settings') }}</a></li>
                         @endif
                     </ul>
+
                 </div>
             </li>
             @endif

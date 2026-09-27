@@ -105,6 +105,12 @@ class School extends Model
         'district',
         'upazila',
         'representative_id', // Representative employee ID
+        // Custom Domain
+        'custom_domain',
+        'custom_domain_status',
+        'custom_domain_reject_reason',
+        'custom_domain_verified_at',
+        'custom_domain_ssl_status',
     ];
 
 
@@ -112,7 +118,24 @@ class School extends Model
         'inbound_webhook_enabled' => 'boolean',
         'imap_enabled' => 'boolean',
         'imap_password' => 'encrypted',
+        'custom_domain_verified_at' => 'datetime',
     ];
+
+    /**
+     * Custom domain ভেরিফাই হয়েছে কিনা চেক করুন।
+     */
+    public function hasVerifiedCustomDomain(): bool
+    {
+        return $this->custom_domain_status === 'verified' && !empty($this->custom_domain);
+    }
+
+    /**
+     * Custom domain পেন্ডিং অবস্থায় আছে কিনা।
+     */
+    public function hasCustomDomainPending(): bool
+    {
+        return $this->custom_domain_status === 'pending';
+    }
 
     public function admissionAcademicYear()
     {
