@@ -10,7 +10,9 @@ class SubscriptionPackageController extends Controller
 {
     public function index()
     {
-        $packages = SubscriptionPackage::latest()->get();
+        $packages = SubscriptionPackage::orderBy('sort_order', 'asc')
+            ->orderBy('price', 'asc')
+            ->get();
         return view('super.subscription_packages.index', compact('packages'));
     }
 
@@ -23,18 +25,40 @@ class SubscriptionPackageController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_free' => 'nullable|boolean',
+            'service_fee' => 'nullable|numeric|min:0',
+            'free_validity_period' => 'nullable|string|in:6_months,1_year',
+            'available_billing_periods' => 'nullable|array',
+            'available_billing_periods.*' => 'string|in:monthly,quarterly,half_yearly,yearly',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'registration_commission_type' => 'nullable|in:flat,percentage',
             'registration_commission_rate' => 'nullable|numeric|min:0',
             'monthly_commission_type' => 'nullable|in:flat,percentage',
             'monthly_commission_rate' => 'nullable|numeric|min:0',
-            'duration' => 'required|string|in:monthly,yearly',
+            'duration' => 'nullable|string|in:monthly,yearly',
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
             'permissions' => 'nullable|array',
         ]);
+
+        $isFree = $request->has('is_free') || (float) $request->price <= 0.0;
+        $validated['is_free'] = $isFree;
+        $validated['sort_order'] = (int) ($request->sort_order ?? 0);
+        $validated['service_fee'] = $isFree ? (float) ($request->service_fee ?? 0) : 0.00;
+        $validated['free_validity_period'] = $request->free_validity_period ?? '1_year';
+
+        if ($isFree) {
+            $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
+            $validated['available_billing_periods'] = [$validated['free_validity_period']];
+        } else {
+            $validated['duration'] = 'monthly'; // Monthly base price
+            $validated['available_billing_periods'] = !empty($request->available_billing_periods)
+                ? array_values($request->available_billing_periods)
+                : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
+        }
 
         $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';
         $validated['registration_commission_rate'] = $request->registration_commission_rate ?? 0;
@@ -50,6 +74,7 @@ class SubscriptionPackageController extends Controller
             $lines = explode("\n", str_replace("\r", "", $validated['features_list']));
             $features = array_values(array_filter(array_map('trim', $lines)));
         }
+
         // Define default basic permissions that every school should have
         $defaultPermissions = [
             'system.settings',
@@ -60,7 +85,7 @@ class SubscriptionPackageController extends Controller
             'student.create',
             'student.edit',
             'student.delete',
-            'student.manage', 
+            'student.manage',
         ];
 
         $validated['features'] = $features;
@@ -70,7 +95,7 @@ class SubscriptionPackageController extends Controller
         SubscriptionPackage::create($validated);
 
         return redirect()->route('super.subscription-packages.index')
-            ->with('success', 'Subscription package created successfully with commission setup.');
+            ->with('success', 'Subscription package created successfully.');
     }
 
     public function edit(SubscriptionPackage $subscriptionPackage)
@@ -82,18 +107,40 @@ class SubscriptionPackageController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_free' => 'nullable|boolean',
+            'service_fee' => 'nullable|numeric|min:0',
+            'free_validity_period' => 'nullable|string|in:6_months,1_year',
+            'available_billing_periods' => 'nullable|array',
+            'available_billing_periods.*' => 'string|in:monthly,quarterly,half_yearly,yearly',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'registration_commission_type' => 'nullable|in:flat,percentage',
             'registration_commission_rate' => 'nullable|numeric|min:0',
             'monthly_commission_type' => 'nullable|in:flat,percentage',
             'monthly_commission_rate' => 'nullable|numeric|min:0',
-            'duration' => 'required|string|in:monthly,yearly',
+            'duration' => 'nullable|string|in:monthly,yearly',
             'student_limit' => 'nullable|integer|min:0',
             'teacher_limit' => 'nullable|integer|min:0',
             'features_list' => 'nullable|string',
             'permissions' => 'nullable|array',
         ]);
+
+        $isFree = $request->has('is_free') || (float) $request->price <= 0.0;
+        $validated['is_free'] = $isFree;
+        $validated['sort_order'] = (int) ($request->sort_order ?? 0);
+        $validated['service_fee'] = $isFree ? (float) ($request->service_fee ?? 0) : 0.00;
+        $validated['free_validity_period'] = $request->free_validity_period ?? '1_year';
+
+        if ($isFree) {
+            $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
+            $validated['available_billing_periods'] = [$validated['free_validity_period']];
+        } else {
+            $validated['duration'] = 'monthly';
+            $validated['available_billing_periods'] = !empty($request->available_billing_periods)
+                ? array_values($request->available_billing_periods)
+                : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
+        }
 
         $validated['registration_commission_type'] = $request->registration_commission_type ?? 'flat';
         $validated['registration_commission_rate'] = $request->registration_commission_rate ?? 0;
@@ -109,7 +156,7 @@ class SubscriptionPackageController extends Controller
             $lines = explode("\n", str_replace("\r", "", $validated['features_list']));
             $features = array_values(array_filter(array_map('trim', $lines)));
         }
-        // Define default basic permissions that every school should have
+
         $defaultPermissions = [
             'system.settings',
             'notice.manage',
@@ -129,7 +176,7 @@ class SubscriptionPackageController extends Controller
         $subscriptionPackage->update($validated);
 
         return redirect()->route('super.subscription-packages.index')
-            ->with('success', 'Subscription package updated successfully with commission setup.');
+            ->with('success', 'Subscription package updated successfully.');
     }
 
     public function destroy(SubscriptionPackage $subscriptionPackage)

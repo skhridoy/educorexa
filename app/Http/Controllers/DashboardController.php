@@ -261,7 +261,10 @@ class DashboardController extends Controller
 
     public function pricing()
     {
-        $packages = SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
+        $packages = SubscriptionPackage::where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('price', 'asc')
+            ->get();
         $currentSchool = app('currentSchool');
         $activeSubscription = $currentSchool->activeSubscription();
         $pendingSubscription = $currentSchool->subscriptions()->where('status', 'pending')->latest()->first();
@@ -271,21 +274,43 @@ class DashboardController extends Controller
     public function upgradeRequest(Request $request)
     {
         $request->validate([
-            'package_id' => 'required|exists:subscription_packages,id'
+            'package_id' => 'required|exists:subscription_packages,id',
+            'billing_period' => 'nullable|string|in:monthly,quarterly,half_yearly,yearly,free_6_months,free_1_year,6_months,1_year',
         ]);
 
         $school  = app('currentSchool');
         $package = SubscriptionPackage::where('is_active', true)->findOrFail($request->package_id);
 
-        // ফ্রি প্যাকেজ হলে পেমেন্ট পেজে না গিয়ে সরাসরি অ্যাক্টিভ করা
-        if ((float) $package->price === 0.0) {
-            app(\App\Services\SubscriptionBillingService::class)->activateFree($school, $package);
-            return redirect()->route('school.pricing', ['tenant' => $school->slug])
-                ->with('success', '🎉 ' . $package->name . ' package activated successfully! Enjoy your free plan.');
+        $period = $request->billing_period;
+        if (!$period) {
+            $period = $package->isFreePackage() ? ($package->free_validity_period ?: '1_year') : 'monthly';
+        }
+        if ($period === '6_months') $period = 'free_6_months';
+        if ($period === '1_year') $period = 'free_1_year';
+
+        // Free package: If service fee is 0, activate immediately. If service fee > 0, go to payment.
+        if ($package->isFreePackage()) {
+            if ((float) ($package->service_fee ?? 0.0) <= 0.0) {
+                app(\App\Services\SubscriptionBillingService::class)->activateFree($school, $package);
+                $durationText = $package->getFreeValidityMonths() === 6 ? '6 months' : '1 year';
+                return redirect()->route('school.pricing', ['tenant' => $school->slug])
+                    ->with('success', '🎉 ' . $package->name . ' package activated successfully for ' . $durationText . '! Enjoy your free plan.');
+            }
+
+            // Free package with one-time service fee
+            app(\App\Services\SubscriptionBillingService::class)->createPending(
+                $school,
+                $package,
+                $period,
+                \App\Models\SchoolSubscription::TYPE_SERVICE_FEE
+            );
+
+            return redirect()->route('school.subscription-payment.create', ['tenant' => $school->slug])
+                ->with('success', 'Complete the one-time service fee payment (৳' . number_format($package->service_fee) . ') to activate ' . $package->name . '.');
         }
 
         $pendingSubscription = app(\App\Services\SubscriptionBillingService::class)
-            ->createPending($school, $package);
+            ->createPending($school, $package, $period);
 
         return redirect()->route('school.subscription-payment.create', ['tenant' => $school->slug])
             ->with('success', 'Enter your payment details to activate ' . $package->name . '.');

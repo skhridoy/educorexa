@@ -7,11 +7,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 text-center mb-5">
-                <h2 class="display-5 fw-bold text-main">Choose Your Excellence Plan</h2>
+                <h2 class="display-5 fw-bold text-main">Choose Your Institution Plan</h2>
                 <p class="text-muted lead">Empower your institution with the right set of tools and features.</p>
                 <div class="mt-3">
                     <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill">
-                        Current Plan: {{ $currentSchool->subscriptionPackage->name ?? 'Basic' }}
+                        Current Plan: {{ $currentSchool->subscriptionPackage->name ?? 'No Plan Selected' }}
                     </span>
                     @if($pendingSubscription && $pendingSubscription->payment_reference)
                         <span class="badge bg-warning text-dark px-3 py-2 rounded-pill ms-1">
@@ -22,7 +22,7 @@
                             $daysLeft = $activeSubscription->daysRemaining();
                             $expDate = $activeSubscription->getExpiryDate();
                         @endphp
-                        <span class="badge {{ $activeSubscription->isExpiringSoon(15) ? 'bg-warning text-dark' : 'bg-success' }} px-3 py-2 rounded-pill ms-1">
+                        <span class="badge {{ $activeSubscription->isExpiringSoon() ? 'bg-warning text-dark' : 'bg-success' }} px-3 py-2 rounded-pill ms-1">
                             {{ $activeSubscription->status === 'trialing' ? '7-Day Free Trial' : 'Active' }}
                             @if($expDate)
                                 · Expires {{ $expDate->format('d M Y') }}
@@ -41,10 +41,11 @@
         <div class="row justify-content-center">
             @foreach($packages as $package)
             @php
-                $isCurrent    = ($package->id == $currentSchool->subscription_package_id);
-                $isFree       = ((float) $package->price === 0.0);
-                $isPendingThis = ($pendingSubscription && $pendingSubscription->subscription_package_id == $package->id && $pendingSubscription->payment_reference);
-                $canRenewCurrent = ($activeSubscription && $activeSubscription->canRenew(15)) || !$activeSubscription;
+                $isCurrent       = ($package->id == $currentSchool->subscription_package_id);
+                $isFree          = $package->isFreePackage();
+                $isPendingThis   = ($pendingSubscription && $pendingSubscription->subscription_package_id == $package->id && $pendingSubscription->payment_reference);
+                $action          = $currentSchool->getPackageAction($package);
+                $validityMonths  = $isFree ? $package->getFreeValidityMonths() : 1;
             @endphp
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card h-100 border-0 shadow-sm pricing-card {{ $isCurrent ? 'current-card' : '' }} {{ $package->is_popular ? 'popular' : '' }} {{ $isFree ? 'free-card' : '' }}">
@@ -64,10 +65,22 @@
                                 <div class="free-price-badge">
                                     <i class="fa-solid fa-circle-check me-1"></i> FREE
                                 </div>
-                                <div class="text-muted small mt-1">No payment required</div>
+                                @if((float)($package->service_fee ?? 0) > 0)
+                                    <div class="text-primary fw-bold small mt-2">
+                                        ৳{{ number_format($package->service_fee) }} One-Time Service Fee
+                                    </div>
+                                @else
+                                    <div class="text-muted small mt-1">No monthly renewal required</div>
+                                @endif
+                                <div class="text-success small fw-semibold mt-1">
+                                    <i class="fa-solid fa-calendar-check me-1"></i>Valid for {{ $validityMonths === 6 ? '6 Months' : '1 Year' }}
+                                </div>
                             @else
                                 <span class="h1 fw-bold">৳{{ number_format($package->price) }}</span>
-                                <span class="text-muted">/{{ $package->duration }}</span>
+                                <span class="text-muted">/ Month</span>
+                                <div class="text-muted small mt-1">
+                                    Monthly, Quarterly, Half-Yearly or Yearly billing
+                                </div>
                             @endif
                         </div>
 
@@ -91,51 +104,56 @@
                         </ul>
 
                         <div class="d-grid">
-                            @if($isPendingThis && !$isFree)
+                            @if($isPendingThis)
                                 <button type="button" class="btn btn-warning w-100 fw-bold" disabled style="opacity: 0.9; cursor: not-allowed;">
                                     <i data-feather="clock" class="me-1 icon-sm"></i> Verification Pending
                                 </button>
-                            @elseif($isCurrent)
-                                @if($isFree)
-                                    {{-- Free package & current: always active --}}
-                                    <button type="button" class="btn w-100 fw-bold" disabled
-                                        style="background:linear-gradient(135deg,#059669,#34d399); color:#fff; opacity:0.85; cursor:not-allowed;">
-                                        <i data-feather="check-circle" class="me-1 icon-sm"></i> Free Plan Active
-                                    </button>
-                                @elseif($activeSubscription && $activeSubscription->status === 'active' && !$activeSubscription->isExpiringSoon(15))
-                                    {{-- Paid and Active with > 15 days left --}}
-                                    <button type="button" class="btn btn-secondary w-100 fw-bold" disabled style="opacity: 0.75; cursor: not-allowed;">
-                                        <i data-feather="check-circle" class="me-1 icon-sm"></i> Current Active Plan
-                                    </button>
-                                @else
-                                    {{-- Within 15-day renewal window OR expired / trial --}}
-                                    <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="package_id" value="{{ $package->id }}">
-                                        <button type="submit" class="btn {{ $activeSubscription ? 'btn-primary' : 'btn-danger' }} ripple-effect w-100 fw-bold">
-                                            @if($activeSubscription && $activeSubscription->isExpiringSoon(15))
-                                                <i data-feather="rotate-cw" class="me-1 icon-sm"></i> Renew Plan
-                                            @else
-                                                <i data-feather="credit-card" class="me-1 icon-sm"></i> Pay Now
-                                            @endif
-                                        </button>
-                                    </form>
-                                @endif
-                            @else
-                                {{-- Other package: Upgrade / Switch / Activate Free --}}
+                            @elseif($action === 'current_active')
+                                <button type="button" class="btn btn-secondary w-100 fw-bold" disabled style="opacity: 0.85; cursor: not-allowed;">
+                                    <i data-feather="check-circle" class="me-1 icon-sm"></i> Current Package
+                                </button>
+                            @elseif($action === 'renew_extend' || $action === 'renew')
                                 <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="package_id" value="{{ $package->id }}">
-                                    @if($isFree)
-                                        <button type="submit" class="btn w-100 fw-bold ripple-effect"
-                                            style="background:linear-gradient(135deg,#059669,#34d399); color:#fff; border:none;">
-                                            <i data-feather="zap" class="me-1 icon-sm"></i> Activate Free
-                                        </button>
-                                    @else
-                                        <button type="submit" class="btn {{ $package->is_popular ? 'btn-primary' : 'btn-outline-primary' }} ripple-effect w-100 fw-bold">
-                                            <i data-feather="arrow-up" class="me-1 icon-sm"></i> Upgrade Now
-                                        </button>
-                                    @endif
+                                    <button type="submit" class="btn {{ $action === 'renew_extend' ? 'btn-primary' : 'btn-danger' }} ripple-effect w-100 fw-bold">
+                                        <i data-feather="rotate-cw" class="me-1 icon-sm"></i>
+                                        {{ $action === 'renew_extend' ? 'Renew / Extend' : 'Renew Plan' }}
+                                    </button>
+                                </form>
+                            @elseif($action === 'upgrade')
+                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <button type="submit" class="btn {{ $package->is_popular ? 'btn-primary' : 'btn-outline-primary' }} ripple-effect w-100 fw-bold">
+                                        <i data-feather="arrow-up" class="me-1 icon-sm"></i> Upgrade
+                                    </button>
+                                </form>
+                            @elseif($action === 'activate_free')
+                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <button type="submit" class="btn w-100 fw-bold ripple-effect"
+                                        style="background:linear-gradient(135deg,#059669,#34d399); color:#fff; border:none;">
+                                        <i data-feather="zap" class="me-1 icon-sm"></i>
+                                        {{ (float)($package->service_fee ?? 0) > 0 ? 'Pay Service Fee' : 'Activate Free' }}
+                                    </button>
+                                </form>
+                            @elseif($action === 'downgrade')
+                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <button type="submit" class="btn btn-outline-secondary ripple-effect w-100 fw-bold">
+                                        <i data-feather="arrow-down" class="me-1 icon-sm"></i> Switch to Plan
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('school.upgrade.request', ['tenant' => $currentSchool->slug]) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="package_id" value="{{ $package->id }}">
+                                    <button type="submit" class="btn btn-outline-primary ripple-effect w-100 fw-bold">
+                                        Choose Plan
+                                    </button>
                                 </form>
                             @endif
                         </div>
@@ -214,4 +232,3 @@
     }
 </style>
 @endsection
-

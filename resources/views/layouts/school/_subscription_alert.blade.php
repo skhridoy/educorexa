@@ -41,8 +41,8 @@
             </div>
         </div>
 
-    {{-- 2. Renewal Notice (15 days before expiration) --}}
-    @elseif($activeSub && $activeSub->isExpiringSoon(15))
+    {{-- 2. Renewal Notice (Billing-period aware alert window) --}}
+    @elseif($activeSub && $activeSub->isExpiringSoon())
         <div class="container-fluid pt-3 px-4 pb-0">
             <div class="alert alert-warning border-0 shadow-sm d-flex flex-wrap align-items-center justify-content-between p-3 rounded-4 mb-0"
                  style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 5px solid #f59e0b !important; color: #92400e;">

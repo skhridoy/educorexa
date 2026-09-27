@@ -415,7 +415,7 @@
     @php
         $currentPackage = optional($school->subscriptionPackage);
         $activeSubscription = $school->activeSubscription();
-        $isPremium = $currentPackage->is_popular ?? false;
+        $isHighestTier = $school->hasHighestPackage();
         $packageName = $currentPackage->name ?? 'Basic';
     @endphp
 
@@ -431,8 +431,8 @@
                     </a>
                 </div>
             </div>
-        @elseif($activeSubscription->isExpiringSoon(15))
-            {{-- Renewal Reminder Card (15 days before expiry) --}}
+        @elseif($activeSubscription->isExpiringSoon())
+            {{-- Renewal Reminder Card (Billing-period aware expiry) --}}
             @php $daysLeft = $activeSubscription->daysRemaining(); @endphp
             <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
                 <div class="card-body p-3 text-white text-center">
@@ -450,15 +450,15 @@
                     </a>
                 </div>
             </div>
-        @elseif(!$isPremium)
-            {{-- Basic Package: Upgrade Card --}}
+        @elseif(!$isHighestTier)
+            {{-- Lower/Middle Package: Upgrade Card --}}
             <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">
                 <div class="card-body p-3 text-white text-center">
                     <div class="mb-1.5">
                         <i class="fa-solid fa-rocket fa-xl opacity-85"></i>
                     </div>
-                    <h6 class="fw-bold mb-1" style="font-size:12.5px;">{{ __('Upgrade to Premium') }}</h6>
-                    <p class="mb-2" style="font-size:10.5px; opacity:0.85; line-height:1.3;">{{ __('Unlock all premium features & unlimited benefits.') }}</p>
+                    <h6 class="fw-bold mb-1" style="font-size:12.5px;">{{ __('Upgrade Plan') }}</h6>
+                    <p class="mb-2" style="font-size:10.5px; opacity:0.85; line-height:1.3;">{{ __('Unlock all premium features & higher limits.') }}</p>
                     <div class="mb-2">
                         <span class="badge" style="background:rgba(255,255,255,0.22); padding:3px 8px; border-radius:20px; font-size:9.5px;">
                             {{ __('Current') }}: {{ $packageName }}
@@ -472,13 +472,13 @@
                 </div>
             </div>
         @else
-            {{-- Premium Package: Active Badge --}}
+            {{-- Highest Package Active: Current Plan Active (Never show Upgrade) --}}
             <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #059669, #10b981);">
                 <div class="card-body p-2.5 text-white text-center">
                     <div class="mb-1">
                         <i class="fa-solid fa-crown fa-lg" style="opacity:0.9; color:#fcd34d;"></i>
                     </div>
-                    <h6 class="fw-bold mb-0.5" style="font-size:12px; color:#fcd34d;">{{ __('Premium Active') }}</h6>
+                    <h6 class="fw-bold mb-0.5" style="font-size:12px; color:#fcd34d;">{{ __('Top Plan Active') }}</h6>
                     <p class="mb-1.5" style="font-size:10.5px; opacity:0.85;">{{ __(':package package', ['package' => $packageName]) }}</p>
                     <div style="background:rgba(255,255,255,0.18); border-radius:8px; padding:4px 8px; font-size:9.5px;">
                         <i class="fa-solid fa-check-circle me-1" style="color:#fcd34d;"></i>

@@ -94,7 +94,7 @@
                     </div>
                     <div class="pkg-section-body">
                         <div class="row g-3">
-                            <div class="col-md-7">
+                            <div class="col-md-5">
                                 <label class="edu-label">Package Name <span class="text-danger">*</span></label>
                                 <div class="input-icon-wrap">
                                     <i class="fa-solid fa-box input-icon-left text-indigo"></i>
@@ -106,7 +106,17 @@
                                 </div>
                                 @error('name')<div class="pkg-field-err">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-4">
+                                <label class="edu-label">Package Order / Rank</label>
+                                <div class="input-icon-wrap">
+                                    <i class="fa-solid fa-arrow-up-1-9 input-icon-left text-indigo"></i>
+                                    <input type="number" min="0" name="sort_order" id="pkgSortOrder"
+                                        class="form-control edu-input ps-input-icon"
+                                        placeholder="1, 2, 3..." value="{{ old('sort_order', '0') }}">
+                                </div>
+                                <div class="pkg-field-hint" style="font-size:10.5px;">Higher number = higher tier in upgrade hierarchy</div>
+                            </div>
+                            <div class="col-md-3">
                                 <label class="edu-label">Billing Cycle <span class="text-danger">*</span></label>
                                 <div class="input-icon-wrap">
                                     <i class="fa-solid fa-calendar-days input-icon-left text-indigo"></i>
@@ -133,28 +143,96 @@
                         </div>
                         <div>
                             <h6 class="pkg-section-title">Pricing & Limits</h6>
-                            <p class="pkg-section-sub">Set price and resource quotas — leave blank for unlimited</p>
+                            <p class="pkg-section-sub">Configure whether this plan is Paid or Free (One-time fee) with resource quotas</p>
                         </div>
                         <span class="pkg-step-badge" style="background:#dcfce7;color:#059669;">Step 2</span>
                     </div>
                     <div class="pkg-section-body">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-sm-4">
-                                <label class="edu-label">Price (৳) <span class="text-danger">*</span></label>
-                                <div class="input-group pkg-price-group">
-                                    <span class="input-group-text pkg-currency">৳</span>
-                                    <input type="number" step="0.01" min="0" name="price" id="pkgPrice"
-                                        class="form-control edu-input @error('price') is-invalid @enderror"
-                                        placeholder="0.00"
-                                        value="{{ old('price', '0') }}"
-                                        oninput="updatePreview()" required>
+                        {{-- Package Billing Model Choice --}}
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <label class="edu-label">Plan Type</label>
+                                <div class="d-flex gap-4 p-2.5 rounded-3 bg-light border">
+                                    <label class="form-check form-check-inline m-0">
+                                        <input class="form-check-input" type="radio" name="plan_type" id="typePaid" value="paid"
+                                            {{ old('is_free') ? '' : 'checked' }} onchange="togglePlanType()">
+                                        <span class="form-check-label fw-bold">Regular Paid Package</span>
+                                    </label>
+                                    <label class="form-check form-check-inline m-0">
+                                        <input class="form-check-input" type="radio" name="plan_type" id="typeFree" value="free"
+                                            {{ old('is_free') ? 'checked' : '' }} onchange="togglePlanType()">
+                                        <span class="form-check-label fw-bold text-success">Free Package (One-Time Service Fee / Free Validity)</span>
+                                    </label>
                                 </div>
-                                <div id="freePackageHint" class="pkg-free-hint mt-2" style="display:none;">
-                                    <i class="fa-solid fa-circle-check me-1"></i>
-                                    <strong>Free Package</strong> — no payment required
+                                <input type="hidden" name="is_free" id="isFreeField" value="{{ old('is_free', 0) }}">
+                            </div>
+                        </div>
+
+                        {{-- Free Package Configuration Block --}}
+                        <div id="freeConfigBlock" class="p-3 mb-3 rounded-3 border" style="background:#f0fdf4; border-color:#bbf7d0 !important; display:none;">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="edu-label text-success fw-bold">One-Time Service Fee (৳)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">৳</span>
+                                        <input type="number" step="0.01" min="0" name="service_fee" id="pkgServiceFee"
+                                            class="form-control edu-input" placeholder="0.00" value="{{ old('service_fee', '0.00') }}" oninput="updatePreview()">
+                                    </div>
+                                    <div class="pkg-field-hint" style="font-size:11px;">Set 0 for 100% free, or specify one-time fee. No recurring monthly charges.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="edu-label text-success fw-bold">Free Package Validity Duration</label>
+                                    <select name="free_validity_period" id="pkgFreeValidity" class="form-select edu-input" onchange="updatePreview()">
+                                        <option value="6_months" {{ old('free_validity_period') === '6_months' ? 'selected' : '' }}>6 Months</option>
+                                        <option value="1_year" {{ old('free_validity_period', '1_year') === '1_year' ? 'selected' : '' }}>1 Year (12 Months)</option>
+                                    </select>
+                                    <div class="pkg-field-hint" style="font-size:11px;">Subscription remains active for this duration after one-time activation.</div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                        </div>
+
+                        {{-- Paid Package Price & Billing Durations --}}
+                        <div id="paidConfigBlock">
+                            <div class="row g-3 align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label class="edu-label">Monthly Base Price (৳) <span class="text-danger">*</span></label>
+                                    <div class="input-group pkg-price-group">
+                                        <span class="input-group-text pkg-currency">৳</span>
+                                        <input type="number" step="0.01" min="0" name="price" id="pkgPrice"
+                                            class="form-control edu-input @error('price') is-invalid @enderror"
+                                            placeholder="1000.00"
+                                            value="{{ old('price', '1000') }}"
+                                            oninput="updatePreview()" required>
+                                    </div>
+                                    <div class="pkg-field-hint">Base monthly price displayed on package cards.</div>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="edu-label">Available Billing Durations</label>
+                                    <div class="d-flex flex-wrap gap-2 pt-1">
+                                        <label class="form-check form-check-inline" style="font-size:0.83rem;">
+                                            <input class="form-check-input" type="checkbox" name="available_billing_periods[]" value="monthly" checked>
+                                            Monthly (1m)
+                                        </label>
+                                        <label class="form-check form-check-inline" style="font-size:0.83rem;">
+                                            <input class="form-check-input" type="checkbox" name="available_billing_periods[]" value="quarterly" checked>
+                                            Quarterly (3m)
+                                        </label>
+                                        <label class="form-check form-check-inline" style="font-size:0.83rem;">
+                                            <input class="form-check-input" type="checkbox" name="available_billing_periods[]" value="half_yearly" checked>
+                                            Half-Yearly (6m)
+                                        </label>
+                                        <label class="form-check form-check-inline" style="font-size:0.83rem;">
+                                            <input class="form-check-input" type="checkbox" name="available_billing_periods[]" value="yearly" checked>
+                                            Yearly (12m)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Quotas / Limits --}}
+                        <div class="row g-3 align-items-end">
+                            <div class="col-sm-6">
                                 <label class="edu-label">
                                     <i class="fa-solid fa-user-graduate me-1 text-muted" style="font-size:11px;"></i> Student Limit
                                 </label>
@@ -162,7 +240,7 @@
                                     placeholder="Unlimited" value="{{ old('student_limit') }}">
                                 <div class="pkg-field-hint">Leave empty for unlimited</div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 <label class="edu-label">
                                     <i class="fa-solid fa-chalkboard-user me-1 text-muted" style="font-size:11px;"></i> Teacher Limit
                                 </label>
@@ -978,11 +1056,37 @@
 </style>
 
 <script>
+function togglePlanType() {
+    const isFree = document.getElementById('typeFree')?.checked || false;
+    const freeBlock = document.getElementById('freeConfigBlock');
+    const paidBlock = document.getElementById('paidConfigBlock');
+    const isFreeField = document.getElementById('isFreeField');
+    const priceInput = document.getElementById('pkgPrice');
+    const durationSelect = document.getElementById('pkgDuration');
+
+    if (isFree) {
+        if (freeBlock) freeBlock.style.display = 'block';
+        if (paidBlock) paidBlock.style.display = 'none';
+        if (isFreeField) isFreeField.value = '1';
+        if (priceInput) priceInput.value = '0';
+        if (durationSelect) durationSelect.value = (document.getElementById('pkgFreeValidity')?.value === '6_months') ? 'monthly' : 'yearly';
+    } else {
+        if (freeBlock) freeBlock.style.display = 'none';
+        if (paidBlock) paidBlock.style.display = 'block';
+        if (isFreeField) isFreeField.value = '0';
+        if (priceInput && parseFloat(priceInput.value) === 0) priceInput.value = '1000';
+        if (durationSelect) durationSelect.value = 'monthly';
+    }
+    updatePreview();
+}
+
 function updatePreview() {
+    const isFree   = document.getElementById('typeFree')?.checked || false;
     const name     = document.getElementById('pkgName')?.value || '';
     const desc     = document.getElementById('pkgDesc')?.value || '';
     const price    = parseFloat(document.getElementById('pkgPrice')?.value) || 0;
-    const duration = document.getElementById('pkgDuration')?.value || 'monthly';
+    const serviceFee = parseFloat(document.getElementById('pkgServiceFee')?.value) || 0;
+    const freeValidity = document.getElementById('pkgFreeValidity')?.value || '1_year';
     const isPop    = document.getElementById('isPopular')?.checked || false;
 
     const previewName = document.getElementById('previewName');
@@ -990,7 +1094,6 @@ function updatePreview() {
     const previewPeriod = document.getElementById('previewPeriod');
     if (previewName) previewName.textContent = name || 'Package Name';
     if (previewDesc) previewDesc.textContent = desc || 'Your short description will appear here...';
-    if (previewPeriod) previewPeriod.textContent = '/' + duration;
 
     const popTag = document.getElementById('previewPopularTag');
     if (popTag) popTag.style.display = isPop ? 'block' : 'none';
@@ -1000,15 +1103,20 @@ function updatePreview() {
     const freeHint    = document.getElementById('freePackageHint');
     const previewBtn  = document.getElementById('previewBtn');
 
-    if (price === 0) {
-        if (freeLabel) freeLabel.style.display = 'inline-block';
+    if (isFree) {
+        if (previewPeriod) previewPeriod.textContent = freeValidity === '6_months' ? '/6 Months' : '/Year';
+        if (freeLabel) {
+            freeLabel.style.display = 'inline-block';
+            freeLabel.textContent = serviceFee > 0 ? `৳${serviceFee.toLocaleString()} Fee` : 'FREE';
+        }
         if (priceAmount) priceAmount.style.display = 'none';
         if (freeHint) freeHint.style.display = 'block';
         if (previewBtn) {
             previewBtn.style.background = 'linear-gradient(135deg,#059669,#34d399)';
-            previewBtn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> Activate Free';
+            previewBtn.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + (serviceFee > 0 ? 'Pay Service Fee' : 'Activate Free');
         }
     } else {
+        if (previewPeriod) previewPeriod.textContent = '/month';
         if (freeLabel) freeLabel.style.display = 'none';
         if (priceAmount) { priceAmount.style.display = 'inline'; priceAmount.textContent = '৳' + price.toLocaleString('en-BD'); }
         if (freeHint) freeHint.style.display = 'none';

@@ -259,9 +259,19 @@
                                 <div class="school-slug-text">{{ $subscription->school->slug ?? '' }}</div>
                             </td>
                             <td>
-                                <span class="pkg-badge">
-                                    {{ $subscription->package->name ?? 'Package' }} ({{ substr(ucfirst($subscription->package->duration ?? 'yr'), 0, 2) }})
-                                </span>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="pkg-badge">
+                                        {{ $subscription->package->name ?? 'Package' }}
+                                    </span>
+                                    <span class="badge bg-light text-primary border" style="font-size:0.65rem; width:fit-content;">
+                                        <i class="fa-solid fa-calendar-check me-1"></i>{{ $subscription->billing_period_label }}
+                                    </span>
+                                    @if($subscription->payment_type)
+                                        <span class="badge bg-secondary-subtle text-secondary" style="font-size:0.62rem; width:fit-content;">
+                                            {{ $subscription->payment_type_label }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 <span class="badge {{ strtolower($subscription->payment_method) === 'bkash' ? 'bg-danger' : 'bg-warning text-dark' }} rounded-pill px-2 py-0.5" style="font-size:0.65rem;">

@@ -199,6 +199,59 @@ class School extends Model
         return in_array($permission, $packagePermissions);
     }
 
+    /**
+     * Current school's active package rank.
+     */
+    public function currentPackageRank(): int
+    {
+        return $this->subscriptionPackage ? $this->subscriptionPackage->getRank() : 0;
+    }
+
+    /**
+     * Check if school is already on the highest tier active package.
+     */
+    public function hasHighestPackage(): bool
+    {
+        return $this->subscriptionPackage ? $this->subscriptionPackage->isHighest() : false;
+    }
+
+    /**
+     * Determine UI action for a package relative to current school state.
+     * Returns: 'current_active', 'renew', 'renew_extend', 'upgrade', 'downgrade', 'activate_free'
+     */
+    public function getPackageAction(SubscriptionPackage $package): string
+    {
+        $isCurrent = ((int) $this->subscription_package_id === (int) $package->id);
+        $activeSub = $this->activeSubscription();
+
+        if ($isCurrent) {
+            if ($activeSub && $activeSub->isEntitled()) {
+                if ($activeSub->isExpiringSoon()) {
+                    return 'renew_extend';
+                }
+                return 'current_active';
+            }
+            return 'renew';
+        }
+
+        if ($package->isFreePackage() && !$this->subscription_package_id) {
+            return 'activate_free';
+        }
+
+        $currentRank = $this->currentPackageRank();
+        $targetRank  = $package->getRank();
+
+        if ($targetRank > $currentRank) {
+            return 'upgrade';
+        }
+
+        if ($targetRank < $currentRank) {
+            return 'downgrade';
+        }
+
+        return 'switch';
+    }
+
     // ✅ Relation: school has many students
     public function student()
     {
