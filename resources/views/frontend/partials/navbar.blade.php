@@ -9,8 +9,12 @@
     $demo_link      = $topBarContent['demo_link']     ?? '#';
 @endphp
 
+@php
+    $isHomePage = Request::is('/');
+@endphp
+
 {{-- ======= MAIN HEADER ======= --}}
-<header id="ec-header" class="ec-header">
+<header id="ec-header" class="ec-header {{ !$isHomePage ? 'is-scrolled ec-header--solid' : '' }}">
     <div class="ec-header__inner">
 
         {{-- Logo --}}
@@ -32,11 +36,11 @@
         <nav class="ec-nav">
             <ul class="ec-nav__list">
                 <li><a href="{{ url('/') }}"            class="ec-nav__link {{ Request::is('/') ? 'active' : '' }}">হোম</a></li>
-                <li><a href="#features"                 class="ec-nav__link">ফিচার</a></li>
-                <li><a href="#about"                    class="ec-nav__link">আমাদের সম্পর্কে</a></li>
-                <li><a href="#client"                   class="ec-nav__link">ক্লায়েন্ট</a></li>
+                <li><a href="{{ url('/#features') }}"   class="ec-nav__link">ফিচার</a></li>
+                <li><a href="{{ url('/#about') }}"      class="ec-nav__link">আমাদের সম্পর্কে</a></li>
+                <li><a href="{{ url('/#client') }}"     class="ec-nav__link">ক্লায়েন্ট</a></li>
                 <li><a href="{{ route('main.blogs') }}" class="ec-nav__link {{ request()->routeIs('main.blogs') ? 'active' : '' }}">ব্লগ</a></li>
-                <li><a href="#contact"                  class="ec-nav__link">যোগাযোগ</a></li>
+                <li><a href="{{ url('/#contact') }}"    class="ec-nav__link">যোগাযোগ</a></li>
                 <li>
                     @auth
                         <a href="{{ route('common.dashboard') }}" class="ec-nav__cta">ড্যাশবোর্ড</a>
@@ -85,11 +89,11 @@
     </div>
     <nav class="ec-drawer__nav">
         <a href="{{ url('/') }}"            class="ec-drawer__link">হোম</a>
-        <a href="#features"                 class="ec-drawer__link">ফিচার</a>
-        <a href="#about"                    class="ec-drawer__link">আমাদের সম্পর্কে</a>
-        <a href="#client"                   class="ec-drawer__link">ক্লায়েন্ট</a>
+        <a href="{{ url('/#features') }}"   class="ec-drawer__link">ফিচার</a>
+        <a href="{{ url('/#about') }}"      class="ec-drawer__link">আমাদের সম্পর্কে</a>
+        <a href="{{ url('/#client') }}"     class="ec-drawer__link">ক্লায়েন্ট</a>
         <a href="{{ route('main.blogs') }}" class="ec-drawer__link">ব্লগ</a>
-        <a href="#contact"                  class="ec-drawer__link">যোগাযোগ</a>
+        <a href="{{ url('/#contact') }}"    class="ec-drawer__link">যোগাযোগ</a>
     </nav>
     <div class="ec-drawer__foot">
         @auth
@@ -125,11 +129,12 @@
         box-shadow 0.35s ease;
 }
 
-/* Scrolled → solid white */
-.ec-header.is-scrolled {
-    background: rgba(255, 255, 255, 0.97);
-    border-bottom-color: rgba(0, 97, 168, 0.12);
-    box-shadow: 0 4px 28px rgba(0, 97, 168, 0.10);
+/* Scrolled or Solid → solid white */
+.ec-header.is-scrolled,
+.ec-header.ec-header--solid {
+    background: rgba(255, 255, 255, 0.98);
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 4px 25px rgba(15, 23, 42, 0.08);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
@@ -168,12 +173,15 @@
 }
 .ec-logo-icon svg { stroke: #fff; transition: stroke 0.35s; }
 
-/* scrolled logo icon → blue gradient */
-.ec-header.is-scrolled .ec-logo-icon {
-    background: linear-gradient(135deg, #0061A8, #0080d4);
+/* scrolled / solid logo icon → blue gradient */
+.ec-header.is-scrolled .ec-logo-icon,
+.ec-header.ec-header--solid .ec-logo-icon {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
     border-color: transparent;
-    box-shadow: 0 4px 14px rgba(0,97,168,0.32);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
 }
+.ec-header.is-scrolled .ec-logo-icon svg,
+.ec-header.ec-header--solid .ec-logo-icon svg { stroke: #fff; }
 
 .ec-logo-text {
     font-size: 20px;
@@ -186,9 +194,11 @@
 }
 .ec-logo-text span { color: rgba(255,255,255,0.72); transition: color 0.35s; }
 
-/* scrolled logo text → dark */
-.ec-header.is-scrolled .ec-logo-text { color: #1e293b; }
-.ec-header.is-scrolled .ec-logo-text span { color: #0061A8; }
+/* scrolled / solid logo text → dark */
+.ec-header.is-scrolled .ec-logo-text,
+.ec-header.ec-header--solid .ec-logo-text { color: #0f172a; }
+.ec-header.is-scrolled .ec-logo-text span,
+.ec-header.ec-header--solid .ec-logo-text span { color: #4f46e5; }
 
 /* ---------- Desktop nav ---------- */
 .ec-nav { display: flex; align-items: center; flex: 1; justify-content: flex-end; }
@@ -198,7 +208,7 @@
     margin: 0; padding: 0;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
 }
 
 /* nav links — white on transparent */
@@ -233,19 +243,23 @@
 .ec-nav__link:hover::after,
 .ec-nav__link.active::after { transform: scaleX(1); }
 
-/* scrolled → dark links */
-.ec-header.is-scrolled .ec-nav__link { color: #475569; background: transparent; }
-.ec-header.is-scrolled .ec-nav__link::after { background: #0061A8; }
+/* scrolled / solid → dark links */
+.ec-header.is-scrolled .ec-nav__link,
+.ec-header.ec-header--solid .ec-nav__link { color: #334155; background: transparent; }
+.ec-header.is-scrolled .ec-nav__link::after,
+.ec-header.ec-header--solid .ec-nav__link::after { background: #4f46e5; }
 .ec-header.is-scrolled .ec-nav__link:hover,
-.ec-header.is-scrolled .ec-nav__link.active { color: #0061A8; background: rgba(0,97,168,0.06); }
+.ec-header.ec-header--solid .ec-nav__link:hover,
+.ec-header.is-scrolled .ec-nav__link.active,
+.ec-header.ec-header--solid .ec-nav__link.active { color: #4f46e5; background: rgba(79, 70, 229, 0.08); }
 
 /* CTA buttons */
 .ec-nav__cta {
     display: inline-flex; align-items: center; gap: 6px;
     margin-left: 8px;
-    padding: 9px 22px;
+    padding: 9px 20px;
     font-size: 14px; font-weight: 700;
-    border-radius: 5px;
+    border-radius: 8px;
     text-decoration: none;
     white-space: nowrap;
     transition: all 0.28s ease;
@@ -256,43 +270,50 @@
 }
 .ec-nav__cta:hover {
     background: #fff;
-    color: #0061A8 !important;
+    color: #4f46e5 !important;
     border-color: #fff;
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.12);
     text-decoration: none;
 }
-/* scrolled cta → blue */
-.ec-header.is-scrolled .ec-nav__cta {
-    background: linear-gradient(135deg, #0061A8, #0080d4);
-    border-color: transparent;
-    box-shadow: 0 4px 16px rgba(0,97,168,0.28);
+/* scrolled / solid cta → outline blue for login */
+.ec-header.is-scrolled .ec-nav__cta,
+.ec-header.ec-header--solid .ec-nav__cta {
+    background: transparent;
+    color: #4f46e5 !important;
+    border: 1.5px solid #4f46e5;
+    box-shadow: none;
 }
-.ec-header.is-scrolled .ec-nav__cta:hover {
-    background: linear-gradient(135deg, #004c84, #0061A8);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,97,168,0.38);
+.ec-header.is-scrolled .ec-nav__cta:hover,
+.ec-header.ec-header--solid .ec-nav__cta:hover {
+    background: rgba(79, 70, 229, 0.08);
+    transform: translateY(-1px);
+    color: #4338ca !important;
 }
 /* alternate (register) cta */
 .ec-nav__cta--alt {
     background: #fff;
-    color: #0061A8 !important;
+    color: #4f46e5 !important;
     border-color: #fff;
 }
 .ec-nav__cta--alt:hover {
-    background: #0061A8;
+    background: #4f46e5;
     color: #fff !important;
-    border-color: #0061A8;
+    border-color: #4f46e5;
 }
-.ec-header.is-scrolled .ec-nav__cta--alt {
-    background: transparent;
-    color: #0061A8 !important;
-    border-color: #0061A8;
-    box-shadow: none;
-}
-.ec-header.is-scrolled .ec-nav__cta--alt:hover {
-    background: #0061A8;
+.ec-header.is-scrolled .ec-nav__cta--alt,
+.ec-header.ec-header--solid .ec-nav__cta--alt {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
     color: #fff !important;
+    border: 1.5px solid transparent !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
+}
+.ec-header.is-scrolled .ec-nav__cta--alt:hover,
+.ec-header.ec-header--solid .ec-nav__cta--alt:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%) !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
 }
 
 /* ---------- Hamburger — ieducore bi-list ---------- */
@@ -309,8 +330,9 @@
 }
 .ec-hamburger:hover { opacity: 0.8; }
 
-/* scrolled → blue hamburger */
-.ec-header.is-scrolled .ec-hamburger { color: #0061A8; }
+/* scrolled / solid → dark hamburger */
+.ec-header.is-scrolled .ec-hamburger,
+.ec-header.ec-header--solid .ec-hamburger { color: #0f172a; }
 
 /* ============================================================
    MOBILE DRAWER
@@ -500,7 +522,11 @@
     /* ── Scroll: add/remove is-scrolled class ── */
     function handleScroll() {
         if (!header) return;
-        header.classList.toggle('is-scrolled', window.scrollY > 50);
+        if (header.classList.contains('ec-header--solid')) {
+            header.classList.add('is-scrolled');
+            return;
+        }
+        header.classList.toggle('is-scrolled', window.scrollY > 40);
     }
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // run once on page load

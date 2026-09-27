@@ -292,7 +292,7 @@
                                             লগইন সাবডোমেন (Subdomain) <span class="text-danger">*</span>
                                         </label>
                                         <div class="ec-subdomain-group">
-                                            <span class="subdomain-prefix">https://</span>
+                                            <span class="subdomain-prefix d-none d-sm-inline-flex">https://</span>
                                             <input type="text"
                                                    name="slug"
                                                    id="slug"
@@ -303,9 +303,9 @@
                                                    autocomplete="off">
                                             <span class="subdomain-suffix">.{{ request()->getHost() }}</span>
                                         </div>
-                                        <div class="ec-subdomain-hint mt-2">
+                                        <div class="ec-subdomain-hint mt-2 text-break">
                                             <i class="bi bi-info-circle me-1"></i>
-                                            আপনার স্কুল পোর্টাল অ্যাড্রেস হবে: <strong id="preview-url" class="text-primary">abcschool.{{ request()->getHost() }}</strong>
+                                            আপনার স্কুল পোর্টাল অ্যাড্রেস হবে: <strong id="preview-url" class="text-primary text-break">abcschool.{{ request()->getHost() }}</strong>
                                         </div>
                                         @error('slug')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -345,19 +345,26 @@
                                                             @if($pkg->is_popular)
                                                                 <span class="ec-pkg-badge-popular">জনপ্রিয়</span>
                                                             @endif
-                                                            <div class="ec-pkg-radio-header">
-                                                                <h6 class="pkg-title mb-1">{{ $pkg->name }}</h6>
-                                                                <div class="pkg-price-text">
-                                                                    @if($isFreePkg)
-                                                                        <span class="free-text">ফ্রি</span>
-                                                                    @else
-                                                                        <span class="price-val">৳{{ number_format($pkg->price) }}</span>
-                                                                        <small class="price-unit">/{{ $pkg->duration == 'yearly' ? 'বছর' : 'মাস' }}</small>
-                                                                    @endif
+                                                            <div class="ec-pkg-card-inner">
+                                                                <div class="ec-pkg-card-left">
+                                                                    <div class="ec-pkg-radio-circle">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                    </div>
+                                                                    <div class="ec-pkg-info">
+                                                                        <h6 class="pkg-title mb-0">{{ $pkg->name }}</h6>
+                                                                        <small class="text-muted pkg-limit">{{ $pkg->student_limit ? ($pkg->student_limit . ' শিক্ষার্থী') : 'আনলিমিটেড শিক্ষার্থী' }}</small>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="ec-pkg-radio-check">
-                                                                <i class="bi bi-check-circle-fill"></i>
+                                                                <div class="ec-pkg-card-right">
+                                                                    <div class="pkg-price-text">
+                                                                        @if($isFreePkg)
+                                                                            <span class="free-text">ফ্রি</span>
+                                                                        @else
+                                                                            <span class="price-val">৳{{ number_format($pkg->price) }}</span>
+                                                                            <small class="price-unit">/{{ $pkg->duration == 'yearly' ? 'বছর' : 'মাস' }}</small>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -735,36 +742,53 @@
     /* Subdomain Input Group */
     .ec-subdomain-group {
         display: flex;
-        align-items: center;
+        align-items: stretch;
         background-color: #ffffff;
         border: 1.5px solid #e2e8f0;
         border-radius: 11px;
         overflow: hidden;
+        min-width: 0;
+        width: 100%;
         transition: all 0.25s ease;
     }
     .ec-subdomain-group:focus-within {
         border-color: var(--reg-primary);
         box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
     }
-    .subdomain-prefix, .subdomain-suffix {
+    .subdomain-prefix {
         background-color: #f8fafc;
         color: #64748b;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         font-weight: 600;
         padding: 12px 14px;
         user-select: none;
+        border-right: 1px solid #edf2f7;
+        align-items: center;
+        flex-shrink: 0;
     }
-    .subdomain-prefix { border-right: 1px solid #edf2f7; }
-    .subdomain-suffix { border-left: 1px solid #edf2f7; }
     .ec-subdomain-input {
-        flex: 1;
+        flex: 1 1 auto;
+        min-width: 0;
         border: none;
         padding: 12px 14px;
-        font-size: 0.96rem;
+        font-size: 0.94rem;
         font-weight: 700;
         color: #0f172a;
         outline: none;
         letter-spacing: 0.3px;
+    }
+    .subdomain-suffix {
+        background-color: #f8fafc;
+        color: #4f46e5;
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 12px 14px;
+        user-select: none;
+        border-left: 1px solid #edf2f7;
+        flex-shrink: 0;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
     }
     .ec-subdomain-hint {
         font-size: 0.82rem;
@@ -777,7 +801,7 @@
         background: #ffffff;
         border: 2px solid #e2e8f0;
         border-radius: 12px;
-        padding: 16px 14px;
+        padding: 14px 16px;
         cursor: pointer;
         position: relative;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -808,11 +832,45 @@
         padding: 2px 8px;
         border-radius: 999px;
         letter-spacing: 0.5px;
+        z-index: 2;
+    }
+    .ec-pkg-card-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .ec-pkg-card-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .ec-pkg-radio-circle {
+        width: 22px;
+        height: 22px;
+        border: 2px solid #cbd5e1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: transparent;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    .ec-pkg-radio-card.is-selected .ec-pkg-radio-circle {
+        border-color: var(--reg-primary);
+        background-color: var(--reg-primary);
+        color: #ffffff;
     }
     .pkg-title {
-        font-size: 0.92rem;
+        font-size: 0.94rem;
         font-weight: 700;
         color: #1e293b;
+    }
+    .pkg-limit {
+        font-size: 0.76rem;
+        display: block;
     }
     .pkg-price-text .free-text {
         font-size: 1.15rem;
@@ -828,16 +886,17 @@
         font-size: 0.76rem;
         color: #64748b;
     }
-    .ec-pkg-radio-check {
-        position: absolute;
-        bottom: 12px;
-        right: 12px;
-        color: #cbd5e1;
-        font-size: 1.15rem;
-        transition: color 0.2s ease;
-    }
-    .ec-pkg-radio-card.is-selected .ec-pkg-radio-check {
-        color: var(--reg-primary);
+
+    @media (min-width: 992px) {
+        .ec-pkg-card-inner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .ec-pkg-radio-card {
+            padding: 16px 14px;
+            min-height: 96px;
+        }
     }
 
     /* Password Toggle Button */
@@ -1132,23 +1191,72 @@
 
     /* Responsive */
     @media (max-width: 768px) {
+        .ec-reg-hero {
+            padding: 28px 0 16px;
+        }
         .ec-reg-hero__title {
-            font-size: 1.7rem;
+            font-size: 1.55rem;
+            line-height: 1.35;
+        }
+        .ec-reg-hero__subtitle {
+            font-size: 0.88rem;
+            line-height: 1.5;
         }
         .ec-reg-card {
-            padding: 24px 18px;
+            padding: 20px 14px;
             border-radius: 14px;
         }
         .form-section-card {
-            padding: 18px 14px;
+            padding: 16px 12px;
+            border-radius: 11px;
         }
-        .subdomain-prefix, .subdomain-suffix {
-            padding: 10px 8px;
-            font-size: 0.8rem;
+        .form-section-header {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            gap: 10px;
+        }
+        .form-section-step {
+            width: 32px;
+            height: 32px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+        }
+        .form-section-title {
+            font-size: 1.05rem;
+        }
+        .form-section-desc {
+            font-size: 0.78rem;
+        }
+        .ec-field-label {
+            font-size: 0.84rem;
+            margin-bottom: 5px;
+        }
+        .ec-input, .ec-select, .ec-textarea {
+            padding: 10px 12px 10px 38px;
+            font-size: 0.92rem;
+            border-radius: 9px;
+        }
+        .ec-input-icon {
+            left: 12px;
+            font-size: 1rem;
+        }
+        .ec-input-icon--top {
+            top: 12px;
+        }
+        .subdomain-suffix {
+            font-size: 0.78rem;
+            padding: 10px 10px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .ec-subdomain-input {
-            padding: 10px 8px;
-            font-size: 0.88rem;
+            padding: 10px 10px;
+            font-size: 0.9rem;
+        }
+        .ec-reg-submit-btn {
+            padding: 13px 20px;
+            font-size: 0.98rem;
         }
     }
 </style>

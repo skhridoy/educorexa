@@ -278,12 +278,20 @@
                 padding-left:  var(--site-px-sm) !important;
                 padding-right: var(--site-px-sm) !important;
             }
+        /* ── Inner page content spacing under fixed header ── */
+        body.is-innerpage .frontend-content {
+            padding-top: 70px;
+        }
+        @media (max-width: 575px) {
+            body.is-innerpage .frontend-content {
+                padding-top: 62px;
+            }
         }
     </style>
     @stack('custom-css')
 </head>
 
-<body>
+<body class="{{ Request::is('/') ? 'is-homepage' : 'is-innerpage' }}">
     @include('frontend.partials.navbar')
 
     <main class="frontend-content">
