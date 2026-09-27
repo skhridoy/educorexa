@@ -16,11 +16,13 @@ use App\Services\SubscriptionBillingService;
 
 class SchoolRegisterController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
+        $selectedPackageId = $request->query('package_id');
         $packages = \App\Models\SubscriptionPackage::where('is_active', true)->orderBy('price', 'asc')->get();
-        return view('auth.school-register', compact('packages'));
+        return view('auth.school-register', compact('packages', 'selectedPackageId'));
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -32,8 +34,26 @@ class SchoolRegisterController extends Controller
             'slug'            => 'required|alpha_num|unique:schools,slug',
             'admin_name'      => 'required|string|max:255',
             'admin_email'     => 'required|email|unique:users,email',
+            'admin_phone'     => ['required', 'regex:/^01[3-9]\d{8}$/'],
             'admin_password'  => 'required|min:8',
             'package_id'      => ['required', Rule::exists('subscription_packages', 'id')->where('is_active', true)],
+        ], [
+            'school_name.required'    => 'প্রতিষ্ঠানের নাম লিখুন।',
+            'division.required'       => 'বিভাগ নির্বাচন করুন।',
+            'district.required'       => 'জেলা নির্বাচন করুন।',
+            'upazila.required'        => 'উপজেলা নির্বাচন করুন।',
+            'address.required'        => 'প্রতিষ্ঠানের বিস্তারিত ঠিকানা লিখুন।',
+            'slug.required'           => 'লগইন সাবডোমেন দিন।',
+            'slug.unique'             => 'এই সাবডোমেনটি ইতিমধ্যে ব্যবহৃত হয়েছে, অন্য একটি বেছে নিন।',
+            'slug.alpha_num'          => 'সাবডোমেনে শুধুমাত্র ইংরেজি বর্ণ ও সংখ্যা ব্যবহার করতে পারবেন।',
+            'admin_name.required'     => 'অ্যাডমিনের নাম লিখুন।',
+            'admin_email.required'    => 'ইমেইল অ্যাড্রেস লিখুন।',
+            'admin_email.unique'      => 'এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট তৈরি করা হয়েছে।',
+            'admin_phone.required'    => 'মোবাইল নম্বর লিখুন।',
+            'admin_phone.regex'       => 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)।',
+            'admin_password.required' => 'পাসওয়ার্ড প্রদান করুন।',
+            'admin_password.min'      => 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+            'package_id.required'     => 'একটি সাবস্ক্রিপশন প্যাকেজ নির্বাচন করুন।',
         ]);
 
         // আমরা ডাটাগুলো ট্রানজাকশনের বাইরে এক্সেস করার জন্য ভেরিয়েবলে রাখছি
@@ -44,20 +64,21 @@ class SchoolRegisterController extends Controller
             $appCode = School::generateAppCode();
 
             $newSchool = School::create([
-                'name'   => $request->school_name,
-                'slug'   => strtolower($request->slug),
+                'name'     => $request->school_name,
+                'slug'     => strtolower($request->slug),
                 'app_code' => $appCode,
-                'email'  => $request->admin_email,
+                'email'    => $request->admin_email,
+                'phone'    => $request->admin_phone,
                 'division' => $request->division,
                 'district' => $request->district,
-                'upazila' => $request->upazila,
-                'address' => implode(', ', [
+                'upazila'  => $request->upazila,
+                'address'  => implode(', ', array_filter([
                     $request->address,
                     $request->upazila,
                     $request->district,
                     $request->division,
-                ]),
-                'status' => 'pending',
+                ])),
+                'status'   => 'pending',
                 'subscription_package_id' => $request->package_id,
             ]);
 
@@ -70,6 +91,7 @@ class SchoolRegisterController extends Controller
             $user = User::create([
                 'name'      => $request->admin_name,
                 'email'     => $request->admin_email,
+                'phone'     => $request->admin_phone,
                 'password'  => Hash::make($request->admin_password),
                 'role'      => 'school_admin',
                 'school_id' => $newSchool->id,
@@ -83,34 +105,31 @@ class SchoolRegisterController extends Controller
 
         $superAdmin = User::where('role', 'super_admin')->first();
 
-        if (!$superAdmin) {
-            
-            // যদি এটি দেখায়, তবে বুঝবেন আপনার ডাটাবেসে 'super_admin' রোলে কেউ নেই।
-            dd("Error: সুপার এডমিন ইউজার পাওয়া যায় নাই! আপনার ডাটাবেসের role কলাম চেক করুন।"); 
-        }
-
-        try {
-            $details = [
-                'message' => "New School Registered: {$newSchool->name}",
-                'icon'    => 'home',
-                'link'    => route('manage.schools.pending'),
-            ];
-            $superAdmin->notify(new SuperAdminNotification($details));
-        } catch (\Exception $e) {
-            dd("Error: " . $e->getMessage());
+        if ($superAdmin) {
+            try {
+                $details = [
+                    'message' => "New School Registered: {$newSchool->name}",
+                    'icon'    => 'home',
+                    'link'    => route('manage.schools.pending'),
+                ];
+                $superAdmin->notify(new SuperAdminNotification($details));
+            } catch (\Throwable $e) {
+                \Log::warning("SuperAdminNotification Error: " . $e->getMessage());
+            }
+        } else {
+            \Log::warning("Super Admin user not found for registration notification.");
         }
 
         try {
             // স্কুলকে পেন্ডিং ধন্যবাদ মেইল পাঠানো
             Mail::to($newSchool->email)->send(new SchoolPendingMail($newSchool));
-        } catch (\Exception $e) {
-            dd("মেইল এরর মেসেজ: " . $e->getMessage());
+        } catch (\Throwable $e) {
             \Log::error("Registration Mail Error: " . $e->getMessage());
         }
 
         return redirect()
             ->back()
-            ->with('success', 'School registered successful! Waiting for approval. You will receive an email once your school is approved.');
+            ->with('success', 'আপনার প্রতিষ্ঠান সফলভাবে রেজিস্ট্রেশন করা হয়েছে! অনুমোদনের জন্য অপেক্ষমান রয়েছে। খুব শীঘ্রই আপনার সাথে যোগাযোগ করা হবে।');
     }
 
     public function divisions()

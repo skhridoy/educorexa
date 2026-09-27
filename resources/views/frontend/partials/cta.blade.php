@@ -10,7 +10,7 @@
             <h2 class="font-display-xl text-3xl md:text-5xl">আজই আপনার প্রতিষ্ঠানকে ডিজিটালাইজ করুন</h2>
             <p class="font-body-lg text-sm md:text-lg text-white/90">অপেক্ষা কিসের? আধুনিক যুগের সাথে তাল মিলিয়ে আপনার স্কুল বা মাদ্রাসাকে এগিয়ে নিতে আজই আমাদের সাথে যুক্ত হোন।</p>
             <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4 md:gap-6 pt-2 md:pt-4">
-                <a href="{{ url('/register') }}" class="px-8 md:px-10 py-3 md:py-5 bg-white text-primary font-bold rounded-lg md:rounded-2xl shadow-2xl hover:bg-surface-container-lowest transition-colors active:scale-95 transform text-sm md:text-base">
+                <a href="{{ route('school.register.form') }}" class="px-8 md:px-10 py-3 md:py-5 bg-white text-primary font-bold rounded-lg md:rounded-2xl shadow-2xl hover:bg-surface-container-lowest transition-colors active:scale-95 transform text-sm md:text-base">
                     রেজিস্ট্রেশন করুন
                 </a>
                 <button class="px-8 md:px-10 py-3 md:py-5 bg-primary-container/20 border border-white/30 text-white font-bold rounded-lg md:rounded-2xl backdrop-blur-sm hover:bg-white/10 transition-colors active:scale-95 transform text-sm md:text-base">

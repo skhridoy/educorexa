@@ -148,7 +148,7 @@
                         </ul>
 
                         {{-- CTA --}}
-                        <a href="{{ route('school.register.form') }}"
+                        <a href="{{ route('school.register.form', ['package_id' => $package->id]) }}"
                            class="ec-pkg__cta {{ $package->is_popular ? 'ec-pkg__cta--primary' : 'ec-pkg__cta--outline' }}">
                             @if($isFree && (float)($package->service_fee ?? 0) <= 0)
                                 <i class="bi bi-rocket-takeoff me-1"></i> বিনামূল্যে শুরু করুন

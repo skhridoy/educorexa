@@ -59,7 +59,9 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::get('/join-as-representative', [RepresentativeController::class, 'showForm'])->name('representative.register.form');
     Route::post('/join-as-representative', [RepresentativeController::class, 'store'])->name('representative.register.store');
     Route::get('/register-school', [SchoolRegisterController::class, 'create'])->name('school.register.form');
+    Route::get('/register', [SchoolRegisterController::class, 'create'])->name('register');
     Route::post('/register-school', [SchoolRegisterController::class, 'store'])->name('school.register.store');
+    Route::post('/register', [SchoolRegisterController::class, 'store']);
     Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('locations.divisions');
     Route::get('/locations/districts/{division}', [SchoolRegisterController::class, 'districts'])->name('locations.districts');
     Route::get('/locations/upazilas/{district}', [SchoolRegisterController::class, 'upazilas'])->name('locations.upazilas');
