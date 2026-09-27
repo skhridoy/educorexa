@@ -23,6 +23,10 @@ class SubscriptionPackageController extends Controller
 
     public function store(Request $request)
     {
+        $isFree = $request->plan_type === 'free'
+            || $request->boolean('is_free')
+            || ((float) ($request->price ?? 0) <= 0.0 && $request->plan_type !== 'paid');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sort_order' => 'nullable|integer|min:0',
@@ -36,7 +40,7 @@ class SubscriptionPackageController extends Controller
             'billing_discounts.half_yearly' => 'nullable|numeric|min:0|max:100',
             'billing_discounts.yearly' => 'nullable|numeric|min:0|max:100',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => $isFree ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'registration_commission_type' => 'nullable|in:flat,percentage',
             'registration_commission_rate' => 'nullable|numeric|min:0',
             'monthly_commission_type' => 'nullable|in:flat,percentage',
@@ -48,18 +52,19 @@ class SubscriptionPackageController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $isFree = $request->has('is_free') || (float) $request->price <= 0.0;
         $validated['is_free'] = $isFree;
         $validated['sort_order'] = (int) ($request->sort_order ?? 0);
         $validated['service_fee'] = $isFree ? (float) ($request->service_fee ?? 0) : 0.00;
         $validated['free_validity_period'] = $request->free_validity_period ?? '1_year';
 
         if ($isFree) {
+            $validated['price'] = 0.00;
             $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
             $validated['available_billing_periods'] = [$validated['free_validity_period']];
             $validated['billing_discounts'] = null;
         } else {
-            $validated['duration'] = 'monthly'; // Monthly base price
+            $validated['price'] = (float) $request->price;
+            $validated['duration'] = $request->duration ?? 'monthly';
             $validated['available_billing_periods'] = !empty($request->available_billing_periods)
                 ? array_values($request->available_billing_periods)
                 : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
@@ -103,7 +108,7 @@ class SubscriptionPackageController extends Controller
         ];
 
         $validated['features'] = $features;
-        $validated['permissions'] = array_unique(array_merge($request->permissions ?? [], $defaultPermissions));
+        $validated['permissions'] = array_values(array_unique(array_merge($request->permissions ?? [], $defaultPermissions)));
         unset($validated['features_list']);
 
         SubscriptionPackage::create($validated);
@@ -119,6 +124,10 @@ class SubscriptionPackageController extends Controller
 
     public function update(Request $request, SubscriptionPackage $subscriptionPackage)
     {
+        $isFree = $request->plan_type === 'free'
+            || $request->boolean('is_free')
+            || ((float) ($request->price ?? 0) <= 0.0 && $request->plan_type !== 'paid');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sort_order' => 'nullable|integer|min:0',
@@ -132,7 +141,7 @@ class SubscriptionPackageController extends Controller
             'billing_discounts.half_yearly' => 'nullable|numeric|min:0|max:100',
             'billing_discounts.yearly' => 'nullable|numeric|min:0|max:100',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => $isFree ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'registration_commission_type' => 'nullable|in:flat,percentage',
             'registration_commission_rate' => 'nullable|numeric|min:0',
             'monthly_commission_type' => 'nullable|in:flat,percentage',
@@ -144,18 +153,19 @@ class SubscriptionPackageController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
-        $isFree = $request->has('is_free') || (float) $request->price <= 0.0;
         $validated['is_free'] = $isFree;
         $validated['sort_order'] = (int) ($request->sort_order ?? 0);
         $validated['service_fee'] = $isFree ? (float) ($request->service_fee ?? 0) : 0.00;
         $validated['free_validity_period'] = $request->free_validity_period ?? '1_year';
 
         if ($isFree) {
+            $validated['price'] = 0.00;
             $validated['duration'] = ($validated['free_validity_period'] === '6_months') ? 'monthly' : 'yearly';
             $validated['available_billing_periods'] = [$validated['free_validity_period']];
             $validated['billing_discounts'] = null;
         } else {
-            $validated['duration'] = 'monthly';
+            $validated['price'] = (float) $request->price;
+            $validated['duration'] = $request->duration ?? 'monthly';
             $validated['available_billing_periods'] = !empty($request->available_billing_periods)
                 ? array_values($request->available_billing_periods)
                 : ['monthly', 'quarterly', 'half_yearly', 'yearly'];
@@ -198,7 +208,7 @@ class SubscriptionPackageController extends Controller
         ];
 
         $validated['features'] = $features;
-        $validated['permissions'] = array_unique(array_merge($request->permissions ?? [], $defaultPermissions));
+        $validated['permissions'] = array_values(array_unique(array_merge($request->permissions ?? [], $defaultPermissions)));
         unset($validated['features_list']);
 
         $subscriptionPackage->update($validated);

@@ -21,6 +21,18 @@
         </a>
     </div>
 
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+            <div class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i> Please fix the following errors:</div>
+            <ul class="mb-0 ps-3">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <form action="{{ route('super.subscription-packages.update', $subscriptionPackage->id) }}" method="POST" id="editPackageForm">
         @csrf
         @method('PUT')
@@ -42,18 +54,29 @@
                     </div>
                     <div class="pkg-section-body">
                         <div class="row g-3">
-                            <div class="col-md-7">
+                            <div class="col-md-5">
                                 <label class="edu-label">Package Name <span class="text-danger">*</span></label>
                                 <div class="input-icon-wrap">
                                     <i class="fa-solid fa-box input-icon-left text-indigo"></i>
                                     <input type="text" name="name" id="pkgName"
-                                        class="form-control edu-input ps-input-icon"
+                                        class="form-control edu-input ps-input-icon @error('name') is-invalid @enderror"
                                         placeholder="e.g. Premium Pro"
                                         value="{{ old('name', $subscriptionPackage->name) }}"
                                         oninput="updatePreview()" required>
                                 </div>
+                                @error('name')<div class="pkg-field-err">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-4">
+                                <label class="edu-label">Package Order / Rank</label>
+                                <div class="input-icon-wrap">
+                                    <i class="fa-solid fa-arrow-up-1-9 input-icon-left text-indigo"></i>
+                                    <input type="number" min="0" name="sort_order" id="pkgSortOrder"
+                                        class="form-control edu-input ps-input-icon"
+                                        placeholder="1, 2, 3..." value="{{ old('sort_order', $subscriptionPackage->sort_order ?? '0') }}">
+                                </div>
+                                <div class="pkg-field-hint" style="font-size:10.5px;">Higher number = higher tier in upgrade hierarchy</div>
+                            </div>
+                            <div class="col-md-3">
                                 <label class="edu-label">Billing Cycle <span class="text-danger">*</span></label>
                                 <div class="input-icon-wrap">
                                     <i class="fa-solid fa-calendar-days input-icon-left text-indigo"></i>
@@ -152,8 +175,9 @@
                                             class="form-control edu-input @error('price') is-invalid @enderror"
                                             placeholder="1000.00"
                                             value="{{ old('price', $subscriptionPackage->price) }}"
-                                            oninput="updatePreview()" required>
+                                            oninput="updatePreview()" {{ $isFreePkg ? '' : 'required' }}>
                                     </div>
+                                    @error('price')<div class="pkg-field-err text-danger small mt-1">{{ $message }}</div>@enderror
                                     <div class="pkg-field-hint">Base monthly price displayed on package cards.</div>
                                 </div>
                                 <div class="col-md-7">
