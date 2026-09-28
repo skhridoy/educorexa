@@ -41,7 +41,7 @@
             border-collapse: collapse;
             border-bottom: 1px solid #0f172a;
             padding-bottom: 2px;
-            margin-bottom: 2px;
+            margin-bottom: 5px;
         }
         .hdr-logo {
             width: 80px;
