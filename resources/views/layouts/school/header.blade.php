@@ -609,7 +609,7 @@
                 </div>
 
                 <div class="p-2">
-                    <a href="{{ ($user->role === 'super_admin') ? route('profile') : route('user.profile') }}"
+                    <a href="{{ ($user->role === 'super_admin') ? route('profile') : route('user.profile', ['tenant' => request()->route('tenant') ?? (app()->bound('currentSchool') ? app('currentSchool')->slug : null)]) }}"
                        class="dropdown-item d-flex align-items-center gap-2 py-2">
                         <i data-feather="user" style="width:16px;height:16px;"></i> {{ __('My Profile') }}
                     </a>

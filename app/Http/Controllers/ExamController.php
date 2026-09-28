@@ -14,6 +14,7 @@ use App\Models\AssignClass;
 use App\Models\CommunicationSetting;
 use App\Services\SmsService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class ExamController extends Controller
 {
@@ -426,7 +427,13 @@ class ExamController extends Controller
         $students      = null;
         $selected_exam = null;
         $examRoutines  = collect();
+        $schoolEinCode = $school?->ein_number;
         $assignClasses = collect();
+
+        // প্রবেশপত্রের নির্দেশনাবলী: ডিফল্ট লাইনসমূহ + টেক্সট এরিয়া/প্লেসহোল্ডারের জন্য একক স্ট্রিং
+        $defaultInstructionLines = Exam::defaultAdmitCardInstructions();
+        $defaultInstructionText  = implode("\n", $defaultInstructionLines);
+        $instructionLines        = $defaultInstructionLines;
 
         if ($request->filled('class_id') && $request->filled('exam_id')) {
             $students = Student::where('school_id', $schoolId)
@@ -436,6 +443,7 @@ class ExamController extends Controller
                 ->get();
 
             $selected_exam = Exam::with('categories')->find($request->exam_id);
+            $instructionLines = $selected_exam ? $selected_exam->admitCardInstructions() : Exam::defaultAdmitCardInstructions();
 
             $examRoutines = ExamRoutine::where('school_id', $schoolId)
                 ->where('exam_id', $request->exam_id)
@@ -451,25 +459,36 @@ class ExamController extends Controller
                 ->keyBy('subject_id');
         }
 
-        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines', 'school', 'assignClasses'));
+        return view('school.exam.bulk_admit', compact('classes', 'exams', 'students', 'selected_exam', 'schoolLogo', 'examRoutines', 'school', 'assignClasses', 'instructionLines', 'defaultInstructionText'));
     }
 
     public function bulkAdmitCard(Request $request, $tenant)
     {
+        // Opened in new tab - use HTML responses, redirect() will not work
+        if (!$request->filled('class_id') || !$request->filled('exam_id')) {
+            return response($this->pdfErrorHtml('Class & Exam required', 'Please select both class and exam to generate PDF.'), 422)->header('Content-Type', 'text/html; charset=utf-8');
+        }
+
         $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
         if ($school && !$school->hasPackagePermission('exam.admit_card')) {
-            return redirect()->route('exams.admit-card', ['tenant' => $tenant])
-                ->with('error', 'প্রবেশপত্র ডাউনলোড ও প্রিন্ট করার সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+            return response($this->pdfErrorHtml('Premium required', 'Admit card download requires a premium package.'), 403)->header('Content-Type', 'text/html; charset=utf-8');
         }
 
         $schoolId = $this->getSchoolId($request);
         $students = Student::where('school_id', $schoolId)
             ->where('class_id', $request->class_id)
-            ->with(['class', 'section', 'group', 'category'])
+            ->with(['class', 'section', 'group', 'category', 'subCategory'])
             ->orderBy('roll', 'asc')
             ->get();
 
-        $exam   = Exam::with('categories')->findOrFail($request->exam_id);
+        $exam = Exam::with('categories')->find($request->exam_id);
+        if (!$exam) {
+            return response($this->pdfErrorHtml('পরীক্ষা পাওয়া যায়নি', 'নির্বাচিত পরীক্ষাটি বিদ্যমান নেই।'), 404)
+                ->header('Content-Type', 'text/html; charset=utf-8');
+        }
+
+        // প্রবেশপত্রে ছাপা নির্দেশনাবলী (পরীক্ষায় সেট করা থাকলে সেটাই, নাহলে ডিফল্ট)
+        $instructionLines = $exam->admitCardInstructions();
 
         $examRoutines = ExamRoutine::where('school_id', $schoolId)
             ->where('exam_id', $request->exam_id)
@@ -484,9 +503,128 @@ class ExamController extends Controller
             ->get()
             ->keyBy('subject_id');
 
-        $pdf = Pdf::loadView('school.exam.bulk_admit_card', compact('students', 'exam', 'school', 'examRoutines', 'assignClasses'));
+        try {
+            $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+            $fontDirs = $defaultConfig['fontDir'];
 
-        return $pdf->setPaper('a4', 'portrait')->download('bulk-admit-card.pdf');
+            $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+            $fontData = $defaultFontConfig['fontdata'];
+
+            // Bengali language-to-font resolver for mPDF
+            $customLangToFont = new class extends \Mpdf\Language\LanguageToFont {
+                public function getLanguageOptions($llcc, $adobeCJK) {
+                    $res = parent::getLanguageOptions($llcc, $adobeCJK);
+                    if (in_array(strtolower($llcc), ['bn', 'ben', 'bengali', 'beng'])) {
+                        return [false, 'solaimanlipi'];
+                    }
+                    return $res;
+                }
+            };
+
+            $tempDir = storage_path('app/mpdf');
+            if (!\Illuminate\Support\Facades\File::isDirectory($tempDir)) {
+                \Illuminate\Support\Facades\File::makeDirectory($tempDir, 0777, true, true);
+            }
+
+            $mpdf = new \Mpdf\Mpdf([
+                'mode'             => 'utf-8',
+                'format'           => 'A4-P',
+                'margin_left'      => 7,
+                'margin_right'     => 7,
+                'margin_top'       => 7,
+                'margin_bottom'    => 7,
+                'margin_header'    => 0,
+                'margin_footer'    => 0,
+                'fontDir'          => array_merge($fontDirs, [
+                    public_path('fonts'),
+                ]),
+                'fontdata'         => $fontData + [
+                    'solaimanlipi' => [
+                        'R'          => 'SolaimanLipi.ttf',
+                        'B'          => 'SolaimanLipi.ttf',
+                        'I'          => 'SolaimanLipi.ttf',
+                        'BI'         => 'SolaimanLipi.ttf',
+                        'useOTL'     => 0xFF,
+                        'useKashida' => 75,
+                    ],
+                    'kalpurush' => [
+                        'R'          => 'kalpurush.ttf',
+                        'B'          => 'kalpurush.ttf',
+                        'I'          => 'kalpurush.ttf',
+                        'BI'         => 'kalpurush.ttf',
+                        'useOTL'     => 0xFF,
+                        'useKashida' => 75,
+                    ],
+                ],
+                'languageToFont'   => $customLangToFont,
+                'autoScriptToLang' => true,
+                'autoLangToFont'   => true,
+                'tempDir'          => $tempDir,
+            ]);
+
+            $html = view('school.exam.bulk_admit_card', compact(
+                'students', 'exam', 'school', 'examRoutines', 'assignClasses', 'instructionLines'
+            ))->render();
+
+            $mpdf->WriteHTML($html);
+
+            $fileName = 'admit-card-' . \Illuminate\Support\Str::slug($exam->name ?: 'exam') . '.pdf';
+
+            return response($mpdf->Output($fileName, \Mpdf\Output\Destination::STRING_RETURN), 200, [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Admit card PDF generation failed', [
+                'exam_id'  => $request->exam_id,
+                'class_id' => $request->class_id,
+                'error'    => $e->getMessage(),
+                'trace'    => $e->getTraceAsString(),
+            ]);
+            // HTML error page — works in new tab unlike redirect()->back()
+            $msg = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+            return response($this->pdfErrorHtml('PDF তৈরি ব্যর্থ হয়েছে', "প্রবেশপত্র তৈরি করা যায়নি। বিস্তারিত: {$msg}"), 500)
+                ->header('Content-Type', 'text/html; charset=utf-8');
+        }
+    }
+
+    /**
+     * প্রবেশপত্রের নির্দেশনাবলী ডাইনামিকভাবে সংরক্ষণ (প্রতি পরীক্ষার জন্য)।
+     */
+    public function updateAdmitInstruction(Request $request, $tenant)
+    {
+        $school = app()->bound('currentSchool') ? app('currentSchool') : (auth()->user()?->school ?? null);
+        if ($school && !$school->hasPackagePermission('exam.admit_card')) {
+            return redirect()->route('exams.admit-card', ['tenant' => $tenant])
+                ->with('error', 'প্রবেশপত্র ডাউনলোড ও প্রিন্ট করার সুবিধাটি প্রিমিয়াম প্যাকেজে অন্তর্ভুক্ত। অনুগ্রহ করে প্রিমিয়াম প্যাকেজ চালু করুন।');
+        }
+
+        $request->validate([
+            'exam_id'                => 'required|exists:exams,id',
+            'admit_card_instruction' => 'nullable|string|max:5000',
+        ], [
+            'exam_id.required'                => 'পরীক্ষা সিলেক্ট করা বাধ্যতামূলক।',
+            'exam_id.exists'                  => 'সিলেক্ট করা পরীক্ষাটি পাওয়া যায়নি।',
+            'admit_card_instruction.max'      => 'নির্দেশনাবলী সর্বোচ্চ ৫০০০ অক্ষর পর্যন্ত লেখা যাবে।',
+        ]);
+
+        $schoolId = $this->getSchoolId($request);
+
+        $exam = Exam::where('school_id', $schoolId)
+            ->where('id', $request->exam_id)
+            ->firstOrFail();
+
+        // খালি লাইন বাদ দিয়ে পরিষ্কার টেক্সট সেভ করা (প্রতি লাইনে একটি নির্দেশনা)
+        $lines = preg_split('/\r\n|\r|\n/', (string) $request->input('admit_card_instruction'));
+        $lines = array_values(array_filter(array_map('trim', $lines), fn ($line) => $line !== ''));
+
+        $exam->admit_card_instruction = !empty($lines) ? implode("\n", $lines) : null;
+        $exam->save();
+
+        return back()->with([
+            'success' => 'প্রবেশপত্রের নির্দেশনাবলী সফলভাবে সংরক্ষণ করা হয়েছে!',
+            'type'    => 'success',
+        ]);
     }
 
     public function publishResult(Request $request, $tenant, $id)
@@ -530,5 +668,38 @@ class ExamController extends Controller
                 'message' => 'Something went wrong. Please try again.'
             ], 500);
         }
+    }
+
+    /**
+     * PDF error page helper — returns a clean HTML string for new-tab error display.
+     */
+    private function pdfErrorHtml(string $title, string $message): string
+    {
+        $t = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $m = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>{$t}</title>
+<style>
+  body { font-family: 'Hind Siliguri', Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8fafc; }
+  .box { background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 40px 48px; max-width: 480px; text-align: center; }
+  h2 { color: #dc2626; margin-bottom: 12px; font-size: 1.3rem; }
+  p  { color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px; }
+  a  { display: inline-block; padding: 9px 22px; background: #2563eb; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+  a:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h2>{$t}</h2>
+    <p>{$m}</p>
+    <a href="javascript:history.back()">← ফিরে যান</a>
+  </div>
+</body>
+</html>
+HTML;
     }
 }

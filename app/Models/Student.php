@@ -166,6 +166,11 @@ class Student extends Model
         return $this->belongsTo(SchoolSubCategory::class, 'school_sub_category_id');
     }
 
+    public function subCategory()
+    {
+        return $this->belongsTo(SchoolSubCategory::class, 'school_sub_category_id');
+    }
+
     // 🔹 Student belongs to Admission (Reference)
     public function admission()
     {

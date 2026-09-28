@@ -334,10 +334,7 @@
                         </p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap align-items-center">
-                        {{-- Add Row Button --}}
-                        <button type="button" id="add-row-btn" class="btn btn-outline-primary fw-semibold btn-sm" style="border-radius: 8px; padding: 7px 14px;">
-                            <i class="fa-solid fa-plus me-1"></i> নতুন বিষয় যোগ করুন
-                        </button>
+                        
 
                         {{-- Bulk Delete Button (if routines exist) --}}
                         @if($routines->count() > 0)
@@ -391,7 +388,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="date" name="routines[{{ $index }}][exam_date]" class="form-control form-control-sm" value="{{ $routine->exam_date }}" required>
+                                                <input type="date" name="routines[{{ $index }}][exam_date]" min="{{ \Carbon\Carbon::now()->format('dd-mm-yyyy') }}" class="form-control form-control-sm" value="{{ $routine->exam_date }}" required>
                                             </td>
                                             <td>
                                                 <input type="time" name="routines[{{ $index }}][start_time]" class="form-control form-control-sm" value="{{ $routine->start_time }}">
@@ -420,9 +417,9 @@
                                                          </option>
                                                      @endforeach
                                                 </select>
-                                            </td>
+                                            </td> 
                                             <td>
-                                                <input type="date" name="routines[{{ $index }}][exam_date]" class="form-control form-control-sm" required>
+                                                <input type="date" name="routines[{{ $index }}][exam_date]" min="{{ \Carbon\Carbon::now()->format('d-m-Y') }}" class="form-control form-control-sm" required>
                                             </td>
                                             <td>
                                                 <input type="time" name="routines[{{ $index }}][start_time]" class="form-control form-control-sm">
@@ -445,7 +442,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="date" name="routines[0][exam_date]" class="form-control form-control-sm" required>
+                                                <input type="date" name="routines[0][exam_date]" min="{{ \Carbon\Carbon::now()->format('d-m-Y') }}" class="form-control form-control-sm" required>
                                             </td>
                                             <td>
                                                 <input type="time" name="routines[0][start_time]" class="form-control form-control-sm">
@@ -464,6 +461,11 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- Add Row Button --}}
+                    <button type="button" id="add-row-btn" class="btn btn-primary fw-semibold btn-sm" style="border-radius: 5px; padding: 7px 14px;">
+                        <i class="fa-solid fa-plus me-1"></i> নতুন বিষয় যোগ করুন
+                    </button>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-2">
                         <small class="text-muted"><i class="fa-solid fa-info-circle me-1"></i> সংরক্ষণ করার পর পূর্বের রুটিন স্বয়ংক্রিয়ভাবে আপডেট হয়ে যাবে।</small>
@@ -593,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </select>
                 </td>
                 <td>
-                    <input type="date" name="routines[${rowIndex}][exam_date]" class="form-control form-control-sm" required>
+                    <input type="date" name="routines[${rowIndex}][exam_date]" min="{{ \Carbon\Carbon::now()->format('d-m-Y') }}" class="form-control form-control-sm" required>
                 </td>
                 <td>
                     <input type="time" name="routines[${rowIndex}][start_time]" class="form-control form-control-sm">

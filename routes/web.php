@@ -531,6 +531,7 @@ Route::domain($schoolDomainPattern)
                     Route::post('exams/{exam}/status', [ExamController::class, 'toggleStatus'])->name('exams.status');
                     Route::get('exams/admit-card', [ExamController::class, 'generateAdmitIndex'])->name('exams.admit-card');
                     Route::get('exams/bulk-admit-card', [ExamController::class, 'bulkAdmitCard'])->name('exam.bulk_admit_card');
+                    Route::post('exams/admit-card/instruction', [ExamController::class, 'updateAdmitInstruction'])->name('exam.admit_card_instruction.update');
                     Route::post('/exams/{exam}/publish', [ExamController::class, 'publishResult'])->name('exams.publish');
                     Route::resource('exams', ExamController::class);
 

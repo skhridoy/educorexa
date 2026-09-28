@@ -125,13 +125,123 @@
             </div>
         </div>
 
+        {{-- নির্দেশনাবলী সেটিংস (প্রবেশপত্রে যেভাবে ছাপা হবে) --}}
+        @if($selected_exam)
+            <div class="card mb-4 border-0 shadow-sm overflow-hidden" style="border-radius: 18px; background: #ffffff;">
+                {{-- Card Header --}}
+                <div class="px-4 pt-4 pb-3" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%); border-bottom: 1px solid #e0e7ff;">
+                    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #818cf8); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-list-check"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark" style="font-size: 1rem;">প্রবেশপত্রের নির্দেশনাবলী</h6>
+                                    <p class="text-muted mb-0" style="font-size: 0.72rem; letter-spacing: 0.3px;">Admit Card Instruction Set</p>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="badge fw-semibold px-3 py-2 rounded-pill" style="background: #e0e7ff; color: #4338ca; font-size: 12px; border: 1px solid #c7d2fe;">
+                            <i class="fa-solid fa-graduation-cap me-1"></i>{{ $selected_exam->name }}
+                        </span>
+                    </div>
+                    <p class="text-muted mt-2 mb-0" style="font-size: 0.78rem; line-height: 1.6;">
+                        <i class="fa-solid fa-circle-info me-1 text-primary" style="font-size: 0.7rem;"></i>
+                        প্রতি লাইনে একটি নির্দেশনা লিখুন। নিচে যা লিখবেন, PDF-এ ঠিক সেই ক্রম অনুযায়ী নির্দেশনাবলী ছাপা হবে। খালি রাখলে ডিফল্ট নির্দেশনাবলী ব্যবহৃত হবে।
+                    </p>
+                </div>
+
+                {{-- Card Body: two-column editor + live preview --}}
+                <div class="card-body p-0">
+                    <div class="row g-0">
+
+                        {{-- Left: Editor Panel --}}
+                        <div class="col-lg-7 p-4 border-end" style="border-color: #e2e8f0 !important;">
+                            <form action="{{ route('exam.admit_card_instruction.update', ['tenant' => $tenant]) }}" method="POST" id="instructionForm">
+                                @csrf
+                                <input type="hidden" name="exam_id" value="{{ $selected_exam->id }}">
+
+                                {{-- Toolbar --}}
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="fw-semibold text-dark mb-0" style="font-size: 0.8rem;">
+                                        <i class="fa-solid fa-pen-to-square me-1 text-primary"></i> নির্দেশনা এডিটর
+                                    </label>
+                                    <span id="lineCounter" class="badge rounded-pill" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; border: 1px solid #e2e8f0;">
+                                        <i class="fa-solid fa-list-ol me-1"></i><span id="lineCountNum">0</span> লাইন
+                                    </span>
+                                </div>
+
+                                {{-- Textarea with styled container --}}
+                                <div style="border: 1.5px solid #c7d2fe; border-radius: 14px; overflow: hidden; background: #fafbff; box-shadow: inset 0 1px 4px rgba(99,102,241,0.06);">
+                                    <div style="padding: 6px 10px 4px; background: #eef2ff; border-bottom: 1px solid #e0e7ff; display: flex; align-items: center; gap: 6px;">
+                                        <span style="width: 9px; height: 9px; border-radius: 50%; background: #f87171; display: inline-block;"></span>
+                                        <span style="width: 9px; height: 9px; border-radius: 50%; background: #fbbf24; display: inline-block;"></span>
+                                        <span style="width: 9px; height: 9px; border-radius: 50%; background: #34d399; display: inline-block;"></span>
+                                        <span class="text-muted ms-2" style="font-size: 0.68rem; font-family: monospace;">admit_card_instruction.txt</span>
+                                    </div>
+                                    <textarea name="admit_card_instruction" id="admitInstructionInput" rows="10"
+                                              data-defaults="{{ $defaultInstructionText }}"
+                                              placeholder="{{ $defaultInstructionText }}"
+                                              style="width: 100%; border: none; outline: none; padding: 14px 16px; font-size: 0.84rem; font-family: 'SolaimanLipi', 'Hind Siliguri', sans-serif; line-height: 1.75; background: transparent; resize: vertical; color: #1e293b;">{{ old('admit_card_instruction', $selected_exam->admit_card_instruction) }}</textarea>
+                                </div>
+
+                                {{-- Action Buttons --}}
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    <button type="submit" class="btn fw-bold px-4" style="border-radius: 10px; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; box-shadow: 0 4px 12px rgba(99,102,241,0.3); font-size: 0.85rem;" {{ !$canGenerateAdmitCard ? 'disabled' : '' }}>
+                                        <i class="fa-solid fa-floppy-disk me-2"></i>সংরক্ষণ করুন
+                                    </button>
+                                    <button type="button" class="btn fw-bold px-3" id="loadDefaultInstruction" style="border-radius: 10px; background: #f1f5f9; color: #475569; border: 1.5px solid #e2e8f0; font-size: 0.85rem;">
+                                        <i class="fa-solid fa-rotate-left me-1"></i> ডিফল্ট বসান
+                                    </button>
+                                    <button type="button" class="btn fw-bold px-3" id="clearInstruction" style="border-radius: 10px; background: #fff1f2; color: #e11d48; border: 1.5px solid #fecdd3; font-size: 0.85rem;">
+                                        <i class="fa-solid fa-eraser me-1"></i> মুছুন
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {{-- Right: Live Preview Panel --}}
+                        <div class="col-lg-5 p-4" style="background: #f8fafc;">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <div style="width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #34d399); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px;">
+                                    <i class="fa-solid fa-eye"></i>
+                                </div>
+                                <span class="fw-semibold text-dark" style="font-size: 0.82rem;">লাইভ প্রিভিউ <span class="badge bg-success-subtle text-success ms-1" style="font-size: 10px; border-radius: 6px;">Live</span></span>
+                            </div>
+
+                            <div style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                                <div style="padding: 8px 12px; background: linear-gradient(135deg, #f8faff, #eef2ff); border-bottom: 1px solid #e0e7ff;">
+                                    <span style="font-size: 0.7rem; font-weight: 700; color: #4338ca; text-transform: uppercase; letter-spacing: 0.6px;">
+                                        <i class="fa-solid fa-list-check me-1"></i> নির্দেশনাবলী (Instructions)
+                                    </span>
+                                </div>
+                                <div style="padding: 10px 14px;">
+                                    <ul class="mb-0 ps-3" data-inst-list style="font-size: 0.73rem; line-height: 1.65; list-style-type: disc; color: #1e293b;">
+                                        @foreach($instructionLines as $instructionLine)
+                                            <li>{{ $instructionLine }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p class="text-muted mt-2 mb-0" style="font-size: 0.68rem; line-height: 1.5;">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+                                টেক্সট বক্সে পরিবর্তন করলে এখানে সাথে সাথে দেখা যাবে।
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- Preview Section --}}
         @if(isset($students) && $students->count() > 0)
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <h6 class="fw-bold mb-0 text-dark">
                     <i class="fa-solid fa-eye me-1 text-primary"></i> এডমিট কার্ড প্রিভিউ (মোট {{ $students->count() }} জন শিক্ষার্থী)
                 </h6>
-                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ৩টি করে প্রবেশপত্র প্রিন্ট হবে</small>
+                <small class="text-muted"><i class="fa-solid fa-print me-1"></i>A4 পেজে প্রতি পাতায় ২টি করে প্রবেশপত্র প্রিন্ট হবে ও প্রতি কার্ডে নির্দেশনাবলী থাকবে</small>
             </div>
 
             <div class="row">
@@ -347,7 +457,19 @@
                                     @endif
                                 </div>
 
-                                {{-- 4. Signatures --}}
+                                {{-- 4. নির্দেশনাবলী (Instructions) — admit card পেজ থেকে ডাইনামিকভাবে সেট করা যায় --}}
+                                <div class="mb-2" data-inst-wrapper>
+                                    <div class="px-2 py-1 mb-1 rounded bg-secondary bg-opacity-10 fw-bold text-dark text-uppercase text-center" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                        📋 নির্দেশনাবলী (Instructions)
+                                    </div>
+                                    <ul class="mb-0 ps-3" data-inst-list style="font-size: 0.68rem; line-height: 1.4; list-style-type: disc;">
+                                        @foreach($instructionLines as $instructionLine)
+                                            <li class="text-dark">{{ $instructionLine }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+
+                                {{-- 5. Signatures --}}
                                 <div class="d-flex justify-content-between pt-5 mt-4">
                                     <div class="text-center" style="width: 140px;">
                                         <div style="border-top: 1.5px dashed #64748b; font-size: 0.72rem;" class="fw-bold text-dark pt-1">
@@ -362,7 +484,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>{{-- /.col-lg-6 --}}
                 @endforeach
             </div>
         @elseif(request('class_id'))
@@ -373,4 +495,63 @@
 
     </div>
 </div>
+
+<script>
+    (function () {
+        var input = document.getElementById('admitInstructionInput');
+        if (!input) { return; }
+
+        var lists = document.querySelectorAll('[data-inst-list]');
+        var lineCountEl = document.getElementById('lineCountNum');
+
+        function toLines(value) {
+            return (value || '')
+                .split(/\r\n|\r|\n/)
+                .map(function (line) { return line.trim(); })
+                .filter(function (line) { return line !== ''; });
+        }
+
+        function render() {
+            var lines = toLines(input.value);
+
+            // Update line count badge
+            if (lineCountEl) { lineCountEl.textContent = lines.length; }
+
+            // টেক্সট এরিয়া খালি হলে সার্ভার ডিফল্ট নির্দেশনাবলী ছাপায়
+            if (lines.length === 0) {
+                lines = toLines(input.getAttribute('data-defaults'));
+            }
+
+            lists.forEach(function (list) {
+                list.innerHTML = '';
+                lines.forEach(function (line) {
+                    var li = document.createElement('li');
+                    li.className = 'text-dark';
+                    li.textContent = line;
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        // Initial render
+        render();
+        input.addEventListener('input', render);
+
+        var defaultsBtn = document.getElementById('loadDefaultInstruction');
+        if (defaultsBtn) {
+            defaultsBtn.addEventListener('click', function () {
+                input.value = input.getAttribute('data-defaults') || '';
+                render();
+            });
+        }
+
+        var clearBtn = document.getElementById('clearInstruction');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                render();
+            });
+        }
+    })();
+</script>
 @endsection

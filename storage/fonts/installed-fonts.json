@@ -1,6 +1,10 @@
 {
     "kalpurush": {
-        "normal": "C:\\xampp\\htdocs\\educorexa\\storage\\fonts\/kalpurush_normal_55d8ea7fdfdb8c42e6c3e2955416ed91",
-        "bold": "kalpurush_bold_55d8ea7fdfdb8c42e6c3e2955416ed91"
+        "normal": "C:\\xampp\\htdocs\\laravel\\educorexa\\storage\\fonts\/kalpurush_normal_d702b59c610e93922c6b804662fee330",
+        "bold": "kalpurush_bold_d702b59c610e93922c6b804662fee330"
+    },
+    "solaimanlipi": {
+        "normal": "C:\\xampp\\htdocs\\laravel\\educorexa\\storage\\fonts\/solaimanlipi_normal_66dd0761afb54d1081c5540eaba300dd",
+        "bold": "solaimanlipi_bold_66dd0761afb54d1081c5540eaba300dd"
     }
 }
