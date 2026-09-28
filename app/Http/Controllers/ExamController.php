@@ -504,29 +504,45 @@ class ExamController extends Controller
             ->keyBy('subject_id');
 
         try {
-            $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
-            $fontDirs = $defaultConfig['fontDir'];
+            // ── mPDF font directory & fontdata ──────────────────────────────────────
+            // ConfigVariables / FontVariables exist only in mPDF 7.1+.
+            // Older live servers may still have mPDF 6.x → use safe fallbacks.
+            if (class_exists('\\Mpdf\\Config\\ConfigVariables')) {
+                $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+                $fontDirs = $defaultConfig['fontDir'];
+            } else {
+                // mPDF 6.x fallback: use the bundled font directory
+                $fontDirs = [base_path('vendor/mpdf/mpdf/src/fonts')];
+            }
 
-            $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
-            $fontData = $defaultFontConfig['fontdata'];
+            if (class_exists('\\Mpdf\\Config\\FontVariables')) {
+                $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+                $fontData = $defaultFontConfig['fontdata'];
+            } else {
+                // mPDF 6.x fallback: start with an empty array; mPDF merges it with its own defaults
+                $fontData = [];
+            }
 
-            // Bengali language-to-font resolver for mPDF
-            $customLangToFont = new class extends \Mpdf\Language\LanguageToFont {
-                public function getLanguageOptions($llcc, $adobeCJK) {
-                    $res = parent::getLanguageOptions($llcc, $adobeCJK);
-                    if (in_array(strtolower($llcc), ['bn', 'ben', 'bengali', 'beng'])) {
-                        return [false, 'solaimanlipi'];
+            // Bengali language-to-font resolver (mPDF 7.x+ only)
+            $customLangToFont = null;
+            if (class_exists('\\Mpdf\\Language\\LanguageToFont')) {
+                $customLangToFont = new class extends \Mpdf\Language\LanguageToFont {
+                    public function getLanguageOptions($llcc, $adobeCJK) {
+                        $res = parent::getLanguageOptions($llcc, $adobeCJK);
+                        if (in_array(strtolower($llcc), ['bn', 'ben', 'bengali', 'beng'])) {
+                            return [false, 'solaimanlipi'];
+                        }
+                        return $res;
                     }
-                    return $res;
-                }
-            };
+                };
+            }
 
             $tempDir = storage_path('app/mpdf');
             if (!\Illuminate\Support\Facades\File::isDirectory($tempDir)) {
                 \Illuminate\Support\Facades\File::makeDirectory($tempDir, 0777, true, true);
             }
 
-            $mpdf = new \Mpdf\Mpdf([
+            $mpdfConfig = [
                 'mode'             => 'utf-8',
                 'format'           => 'A4-P',
                 'margin_left'      => 7,
@@ -556,11 +572,17 @@ class ExamController extends Controller
                         'useKashida' => 75,
                     ],
                 ],
-                'languageToFont'   => $customLangToFont,
                 'autoScriptToLang' => true,
                 'autoLangToFont'   => true,
                 'tempDir'          => $tempDir,
-            ]);
+            ];
+
+            // Only set languageToFont if the class exists (mPDF 7.x+)
+            if ($customLangToFont !== null) {
+                $mpdfConfig['languageToFont'] = $customLangToFont;
+            }
+
+            $mpdf = new \Mpdf\Mpdf($mpdfConfig);
 
             $html = view('school.exam.bulk_admit_card', compact(
                 'students', 'exam', 'school', 'examRoutines', 'assignClasses', 'instructionLines'
