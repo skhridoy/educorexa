@@ -75,10 +75,10 @@
             margin-bottom: 1px;
         }
         .school-code-line {
-            font-size: 12px;
+            font-size: 10px;
             color: #475569;
             margin: 1px 0;
-            font-weight: bold;
+            font-weight: 600;
             line-height: 1.1;
         }
         .exam-name-line {
