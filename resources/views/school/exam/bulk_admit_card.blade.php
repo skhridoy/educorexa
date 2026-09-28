@@ -260,7 +260,7 @@
     </style>
 </head>
 <body>
-    @foreach($students->chunk(3) as $chunkIndex => $pair)
+    @foreach($students->chunk(2) as $chunkIndex => $pair)
         @foreach($pair as $pairIndex => $student)
             @php
                 $studentSubCategoryId = $student->school_sub_category_id;
