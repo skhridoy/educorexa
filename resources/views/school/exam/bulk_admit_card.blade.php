@@ -44,16 +44,16 @@
             margin-bottom: 5px;
         }
         .hdr-logo {
-            width: 80px;
-            max-width: 80px;
+            width: 70px;
+            max-width: 70px;
             vertical-align: middle;
             text-align: left;
         }
         .hdr-logo img {
-            width: 80px;
-            height: 80px;
-            max-width: 80px;
-            max-height: 80px;   
+            width: 70px;
+            height: 70px;
+            max-width: 70px;
+            max-height: 70px;   
             display: block;
         }
         .hdr-center {
