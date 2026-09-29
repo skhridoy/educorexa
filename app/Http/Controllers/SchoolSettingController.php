@@ -252,6 +252,12 @@ class SchoolSettingController extends Controller
             return back()->with('error', 'আপনার ডোমেইন রিকোয়েস্ট ইতিমধ্যে ' . $school->custom_domain_status . ' অবস্থায় আছে।');
         }
 
+        // ডোমেইন ইনপুট স্যানিটাইজ করা (http://, https://, trailing slash সরানো)
+        $cleanDomain = strtolower(trim($request->custom_domain ?? ''));
+        $cleanDomain = preg_replace('#^https?://#i', '', $cleanDomain);
+        $cleanDomain = preg_replace('#/.*$#', '', $cleanDomain);
+        $request->merge(['custom_domain' => $cleanDomain]);
+
         $request->validate([
             'custom_domain' => [
                 'required',
@@ -262,21 +268,21 @@ class SchoolSettingController extends Controller
             ],
         ], [
             'custom_domain.required' => 'ডোমেইন নাম আবশ্যক।',
-            'custom_domain.regex' => 'সঠিক ডোমেইন ফরম্যাট দিন (যেমন: school.example.com)',
-            'custom_domain.unique' => 'এই ডোমেইনটি ইতিমধ্যে অন্য স্কুলে ব্যবহৃত হচ্ছে।',
+            'custom_domain.regex'    => 'সঠিক ডোমেইন ফরম্যাট দিন (যেমন: school.example.com বা myschool.edu.bd)',
+            'custom_domain.unique'   => 'এই ডোমেইনটি ইতিমধ্যে অন্য স্কুলে ব্যবহৃত হচ্ছে।',
         ]);
 
-        $domain = strtolower(trim($request->custom_domain));
+        $domain = $cleanDomain;
 
         // মূল ডোমেইন (app.main_domain) ব্লক করো
         $mainDomain = config('app.main_domain');
-        if (str_ends_with($domain, $mainDomain)) {
-            return back()->with('error', 'মূল সিস্টেম ডোমেইন কাস্টম ডোমেইন হিসেবে ব্যবহার করা যাবে না।');
+        if ($domain === $mainDomain || str_ends_with($domain, '.' . $mainDomain)) {
+            return back()->with('error', 'মূল সিস্টেম ডোমেইন বা সাবডোমেইন কাস্টম ডোমেইন হিসেবে ব্যবহার করা যাবে না।');
         }
 
         $school->update([
-            'custom_domain'        => $domain,
-            'custom_domain_status' => 'pending',
+            'custom_domain'               => $domain,
+            'custom_domain_status'        => 'pending',
             'custom_domain_reject_reason' => null,
             'custom_domain_verified_at'   => null,
             'custom_domain_ssl_status'    => 'pending',
@@ -313,5 +319,80 @@ class SchoolSettingController extends Controller
         ]);
 
         return back()->with('success', 'ডোমেইন রিকোয়েস্ট বাতিল করা হয়েছে।');
+    }
+
+    /**
+     * DNS রেকর্ড চেক করো (School Admin লাইভ চেক)
+     */
+    public function checkDns(\Illuminate\Http\Request $request)
+    {
+        $user = auth()->user();
+        $schoolId = $user->school_id;
+        $school = \App\Models\School::findOrFail($schoolId);
+
+        $domain = strtolower(trim($request->domain ?? ''));
+        if (!$domain) {
+            $domain = $school->custom_domain;
+        }
+
+        if (!$domain) {
+            return response()->json(['success' => false, 'message' => 'কোনো ডোমেইন নির্ধারণ করা হয়নি।'], 422);
+        }
+
+        // Clean domain
+        $domain = preg_replace('#^https?://#i', '', $domain);
+        $domain = preg_replace('#/.*$#', '', $domain);
+
+        $serverIp = config('app.server_ip') ?: '127.0.0.1';
+        $mainDomain = config('app.main_domain', 'educorexa.com');
+
+        $resolvedIps = [];
+        $cnameTargets = [];
+
+        // Fetch A records
+        $recordsA = @dns_get_record($domain, DNS_A) ?: [];
+        foreach ($recordsA as $rec) {
+            if (!empty($rec['ip'])) {
+                $resolvedIps[] = $rec['ip'];
+            }
+        }
+
+        // Fetch CNAME records
+        $recordsCname = @dns_get_record($domain, DNS_CNAME) ?: [];
+        foreach ($recordsCname as $rec) {
+            if (!empty($rec['target'])) {
+                $cnameTargets[] = $rec['target'];
+            }
+        }
+
+        // Fallback gethostbyname
+        $directIp = @gethostbyname($domain);
+        if ($directIp && $directIp !== $domain && !in_array($directIp, $resolvedIps)) {
+            $resolvedIps[] = $directIp;
+        }
+
+        $isIpMatched = in_array($serverIp, $resolvedIps);
+        $isCnameMatched = false;
+        foreach ($cnameTargets as $target) {
+            if (str_contains(strtolower($target), strtolower($mainDomain))) {
+                $isCnameMatched = true;
+                break;
+            }
+        }
+
+        $isConfigured = $isIpMatched || $isCnameMatched;
+
+        return response()->json([
+            'success'       => true,
+            'domain'        => $domain,
+            'server_ip'     => $serverIp,
+            'main_domain'   => $mainDomain,
+            'resolved_ips'  => $resolvedIps,
+            'cname_targets' => $cnameTargets,
+            'is_configured' => $isConfigured,
+            'message'       => $isConfigured
+                ? '✅ চমৎকার! আপনার ডোমেইনটি সার্ভারের সাথে সফলভাবে সংযুক্ত হয়েছে।'
+                : '⏳ এখনও DNS সার্ভারে পয়েন্ট করেনি। DNS আপডেটে সাধারণত ৫ মিনিট থেকে ২৪ ঘণ্টা সময় লাগতে পারে।'
+        ]);
     }
 }

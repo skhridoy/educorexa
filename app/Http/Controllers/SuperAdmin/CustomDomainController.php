@@ -127,4 +127,72 @@ class CustomDomainController extends Controller
 
         return back()->with('success', '"' . $oldDomain . '" ডোমেইন সম্পূর্ণ রিসেট করা হয়েছে।');
     }
+
+    /**
+     * Check DNS resolution for a school custom domain (Super Admin live check)
+     */
+    public function checkDns(School $school)
+    {
+        $domain = $school->custom_domain;
+        if (!$domain) {
+            return response()->json(['success' => false, 'message' => 'No custom domain set for this school.'], 422);
+        }
+
+        $domain = strtolower(trim($domain));
+        $domain = preg_replace('#^https?://#i', '', $domain);
+        $domain = preg_replace('#/.*$#', '', $domain);
+
+        $serverIp = config('app.server_ip') ?: '127.0.0.1';
+        $mainDomain = config('app.main_domain', 'educorexa.com');
+
+        $resolvedIps = [];
+        $cnameTargets = [];
+
+        // Fetch A records
+        $recordsA = @dns_get_record($domain, DNS_A) ?: [];
+        foreach ($recordsA as $rec) {
+            if (!empty($rec['ip'])) {
+                $resolvedIps[] = $rec['ip'];
+            }
+        }
+
+        // Fetch CNAME records
+        $recordsCname = @dns_get_record($domain, DNS_CNAME) ?: [];
+        foreach ($recordsCname as $rec) {
+            if (!empty($rec['target'])) {
+                $cnameTargets[] = $rec['target'];
+            }
+        }
+
+        // Fallback gethostbyname
+        $directIp = @gethostbyname($domain);
+        if ($directIp && $directIp !== $domain && !in_array($directIp, $resolvedIps)) {
+            $resolvedIps[] = $directIp;
+        }
+
+        $isIpMatched = in_array($serverIp, $resolvedIps);
+        $isCnameMatched = false;
+        foreach ($cnameTargets as $target) {
+            if (str_contains(strtolower($target), strtolower($mainDomain))) {
+                $isCnameMatched = true;
+                break;
+            }
+        }
+
+        $isConfigured = $isIpMatched || $isCnameMatched;
+
+        return response()->json([
+            'success'       => true,
+            'school_name'   => $school->name,
+            'domain'        => $domain,
+            'server_ip'     => $serverIp,
+            'main_domain'   => $mainDomain,
+            'resolved_ips'  => $resolvedIps,
+            'cname_targets' => $cnameTargets,
+            'is_configured' => $isConfigured,
+            'message'       => $isConfigured 
+                ? 'DNS records match server IP (' . $serverIp . ') or CNAME target.' 
+                : 'DNS does not point to target server IP (' . $serverIp . ').'
+        ]);
+    }
 }

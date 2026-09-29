@@ -14,7 +14,7 @@ class IdentifySchool
         $host = strtolower($request->getHost());
         $mainDomain = strtolower(config('app.main_domain', 'schoolerp.test'));
 
-        // ২. মেন ডোমেইন হলে এড়িয়ে যান
+        // ২. মেইন ডোমেইন হলে এড়িয়ে যান
         if ($host === $mainDomain) {
             return $next($request);
         }
@@ -25,13 +25,44 @@ class IdentifySchool
         // সাবডোমেইন চেক (যেমন: school1.schoolerp.test)
         if (str_ends_with($host, '.' . $mainDomain)) {
             $subdomain = str_replace('.' . $mainDomain, '', $host);
+            // Handle possible www. prefix on subdomain
+            $subdomain = preg_replace('/^www\./', '', $subdomain);
             $school = School::where('slug', $subdomain)->first();
         } else {
-            // ৩. ভেরিফাইড কাস্টম ডোমেইন চেক (যেমন: myschool.edu.bd)
-            $school = School::where('custom_domain', $host)
+            // ৩. ভেরিফাইড কাস্টম ডোমেইন চেক (যেমন: myschool.edu.bd বা www.myschool.edu.bd)
+            $bareHost = preg_replace('/^www\./', '', $host);
+            $wwwHost = 'www.' . $bareHost;
+
+            $school = School::whereIn('custom_domain', [$host, $bareHost, $wwwHost])
                 ->where('custom_domain_status', 'verified')
                 ->first();
             $isCustomDomain = true;
+
+            // যদি কাস্টম ডোমেইন ভেরিফাইড না পাওয়া যায় কিন্তু পেন্ডিং/ডিজেবল্ড থাকে
+            if (!$school) {
+                $pendingOrOtherSchool = School::whereIn('custom_domain', [$host, $bareHost, $wwwHost])->first();
+                if ($pendingOrOtherSchool) {
+                    if ($pendingOrOtherSchool->custom_domain_status === 'pending') {
+                        return response()->view('school.domain_status', [
+                            'school'  => $pendingOrOtherSchool,
+                            'status'  => 'pending',
+                            'message' => 'Custom domain setup is pending verification by Super Admin.'
+                        ], 503);
+                    } elseif ($pendingOrOtherSchool->custom_domain_status === 'rejected') {
+                        return response()->view('school.domain_status', [
+                            'school'  => $pendingOrOtherSchool,
+                            'status'  => 'rejected',
+                            'message' => 'Custom domain request was rejected: ' . ($pendingOrOtherSchool->custom_domain_reject_reason ?? 'Please contact administration.')
+                        ], 503);
+                    } elseif ($pendingOrOtherSchool->custom_domain_status === 'disabled') {
+                        return response()->view('school.domain_status', [
+                            'school'  => $pendingOrOtherSchool,
+                            'status'  => 'disabled',
+                            'message' => 'This custom domain is currently disabled.'
+                        ], 503);
+                    }
+                }
+            }
         }
 
         // ৪. স্কুল না থাকলে বা ইনঅ্যাক্টিভ হলে এরর দিন

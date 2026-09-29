@@ -15,6 +15,7 @@ return [
 
     // 'name' => env('APP_NAME', 'Laravel'),
     'main_domain' => env('MAIN_DOMAIN', 'schoolerp.test'),
+    'server_ip' => env('SERVER_IP', '127.0.0.1'),
 
     /*
     |--------------------------------------------------------------------------

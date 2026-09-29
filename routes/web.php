@@ -239,6 +239,7 @@ Route::domain(config('app.main_domain'))->group(function () {
         // Custom Domain Management
         Route::prefix('custom-domains')->name('custom-domain.')->group(function () {
             Route::get('/', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'index'])->name('index');
+            Route::get('/{school}/check-dns', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'checkDns'])->name('check-dns');
             Route::post('/{school}/approve', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'approve'])->name('approve');
             Route::post('/{school}/reject', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'reject'])->name('reject');
             Route::post('/{school}/disable', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'disable'])->name('disable');
@@ -274,6 +275,10 @@ $mainDomain = config('app.main_domain');
 $schoolDomainPattern = (!empty($reqHost) && $reqHost !== $mainDomain && !str_ends_with($reqHost, '.' . $mainDomain))
     ? '{tenant}'
     : '{tenant}.' . $mainDomain;
+
+if (app()->runningInConsole()) {
+    $schoolDomainPattern = '{tenant}';
+}
 
 Route::domain($schoolDomainPattern)
     ->middleware(['identify.school'])
@@ -400,6 +405,7 @@ Route::domain($schoolDomainPattern)
                     Route::get('/school-settings/domain', [App\Http\Controllers\SchoolSettingController::class, 'domainSetup'])->name('admin.school.domain');
                     Route::post('/school-settings/domain/request', [App\Http\Controllers\SchoolSettingController::class, 'submitDomainRequest'])->name('admin.school.domain.request');
                     Route::post('/school-settings/domain/cancel', [App\Http\Controllers\SchoolSettingController::class, 'cancelDomainRequest'])->name('admin.school.domain.cancel');
+                    Route::post('/school-settings/domain/check-dns', [App\Http\Controllers\SchoolSettingController::class, 'checkDns'])->name('admin.school.domain.check-dns');
 
                     // School Roles Management
                     Route::middleware(['permission:system.settings'])->group(function () {

@@ -287,8 +287,14 @@
                         </td>
 
                         {{-- Actions --}}
+                        {{-- Actions --}}
                         <td style="text-align: right;">
-                            <div class="d-inline-flex gap-1">
+                            <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
+                                {{-- Live DNS Check Button --}}
+                                <button type="button" class="btn btn-sm btn-outline-info px-2 py-1" onclick="checkSuperDns('{{ route('super.custom-domain.check-dns', $school->id) }}', '{{ $school->custom_domain }}', '{{ addslashes($school->name) }}')" title="Live DNS Check">
+                                    <i class="fa-solid fa-satellite-dish me-1"></i> Check DNS
+                                </button>
+
                                 @if($school->custom_domain_status === 'pending')
                                     {{-- Approve Form --}}
                                     <form action="{{ route('super.custom-domain.approve', $school->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই কাস্টম ডোমেইনটি Approve করতে চান?');">
@@ -385,6 +391,157 @@
                 {{ $schools->links() }}
             </div>
         @endif
+    {{-- Super Admin Live DNS Check Modal --}}
+    <div class="modal fade" id="superDnsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:18px; overflow:hidden;">
+                <div class="modal-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #1e293b, #0f172a); color:#fff;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width:34px;height:34px;border-radius:10px;background:rgba(99,102,241,0.25);display:flex;align-items:center;justify-content:center;color:#818cf8;">
+                            <i class="fa-solid fa-satellite-dish"></i>
+                        </div>
+                        <div>
+                            <h6 class="modal-title fw-bold mb-0 text-white" style="font-size:15px;">Live DNS Verification</h6>
+                            <small class="text-white-50" id="superDnsSchoolName">School Name</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="superDnsLoading" class="text-center py-4">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <div class="fw-semibold text-dark">Checking DNS Records...</div>
+                        <small class="text-muted">Resolving A and CNAME records from global DNS</small>
+                    </div>
+
+                    <div id="superDnsResult" style="display:none;">
+                        {{-- Status Banner --}}
+                        <div id="superDnsStatusAlert" class="alert d-flex align-items-center gap-3 mb-4 rounded-3 border-0 py-3">
+                            <div id="superDnsStatusIcon" style="font-size:22px;"></div>
+                            <div>
+                                <div id="superDnsStatusTitle" class="fw-bold"></div>
+                                <small id="superDnsStatusMsg" class="opacity-75"></small>
+                            </div>
+                        </div>
+
+                        {{-- Details Table --}}
+                        <div class="bg-light p-3 rounded-3 mb-3 border">
+                            <div class="d-flex justify-content-between py-1 border-bottom">
+                                <span class="text-muted small">Domain:</span>
+                                <code id="superDnsDomain" class="fw-bold text-dark"></code>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom">
+                                <span class="text-muted small">Target Server IP:</span>
+                                <code id="superDnsTargetIp" class="text-primary fw-bold"></code>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 border-bottom">
+                                <span class="text-muted small">Detected IP(s):</span>
+                                <span id="superDnsResolvedIps" class="small fw-semibold"></span>
+                            </div>
+                            <div class="d-flex justify-content-between py-1">
+                                <span class="text-muted small">CNAME Target(s):</span>
+                                <span id="superDnsCnameTargets" class="small fw-semibold"></span>
+                            </div>
+                        </div>
+
+                        <div class="small text-muted">
+                            <i class="fa-solid fa-circle-info me-1 text-primary"></i>
+                            DNS changes can take anywhere from a few minutes up to 24-48 hours to propagate worldwide.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light py-2 px-4">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="superDnsRetryBtn">
+                        <i class="fa-solid fa-rotate-right me-1"></i> Check Again
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+@endsection
+
+@section('customJs')
+<script>
+    let currentCheckDnsUrl = '';
+    let currentCheckDomain = '';
+    let currentCheckSchool = '';
+
+    function checkSuperDns(url, domain, schoolName) {
+        currentCheckDnsUrl = url;
+        currentCheckDomain = domain;
+        currentCheckSchool = schoolName;
+
+        const modalEl = document.getElementById('superDnsModal');
+        const modal = new bootstrap.Modal(modalEl);
+        document.getElementById('superDnsSchoolName').textContent = schoolName;
+
+        document.getElementById('superDnsLoading').style.display = 'block';
+        document.getElementById('superDnsResult').style.display = 'none';
+
+        modal.show();
+        performDnsCheck();
+    }
+
+    function performDnsCheck() {
+        document.getElementById('superDnsLoading').style.display = 'block';
+        document.getElementById('superDnsResult').style.display = 'none';
+
+        fetch(currentCheckDnsUrl)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('superDnsLoading').style.display = 'none';
+                document.getElementById('superDnsResult').style.display = 'block';
+
+                document.getElementById('superDnsDomain').textContent = data.domain || currentCheckDomain;
+                document.getElementById('superDnsTargetIp').textContent = data.server_ip || 'N/A';
+
+                const ipsEl = document.getElementById('superDnsResolvedIps');
+                if (data.resolved_ips && data.resolved_ips.length > 0) {
+                    ipsEl.innerHTML = data.resolved_ips.map(ip => `<code>${ip}</code>`).join(', ');
+                } else {
+                    ipsEl.innerHTML = '<span class="text-danger">None detected</span>';
+                }
+
+                const cnameEl = document.getElementById('superDnsCnameTargets');
+                if (data.cname_targets && data.cname_targets.length > 0) {
+                    cnameEl.innerHTML = data.cname_targets.map(c => `<code>${c}</code>`).join(', ');
+                } else {
+                    cnameEl.innerHTML = '<span class="text-muted">None</span>';
+                }
+
+                const alertBox = document.getElementById('superDnsStatusAlert');
+                const alertIcon = document.getElementById('superDnsStatusIcon');
+                const alertTitle = document.getElementById('superDnsStatusTitle');
+                const alertMsg = document.getElementById('superDnsStatusMsg');
+
+                if (data.is_configured) {
+                    alertBox.className = 'alert alert-success d-flex align-items-center gap-3 mb-4 rounded-3 border-0 py-3';
+                    alertIcon.innerHTML = '<i class="fa-solid fa-circle-check text-success"></i>';
+                    alertTitle.textContent = 'DNS Pointed Successfully!';
+                    alertMsg.textContent = data.message || 'Domain is actively resolving to this server.';
+                } else {
+                    alertBox.className = 'alert alert-warning d-flex align-items-center gap-3 mb-4 rounded-3 border-0 py-3';
+                    alertIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-warning"></i>';
+                    alertTitle.textContent = 'DNS Not Pointed Yet';
+                    alertMsg.textContent = data.message || 'Domain records do not match the expected server IP.';
+                }
+            })
+            .catch(err => {
+                document.getElementById('superDnsLoading').style.display = 'none';
+                document.getElementById('superDnsResult').style.display = 'block';
+
+                const alertBox = document.getElementById('superDnsStatusAlert');
+                alertBox.className = 'alert alert-danger d-flex align-items-center gap-3 mb-4 rounded-3 border-0 py-3';
+                document.getElementById('superDnsStatusIcon').innerHTML = '<i class="fa-solid fa-circle-xmark text-danger"></i>';
+                document.getElementById('superDnsStatusTitle').textContent = 'Error checking DNS';
+                document.getElementById('superDnsStatusMsg').textContent = err.message || 'Failed to query DNS records.';
+            });
+    }
+
+    document.getElementById('superDnsRetryBtn')?.addEventListener('click', () => {
+        performDnsCheck();
+    });
+</script>
 @endsection

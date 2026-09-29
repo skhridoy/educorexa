@@ -137,6 +137,50 @@ class School extends Model
         return $this->custom_domain_status === 'pending';
     }
 
+    /**
+     * স্কুলের প্রধান ওয়েবসাইটের URL (ভেরিফাইড কাস্টম ডোমেইন থাকলে সেটি, না থাকলে সাবডোমেইন)
+     */
+    public function getWebsiteUrlAttribute(): string
+    {
+        $scheme = request()->isSecure() ? 'https://' : 'http://';
+        if ($this->hasVerifiedCustomDomain()) {
+            return $scheme . $this->custom_domain;
+        }
+        return $scheme . $this->slug . '.' . config('app.main_domain');
+    }
+
+    /**
+     * কাস্টম ডোমেইনের পূর্ণাঙ্গ URL
+     */
+    public function getCustomDomainUrlAttribute(): ?string
+    {
+        if (empty($this->custom_domain)) {
+            return null;
+        }
+        $scheme = request()->isSecure() ? 'https://' : 'http://';
+        return $scheme . $this->custom_domain;
+    }
+
+    /**
+     * সাবডোমেইনের পূর্ণাঙ্গ URL
+     */
+    public function getSubdomainUrlAttribute(): string
+    {
+        $scheme = request()->isSecure() ? 'https://' : 'http://';
+        return $scheme . $this->slug . '.' . config('app.main_domain');
+    }
+
+    /**
+     * ডোমেইন ডিসপ্লে নাম
+     */
+    public function getDomainDisplayNameAttribute(): string
+    {
+        if ($this->hasVerifiedCustomDomain()) {
+            return $this->custom_domain . ' (Custom Domain)';
+        }
+        return $this->slug . '.' . config('app.main_domain');
+    }
+
     public function admissionAcademicYear()
     {
         return $this->belongsTo(AcademicYear::class, 'admission_academic_year_id');

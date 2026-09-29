@@ -396,7 +396,7 @@
                         </p>
 
                         @php
-                            $serverIp = config('app.server_ip', '103.x.x.x'); // আপনার সার্ভার IP
+                            $serverIp = config('app.server_ip') ?: '127.0.0.1'; // আপনার সার্ভার IP
                             $mainDomain = config('app.main_domain', 'educorexa.com');
                         @endphp
 
@@ -434,10 +434,27 @@
                                 </tbody>
                             </table>
                         </div>
-                        <p class="text-muted mb-0" style="font-size:11.5px;">
-                            <i class="fa-solid fa-clock me-1"></i>
-                            DNS প্রপাগেশনে সাধারণত ২৪-৪৮ ঘণ্টা সময় লাগে।
-                        </p>
+
+                        {{-- Live DNS Checker Box --}}
+                        <div class="p-3 rounded-3 mb-3" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fw-bold" style="font-size:12.5px; color:#1e293b;">
+                                    <i class="fa-solid fa-satellite-dish me-1 text-primary"></i> লাইভ DNS স্ট্যাটাস
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-primary py-1 px-3 rounded-pill fw-semibold" id="btnCheckSchoolDns" style="font-size:11.5px;">
+                                    <i class="fa-solid fa-rotate me-1" id="dnsCheckSpin"></i> টেস্ট করুন
+                                </button>
+                            </div>
+                            <div id="schoolDnsStatusResult" style="display:none; font-size:12px;">
+                                <div id="schoolDnsAlert" class="alert py-2 px-3 mb-2 rounded-2 border-0"></div>
+                                <div class="text-muted" style="font-size:11px;">
+                                    ডিটেক্টেড IP: <strong id="schoolDnsDetectedIp" class="text-dark"></strong>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0" style="font-size:11px;">
+                                <i class="fa-solid fa-clock me-1"></i> DNS রেকর্ড যোগ করার পর বিশ্বব্যাপী প্রপাগেশনে সাধারণত ৫ মিনিট থেকে ২৪ ঘণ্টা লাগতে পারে।
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -499,5 +516,56 @@
             }, 1500);
         });
     }
+
+    document.getElementById('btnCheckSchoolDns')?.addEventListener('click', function() {
+        const btn = this;
+        const spin = document.getElementById('dnsCheckSpin');
+        const resBox = document.getElementById('schoolDnsStatusResult');
+        const alertBox = document.getElementById('schoolDnsAlert');
+        const ipEl = document.getElementById('schoolDnsDetectedIp');
+
+        btn.disabled = true;
+        spin.classList.add('fa-spin');
+        resBox.style.display = 'none';
+
+        fetch("{{ route('admin.school.domain.check-dns', ['tenant' => request()->route('tenant')]) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                domain: document.getElementById('domainInput')?.value || '{{ $school->custom_domain }}'
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            spin.classList.remove('fa-spin');
+            resBox.style.display = 'block';
+
+            if (data.is_configured) {
+                alertBox.className = 'alert alert-success py-2 px-3 mb-2 rounded-2 border-0 fw-semibold';
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + (data.message || 'DNS সঠিকভাবে পয়েন্ট করছে!');
+            } else {
+                alertBox.className = 'alert alert-warning py-2 px-3 mb-2 rounded-2 border-0';
+                alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> ' + (data.message || 'DNS এখনও সার্ভারে পয়েন্ট করেনি।');
+            }
+
+            if (data.resolved_ips && data.resolved_ips.length > 0) {
+                ipEl.textContent = data.resolved_ips.join(', ');
+            } else {
+                ipEl.textContent = 'কোনো রেকর্ড পাওয়া যায়নি';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            spin.classList.remove('fa-spin');
+            resBox.style.display = 'block';
+            alertBox.className = 'alert alert-danger py-2 px-3 mb-2 rounded-2 border-0';
+            alertBox.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i> DNS চেক করতে সমস্যা হয়েছে: ' + err.message;
+            ipEl.textContent = 'Error';
+        });
+    });
 </script>
 @endsection

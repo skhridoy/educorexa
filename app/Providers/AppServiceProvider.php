@@ -47,14 +47,48 @@ class AppServiceProvider extends ServiceProvider
             // ডাটাবেজ কানেকশন না থাকলে ইগনোর করবে
         }
 
+        // ডাইনামিক URL ফরম্যাটিং: সাবডোমেইন ও কাস্টম ডোমেইন রুটের হোস্ট নিশ্চিত করা
+        \Illuminate\Support\Facades\URL::formatHostUsing(function ($root, $route) {
+            $parsed = parse_url($root);
+            $host = $parsed['host'] ?? '';
+
+            // যদি বর্তমান রিকোয়েস্ট ভেরিফাইড কাস্টম ডোমেইন থেকে আসে, তবে লিংকগুলো কাস্টম ডোমেইনেই রাখুন
+            if (app()->bound('currentSchool')) {
+                $currentSchool = app('currentSchool');
+                $reqHost = request()->getHost();
+                $bareReqHost = preg_replace('/^www\./i', '', $reqHost);
+                $customDomain = $currentSchool->custom_domain;
+                $bareCustom = $customDomain ? preg_replace('/^www\./i', '', $customDomain) : null;
+
+                if ($currentSchool->hasVerifiedCustomDomain() && in_array($bareReqHost, array_filter([$customDomain, $bareCustom]))) {
+                    $scheme = request()->isSecure() ? 'https://' : 'http://';
+                    return preg_replace('#https?://[^/]+#i', $scheme . $reqHost, $root);
+                }
+            }
+
+            // যদি হোস্ট একটি সাধারণ স্লাগ হয় (যেমন 'school1' যাতে ডট নেই) এবং লোকালহোস্ট না হয়
+            if (!empty($host) && !str_contains($host, '.') && $host !== 'localhost') {
+                $mainDomain = config('app.main_domain', 'educorexa.com');
+                return str_replace($host, $host . '.' . $mainDomain, $root);
+            }
+
+            return $root;
+        });
+
         // ভিউ কম্পোজার ব্যবহার করে সব ভিউতে ডাটা পাস করা
         View::composer('*', function ($view) {
             try {
-                // ১. টেন্যান্ট বা স্কুলের ডাটা আনা
-                $tenant = Request::route('tenant');
-                $school = null;
-                if ($tenant) {
-                    $school = School::where('slug', $tenant)->first();
+                // ১. টেন্যান্ট বা স্কুলের ডাটা আনা (কাস্টম ডোমেইন বা সাবডোমেইন উভয় থেকেই)
+                $school = app()->bound('currentSchool') ? app('currentSchool') : null;
+                if (!$school) {
+                    $tenant = Request::route('tenant');
+                    if ($tenant) {
+                        $bareTenant = preg_replace('/^www\./i', '', $tenant);
+                        $school = School::where('slug', $tenant)
+                            ->orWhere('custom_domain', $tenant)
+                            ->orWhere('custom_domain', $bareTenant)
+                            ->first();
+                    }
                 }
                 
                 // ২. সাইট সেটিংস ডাটা আনা
