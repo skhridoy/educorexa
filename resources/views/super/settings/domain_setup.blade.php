@@ -258,6 +258,53 @@
                     </div>
                 </div>
 
+                {{-- Custom Domain Server Fee (Annual) --}}
+                <div class="ds-card">
+                    <div class="ds-card-header">
+                        <div class="ds-card-header-icon" style="background:#fef3c7; color:#d97706;">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">Custom Domain Server Fee (বাৎসরিক সার্ভার চার্জ)</div>
+                            <div class="text-muted small">ফ্রি বা নন-ইনক্লুডেড প্যাকেজের স্কুলের জন্য কাস্টম ডোমেইন ফি</div>
+                        </div>
+                        <div class="ms-auto">
+                            <span class="current-val-badge">
+                                <i class="fa-solid fa-bangladeshi-taka-sign text-warning" style="font-size:11px;"></i>
+                                ৳ {{ number_format($setting->custom_domain_yearly_fee ?? 1500, 2) }} / year
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ds-card-body">
+                        <div class="info-block mb-3">
+                            <div class="fw-semibold text-dark mb-1"><i class="fa-solid fa-circle-info me-1" style="color:#3b82f6;"></i> চার্জ মডেল কীভাবে কাজ করে?</div>
+                            <div class="text-muted small">
+                                • যেসব স্কুল <strong>ফ্রি প্যাকেজ</strong> বা সাধারণ প্যাকেজ ব্যবহার করে, তারা কাস্টম ডোমেইন যুক্ত করতে চাইলে প্রতি বছর এই নির্ধারিত সার্ভার চার্জ প্রদান করবে।<br>
+                                • যেসব প্রিমিয়াম প্যাকেজে কাস্টম ডোমেইন <strong>অন্তর্ভুক্ত (Free Included)</strong> থাকে, তাদের কোনো আলাদা ফি দিতে হবে না।<br>
+                                • স্কুল এডমিন বিকাশ/নগদে ফি পরিশোধ করে TrxID দিয়ে রিকোয়েস্ট জমা দেবে। Super Admin পেমেন্ট যাচাই করে Approve করলে ১ বছরের জন্য সক্রিয় হবে।
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="custom_domain_yearly_fee" class="form-label fw-semibold">
+                                বাৎসরিক সার্ভার চার্জ (টাকায় / BDT) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted fw-bold">৳</span>
+                                <input type="number" step="0.01" min="0" name="custom_domain_yearly_fee" id="custom_domain_yearly_fee"
+                                    class="form-control @error('custom_domain_yearly_fee') is-invalid @enderror"
+                                    value="{{ old('custom_domain_yearly_fee', $setting->custom_domain_yearly_fee ?? 1500.00) }}"
+                                    placeholder="1500.00">
+                                <span class="input-group-text bg-light text-muted">/ বছর (Annual)</span>
+                                @error('custom_domain_yearly_fee')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fa-solid fa-info-circle me-1"></i>
+                                উদাহরণ: <code>1500</code> টাকা। কোনো চার্জ না রাখতে চাইলে <code>0</code> দিন।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Save --}}
                 <div class="d-flex justify-content-end gap-3">
                     <a href="{{ route('super.dashboard') }}" class="btn btn-light px-4">Cancel</a>
@@ -309,6 +356,13 @@
                                     @else
                                         <span class="badge bg-danger-subtle text-danger" style="font-size:10px;">Missing</span>
                                     @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted small fw-semibold">Custom Domain Fee</td>
+                                <td><code class="text-dark">৳ {{ number_format($setting->custom_domain_yearly_fee ?? 1500, 2) }} / yr</code></td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:10px;">Annual</span>
                                 </td>
                             </tr>
                             <tr>

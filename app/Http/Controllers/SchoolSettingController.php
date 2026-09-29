@@ -223,29 +223,23 @@ class SchoolSettingController extends Controller
     {
         $user = auth()->user();
         $schoolId = $user->school_id;
-        $school = \App\Models\School::findOrFail($schoolId);
+        $school = \App\Models\School::with('subscriptionPackage')->findOrFail($schoolId);
+        $setting = \App\Models\SiteSetting::first() ?? new \App\Models\SiteSetting();
 
-        // Permission চেক: custom.domain পারমিশন প্যাকেজে আছে কিনা
-        if (!$school->hasPackagePermission('custom.domain')) {
-            return view('school.setting.domain', compact('school'))->with('locked', true);
-        }
+        $isFeeIncluded = $school->isCustomDomainFeeIncluded();
+        $yearlyFee = $school->getCustomDomainYearlyFee();
 
-        return view('school.setting.domain', compact('school'))->with('locked', false);
+        return view('school.setting.domain', compact('school', 'setting', 'isFeeIncluded', 'yearlyFee'));
     }
 
     /**
-     * Custom Domain সংযুক্ত করার রিকোয়েস্ট সাবমিট করো
+     * Custom Domain সংযুক্ত করার রিকোয়েস্ট সাবমিট করো (পেমেন্ট তথ্য সহ)
      */
     public function submitDomainRequest(\Illuminate\Http\Request $request)
     {
         $user = auth()->user();
         $schoolId = $user->school_id;
-        $school = \App\Models\School::findOrFail($schoolId);
-
-        // প্যাকেজ পারমিশন চেক
-        if (!$school->hasPackagePermission('custom.domain')) {
-            return back()->with('error', 'কাস্টম ডোমেইন ফিচারটি আপনার বর্তমান প্যাকেজে অন্তর্ভুক্ত নয়। প্রিমিয়াম প্যাকেজে আপগ্রেড করুন।');
-        }
+        $school = \App\Models\School::with('subscriptionPackage')->findOrFail($schoolId);
 
         // ইতিমধ্যে verified বা pending থাকলে নতুন রিকোয়েস্ট করা যাবে না
         if (in_array($school->custom_domain_status, ['verified', 'pending'])) {
@@ -258,7 +252,10 @@ class SchoolSettingController extends Controller
         $cleanDomain = preg_replace('#/.*$#', '', $cleanDomain);
         $request->merge(['custom_domain' => $cleanDomain]);
 
-        $request->validate([
+        $isFeeIncluded = $school->isCustomDomainFeeIncluded();
+        $yearlyFee = $school->getCustomDomainYearlyFee();
+
+        $validationRules = [
             'custom_domain' => [
                 'required',
                 'string',
@@ -266,11 +263,27 @@ class SchoolSettingController extends Controller
                 'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/',
                 \Illuminate\Validation\Rule::unique('schools', 'custom_domain')->ignore($school->id),
             ],
-        ], [
+        ];
+
+        $validationMessages = [
             'custom_domain.required' => 'ডোমেইন নাম আবশ্যক।',
             'custom_domain.regex'    => 'সঠিক ডোমেইন ফরম্যাট দিন (যেমন: school.example.com বা myschool.edu.bd)',
             'custom_domain.unique'   => 'এই ডোমেইনটি ইতিমধ্যে অন্য স্কুলে ব্যবহৃত হচ্ছে।',
-        ]);
+        ];
+
+        // যদি প্যাকেজে অন্তর্ভুক্ত না থাকে, তবে বাৎসরিক সার্ভার ফি পেমেন্ট তথ্য আবশ্যক
+        if (!$isFeeIncluded && $yearlyFee > 0) {
+            $validationRules['payment_method'] = 'required|in:bkash,nagad,bank';
+            $validationRules['sender_number']  = 'required|string|max:50';
+            $validationRules['trx_id']         = 'required|string|max:100';
+
+            $validationMessages['payment_method.required'] = 'পেমেন্ট মেথড নির্বাচন করুন।';
+            $validationMessages['payment_method.in']       = 'সঠিক পেমেন্ট মেথড নির্বাচন করুন (bKash, Nagad বা Bank)।';
+            $validationMessages['sender_number.required']  = 'যে নম্বর বা অ্যাকাউন্ট থেকে পেমেন্ট করেছেন তা লিখুন।';
+            $validationMessages['trx_id.required']         = 'TrxID / ট্রানজেকশন আইডি আবশ্যক।';
+        }
+
+        $request->validate($validationRules, $validationMessages);
 
         $domain = $cleanDomain;
 
@@ -280,13 +293,29 @@ class SchoolSettingController extends Controller
             return back()->with('error', 'মূল সিস্টেম ডোমেইন বা সাবডোমেইন কাস্টম ডোমেইন হিসেবে ব্যবহার করা যাবে না।');
         }
 
-        $school->update([
+        $updateData = [
             'custom_domain'               => $domain,
             'custom_domain_status'        => 'pending',
             'custom_domain_reject_reason' => null,
             'custom_domain_verified_at'   => null,
             'custom_domain_ssl_status'    => 'pending',
-        ]);
+        ];
+
+        if (!$isFeeIncluded && $yearlyFee > 0) {
+            $updateData['custom_domain_payment_method'] = $request->payment_method;
+            $updateData['custom_domain_payment_sender'] = $request->sender_number;
+            $updateData['custom_domain_payment_trx_id'] = strtoupper(trim($request->trx_id));
+            $updateData['custom_domain_payment_amount'] = $yearlyFee;
+            $updateData['custom_domain_payment_status'] = 'pending';
+        } else {
+            $updateData['custom_domain_payment_method'] = 'package_included';
+            $updateData['custom_domain_payment_sender'] = null;
+            $updateData['custom_domain_payment_trx_id'] = 'PACKAGE_INCLUDED';
+            $updateData['custom_domain_payment_amount'] = 0.00;
+            $updateData['custom_domain_payment_status'] = 'paid';
+        }
+
+        $school->update($updateData);
 
         // Super Admin-কে নোটিফিকেশন
         $superAdmins = \App\Models\User::where('role', 'super_admin')->get();
@@ -294,7 +323,11 @@ class SchoolSettingController extends Controller
             $admin->notify(new \App\Notifications\CustomDomainRequested($school));
         }
 
-        return back()->with('success', 'কাস্টম ডোমেইন রিকোয়েস্ট সফলভাবে জমা হয়েছে! সুপার এডমিন শীঘ্রই রিভিউ করবেন।');
+        $msg = $isFeeIncluded 
+            ? 'কাস্টম ডোমেইন রিকোয়েস্ট সফলভাবে জমা হয়েছে! সুপার এডমিন শীঘ্রই রিভিউ করে সক্রিয় করবেন।' 
+            : 'কাস্টম ডোমেইন রিকোয়েস্ট ও পেমেন্ট তথ্য সফলভাবে জমা হয়েছে! সুপার এডমিন পেমেন্ট যাচাই করে ডোমেইন সক্রিয় করবেন।';
+
+        return back()->with('success', $msg);
     }
 
     /**
@@ -311,11 +344,16 @@ class SchoolSettingController extends Controller
         }
 
         $school->update([
-            'custom_domain'               => null,
-            'custom_domain_status'        => 'none',
-            'custom_domain_reject_reason' => null,
-            'custom_domain_verified_at'   => null,
-            'custom_domain_ssl_status'    => null,
+            'custom_domain'                => null,
+            'custom_domain_status'         => 'none',
+            'custom_domain_reject_reason'  => null,
+            'custom_domain_verified_at'    => null,
+            'custom_domain_ssl_status'     => null,
+            'custom_domain_payment_method' => null,
+            'custom_domain_payment_sender' => null,
+            'custom_domain_payment_trx_id' => null,
+            'custom_domain_payment_amount' => null,
+            'custom_domain_payment_status' => 'unpaid',
         ]);
 
         return back()->with('success', 'ডোমেইন রিকোয়েস্ট বাতিল করা হয়েছে।');

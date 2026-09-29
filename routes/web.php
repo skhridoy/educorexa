@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Models\School;
@@ -245,6 +245,7 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::post('/{school}/approve', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'approve'])->name('approve');
             Route::post('/{school}/reject', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'reject'])->name('reject');
             Route::post('/{school}/disable', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'disable'])->name('disable');
+            Route::post('/{school}/extend', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'extend'])->name('extend');
             Route::post('/{school}/reset', [\App\Http\Controllers\SuperAdmin\CustomDomainController::class, 'reset'])->name('reset');
         });
     });

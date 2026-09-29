@@ -61,7 +61,8 @@ class SiteSetting extends Model
         'payment_mode', 'bkash_personal_number', 'nagad_personal_number',
         'bkash_merchant_number', 'bkash_merchant_id', 'bkash_api_key', 'bkash_api_secret',
         'nagad_merchant_number', 'nagad_merchant_id', 'nagad_api_key', 'nagad_api_secret',
-        'manual_payment_instructions'
+        'manual_payment_instructions',
+        'custom_domain_yearly_fee',
     ];
 
     protected $casts = [
@@ -72,6 +73,7 @@ class SiteSetting extends Model
         'bkash_api_secret' => 'encrypted',
         'nagad_api_key' => 'encrypted',
         'nagad_api_secret' => 'encrypted',
+        'custom_domain_yearly_fee' => 'decimal:2',
     ];
 
 }

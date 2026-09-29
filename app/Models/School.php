@@ -111,6 +111,12 @@ class School extends Model
         'custom_domain_reject_reason',
         'custom_domain_verified_at',
         'custom_domain_ssl_status',
+        'custom_domain_expires_at',
+        'custom_domain_payment_method',
+        'custom_domain_payment_sender',
+        'custom_domain_payment_trx_id',
+        'custom_domain_payment_amount',
+        'custom_domain_payment_status',
     ];
 
 
@@ -119,14 +125,84 @@ class School extends Model
         'imap_enabled' => 'boolean',
         'imap_password' => 'encrypted',
         'custom_domain_verified_at' => 'datetime',
+        'custom_domain_expires_at' => 'datetime',
+        'custom_domain_payment_amount' => 'decimal:2',
     ];
 
     /**
-     * Custom domain ভেরিফাই হয়েছে কিনা চেক করুন।
+     * Check if custom domain fee is included (free) in the school's package.
+     */
+    public function isCustomDomainFeeIncluded(): bool
+    {
+        if (!$this->subscriptionPackage) {
+            return false;
+        }
+
+        return (bool) ($this->subscriptionPackage->custom_domain_included || $this->hasPackagePermission('custom.domain'));
+    }
+
+    /**
+     * Get annual server charge for custom domain (returns 0 if included in package).
+     */
+    public function getCustomDomainYearlyFee(): float
+    {
+        if ($this->isCustomDomainFeeIncluded()) {
+            return 0.00;
+        }
+
+        $setting = \App\Models\SiteSetting::first();
+        return (float) ($setting->custom_domain_yearly_fee ?? 1500.00);
+    }
+
+    /**
+     * Custom domain ভেরিফাই হয়েছে কিনা চেক করুন (এবং মেয়াদোত্তীর্ণ হয়নি)।
      */
     public function hasVerifiedCustomDomain(): bool
     {
-        return $this->custom_domain_status === 'verified' && !empty($this->custom_domain);
+        if ($this->custom_domain_status !== 'verified' || empty($this->custom_domain)) {
+            return false;
+        }
+
+        // মেয়াদ চেক
+        if ($this->custom_domain_expires_at && $this->custom_domain_expires_at->isPast()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if custom domain has expired.
+     */
+    public function isCustomDomainExpired(): bool
+    {
+        return $this->custom_domain_expires_at instanceof \Illuminate\Support\Carbon 
+            && $this->custom_domain_expires_at->isPast();
+    }
+
+    /**
+     * Remaining days before custom domain validity expires.
+     */
+    public function customDomainDaysRemaining(): ?int
+    {
+        if (!$this->custom_domain_expires_at) {
+            return null;
+        }
+
+        return (int) ceil(now()->diffInSeconds($this->custom_domain_expires_at, false) / 86400);
+    }
+
+    /**
+     * Check if custom domain is expiring within 30 days.
+     */
+    public function isCustomDomainExpiringSoon(int $thresholdDays = 30): bool
+    {
+        if ($this->custom_domain_status !== 'verified' || !$this->custom_domain_expires_at) {
+            return false;
+        }
+
+        $days = $this->customDomainDaysRemaining();
+        return $days !== null && $days <= $thresholdDays && $days >= 0;
     }
 
     /**

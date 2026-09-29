@@ -12,35 +12,43 @@ class IdentifySchool
     public function handle(Request $request, Closure $next)
     {
         $host = strtolower($request->getHost());
-        $mainDomain = strtolower(config('app.main_domain', 'schoolerp.test'));
+        $mainDomain = strtolower(config('app.main_domain', 'educorexa.com'));
 
-        // ২. মেইন ডোমেইন হলে এড়িয়ে যান
-        if ($host === $mainDomain) {
+        $bareHost = preg_replace('/^www\./i', '', $host);
+        $bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
+
+        // ২. মেইন ডোমেইন (www সহ বা ছাড়া) হলে এড়িয়ে যান
+        if ($bareHost === $bareMainDomain) {
             return $next($request);
         }
 
         $school = null;
         $isCustomDomain = false;
 
-        // সাবডোমেইন চেক (যেমন: school1.schoolerp.test)
-        if (str_ends_with($host, '.' . $mainDomain)) {
-            $subdomain = str_replace('.' . $mainDomain, '', $host);
-            // Handle possible www. prefix on subdomain
-            $subdomain = preg_replace('/^www\./', '', $subdomain);
+        // সাবডোমেইন চেক (যেমন: school1.educorexa.com)
+        if (str_ends_with($bareHost, '.' . $bareMainDomain)) {
+            $subdomain = str_replace('.' . $bareMainDomain, '', $bareHost);
+            $subdomain = preg_replace('/^www\./i', '', $subdomain);
             $school = School::where('slug', $subdomain)->first();
         } else {
             // ৩. ভেরিফাইড কাস্টম ডোমেইন চেক (যেমন: myschool.edu.bd বা www.myschool.edu.bd)
-            $bareHost = preg_replace('/^www\./', '', $host);
             $wwwHost = 'www.' . $bareHost;
 
-            $school = School::whereIn('custom_domain', [$host, $bareHost, $wwwHost])
-                ->where('custom_domain_status', 'verified')
-                ->first();
+            $school = School::where(function ($q) use ($host, $bareHost, $wwwHost) {
+                $q->whereIn('custom_domain', [$host, $bareHost, $wwwHost])
+                  ->orWhere('custom_domain', 'like', '%' . $bareHost . '%');
+            })
+            ->where('custom_domain_status', 'verified')
+            ->first();
             $isCustomDomain = true;
 
-            // যদি কাস্টম ডোমেইন ভেরিফাইড না পাওয়া যায় কিন্তু পেন্ডিং/ডিজেবল্ড থাকে
+            // যদি কাস্টম ডোমেইন ভেরিফাইড না পাওয়া যায় কিন্তু পেন্ডিং/ডিজেবল্ড/রিজেক্টেড থাকে
             if (!$school) {
-                $pendingOrOtherSchool = School::whereIn('custom_domain', [$host, $bareHost, $wwwHost])->first();
+                $pendingOrOtherSchool = School::where(function ($q) use ($host, $bareHost, $wwwHost) {
+                    $q->whereIn('custom_domain', [$host, $bareHost, $wwwHost])
+                      ->orWhere('custom_domain', 'like', '%' . $bareHost . '%');
+                })->first();
+
                 if ($pendingOrOtherSchool) {
                     if ($pendingOrOtherSchool->custom_domain_status === 'pending') {
                         return response()->view('school.domain_status', [
@@ -61,6 +69,15 @@ class IdentifySchool
                             'message' => 'This custom domain is currently disabled.'
                         ], 503);
                     }
+                }
+            } else {
+                // মেয়াদোত্তীর্ণ চেক
+                if ($school->isCustomDomainExpired()) {
+                    return response()->view('school.domain_status', [
+                        'school'  => $school,
+                        'status'  => 'disabled',
+                        'message' => 'Custom domain annual validity has expired. Please renew the server fee to reactivate.'
+                    ], 503);
                 }
             }
         }

@@ -190,11 +190,11 @@
             <table class="table align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 25%;">School Info</th>
-                        <th style="width: 25%;">Custom Domain</th>
-                        <th style="width: 15%;">Status</th>
-                        <th style="width: 15%;">SSL / Verification</th>
-                        <th style="width: 20%; text-align: right;">Actions</th>
+                        <th style="width: 22%;">School Info</th>
+                        <th style="width: 22%;">Custom Domain</th>
+                        <th style="width: 20%;">Package & Server Fee</th>
+                        <th style="width: 18%;">Status & Validity</th>
+                        <th style="width: 18%; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -240,53 +240,94 @@
                             @endif
                         </td>
 
-                        {{-- Status --}}
+                        {{-- Package & Server Fee / Payment --}}
                         <td>
-                            @if($school->custom_domain_status === 'verified')
-                                <span class="badge domain-badge-verified px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
-                                    <i class="fa-solid fa-circle-check"></i> Verified
+                            <div class="mb-1">
+                                <span class="badge bg-light text-dark border fw-semibold" style="font-size:11px;">
+                                    <i class="fa-solid fa-box me-1 text-primary"></i>
+                                    {{ $school->subscriptionPackage?->name ?? 'Free Package' }}
                                 </span>
-                            @elseif($school->custom_domain_status === 'pending')
-                                <span class="badge domain-badge-pending px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
-                                    <i class="fa-solid fa-clock"></i> Pending Review
-                                </span>
-                            @elseif($school->custom_domain_status === 'rejected')
-                                <span class="badge domain-badge-rejected px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
-                                    <i class="fa-solid fa-circle-xmark"></i> Rejected
-                                </span>
-                            @elseif($school->custom_domain_status === 'disabled')
-                                <span class="badge domain-badge-disabled px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
-                                    <i class="fa-solid fa-ban"></i> Disabled
-                                </span>
-                            @else
-                                <span class="badge bg-light text-muted px-2.5 py-1.5 rounded-pill">None</span>
-                            @endif
-                        </td>
+                            </div>
 
-                        {{-- SSL / Verification --}}
-                        <td>
-                            @if($school->custom_domain_verified_at)
-                                <div class="small text-success fw-semibold">
-                                    <i class="fa-solid fa-calendar-check me-1"></i> {{ $school->custom_domain_verified_at->format('d M, Y') }}
+                            @if($school->custom_domain_payment_method === 'package_included')
+                                <span class="badge bg-info-subtle text-info border border-info-subtle" style="font-size:11px;">
+                                    <i class="fa-solid fa-gift me-1"></i> Package Included (Free)
+                                </span>
+                            @elseif($school->custom_domain_payment_amount !== null || $school->custom_domain_payment_trx_id)
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-bold text-dark" style="font-size:12.5px;">
+                                        ৳ {{ number_format($school->custom_domain_payment_amount ?? 1500, 2) }}
+                                    </span>
+                                    @if($school->custom_domain_payment_status === 'paid')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:10px;">Paid</span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:10px;">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="small text-muted mt-0.5">
+                                    <span class="badge bg-secondary-subtle text-dark" style="font-size:10px;">
+                                        {{ strtoupper($school->custom_domain_payment_method ?? 'bKash') }}
+                                    </span>
+                                    {{ $school->custom_domain_payment_sender }}
+                                </div>
+                                <div class="small text-primary font-monospace mt-0.5" style="font-size:11px;">
+                                    Trx: <strong>{{ $school->custom_domain_payment_trx_id }}</strong>
                                 </div>
                             @else
-                                <div class="small text-muted">Not verified yet</div>
+                                <span class="badge bg-secondary-subtle text-muted" style="font-size:11px;">No Payment Data</span>
                             @endif
-
-                            <div class="mt-1">
-                                @if($school->custom_domain_ssl_status === 'active')
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:10px;">
-                                        <i class="fa-solid fa-lock me-1"></i> SSL Active
-                                    </span>
-                                @elseif($school->custom_domain_ssl_status === 'pending')
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:10px;">
-                                        <i class="fa-solid fa-shield me-1"></i> SSL Pending
-                                    </span>
-                                @endif
-                            </div>
                         </td>
 
-                        {{-- Actions --}}
+                        {{-- Status & Validity --}}
+                        <td>
+                            <div class="mb-1">
+                                @if($school->custom_domain_status === 'verified')
+                                    <span class="badge domain-badge-verified px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-circle-check"></i> Verified
+                                    </span>
+                                @elseif($school->custom_domain_status === 'pending')
+                                    <span class="badge domain-badge-pending px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-clock"></i> Pending Review
+                                    </span>
+                                @elseif($school->custom_domain_status === 'rejected')
+                                    <span class="badge domain-badge-rejected px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-circle-xmark"></i> Rejected
+                                    </span>
+                                @elseif($school->custom_domain_status === 'disabled')
+                                    <span class="badge domain-badge-disabled px-2.5 py-1.5 rounded-pill d-inline-flex align-items-center gap-1">
+                                        <i class="fa-solid fa-ban"></i> Disabled
+                                    </span>
+                                @else
+                                    <span class="badge bg-light text-muted px-2.5 py-1.5 rounded-pill">None</span>
+                                @endif
+                            </div>
+
+                            {{-- Validity Date --}}
+                            @if($school->custom_domain_status === 'verified')
+                                @if($school->custom_domain_expires_at)
+                                    @php $isExpired = $school->isCustomDomainExpired(); @endphp
+                                    <div class="small fw-semibold {{ $isExpired ? 'text-danger' : ($school->isCustomDomainExpiringSoon() ? 'text-warning' : 'text-success') }}">
+                                        <i class="fa-solid fa-calendar-days me-1"></i>
+                                        Exp: {{ $school->custom_domain_expires_at->format('d M, Y') }}
+                                    </div>
+                                    <div class="small text-muted" style="font-size:11px;">
+                                        {{ $isExpired ? 'Expired' : $school->customDomainDaysRemaining() . ' days left' }}
+                                    </div>
+                                @endif
+                                <div class="mt-1">
+                                    @if($school->custom_domain_ssl_status === 'active')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:10px;">
+                                            <i class="fa-solid fa-lock me-1"></i> SSL Active
+                                        </span>
+                                    @else
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:10px;">
+                                            <i class="fa-solid fa-shield me-1"></i> SSL Pending
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
+                        </td>
+
                         {{-- Actions --}}
                         <td style="text-align: right;">
                             <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
@@ -297,9 +338,9 @@
 
                                 @if($school->custom_domain_status === 'pending')
                                     {{-- Approve Form --}}
-                                    <form action="{{ route('super.custom-domain.approve', $school->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই কাস্টম ডোমেইনটি Approve করতে চান?');">
+                                    <form action="{{ route('super.custom-domain.approve', $school->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই কাস্টম ডোমেইনটি Approve করতে চান? (এটি ১ বছরের জন্য সক্রিয় হবে)');">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Approve Domain">
+                                        <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Approve Domain (1 Year)">
                                             <i class="fa-solid fa-check me-1"></i> Approve
                                         </button>
                                     </form>
@@ -311,6 +352,14 @@
                                 @endif
 
                                 @if($school->custom_domain_status === 'verified')
+                                    {{-- Extend 1 Year Form --}}
+                                    <form action="{{ route('super.custom-domain.extend', $school->id) }}" method="POST" onsubmit="return confirm('ডোমেইনের মেয়াদ আরও ১ বছর বৃদ্ধি করতে চান?');">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-success px-2 py-1" title="Extend 1 Year Validity">
+                                            <i class="fa-solid fa-calendar-plus me-1"></i> +1 Year
+                                        </button>
+                                    </form>
+
                                     {{-- Disable Form --}}
                                     <form action="{{ route('super.custom-domain.disable', $school->id) }}" method="POST" onsubmit="return confirm('এই ডোমেইনটি কি সাময়িকভাবে Disable করতে চান?');">
                                         @csrf

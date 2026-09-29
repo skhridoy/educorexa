@@ -215,11 +215,13 @@ class SettingController extends Controller
         $setting = SiteSetting::first() ?? new SiteSetting();
 
         $validated = $request->validate([
-            'server_ip'   => ['nullable', 'string', 'max:45', 'regex:/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/'],
-            'main_domain' => ['nullable', 'string', 'max:253', 'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/'],
+            'server_ip'                => ['nullable', 'string', 'max:45', 'regex:/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/'],
+            'main_domain'              => ['nullable', 'string', 'max:253', 'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/'],
+            'custom_domain_yearly_fee' => ['nullable', 'numeric', 'min:0', 'max:999999'],
         ], [
-            'server_ip.regex'   => 'সঠিক IPv4 বা IPv6 ঠিকানা দিন।',
-            'main_domain.regex' => 'সঠিক ডোমেইন নাম দিন (যেমন: educorexa.com)।',
+            'server_ip.regex'                  => 'সঠিক IPv4 বা IPv6 ঠিকানা দিন।',
+            'main_domain.regex'                => 'সঠিক ডোমেইন নাম দিন (যেমন: educorexa.com)।',
+            'custom_domain_yearly_fee.numeric' => 'বাৎসরিক সার্ভার ফি সঠিক সংখ্যায় দিন।',
         ]);
 
         if (array_key_exists('server_ip', $validated)) {
@@ -227,6 +229,9 @@ class SettingController extends Controller
         }
         if (array_key_exists('main_domain', $validated)) {
             $setting->main_domain = $validated['main_domain'] ?: null;
+        }
+        if (array_key_exists('custom_domain_yearly_fee', $validated)) {
+            $setting->custom_domain_yearly_fee = $validated['custom_domain_yearly_fee'] !== null ? (float) $validated['custom_domain_yearly_fee'] : 1500.00;
         }
 
         $setting->save();

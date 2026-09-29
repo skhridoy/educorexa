@@ -17,7 +17,7 @@ class CustomDomainController extends Controller
         $query = School::query()
             ->whereNotNull('custom_domain')
             ->where('custom_domain_status', '!=', 'none')
-            ->with('admin');
+            ->with(['admin', 'subscriptionPackage']);
 
         // ফিল্টার
         if ($request->filled('status')) {
@@ -42,7 +42,7 @@ class CustomDomainController extends Controller
     }
 
     /**
-     * একটি Domain রিকোয়েস্ট Approve করো
+     * একটি Domain রিকোয়েস্ট Approve করো (১ বছর মেয়াদ সহ)
      */
     public function approve(Request $request, School $school)
     {
@@ -51,10 +51,12 @@ class CustomDomainController extends Controller
         }
 
         $school->update([
-            'custom_domain_status'      => 'verified',
-            'custom_domain_verified_at' => now(),
-            'custom_domain_ssl_status'  => 'active',
-            'custom_domain_reject_reason' => null,
+            'custom_domain_status'         => 'verified',
+            'custom_domain_verified_at'    => now(),
+            'custom_domain_expires_at'     => now()->addYear(),
+            'custom_domain_payment_status' => 'paid',
+            'custom_domain_ssl_status'     => 'active',
+            'custom_domain_reject_reason'  => null,
         ]);
 
         // School Admin-কে নোটিফিকেশন
@@ -63,7 +65,27 @@ class CustomDomainController extends Controller
             $schoolAdmin->notify(new \App\Notifications\CustomDomainStatusChanged($school, 'verified'));
         }
 
-        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন সফলভাবে Approve করা হয়েছে।');
+        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন সফলভাবে Approve করা হয়েছে (মেয়াদ: ' . now()->addYear()->format('d M, Y') . ' পর্যন্ত)।');
+    }
+
+    /**
+     * ডোমেইনের মেয়াদ ১ বছর বৃদ্ধি (Renew / Extend 1 Year)
+     */
+    public function extend(School $school)
+    {
+        $currentExpiry = $school->custom_domain_expires_at && $school->custom_domain_expires_at->isFuture() 
+            ? $school->custom_domain_expires_at 
+            : now();
+
+        $newExpiry = $currentExpiry->copy()->addYear();
+
+        $school->update([
+            'custom_domain_expires_at'     => $newExpiry,
+            'custom_domain_payment_status' => 'paid',
+            'custom_domain_status'         => 'verified',
+        ]);
+
+        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইনের মেয়াদ ' . $newExpiry->format('d M, Y') . ' পর্যন্ত ১ বছর বাড়ানো হয়েছে।');
     }
 
     /**

@@ -28,6 +28,7 @@ class SubscriptionPackage extends Model
         'teacher_limit',
         'features',
         'permissions',
+        'custom_domain_included',
         'is_popular',
         'is_active',
     ];
@@ -43,6 +44,7 @@ class SubscriptionPackage extends Model
         'monthly_commission_rate' => 'decimal:2',
         'features' => 'array',
         'permissions' => 'array',
+        'custom_domain_included' => 'boolean',
         'is_popular' => 'boolean',
         'is_active' => 'boolean',
     ];
