@@ -274,8 +274,14 @@ Route::domain(config('app.main_domain'))->group(function () {
 */
 // School Routes (Supports Subdomains and Custom Domains)
 $reqHost = request()->getHost();
-$mainDomain = config('app.main_domain');
-$schoolDomainPattern = (!empty($reqHost) && $reqHost !== $mainDomain && !str_ends_with($reqHost, '.' . $mainDomain))
+$mainDomain = config('app.main_domain', 'educorexa.com');
+if ($mainDomain === 'schoolerp.test' || empty($mainDomain)) {
+    $mainDomain = 'educorexa.com';
+}
+$bareReqHost = preg_replace('/^www\./i', '', $reqHost);
+$bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
+
+$schoolDomainPattern = (!empty($bareReqHost) && $bareReqHost !== $bareMainDomain && !str_ends_with($bareReqHost, '.' . $bareMainDomain))
     ? '{tenant}'
     : '{tenant}.' . $mainDomain;
 

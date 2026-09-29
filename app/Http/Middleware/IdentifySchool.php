@@ -12,7 +12,13 @@ class IdentifySchool
     public function handle(Request $request, Closure $next)
     {
         $host = strtolower($request->getHost());
-        $mainDomain = strtolower(config('app.main_domain', 'educorexa.com'));
+        $dbMainDomain = \Illuminate\Support\Facades\Schema::hasTable('site_settings') 
+            ? \App\Models\SiteSetting::value('main_domain') 
+            : null;
+        $mainDomain = strtolower($dbMainDomain ?: config('app.main_domain', 'educorexa.com'));
+        if ($mainDomain === 'schoolerp.test' || empty($mainDomain)) {
+            $mainDomain = 'educorexa.com';
+        }
 
         $bareHost = preg_replace('/^www\./i', '', $host);
         $bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
@@ -30,6 +36,14 @@ class IdentifySchool
             $subdomain = str_replace('.' . $bareMainDomain, '', $bareHost);
             $subdomain = preg_replace('/^www\./i', '', $subdomain);
             $school = School::where('slug', $subdomain)->first();
+
+            // যদি এই স্কুলের ভেরিফাইড কাস্টম ডোমেইন থাকে, তবে সাবডোমেইন থেকে কাস্টম ডোমেইনে রিডাইরেক্ট করুন!
+            if ($school && $school->hasVerifiedCustomDomain()) {
+                $targetDomain = preg_replace('#^https?://#i', '', $school->custom_domain);
+                $targetDomain = rtrim($targetDomain, '/');
+                $scheme = $request->isSecure() ? 'https://' : 'http://';
+                return redirect()->away($scheme . $targetDomain . $request->getRequestUri(), 301);
+            }
         } else {
             // ৩. ভেরিফাইড কাস্টম ডোমেইন চেক (যেমন: myschool.edu.bd বা www.myschool.edu.bd)
             $wwwHost = 'www.' . $bareHost;

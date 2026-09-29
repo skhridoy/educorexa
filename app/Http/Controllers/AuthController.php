@@ -39,8 +39,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             
-            // রিডাইরেক্ট করার সময় নিশ্চিত করা যে স্লাগ আছে
-            $tenant = $school->slug; 
+            // রিডাইরেক্ট করার সময়: কাস্টম ডোমেইন থাকলে কাস্টম ডোমেইনে রাখুন
+            $currentHost = strtolower($request->getHost());
+            $bareHost = preg_replace('/^www\./i', '', $currentHost);
+            $bareCustom = $school->custom_domain ? preg_replace('/^www\./i', '', $school->custom_domain) : null;
+
+            if ($bareHost === $bareCustom || $currentHost === $school->custom_domain) {
+                $tenant = $currentHost;
+            } elseif ($school->hasVerifiedCustomDomain()) {
+                $tenant = $school->custom_domain;
+            } else {
+                $tenant = $school->slug;
+            } 
 
             if ($user->hasRole('student')) {
                 return redirect()->route('student.dashboard', ['tenant' => $tenant]);
