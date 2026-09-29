@@ -290,6 +290,7 @@ if (app()->runningInConsole()) {
 }
 
 Route::domain($schoolDomainPattern)
+    ->where(['tenant' => '.*'])
     ->middleware(['identify.school'])
     ->scopeBindings()
     ->group(function () {
