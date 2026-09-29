@@ -36,7 +36,6 @@ class CustomDomainController extends Controller
             'pending'  => School::where('custom_domain_status', 'pending')->count(),
             'verified' => School::where('custom_domain_status', 'verified')->count(),
             'rejected' => School::where('custom_domain_status', 'rejected')->count(),
-            'disabled' => School::where('custom_domain_status', 'disabled')->count(),
         ];
 
         return view('super.custom-domain.index', compact('schools', 'stats'));

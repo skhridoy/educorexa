@@ -207,10 +207,6 @@
                     <span class="badge bg-danger" style="font-size:11px; padding:6px 12px; border-radius:20px;">
                         <i class="fa-solid fa-times-circle me-1"></i> Rejected
                     </span>
-                @elseif($school->custom_domain_status === 'disabled')
-                    <span class="badge" style="background:#f59e0b; font-size:11px; padding:6px 12px; border-radius:20px;">
-                        <i class="fa-solid fa-ban me-1"></i> Disabled
-                    </span>
                 @else
                     <span class="badge" style="background:rgba(255,255,255,0.15); font-size:11px; padding:6px 12px; border-radius:20px;">
                         <i class="fa-solid fa-circle me-1 text-muted"></i> Not Configured
@@ -239,57 +235,6 @@
     <div class="row g-4">
         {{-- Left Column: Status + Form --}}
         <div class="col-lg-7">
-
-            {{-- ── 0. DISABLED STATE ── --}}
-            @if($school->custom_domain_status === 'disabled')
-                @php
-                    $subdomainFallback = (request()->isSecure() ? 'https://' : 'http://') . $school->slug . '.' . config('app.main_domain');
-                @endphp
-                <div class="domain-status-card d-flex align-items-start gap-3 mb-4" style="background:linear-gradient(135deg,#fff7ed,#fffbeb); border:1.5px solid #fed7aa;">
-                    <div class="domain-status-icon" style="background:#f97316; color:#fff;">
-                        <i class="fa-solid fa-ban"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
-                            <h6 class="fw-bold mb-0" style="color:#9a3412; font-size:15px;">কাস্টম ডোমেইন সাময়িকভাবে Disabled</h6>
-                            <span class="badge" style="background:#f97316; font-size:11px;"><i class="fa-solid fa-ban me-1"></i> Disabled</span>
-                        </div>
-                        <p class="mb-2" style="color:#7c2d12; font-size:13px;">
-                            আপনার কাস্টম ডোমেইন <strong>{{ $school->custom_domain }}</strong> সুপার এডমিন কর্তৃক সাময়িকভাবে বন্ধ করা হয়েছে।
-                            আপনার স্কুল পোর্টাল এখনও সাবডোমেইন থেকে সচল আছে।
-                        </p>
-
-                        {{-- Fallback Subdomain --}}
-                        <div class="p-3 rounded-3 mb-3" style="background:#fff; border:1px solid #fed7aa;">
-                            <div class="small text-muted mb-1"><i class="fa-solid fa-arrow-right me-1"></i> এই লিংকে স্কুল পোর্টাল অ্যাক্সেস করুন:</div>
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <code style="font-size:13px; color:#ea580c;">{{ $school->slug }}.{{ config('app.main_domain') }}</code>
-                                <a href="{{ $subdomainFallback }}" target="_blank" class="btn btn-sm btn-outline-warning rounded-3" style="font-size:11px;">
-                                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> ভিজিট করুন
-                                </a>
-                            </div>
-                        </div>
-
-                        {{-- Expiry if available --}}
-                        @if($school->custom_domain_expires_at)
-                            <div class="small" style="color:#9a3412;">
-                                <i class="fa-regular fa-calendar me-1"></i>
-                                ডোমেইন মেয়াদ: <strong>{{ $school->custom_domain_expires_at->format('d M, Y') }}</strong>
-                                @if($school->custom_domain_expires_at->isFuture())
-                                    <span class="badge bg-success-subtle text-success ms-1" style="font-size:10px;">মেয়াদ আছে</span>
-                                @else
-                                    <span class="badge bg-danger-subtle text-danger ms-1" style="font-size:10px;">মেয়াদ শেষ</span>
-                                @endif
-                            </div>
-                        @endif
-
-                        <div class="mt-3 p-2 rounded-3" style="background:#fff3e0; border:1px dashed #fb923c; font-size:12px; color:#7c2d12;">
-                            <i class="fa-solid fa-circle-info me-1"></i>
-                            কাস্টম ডোমেইন পুনরায় সক্রিয় করতে <strong>Super Admin</strong>-এর সাথে যোগাযোগ করুন অথবা সাপোর্ট টিকেট তৈরি করুন।
-                        </div>
-                    </div>
-                </div>
-            @endif
 
             {{-- ── 1. ACTIVE / VERIFIED STATE ── --}}
             @if($school->custom_domain_status === 'verified')
