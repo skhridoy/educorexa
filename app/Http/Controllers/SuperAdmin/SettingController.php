@@ -17,7 +17,7 @@ class SettingController extends Controller
     public function update(Request $request) {
         $setting = SiteSetting::first() ?? new SiteSetting();
         
-        // সাধারণ টেক্সট ডাটা আপডেট
+        // à¦¸à¦¾à¦§à¦¾à¦°à¦£ à¦Ÿà§‡à¦•à§à¦¸à¦Ÿ à¦¡à¦¾à¦Ÿà¦¾ à¦†à¦ªà¦¡à§‡à¦Ÿ
         $setting->site_name = $request->site_name;
         $setting->email = $request->email;
         $setting->phone = $request->phone;
@@ -28,15 +28,15 @@ class SettingController extends Controller
         $setting->linkedin_url = $request->linkedin_url;
         $setting->instagram_url = $request->instagram_url;
 
-        // --- নতুন SEO ডাটা আপডেট ---
+        // --- à¦¨à¦¤à§à¦¨ SEO à¦¡à¦¾à¦Ÿà¦¾ à¦†à¦ªà¦¡à§‡à¦Ÿ ---
         $setting->meta_title = $request->meta_title;
         $setting->meta_description = $request->meta_description;
         $setting->meta_keywords = $request->meta_keywords;
 
-        // মেইন পাথ সেটআপ
+        // à¦®à§‡à¦‡à¦¨ à¦ªà¦¾à¦¥ à¦¸à§‡à¦Ÿà¦†à¦ª
         $basePath = 'uploads/settings';
 
-        // ১. লোগো হ্যান্ডেলিং (Wide Logo)
+        // à§§. à¦²à§‹à¦—à§‹ à¦¹à§à¦¯à¦¾à¦¨à§à¦¡à§‡à¦²à¦¿à¦‚ (Wide Logo)
         if ($request->hasFile('logo_wide')) {
             $logoPath = public_path($basePath . '/logos');
             if (!file_exists($logoPath)) mkdir($logoPath, 0755, true);
@@ -51,7 +51,7 @@ class SettingController extends Controller
             $setting->logo_wide = $basePath . '/logos/' . $fileName;
         }
 
-        // ২. স্কয়ার লোগো হ্যান্ডেলিং (Square Logo)
+        // à§¨. à¦¸à§à¦•à¦¯à¦¼à¦¾à¦° à¦²à§‹à¦—à§‹ à¦¹à§à¦¯à¦¾à¦¨à§à¦¡à§‡à¦²à¦¿à¦‚ (Square Logo)
         if ($request->hasFile('logo_square')) {
             $squarePath = public_path($basePath . '/logos_square');
             if (!file_exists($squarePath)) mkdir($squarePath, 0755, true);
@@ -66,7 +66,7 @@ class SettingController extends Controller
             $setting->logo_square = $basePath . '/logos_square/' . $fileName;
         }
 
-        // ৩. ফেভিকন হ্যান্ডেলিং
+        // à§©. à¦«à§‡à¦­à¦¿à¦•à¦¨ à¦¹à§à¦¯à¦¾à¦¨à§à¦¡à§‡à¦²à¦¿à¦‚
         if ($request->hasFile('favicon')) {
             $favPath = public_path($basePath . '/favicons');
             if (!file_exists($favPath)) mkdir($favPath, 0755, true);
@@ -81,7 +81,7 @@ class SettingController extends Controller
             $setting->favicon = $basePath . '/favicons/' . $fileName;
         }
 
-        // ৪. OG Image হ্যান্ডেলিং (SEO Social Preview)
+        // à§ª. OG Image à¦¹à§à¦¯à¦¾à¦¨à§à¦¡à§‡à¦²à¦¿à¦‚ (SEO Social Preview)
         if ($request->hasFile('og_image')) {
             $seoPath = public_path($basePath . '/seo');
             if (!file_exists($seoPath)) mkdir($seoPath, 0755, true);
@@ -102,7 +102,7 @@ class SettingController extends Controller
     }
 
     public function toggleSection(Request $request) {
-        // শুধুমাত্র সুপার এডমিন চেক
+        // à¦¶à§à¦§à§à¦®à¦¾à¦¤à§à¦° à¦¸à§à¦ªà¦¾à¦° à¦à¦¡à¦®à¦¿à¦¨ à¦šà§‡à¦•
         if(auth()->user()->role !== 'super_admin') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -200,5 +200,61 @@ class SettingController extends Controller
         $setting->save();
 
         return back()->with('success', 'Payment setup updated successfully.');
+    }
+
+    /** Server IP ও Main Domain সেটিংস পেজ */
+    public function domainSetup()
+    {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+        return view('super.settings.domain_setup', compact('setting'));
+    }
+
+    /** Server IP ও Main Domain আপডেট */
+    public function updateDomainSetup(Request $request)
+    {
+        $setting = SiteSetting::first() ?? new SiteSetting();
+
+        $validated = $request->validate([
+            'server_ip'   => ['nullable', 'string', 'max:45', 'regex:/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/'],
+            'main_domain' => ['nullable', 'string', 'max:253', 'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/'],
+        ], [
+            'server_ip.regex'   => 'সঠিক IPv4 বা IPv6 ঠিকানা দিন।',
+            'main_domain.regex' => 'সঠিক ডোমেইন নাম দিন (যেমন: educorexa.com)।',
+        ]);
+
+        if (array_key_exists('server_ip', $validated)) {
+            $setting->server_ip = $validated['server_ip'] ?: null;
+        }
+        if (array_key_exists('main_domain', $validated)) {
+            $setting->main_domain = $validated['main_domain'] ?: null;
+        }
+
+        $setting->save();
+
+        $this->syncEnvFile([
+            'SERVER_IP'   => $validated['server_ip'] ?? '',
+            'MAIN_DOMAIN' => $validated['main_domain'] ?? '',
+        ]);
+
+        return back()->with('success', 'Domain & Server settings সফলভাবে আপডেট হয়েছে।');
+    }
+
+    /** .env ফাইলের নির্দিষ্ট key গুলো আপডেট করে */
+    private function syncEnvFile(array $data): void
+    {
+        $envPath = base_path('.env');
+        if (!file_exists($envPath)) {
+            return;
+        }
+        $content = file_get_contents($envPath);
+        foreach ($data as $key => $value) {
+            $value = trim($value);
+            if (preg_match("/^{$key}=.*/m", $content)) {
+                $content = preg_replace("/^{$key}=.*/m", "{$key}={$value}", $content);
+            } else {
+                $content .= "\n{$key}={$value}";
+            }
+        }
+        file_put_contents($envPath, $content);
     }
 }

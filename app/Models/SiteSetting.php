@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $id
  * @property string $site_name
+ * @property string|null $server_ip
+ * @property string|null $main_domain
  * @property string|null $meta_title
  * @property string|null $meta_description
  * @property string|null $meta_keywords
@@ -51,7 +53,7 @@ use Illuminate\Database\Eloquent\Model;
 class SiteSetting extends Model
 {
     protected $fillable = [
-        'site_name', 'address', 'phone', 'email', 'footer_text',
+        'site_name', 'server_ip', 'main_domain', 'address', 'phone', 'email', 'footer_text',
         'logo_wide', 'logo_square', 'favicon', 'meta_title', 'meta_description', 'meta_keywords', 'og_image',
         'mail_mailer', 'mail_host', 'mail_port', 'mail_username', 'mail_password', 'mail_encryption', 'mail_from_address', 'mail_from_name',
         'inbound_webhook_secret', 'inbound_webhook_enabled'

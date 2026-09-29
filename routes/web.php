@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Models\School;
@@ -95,7 +95,7 @@ Route::domain(config('app.main_domain'))->group(function () {
         if ($user->hasRole('super_admin') || $user->role === 'super_admin') {
             return redirect()->route('super.dashboard');
         } elseif ($user->hasRole('employee') || $user->role === 'employee' || $user->employee) {
-            // school.manage permission থাকলে representative dashboard-এ যাবে
+            // school.manage permission à¦¥à¦¾à¦•à¦²à§‡ representative dashboard-à¦ à¦¯à¦¾à¦¬à§‡
             if ($user->can('school.manage')) {
                 return redirect()->route('rep.dashboard');
             }
@@ -171,7 +171,7 @@ Route::domain(config('app.main_domain'))->group(function () {
                 Route::delete('/support-tickets/{id}', [SupportTicketController::class, 'destroy'])->name('support.destroy');
             });
 
-            // School Delete Requests (Representative দের পাঠানো ডিলিট রিকোয়েস্ট)
+            // School Delete Requests (Representative à¦¦à§‡à¦° à¦ªà¦¾à¦ à¦¾à¦¨à§‹ à¦¡à¦¿à¦²à¦¿à¦Ÿ à¦°à¦¿à¦•à§‹à¦¯à¦¼à§‡à¦¸à§à¦Ÿ)
             Route::middleware(['permission:school.delete'])->group(function () {
                 Route::get('/school-delete-requests', [SchoolDeleteRequestController::class, 'index'])->name('school.delete-requests.index');
                 Route::post('/school-delete-requests/{id}/approve', [SchoolDeleteRequestController::class, 'approve'])->name('school.delete-requests.approve');
@@ -187,19 +187,21 @@ Route::domain(config('app.main_domain'))->group(function () {
             Route::post('/api-setup', [SettingController::class, 'updateApiSetup'])->name('settings.api.update');
             Route::get('/payment-setup', [SettingController::class, 'paymentSetup'])->name('settings.payment');
             Route::post('/payment-setup', [SettingController::class, 'updatePaymentSetup'])->name('settings.payment.update');
+            Route::get('/domain-setup', [SettingController::class, 'domainSetup'])->name('settings.domain');
+            Route::post('/domain-setup', [SettingController::class, 'updateDomainSetup'])->name('settings.domain.update');
         });
         // Common Profile & Settings
         Route::get('/profile', [SuperAdminController::class, 'Profile'])->name('profile');
         Route::post('/profile/store', [SuperAdminController::class, 'ProfileStore'])->name('profile.store');
 
         Route::middleware(['permission:frontend.manage'])->prefix('manage/frontend')->name('manage.frontend.')->group(function () {
-            // সেকশন লিস্ট দেখার জন্য
+            // à¦¸à§‡à¦•à¦¶à¦¨ à¦²à¦¿à¦¸à§à¦Ÿ à¦¦à§‡à¦–à¦¾à¦° à¦œà¦¨à§à¦¯
             Route::get('/manage-sections', [FrontendSectionController::class, 'index'])->name('index');
             
-            // সেকশন স্ট্যাটাস আপডেট (AJAX)
+            // à¦¸à§‡à¦•à¦¶à¦¨ à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸ à¦†à¦ªà¦¡à§‡à¦Ÿ (AJAX)
             Route::post('/update-section-status', [FrontendSectionController::class, 'updateStatus'])->name('update.status');
             
-            // সেকশন কন্টেন্ট এডিট করার জন্য (ঐচ্ছিক)
+            // à¦¸à§‡à¦•à¦¶à¦¨ à¦•à¦¨à§à¦Ÿà§‡à¦¨à§à¦Ÿ à¦à¦¡à¦¿à¦Ÿ à¦•à¦°à¦¾à¦° à¦œà¦¨à§à¦¯ (à¦à¦šà§à¦›à¦¿à¦•)
             Route::get('/edit-section/{id}', [FrontendSectionController::class, 'edit'])->name('edit');
             Route::post('/update-section/{id}', [FrontendSectionController::class, 'update'])->name('update');
         });
@@ -209,7 +211,7 @@ Route::domain(config('app.main_domain'))->group(function () {
     Route::middleware(['auth', 'superadmin'])->prefix('super-admin')->name('super.')->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         
-        // Roles & Employee Management (শুধু সুপার এডমিন পারবে)
+        // Roles & Employee Management (à¦¶à§à¦§à§ à¦¸à§à¦ªà¦¾à¦° à¦à¦¡à¦®à¦¿à¦¨ à¦ªà¦¾à¦°à¦¬à§‡)
         Route::middleware(['permission:super.roles.manage'])->group(function () {
             Route::resource('roles', RoleController::class);
             Route::resource('permissions', PermissionController::class);
@@ -253,7 +255,7 @@ Route::domain(config('app.main_domain'))->group(function () {
     });
 
     // --- 3. Representative Portal ---
-    // school.manage permission আছে এমন employee-রা representative হিসেবে কাজ করবেন
+    // school.manage permission à¦†à¦›à§‡ à¦à¦®à¦¨ employee-à¦°à¦¾ representative à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦•à¦¾à¦œ à¦•à¦°à¦¬à§‡à¦¨
     Route::middleware(['auth', 'permission:school.manage'])->prefix('representative')->name('rep.')->group(function () {
         Route::get('/dashboard', [RepresentativeDashboardController::class, 'dashboard'])->name('dashboard');
         Route::get('/my-schools', [RepresentativeDashboardController::class, 'mySchools'])->name('schools.index');
@@ -332,21 +334,21 @@ Route::domain($schoolDomainPattern)
 
             // Protected Routes
             Route::middleware(['auth'])->group(function () {
-                // শিক্ষার্থীর জন্য নির্দিষ্ট রাউট
+                // à¦¶à¦¿à¦•à§à¦·à¦¾à¦°à§à¦¥à§€à¦° à¦œà¦¨à§à¦¯ à¦¨à¦¿à¦°à§à¦¦à¦¿à¦·à§à¦Ÿ à¦°à¦¾à¦‰à¦Ÿ
                 Route::middleware(['is_student'])->group(function () {
-                    // এই রাউটটিই আপনার তৈরি করা studentDashboard মেথডকে কল করবে
+                    // à¦à¦‡ à¦°à¦¾à¦‰à¦Ÿà¦Ÿà¦¿à¦‡ à¦†à¦ªà¦¨à¦¾à¦° à¦¤à§ˆà¦°à¦¿ à¦•à¦°à¦¾ studentDashboard à¦®à§‡à¦¥à¦¡à¦•à§‡ à¦•à¦² à¦•à¦°à¦¬à§‡
                     Route::get('/student/dashboard', [StudentController::class, 'studentDashboard'])
                         ->name('student.dashboard');
                 });
 
-                // শিক্ষকদের জন্য নির্দিষ্ট রাউট
+                // à¦¶à¦¿à¦•à§à¦·à¦•à¦¦à§‡à¦° à¦œà¦¨à§à¦¯ à¦¨à¦¿à¦°à§à¦¦à¦¿à¦·à§à¦Ÿ à¦°à¦¾à¦‰à¦Ÿ
                 Route::middleware(['is_teacher'])->group(function () {
                     Route::get('/teacher/dashboard', [TeacherController::class, 'teacherDashboard'])
                         ->name('teacher.dashboard');
                 });
 
 
-                // বাকি কমন ড্যাশবোর্ড (অ্যাডমিন বা অন্যদের জন্য)
+                // à¦¬à¦¾à¦•à¦¿ à¦•à¦®à¦¨ à¦¡à§à¦¯à¦¾à¦¶à¦¬à§‹à¦°à§à¦¡ (à¦…à§à¦¯à¦¾à¦¡à¦®à¦¿à¦¨ à¦¬à¦¾ à¦…à¦¨à§à¦¯à¦¦à§‡à¦° à¦œà¦¨à§à¦¯)
                 Route::middleware(['is_admin'])->group(function () {
                     Route::get('admin/dashboard', [DashboardController::class, 'index'])
                         ->name('school.dashboard');
@@ -574,14 +576,14 @@ Route::domain($schoolDomainPattern)
 
                 
                 // Lesson Plan
-                // ১. এটি শিক্ষক বা যারা ডায়েরি ম্যানেজ করতে পারেন তাদের জন্য
+                // à§§. à¦à¦Ÿà¦¿ à¦¶à¦¿à¦•à§à¦·à¦• à¦¬à¦¾ à¦¯à¦¾à¦°à¦¾ à¦¡à¦¾à§Ÿà§‡à¦°à¦¿ à¦®à§à¦¯à¦¾à¦¨à§‡à¦œ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à§‡à¦¨ à¦¤à¦¾à¦¦à§‡à¦° à¦œà¦¨à§à¦¯
                 Route::middleware('permission:lesson.manage')->group(function () {
                     Route::get('/get-subjects/{class_id}', [LessonPlanController::class, 'getSubjects'])->name('get.subjects');
                     Route::resource('diary', LessonPlanController::class);
                 });
 
-                // ২. এটি স্টুডেন্ট বা যারা শুধু ডায়েরি দেখতে পাবেন তাদের জন্য
-                // নোট: এটি অবশ্যই lesson.manage গ্রুপের বাইরে আলাদাভাবে থাকবে
+                // à§¨. à¦à¦Ÿà¦¿ à¦¸à§à¦Ÿà§à¦¡à§‡à¦¨à§à¦Ÿ à¦¬à¦¾ à¦¯à¦¾à¦°à¦¾ à¦¶à§à¦§à§ à¦¡à¦¾à§Ÿà§‡à¦°à¦¿ à¦¦à§‡à¦–à¦¤à§‡ à¦ªà¦¾à¦¬à§‡à¦¨ à¦¤à¦¾à¦¦à§‡à¦° à¦œà¦¨à§à¦¯
+                // à¦¨à§‹à¦Ÿ: à¦à¦Ÿà¦¿ à¦…à¦¬à¦¶à§à¦¯à¦‡ lesson.manage à¦—à§à¦°à§à¦ªà§‡à¦° à¦¬à¦¾à¦‡à¦°à§‡ à¦†à¦²à¦¾à¦¦à¦¾à¦­à¦¾à¦¬à§‡ à¦¥à¦¾à¦•à¦¬à§‡
                 Route::middleware('permission:lesson.view')->group(function () {
                     Route::get('diary/view/student', [LessonPlanController::class, 'studentView'])->name('diary.student_view');
                 });

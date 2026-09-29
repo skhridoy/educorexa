@@ -1,4 +1,4 @@
-@php
+﻿@php
     $user = auth()->user();
     $isSuperAdmin = $user->hasRole('super_admin');
     $isFrontendMenuOpen = Request::is('manage/frontend*') || Request::is('super-admin/blogs*') || Request::is('super-admin/blog-categories*');
@@ -293,6 +293,13 @@
                        class="edu-nav-link {{ Request::is('payment-setup') ? 'active' : '' }}">
                         <i data-feather="credit-card"></i>
                         <span>Payment Setup</span>
+                    </a>
+                </li>
+                <li class="edu-nav-item">
+                    <a href="{{ route('settings.domain') }}"
+                       class="edu-nav-link {{ Request::is('domain-setup') ? 'active' : '' }}">
+                        <i data-feather="server"></i>
+                        <span>Domain &amp; Server</span>
                     </a>
                 </li>
             @endcan

@@ -28,19 +28,32 @@ class AppServiceProvider extends ServiceProvider
         Route::model('school', School::class);
         Paginator::useBootstrap();
 
-        // ডাইনামিক গ্লোবাল ইমেইল কনফিগারেশন সেটআপ
+        // ডাইনামিক গ্লোবাল ইমেইল কনফিগারেশন সেটআপ + Server IP / Main Domain লোড
         try {
             if (Schema::hasTable('site_settings')) {
                 $setting = SiteSetting::first();
-                if ($setting && $setting->mail_host) {
-                    \Illuminate\Support\Facades\Config::set('mail.default', $setting->mail_mailer ?? 'smtp');
-                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.host', $setting->mail_host);
-                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.port', $setting->mail_port);
-                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.username', $setting->mail_username);
-                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.password', $setting->mail_password);
-                    \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.encryption', $setting->mail_encryption);
-                    \Illuminate\Support\Facades\Config::set('mail.from.address', $setting->mail_from_address);
-                    \Illuminate\Support\Facades\Config::set('mail.from.name', $setting->mail_from_name);
+                if ($setting) {
+                    // Mail config
+                    if ($setting->mail_host) {
+                        \Illuminate\Support\Facades\Config::set('mail.default', $setting->mail_mailer ?? 'smtp');
+                        \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.host', $setting->mail_host);
+                        \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.port', $setting->mail_port);
+                        \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.username', $setting->mail_username);
+                        \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.password', $setting->mail_password);
+                        \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.encryption', $setting->mail_encryption);
+                        \Illuminate\Support\Facades\Config::set('mail.from.address', $setting->mail_from_address);
+                        \Illuminate\Support\Facades\Config::set('mail.from.name', $setting->mail_from_name);
+                    }
+
+                    // Server IP (DB > .env fallback)
+                    if (!empty($setting->server_ip)) {
+                        \Illuminate\Support\Facades\Config::set('app.server_ip', $setting->server_ip);
+                    }
+
+                    // Main Domain (DB > .env fallback)
+                    if (!empty($setting->main_domain)) {
+                        \Illuminate\Support\Facades\Config::set('app.main_domain', $setting->main_domain);
+                    }
                 }
             }
         } catch (\Exception $e) {
