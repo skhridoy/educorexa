@@ -64,7 +64,12 @@ class IdentifySchool
                 })->first();
 
                 if ($pendingOrOtherSchool) {
-                    if ($pendingOrOtherSchool->custom_domain_status === 'pending') {
+                    if ($pendingOrOtherSchool->custom_domain_status === 'disabled') {
+                        // Disabled হলে সরাসরি সাবডোমেইনে 301 Redirect করুন
+                        $scheme = $request->isSecure() ? 'https://' : 'http://';
+                        $subdomainUrl = $scheme . $pendingOrOtherSchool->slug . '.' . $bareMainDomain . $request->getRequestUri();
+                        return redirect()->away($subdomainUrl, 301);
+                    } elseif ($pendingOrOtherSchool->custom_domain_status === 'pending') {
                         return response()->view('school.domain_status', [
                             'school'  => $pendingOrOtherSchool,
                             'status'  => 'pending',
@@ -76,22 +81,14 @@ class IdentifySchool
                             'status'  => 'rejected',
                             'message' => 'Custom domain request was rejected: ' . ($pendingOrOtherSchool->custom_domain_reject_reason ?? 'Please contact administration.')
                         ], 503);
-                    } elseif ($pendingOrOtherSchool->custom_domain_status === 'disabled') {
-                        return response()->view('school.domain_status', [
-                            'school'  => $pendingOrOtherSchool,
-                            'status'  => 'disabled',
-                            'message' => 'This custom domain is currently disabled.'
-                        ], 503);
                     }
                 }
             } else {
-                // মেয়াদোত্তীর্ণ চেক
+                // মেয়াদোত্তীর্ণ চেক — মেয়াদ শেষ হলেও সাবডোমেইনে Redirect করুন
                 if ($school->isCustomDomainExpired()) {
-                    return response()->view('school.domain_status', [
-                        'school'  => $school,
-                        'status'  => 'disabled',
-                        'message' => 'Custom domain annual validity has expired. Please renew the server fee to reactivate.'
-                    ], 503);
+                    $scheme = $request->isSecure() ? 'https://' : 'http://';
+                    $subdomainUrl = $scheme . $school->slug . '.' . $bareMainDomain . $request->getRequestUri();
+                    return redirect()->away($subdomainUrl, 302);
                 }
             }
         }

@@ -36,6 +36,7 @@ class CustomDomainController extends Controller
             'pending'  => School::where('custom_domain_status', 'pending')->count(),
             'verified' => School::where('custom_domain_status', 'verified')->count(),
             'rejected' => School::where('custom_domain_status', 'rejected')->count(),
+            'disabled' => School::where('custom_domain_status', 'disabled')->count(),
         ];
 
         return view('super.custom-domain.index', compact('schools', 'stats'));
@@ -46,14 +47,20 @@ class CustomDomainController extends Controller
      */
     public function approve(Request $request, School $school)
     {
-        if ($school->custom_domain_status !== 'pending') {
-            return back()->with('error', 'শুধুমাত্র Pending রিকোয়েস্ট Approve করা যাবে।');
+        if (!in_array($school->custom_domain_status, ['pending', 'disabled'])) {
+            return back()->with('error', 'শুধুমাত্র Pending বা Disabled রিকোয়েস্ট Approve/Enable করা যাবে।');
         }
+
+        // If re-enabling a disabled domain, preserve the old expiry if still in the future
+        $isReEnable = $school->custom_domain_status === 'disabled';
+        $expiresAt = ($isReEnable && $school->custom_domain_expires_at && $school->custom_domain_expires_at->isFuture())
+            ? $school->custom_domain_expires_at
+            : now()->addYear();
 
         $school->update([
             'custom_domain_status'         => 'verified',
             'custom_domain_verified_at'    => now(),
-            'custom_domain_expires_at'     => now()->addYear(),
+            'custom_domain_expires_at'     => $expiresAt,
             'custom_domain_payment_status' => 'paid',
             'custom_domain_ssl_status'     => 'active',
             'custom_domain_reject_reason'  => null,
@@ -65,7 +72,8 @@ class CustomDomainController extends Controller
             $schoolAdmin->notify(new \App\Notifications\CustomDomainStatusChanged($school, 'verified'));
         }
 
-        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন সফলভাবে Approve করা হয়েছে (মেয়াদ: ' . now()->addYear()->format('d M, Y') . ' পর্যন্ত)।');
+        $label = $isReEnable ? 'পুনরায় সক্রিয়' : 'Approve';
+        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন সফলভাবে ' . $label . ' করা হয়েছে (মেয়াদ: ' . $expiresAt->format('d M, Y') . ' পর্যন্ত)।');
     }
 
     /**
@@ -116,7 +124,7 @@ class CustomDomainController extends Controller
     }
 
     /**
-     * Verified Domain Disable করো
+     * Verified Domain Disable করো (সাবডোমেইনে ফলব্যাক হবে)
      */
     public function disable(School $school)
     {
@@ -127,9 +135,46 @@ class CustomDomainController extends Controller
         $school->update([
             'custom_domain_status'     => 'disabled',
             'custom_domain_ssl_status' => null,
+            // expiry ধরে রাখুন যাতে পরে re-enable করলে পুরনো মেয়াদ বজায় থাকে
         ]);
 
-        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন Disable করা হয়েছে।');
+        // School Admin-কে নোটিফিকেশন
+        $schoolAdmin = $school->admin;
+        if ($schoolAdmin) {
+            $schoolAdmin->notify(new \App\Notifications\CustomDomainStatusChanged($school, 'disabled'));
+        }
+
+        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন Disable করা হয়েছে। স্কুল এখন সাবডোমেইন (' . $school->slug . '.' . config('app.main_domain', 'educorexa.com') . ') থেকে অ্যাক্সেসযোগ্য।');
+    }
+
+    /**
+     * Disabled Domain পুনরায় Enable করো
+     */
+    public function enable(School $school)
+    {
+        if ($school->custom_domain_status !== 'disabled') {
+            return back()->with('error', 'শুধুমাত্র Disabled ডোমেইন Enable করা যাবে।');
+        }
+
+        // পুরানো মেয়াদ ভবিষ্যতে থাকলে সেটা রাখুন, অন্যথায় ১ বছর বাড়ান
+        $expiresAt = ($school->custom_domain_expires_at && $school->custom_domain_expires_at->isFuture())
+            ? $school->custom_domain_expires_at
+            : now()->addYear();
+
+        $school->update([
+            'custom_domain_status'      => 'verified',
+            'custom_domain_ssl_status'  => 'active',
+            'custom_domain_expires_at'  => $expiresAt,
+            'custom_domain_verified_at' => now(),
+        ]);
+
+        // School Admin-কে নোটিফিকেশন
+        $schoolAdmin = $school->admin;
+        if ($schoolAdmin) {
+            $schoolAdmin->notify(new \App\Notifications\CustomDomainStatusChanged($school, 'verified'));
+        }
+
+        return back()->with('success', '"' . $school->custom_domain . '" ডোমেইন পুনরায় সক্রিয় করা হয়েছে (মেয়াদ: ' . $expiresAt->format('d M, Y') . ' পর্যন্ত)।');
     }
 
     /**

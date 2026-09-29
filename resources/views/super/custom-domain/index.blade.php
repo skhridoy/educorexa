@@ -120,7 +120,7 @@
 
     {{-- Stats Cards --}}
     <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-xl-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="cd-stat-card">
                 <div class="cd-stat-icon" style="background:#fffbeb; color:#d97706;">
                     <i class="fa-solid fa-clock-rotate-left"></i>
@@ -131,18 +131,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-xl-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="cd-stat-card">
                 <div class="cd-stat-icon" style="background:#ecfdf5; color:#059669;">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div>
                     <div class="cd-stat-val">{{ number_format($stats['verified']) }}</div>
-                    <div class="cd-stat-lbl">Active & Verified</div>
+                    <div class="cd-stat-lbl">Active &amp; Verified</div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-xl-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="cd-stat-card">
                 <div class="cd-stat-icon" style="background:#fef2f2; color:#dc2626;">
                     <i class="fa-solid fa-circle-xmark"></i>
@@ -150,6 +150,17 @@
                 <div>
                     <div class="cd-stat-val">{{ number_format($stats['rejected']) }}</div>
                     <div class="cd-stat-lbl">Rejected Requests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="cd-stat-card">
+                <div class="cd-stat-icon" style="background:#fff7ed; color:#ea580c;">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+                <div>
+                    <div class="cd-stat-val">{{ number_format($stats['disabled']) }}</div>
+                    <div class="cd-stat-lbl">Disabled</div>
                 </div>
             </div>
         </div>
@@ -370,10 +381,10 @@
                                 @endif
 
                                 @if($school->custom_domain_status === 'disabled')
-                                    {{-- Re-approve --}}
-                                    <form action="{{ route('super.custom-domain.approve', $school->id) }}" method="POST" onsubmit="return confirm('এই ডোমেইনটি পুনরায় সক্রিয় করতে চান?');">
+                                    {{-- Re-enable Dedicated Route --}}
+                                    <form action="{{ route('super.custom-domain.enable', $school->id) }}" method="POST" onsubmit="return confirm('এই ডোমেইনটি পুনরায় সক্রিয় করতে চান? স্কুল আবার কাস্টম ডোমেইন থেকে অ্যাক্সেসযোগ্য হবে।');">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Reactivate Domain">
+                                        <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Reactivate Custom Domain">
                                             <i class="fa-solid fa-rotate-right me-1"></i> Enable
                                         </button>
                                     </form>
