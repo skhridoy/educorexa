@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class DynamicSessionDomain
 {
@@ -26,31 +27,24 @@ class DynamicSessionDomain
             $mainDomain = 'educorexa.com';
         }
 
-        $bareHost = preg_replace('/^www\./i', '', $host);
-        $bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
+        /*
+         * A parent-domain cookie is sent to every subdomain. With the same
+         * cookie name as a tenant's host-only cookie, Laravel can receive two
+         * session IDs and load the wrong session after tenant login.
+         */
+        $baseCookie = env('SESSION_COOKIE', Str::slug((string) env('APP_NAME', 'laravel')) . '-session');
 
-        // ১. যদি এটি একদম মেইন ডোমেইন হয় (যেমন educorexa.com বা www.educorexa.com)
-        if ($bareHost === $bareMainDomain) {
-            config(['session.domain' => $bareMainDomain]);
-        } 
-        // ২. যদি এটি সাবডোমেইন হয় (যেমন school1.educorexa.com)
-        elseif (str_ends_with($bareHost, '.' . $bareMainDomain)) {
-            // সাবডোমেইনের সেশন কুকি ওই নির্দিষ্ট সাবডোমেইনে সীমাবদ্ধ রাখতে $host বা null দিন
-            // এতে মেইন ডোমেইন ও সাবডোমেইনের সেশন কনফ্লিক্ট করবে না এবং 404 দেখাবে না
-            config(['session.domain' => $host]);
-        } 
-        // ৩. যদি এটি কাস্টম ডোমেইন হয় (যেমন myschool.edu.bd)
-        else {
-            config(['session.domain' => null]);
+        config([
+            'session.domain' => null,
+            'session.cookie' => $baseCookie . '-' . Str::slug($host),
+        ]);
 
-            // Also append custom host to sanctum stateful domains if sanctum is used
-            $stateful = config('sanctum.stateful', []);
-            if (is_array($stateful) && !in_array($host, $stateful)) {
-                $stateful[] = $host;
-                config(['sanctum.sanctum.stateful' => $stateful]); // সঠিক কনফিগ কী বা ঠিক রাখা
-            }
+        // Include a custom host when Sanctum's cookie-based API auth is used.
+        $stateful = config('sanctum.stateful', []);
+        if (is_array($stateful) && !in_array($host, $stateful, true)) {
+            $stateful[] = $host;
+            config(['sanctum.stateful' => $stateful]);
         }
-
         return $next($request);
     }
 }
