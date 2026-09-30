@@ -112,6 +112,11 @@ class IdentifySchool
         view()->share('currentSchool', $school);
 
         // ৭. রিকোয়েস্টে স্কুল আইডি ঢুকিয়ে দিন
+        // Domain routes capture the full host; controllers receive the school slug.
+        if ($route = $request->route()) {
+            $route->setParameter('tenant', $school->slug);
+        }
+
         $request->merge(['school_id' => $school->id]);
 
         // ৮. যদি ইউজার লগইন করা থাকে এবং school_id না থাকে (যেমন সুপার এডমিন)
