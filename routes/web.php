@@ -1,5 +1,4 @@
-<?php
-
+<?php 
 use Illuminate\Support\Facades\Route;
 use App\Models\School;
 use App\Http\Controllers\{
@@ -273,50 +272,31 @@ Route::domain(config('app.main_domain'))->group(function () {
 | Tenant (School) Routes
 |--------------------------------------------------------------------------
 */
-// School Routes (Supports Subdomains and Custom Domains)
-$reqHost = request()->getHost();
-$mainDomain = config('app.main_domain', 'educorexa.com');
-if ($mainDomain === 'schoolerp.test' || empty($mainDomain)) {
-    $mainDomain = 'educorexa.com';
-}
-$bareReqHost = preg_replace('/^www\./i', '', $reqHost);
-$bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
-
-$schoolDomainPattern = (!empty($bareReqHost) && $bareReqHost !== $bareMainDomain && !str_ends_with($bareReqHost, '.' . $bareMainDomain))
-    ? '{tenant}'
-    : '{tenant}.' . $mainDomain;
-
-if (app()->runningInConsole()) {
-    $schoolDomainPattern = '{tenant}';
-}
-
-Route::domain($schoolDomainPattern)
-    ->where(['tenant' => '.*'])
+// সব সাবডোমেইন এবং কাস্টম ডোমেইনের জন্য ডাইনামিক ডোমেইন প্যাটার্ন
+Route::domain('{tenant}')
+    ->where(['tenant' => '.+'])
     ->middleware(['identify.school'])
     ->scopeBindings()
     ->group(function () {
 
-            // Language Switcher for School Tenant
-            Route::get('/set-locale/{lang}', function ($tenant, $lang) {
-                if (in_array($lang, ['en', 'bn'])) {
-                    session(['locale' => $lang]);
-                    cookie()->queue(cookie()->forever('locale', $lang));
-                }
-                return redirect()->back();
-            })->name('school.set.locale');
+        // Language Switcher for School Tenant
+        Route::get('/set-locale/{lang}', function ($tenant, $lang) {
+            if (in_array($lang, ['en', 'bn'])) {
+                session(['locale' => $lang]);
+                cookie()->queue(cookie()->forever('locale', $lang));
+            }
+            return redirect()->back();
+        })->name('school.set.locale');
 
-            Route::get('exam-routine/subjects-by-class/{classId}', [ExamRoutineController::class, 'subjectsByClass'])->name('exam.routine.subjects.by.class');
-            Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
-            Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('school.locations.divisions');
-            Route::get('/locations/districts/{division}', [SchoolRegisterController::class, 'districts'])->name('school.locations.districts');
-            Route::get('/locations/upazilas/{district}', [SchoolRegisterController::class, 'upazilas'])->name('school.locations.upazilas');
-            // Duplicate DELETE route removed (handled in auth middleware group)
+        Route::get('exam-routine/subjects-by-class/{classId}', [ExamRoutineController::class, 'subjectsByClass'])->name('exam.routine.subjects.by.class');
+        Route::get('/', [SchoolWebsiteController::class, 'home'])->name('school.home');
+        Route::get('/locations/divisions', [SchoolRegisterController::class, 'divisions'])->name('school.locations.divisions');
+        Route::get('/locations/districts/{division}', [SchoolRegisterController::class, 'districts'])->name('school.locations.districts');
+        Route::get('/locations/upazilas/{district}', [SchoolRegisterController::class, 'upazilas'])->name('school.locations.upazilas');
 
-            // Login Form
-            Route::get('/login', [AuthController::class, 'loginForm'])
-                ->name('school.login.form');
-
-            Route::post('/login', [AuthController::class, 'login'])->name('school.login');
+        // Login Form
+        Route::get('/login', [AuthController::class, 'loginForm'])->name('school.login.form');
+        Route::post('/login', [AuthController::class, 'login'])->name('school.login');
 
             // Password Reset Routes
             Route::get('/forgot-password', [App\Http\Controllers\Auth\SchoolPasswordResetController::class, 'showForgotPasswordForm'])->name('school.password.request');

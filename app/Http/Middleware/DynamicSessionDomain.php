@@ -29,23 +29,25 @@ class DynamicSessionDomain
         $bareHost = preg_replace('/^www\./i', '', $host);
         $bareMainDomain = preg_replace('/^www\./i', '', $mainDomain);
 
-        // If it's the main domain or a subdomain of the main domain:
-        if ($bareHost === $bareMainDomain || str_ends_with($bareHost, '.' . $bareMainDomain)) {
-            // Use wildcard main domain so sessions can persist across subdomains if configured
-            $configuredDomain = config('session.domain');
-            if (empty($configuredDomain) || str_contains($configuredDomain, $bareMainDomain)) {
-                config(['session.domain' => '.' . $bareMainDomain]);
-            }
-        } else {
-            // It's a custom domain (e.g. myschool.edu.bd or www.myschool.edu.bd)
-            // Session cookie domain MUST be null so browser scopes the cookie to the exact custom host
+        // ১. যদি এটি একদম মেইন ডোমেইন হয় (যেমন educorexa.com বা www.educorexa.com)
+        if ($bareHost === $bareMainDomain) {
+            config(['session.domain' => $bareMainDomain]);
+        } 
+        // ২. যদি এটি সাবডোমেইন হয় (যেমন school1.educorexa.com)
+        elseif (str_ends_with($bareHost, '.' . $bareMainDomain)) {
+            // সাবডোমেইনের সেশন কুকি ওই নির্দিষ্ট সাবডোমেইনে সীমাবদ্ধ রাখতে $host বা null দিন
+            // এতে মেইন ডোমেইন ও সাবডোমেইনের সেশন কনফ্লিক্ট করবে না এবং 404 দেখাবে না
+            config(['session.domain' => $host]);
+        } 
+        // ৩. যদি এটি কাস্টম ডোমেইন হয় (যেমন myschool.edu.bd)
+        else {
             config(['session.domain' => null]);
 
             // Also append custom host to sanctum stateful domains if sanctum is used
             $stateful = config('sanctum.stateful', []);
             if (is_array($stateful) && !in_array($host, $stateful)) {
                 $stateful[] = $host;
-                config(['sanctum.stateful' => $stateful]);
+                config(['sanctum.sanctum.stateful' => $stateful]); // সঠিক কনফিগ কী বা ঠিক রাখা
             }
         }
 
