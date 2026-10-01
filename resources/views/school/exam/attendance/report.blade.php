@@ -26,9 +26,13 @@
         .status { width: 18%; }
         .present { color: #166534; font-weight: bold; }
         .absent { color: #b91c1c; font-weight: bold; }
+        .pagination { display: flex; gap: 5px; justify-content: center; list-style: none; margin: 14px 0 0; padding: 0; }
+        .pagination a, .pagination span { border: 1px solid #cbd5e1; color: #172554; display: block; padding: 5px 9px; text-decoration: none; }
+        .pagination .active span { background: #172554; color: #fff; }
         .signature-row td { border: 0; padding-top: 42px; text-align: center; }
         .signature-line { border-top: 1px solid #111; display: block; margin: 0 20px 4px; }
         @media print { .no-print { display: none; } }
+        @if(!empty($isPdf)) .no-print { display: none !important; } @endif
     </style>
 </head>
 <body>
@@ -70,7 +74,7 @@
         @forelse($students as $index => $student)
             @php $isPresent = ($records[$student->id]->status ?? null) === 'present'; @endphp
             <tr>
-                <td class="sl">{{ $index + 1 }}</td>
+                <td class="sl">{{ $students->firstItem() + $index }}</td>
                 <td>{{ $student->student_id }}</td>
                 <td class="roll">{{ $student->roll }}</td>
                 <td>{{ $student->name }}</td>
@@ -81,6 +85,9 @@
         @endforelse
         </tbody>
     </table>
+    @if($students->hasPages())
+        <div class="no-print">{{ $students->links() }}</div>
+    @endif
 
     <table class="signature-row">
         <tr>

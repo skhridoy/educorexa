@@ -276,9 +276,6 @@
                         @if($hasFeature('attendance.manage') || $hasFeature('attendance.report'))
                             <li class="edu-sub-item"><a href="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/report*') ? 'active' : '' }}">{{ __('Attendance Report') }}</a></li>
                         @endif
-                        @if($hasFeature('exam.manage'))
-                            <li class="edu-sub-item"><a href="{{ route('exam.attendance.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-attendance*') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-check me-1 text-success"></i> {{ __('Exam Attendance') }}</a></li>
-                        @endif
                         @if($hasFeature('holiday.manage'))
                             <li class="edu-sub-item"><a href="{{ route('holidays.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/holidays*') ? 'active' : '' }}">{{ __('Holidays Setup') }}</a></li>
                         @elseif($isPremiumLocked('holiday.manage'))
@@ -292,7 +289,7 @@
             {{-- 5. Exams --}}
             @php
                 $examPerms = ['exam.manage', 'mark.manage'];
-                $examActive = Request::is('*/exams*') || Request::is('*/exam-routine*') || Request::is('*/admit-card*') || Request::is('*/marks*') || Request::is('*/result-search*');
+                $examActive = Request::is('*/exams*') || Request::is('*/exam-routine*') || Request::is('*/admit-card*') || Request::is('*/marks*') || Request::is('*/result-search*') || Request::is('*/exam-status');
             @endphp
             @if($hasGroupAccess($examPerms))
             <li class="edu-nav-item">
@@ -305,6 +302,7 @@
                         @if($hasFeature('exam.manage'))
                             <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') && !Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Exams List') }}</a></li>
                             <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">{{ __('Exams Routine') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exam.status.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-status') ? 'active' : '' }}"><i class="fa-solid fa-chart-line me-1 text-primary"></i> {{ __('Exam Status') }}</a></li>
                             @if($hasFeature('exam.admit_card'))
                                 <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Admit Cards') }}</a></li>
                             @elseif($isPremiumLocked('exam.admit_card'))
@@ -322,6 +320,14 @@
                         @endif
                     </ul>
                 </div>
+            </li>
+            @endif
+
+            @if($hasGroupAccess(['exam.manage', 'attendance.manage']))
+            <li class="edu-nav-item">
+                <a href="{{ route('exam.attendance.index', ['tenant' => $tenant]) }}" class="edu-nav-link {{ Request::is('*/exam-attendance/scan*') ? 'active' : '' }}">
+                    <i data-feather="check-square"></i> <span>{{ __('Exam Attendance') }}</span>
+                </a>
             </li>
             @endif
 

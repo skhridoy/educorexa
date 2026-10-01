@@ -45,8 +45,13 @@ class CheckSchoolPackage
                 ->with('error', 'Your trial or subscription has ended. Please complete payment to continue.');
         }
 
-        // Check if the school's package has the required permission
-        if (!$school->hasPackagePermission($permission)) {
+        // Middleware arguments may contain alternatives, e.g. exam.manage|attendance.manage.
+        $permissions = array_filter(explode('|', $permission));
+        $hasPackagePermission = collect($permissions)->contains(
+            fn ($packagePermission) => $school->hasPackagePermission($packagePermission)
+        );
+
+        if (!$hasPackagePermission) {
             if ($request->ajax()) {
                 return response()->json([
                     'message' => 'Your current package does not support this feature. Please upgrade.'

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Classes;
 use App\Models\Exam;
 use App\Models\ExamAttendance;
@@ -9,6 +10,7 @@ use App\Models\ExamRoutine;
 use App\Models\School;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ExamAttendanceController extends Controller
 {
@@ -23,8 +25,64 @@ class ExamAttendanceController extends Controller
         $examId = $request->integer('exam_id');
         $classId = $request->integer('class_id');
         $date = $request->input('date');
+        $isAttendanceWorkspace = $request->routeIs('exam.attendance.index') || ($examId && $classId);
 
         $exams = Exam::with('categories')->where('school_id', $schoolId)->orderByDesc('id')->get();
+        $overviewRoutines = ExamRoutine::with(['class', 'subject'])
+            ->where('school_id', $schoolId)
+            ->whereIn('exam_id', $exams->pluck('id'))
+            ->orderBy('exam_date')
+            ->get()
+            ->groupBy('exam_id');
+        $examOverview = $exams->map(function ($exam) use ($overviewRoutines) {
+            $examRoutines = $overviewRoutines->get($exam->id, collect());
+            $start = $exam->start_date ? Carbon::parse($exam->start_date) : $examRoutines->min('exam_date');
+            $end = $exam->end_date ? Carbon::parse($exam->end_date) : $examRoutines->max('exam_date');
+            $today = Carbon::today();
+
+            return (object) [
+                'exam' => $exam,
+                'routines' => $examRoutines,
+                'start' => $start ? Carbon::parse($start) : null,
+                'end' => $end ? Carbon::parse($end) : null,
+                'status' => !$start || $today->lt(Carbon::parse($start))
+                    ? 'upcoming'
+                    : ($end && $today->gt(Carbon::parse($end)) ? 'completed' : 'ongoing'),
+                'classCount' => $examRoutines->pluck('class_id')->filter()->unique()->count(),
+                'subjectCount' => $examRoutines->pluck('subject_id')->filter()->unique()->count(),
+                'firstClassId' => $examRoutines->first()?->class_id,
+                'firstDate' => optional($examRoutines->first()?->exam_date)->format('Y-m-d'),
+            ];
+        });
+        $examStatuses = new LengthAwarePaginator(
+            $examOverview->forPage($request->integer('exam_page', 1), 6)->values(),
+            $examOverview->count(),
+            6,
+            $request->integer('exam_page', 1),
+            ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'exam_page']
+        );
+        $routineStatuses = $examOverview
+            ->flatMap(function ($item) {
+                return $item->routines->map(function ($routine) use ($item) {
+                    $routineDate = $routine->exam_date ? Carbon::parse($routine->exam_date) : null;
+
+                    return (object) [
+                        'examName' => $item->exam->name,
+                        'subjectName' => $routine->subject?->name ?? 'Subject not set',
+                        'className' => $routine->class?->name ?? 'Class not set',
+                        'date' => $routineDate,
+                        'status' => $routineDate?->isToday() ? 'ongoing' : 'upcoming',
+                    ];
+                });
+            })->filter(fn ($routine) => !$routine->date || !$routine->date->isBefore(Carbon::today()))
+            ->sortBy(fn ($routine) => $routine->date?->timestamp ?? PHP_INT_MAX)->values();
+        $routineStatuses = new LengthAwarePaginator(
+            $routineStatuses->forPage($request->integer('routine_page', 1), 6)->values(),
+            $routineStatuses->count(),
+            6,
+            $request->integer('routine_page', 1),
+            ['path' => $request->url(), 'query' => $request->query(), 'pageName' => 'routine_page']
+        );
         $selectedExam = $exams->firstWhere('id', $examId);
         $classesQuery = Classes::where('school_id', $schoolId);
         if ($selectedExam) {
@@ -58,7 +116,8 @@ class ExamAttendanceController extends Controller
                 ->orderBy('roll')
                 ->get();
 
-            $records = ExamAttendance::where('school_id', $schoolId)
+            $records = ExamAttendance::with(['student.section'])
+                ->where('school_id', $schoolId)
                 ->where('exam_id', $examId)
                 ->where('class_id', $classId)
                 ->whereDate('attendance_date', $date)
@@ -67,7 +126,7 @@ class ExamAttendanceController extends Controller
         }
 
         return view('school.exam.attendance.index', compact(
-            'exams', 'classes', 'routines', 'students', 'records', 'examId', 'classId', 'date', 'tenant'
+            'exams', 'examOverview', 'examStatuses', 'routineStatuses', 'classes', 'routines', 'students', 'records', 'examId', 'classId', 'date', 'tenant', 'isAttendanceWorkspace'
         ));
     }
 
@@ -146,14 +205,15 @@ class ExamAttendanceController extends Controller
             'already_marked' => !$record->wasRecentlyCreated,
             'message' => $record->wasRecentlyCreated ? 'Exam attendance recorded.' : 'Attendance already recorded.',
             'present' => $present,
-            'student' => [
-                'id' => $student->id,
-                'student_id' => $student->student_id,
-                'name' => $student->name,
-                'roll' => $student->roll,
-                'section' => $student->section?->name,
-                'time' => optional($record->scanned_at)->format('h:i A'),
-            ],
+                'student' => [
+                    'id' => $student->id,
+                    'student_id' => $student->student_id,
+                    'name' => $student->name,
+                    'roll' => $student->roll,
+                    'section' => $student->section?->name,
+                    'photo' => $student->photo ? asset($student->photo) : asset('assets/images/profile.webp'),
+                    'time' => optional($record->scanned_at)->format('h:i A'),
+                ],
         ]);
     }
 
@@ -184,6 +244,25 @@ class ExamAttendanceController extends Controller
 
     public function attendanceReport($tenant, Request $request)
     {
+        return view('school.exam.attendance.report', $this->attendanceReportData($request));
+    }
+
+    public function downloadAttendanceReport($tenant, Request $request)
+    {
+        $data = $this->attendanceReportData($request);
+        $data['isPdf'] = true;
+        $fileName = 'exam-attendance-report-'
+            . \Illuminate\Support\Str::slug($data['exam']->name)
+            . '-' . $data['date']->format('Y-m-d') . '.pdf';
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('school.exam.attendance.report', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption(['isRemoteEnabled' => true, 'isPhpEnabled' => true])
+            ->download($fileName);
+    }
+
+    private function attendanceReportData(Request $request): array
+    {
         $schoolId = $this->schoolId();
         $schoolInfo = School::findOrFail($schoolId);
         $exam = Exam::where('school_id', $schoolId)->findOrFail($request->integer('exam_id'));
@@ -201,7 +280,8 @@ class ExamAttendanceController extends Controller
         $students = $studentsQuery
             ->orderBy('class_id')
             ->orderBy('roll')
-            ->get();
+            ->paginate(25)
+            ->withQueryString();
 
         $records = ExamAttendance::where('school_id', $schoolId)
             ->where('exam_id', $exam->id)
@@ -214,9 +294,7 @@ class ExamAttendanceController extends Controller
             ? Classes::where('school_id', $schoolId)->find($classId)
             : null;
 
-        return view('school.exam.attendance.report', compact(
-            'schoolInfo', 'exam', 'class', 'date', 'students', 'records'
-        ));
+        return compact('schoolInfo', 'exam', 'class', 'date', 'students', 'records');
     }
 
     private function sheetData(Request $request): array

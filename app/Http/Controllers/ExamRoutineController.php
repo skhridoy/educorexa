@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\AcademicYear;
 use App\Models\Classes;
 use App\Models\Exam;
@@ -42,7 +43,7 @@ class ExamRoutineController extends Controller
         $classes = $classesQuery->orderBy('name')->get();
 
         // Exams query (filtered by year and category if provided)
-        $examsQuery = Exam::where('school_id', $schoolId);
+        $examsQuery = Exam::with('categories')->where('school_id', $schoolId);
         if ($selectedYearId) {
             $examsQuery->where('year_id', $selectedYearId);
         }
@@ -90,6 +91,42 @@ class ExamRoutineController extends Controller
                 ->groupBy('class_id');
         }
 
+        $routineDashboardRows = ExamRoutine::where('school_id', $schoolId)
+            ->whereIn('exam_id', $exams->pluck('id'))
+            ->with('class')
+            ->get();
+        $today = Carbon::today();
+        $dashboardExams = $exams->map(function ($exam) use ($routineDashboardRows, $today) {
+            $examRoutines = $routineDashboardRows->where('exam_id', $exam->id);
+            $start = $exam->start_date ? Carbon::parse($exam->start_date) : ($examRoutines->min('exam_date') ? Carbon::parse($examRoutines->min('exam_date')) : null);
+            $end = $exam->end_date ? Carbon::parse($exam->end_date) : ($examRoutines->max('exam_date') ? Carbon::parse($examRoutines->max('exam_date')) : null);
+            $status = !$start || $today->lt($start) ? 'upcoming' : ($end && $today->gt($end) ? 'completed' : 'ongoing');
+
+            return (object) compact('exam', 'start', 'end', 'status');
+        });
+        $featuredExamSummary = $dashboardExams->whereIn('status', ['ongoing', 'upcoming'])
+            ->sortBy(fn ($item) => $item->status === 'ongoing' ? 0 : 1)
+            ->sortBy(fn ($item) => $item->start?->timestamp ?? PHP_INT_MAX)
+            ->first();
+        $featuredClassRoutineStatus = collect();
+        if ($featuredExamSummary) {
+            $featuredCategoryIds = $featuredExamSummary->exam->categories->pluck('id')->filter();
+            $featuredClassesQuery = Classes::where('school_id', $schoolId);
+            if ($featuredCategoryIds->isNotEmpty()) {
+                $featuredClassesQuery->whereIn('school_category_id', $featuredCategoryIds);
+            }
+            $featuredClasses = $featuredClassesQuery->orderBy('name')->get();
+            $featuredRoutines = $routineDashboardRows->where('exam_id', $featuredExamSummary->exam->id)->groupBy('class_id');
+            $featuredClassRoutineStatus = $featuredClasses->map(function ($class) use ($featuredRoutines) {
+                $classRoutines = $featuredRoutines->get($class->id, collect());
+                return (object) [
+                    'class' => $class,
+                    'routineCount' => $classRoutines->count(),
+                    'hasRoutine' => $classRoutines->isNotEmpty(),
+                ];
+            });
+        }
+
         return view('school.exam.exam_routine', compact(
             'years',
             'categories',
@@ -105,7 +142,9 @@ class ExamRoutineController extends Controller
             'selectedExam',
             'selectedClass',
             'classSubjects',
-            'classRoutinesStatus'
+            'classRoutinesStatus',
+            'featuredExamSummary',
+            'featuredClassRoutineStatus'
         ));
     }
 
@@ -282,4 +321,3 @@ class ExamRoutineController extends Controller
         return back()->with('error', 'কোনো রুটিন চিহ্নিত করা যায়নি।');
     }
 }
-

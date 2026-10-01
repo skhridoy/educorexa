@@ -144,6 +144,32 @@
         border-color: #4f46e5;
         box-shadow: 0 4px 12px rgba(79,70,229,0.25);
     }
+    .routine-dashboard {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(15,23,42,0.05);
+    }
+    .routine-dashboard-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+    .routine-class-status {
+        height: 100%;
+        padding: 14px 16px;
+        border: 1px solid #e8edf5;
+        border-radius: 12px;
+        background: #fbfdff;
+    }
+    .routine-class-status.ready { border-left: 4px solid #16a34a; }
+    .routine-class-status.pending { border-left: 4px solid #f59e0b; }
+    .routine-status-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .35px; }
 </style>
 @endsection
 
@@ -283,6 +309,44 @@
                 </div>
             </form>
         </div>
+
+        @if($featuredExamSummary)
+            <div class="routine-dashboard">
+                <div class="routine-dashboard-head">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-chart-column text-primary me-2"></i>{{ __('Routine Dashboard') }}</h5>
+                        <p class="text-muted small mb-0">{{ __('Class-wise routine status for the current or next examination') }}</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge {{ $featuredExamSummary->status === 'ongoing' ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary' }} text-uppercase">{{ __(ucfirst($featuredExamSummary->status)) }}</span>
+                        <span class="fw-bold text-dark">{{ $featuredExamSummary->exam->name }}</span>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    @forelse($featuredClassRoutineStatus as $classStatus)
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="routine-class-status {{ $classStatus->hasRoutine ? 'ready' : 'pending' }}">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="fw-bold text-dark">{{ $classStatus->class->name }}</div>
+                                    <span class="badge {{ $classStatus->hasRoutine ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} routine-status-label">
+                                        {{ $classStatus->hasRoutine ? __('Routine Ready') : __('Routine Not Set') }}
+                                    </span>
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    @if($classStatus->hasRoutine)
+                                        {{ $classStatus->routineCount }} {{ __('subjects scheduled') }}
+                                    @else
+                                        {{ __('No routine configured for this class') }}
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12"><div class="text-muted small">{{ __('No classes found for this examination.') }}</div></div>
+                    @endforelse
+                </div>
+            </div>
+        @endif
 
         {{-- ══ CLASS ROUTINE QUICK SWITCHER & STATUS (If Exam is Selected) ══ --}}
         @if($selectedExam && $classes->count() > 0)
