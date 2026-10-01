@@ -17,7 +17,7 @@ use App\Http\Controllers\{
     RoutineController, SchoolSupportController, SchoolRoleController, SchoolStaffController,
     ExamRoutineController, InboundMessageController,
     RepresentativeController,
-    RepresentativeDashboardController
+    RepresentativeDashboardController, ExamAttendanceController
 };
 use App\Http\Controllers\SuperAdmin\{
     FrontendSectionController, SuperAdminController, SettingController, RoleController, PermissionController,
@@ -592,6 +592,15 @@ Route::domain('{tenant}')
                     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendances.index');
                     Route::post('/attendance-save', [AttendanceController::class, 'store'])->name('attendances.store');
                 });
+
+                Route::middleware(['auth', 'permission:exam.manage', 'school_package:exam.manage'])->group(function () {
+                    Route::get('/exam-attendance', [ExamAttendanceController::class, 'index'])->name('exam.attendance.index');
+                    Route::get('/exam-attendance/scan', [ExamAttendanceController::class, 'scan'])->name('exam.attendance.scan');
+                     Route::post('/exam-attendance/record', [ExamAttendanceController::class, 'record'])->name('exam.attendance.record');
+                     Route::get('/exam-attendance/print', [ExamAttendanceController::class, 'printSheet'])->name('exam.attendance.print');
+                     Route::get('/exam-attendance/download', [ExamAttendanceController::class, 'downloadSheet'])->name('exam.attendance.download');
+                     Route::get('/exam-attendance/report', [ExamAttendanceController::class, 'attendanceReport'])->name('exam.attendance.report');
+                  });
 
                 Route::middleware(['auth', 'permission:fee.manage', 'school_package:fee.manage'])->group(function () {
                     Route::resource('fee-heads', FeeHeadController::class);

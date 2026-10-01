@@ -456,6 +456,11 @@
                                         </td>
                                         <td class="text-end pe-3">
                                             <div class="d-inline-flex gap-1">
+                                                <a href="{{ route('exam.attendance.index', ['tenant' => app()->bound('currentSchool') ? app('currentSchool')->slug : (auth()->user()?->school?->slug ?? request()->route('tenant')), 'exam_id' => $exam->id]) }}"
+                                                   class="btn-act btn-act-edit"
+                                                   title="Exam Attendance Sheet">
+                                                    <i class="fa-solid fa-clipboard-check"></i>
+                                                </a>
                                                 <button type="button"
                                                         class="btn-act btn-act-edit editBtn"
                                                         data-id="{{ $exam->id }}"

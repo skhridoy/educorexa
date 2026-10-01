@@ -249,17 +249,18 @@
             </li>
             @endif
 
-            {{-- 4. Attendance & Exams --}}
+            {{-- 4. Attendance --}}
             @php
-                $examPerms = ['attendance.manage', 'exam.manage', 'mark.manage', 'holiday.manage'];
+                $attendancePerms = ['attendance.manage', 'attendance.analytics', 'attendance.report', 'exam.manage', 'holiday.manage'];
+                $attendanceActive = Request::is('*/attendance*') || Request::is('*/exam-attendance*') || Request::is('*/holidays*');
             @endphp
-            @if($hasGroupAccess($examPerms))
+            @if($hasGroupAccess($attendancePerms))
             <li class="edu-nav-item">
-                <a class="edu-nav-link edu-has-submenu {{ Request::is('*/attendance*') || Request::is('*/exam*') || Request::is('*/mark*') || Request::is('*/holiday*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#examMenu">
-                    <i data-feather="edit-3"></i> <span>{{ __('Attendance & Exams') }}</span>
+                <a class="edu-nav-link edu-has-submenu {{ $attendanceActive ? 'active' : '' }}" data-bs-toggle="collapse" href="#attendanceMenu">
+                    <i data-feather="check-square"></i> <span>{{ __('Attendance') }}</span>
                     <i data-feather="chevron-down" class="edu-arrow"></i>
                 </a>
-                <div class="collapse {{ Request::is('*/attendance*') || Request::is('*/exam*') || Request::is('*/mark*') || Request::is('*/holiday*') ? 'show' : '' }}" id="examMenu">
+                <div class="collapse {{ $attendanceActive ? 'show' : '' }}" id="attendanceMenu">
                     <ul class="edu-sub-nav">
                         @if($hasFeature('attendance.manage'))
                             <li class="edu-sub-item"><a href="{{ route('attendances.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance') ? 'active' : '' }}">{{ __('Daily Attendance') }}</a></li>
@@ -275,19 +276,40 @@
                         @if($hasFeature('attendance.manage') || $hasFeature('attendance.report'))
                             <li class="edu-sub-item"><a href="{{ route('student.attendance.report', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/attendance/report*') ? 'active' : '' }}">{{ __('Attendance Report') }}</a></li>
                         @endif
+                        @if($hasFeature('exam.manage'))
+                            <li class="edu-sub-item"><a href="{{ route('exam.attendance.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-attendance*') ? 'active' : '' }}"><i class="fa-solid fa-clipboard-check me-1 text-success"></i> {{ __('Exam Attendance') }}</a></li>
+                        @endif
                         @if($hasFeature('holiday.manage'))
                             <li class="edu-sub-item"><a href="{{ route('holidays.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/holidays*') ? 'active' : '' }}">{{ __('Holidays Setup') }}</a></li>
                         @elseif($isPremiumLocked('holiday.manage'))
                             <li class="edu-sub-item"><a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link" title="Upgrade to access"><i class="fa-solid fa-lock me-1 text-warning" style="font-size:9px;"></i>{{ __('Holidays Setup') }}</a></li>
                         @endif
+                    </ul>
+                </div>
+            </li>
+            @endif
+
+            {{-- 5. Exams --}}
+            @php
+                $examPerms = ['exam.manage', 'mark.manage'];
+                $examActive = Request::is('*/exams*') || Request::is('*/exam-routine*') || Request::is('*/admit-card*') || Request::is('*/marks*') || Request::is('*/result-search*');
+            @endphp
+            @if($hasGroupAccess($examPerms))
+            <li class="edu-nav-item">
+                <a class="edu-nav-link edu-has-submenu {{ $examActive ? 'active' : '' }}" data-bs-toggle="collapse" href="#examsMenu">
+                    <i data-feather="edit-3"></i> <span>{{ __('Exams') }}</span>
+                    <i data-feather="chevron-down" class="edu-arrow"></i>
+                </a>
+                <div class="collapse {{ $examActive ? 'show' : '' }}" id="examsMenu">
+                    <ul class="edu-sub-nav">
                         @if($hasFeature('exam.manage'))
                             <li class="edu-sub-item"><a href="{{ route('exams.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exams*') && !Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Exams List') }}</a></li>
+                            <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">{{ __('Exams Routine') }}</a></li>
                             @if($hasFeature('exam.admit_card'))
                                 <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}">{{ __('Admit Cards') }}</a></li>
                             @elseif($isPremiumLocked('exam.admit_card'))
                                 <li class="edu-sub-item"><a href="{{ route('exams.admit-card', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/admit-card*') ? 'active' : '' }}" title="Premium Feature"><i class="fa-solid fa-crown me-1 text-warning" style="font-size:10px;"></i>{{ __('Admit Cards') }} <span class="badge bg-warning-subtle text-warning ms-1" style="font-size:8.5px; padding:2px 5px;">PRO</span></a></li>
                             @endif
-                            <li class="edu-sub-item"><a href="{{ route('exam.routine.index', ['tenant' => $tenant]) }}" class="edu-sub-link {{ Request::is('*/exam-routine*') ? 'active' : '' }}">{{ __('Exams Routine') }}</a></li>
                         @elseif($isPremiumLocked('exam.manage'))
                             <li class="edu-sub-item"><a href="{{ $pricingUrl }}" class="edu-sub-link edu-locked-link" title="Upgrade to access"><i class="fa-solid fa-lock me-1 text-warning" style="font-size:9px;"></i>{{ __('Exams List') }}</a></li>
                         @endif
@@ -303,7 +325,7 @@
             </li>
             @endif
 
-            {{-- 5. Finance (Fees) --}}
+            {{-- 6. Finance (Fees) --}}
             @php
                 $financePerms = ['fee.manage', 'fee.collect', 'fee.report'];
             @endphp
@@ -335,7 +357,7 @@
             </li>
             @endif
 
-            {{-- 6. Communication --}}
+            {{-- 7. Communication --}}
             @php
                 $commPerms = ['notice.manage', 'slider.manage', 'message.manage', 'newsletter.manage'];
             @endphp

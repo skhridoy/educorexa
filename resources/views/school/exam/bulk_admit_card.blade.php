@@ -25,15 +25,18 @@
         /* ── Card Container: 2 per A4 page ── */
         .card-table-wrap {
             width: 100%;
-            height:133mm;
+            height:135mm;
             min-height:110mm;
+            position: relative;
             border: 1.2px solid #0f172a;
             border-radius: 4px;
             padding: 4px 7px 4px 7px;
             background: #ffffff;
-            margin-bottom: 2mm;
+            margin-bottom: 5mm;
+            margin-top: 5mm;
         }
-        .card-content { position: relative; }
+        /* Keep the footer positioned against the full card, not the content flow. */
+        .card-content { position: static; }
 
         /* ── Header ── */
         .header-tbl {
@@ -76,7 +79,7 @@
         }
         .school-code-line {
             font-size: 10px;
-            color: #475569;
+            color: #131b27ff;
             margin: 1px 0;
             font-weight: 600;
             line-height: 1.1;
@@ -90,30 +93,23 @@
             line-height: 1.15;
         }
         .admit-badge-div{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 5px;
-            height: 40px; 
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 12px !important;
-            font-weight: bold;
-            letter-spacing: 0.8px;
-            line-height: 1.05;
-            text-align: center;
+            width: 100%;
+            margin-top: 4px;
+        }
+        .admit-badge-tbl {
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 0 auto;
         }
         .admit-badge {
-            display: inline-block;
-            background: #c6d3f7ff;  
+            background: #c6d3f7;
             color: #0f172a;
-            padding: 15px 10px !important;
+            padding: 4px 10px;
             font-size: 12px !important;
             font-weight: bold;
             border-radius: 10px;
             letter-spacing: 0.8px;
             line-height: 1.05;
-            margin-top: 10px !important;
             text-align: center;
         }
         .hdr-qr {
@@ -258,7 +254,11 @@
 
         /* ── Signatures ── */
         .footer-wrap {
-            margin-top: 5px;
+            position: absolute;
+            margin-top:3mm;
+            right: 0;
+            bottom: 0;
+            left: 0;
             padding-top: 0;
         }
         .footer-tbl {
@@ -443,7 +443,7 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                         @endif
 
                                         <div class="exam-name-line">{!! $wrapBn($exam?->name ?? 'EXAM') !!} &mdash; {{ date('Y') }}</div>
-                                        <div class="admit-badge-div"><span class="admit-badge">ADMIT CARD (<span lang="bn" class="bn">প্রবেশপত্র</span>)</span></div>
+                                        <div class="admit-badge-div"><table class="admit-badge-tbl" cellpadding="0" cellspacing="0"><tr><td class="admit-badge">ADMIT CARD (<span lang="bn" class="bn">প্রবেশপত্র</span>)</td></tr></table></div>
                                     </td>
 
                                     {{-- Right: QR Code --}}
@@ -452,8 +452,7 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                             @php
                                                 $qrSvg = null;
                                                 try {
-                                                    $groupStr = $student->group->name ?? '';
-                                                    $qrData = "ID: {$student->student_id}\nName: {$student->name}\nRoll: {$student->roll}\nClass: " . ($student->class->name ?? '') . ($groupStr ? "\nGroup: {$groupStr}" : '') . "\nExam: " . ($exam->name ?? '');
+                                                    $qrData = "ID: {$student->student_id} | Name: {$student->name} | Roll: {$student->roll}";
                                                     $qrSvg = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(60)->generate($qrData));
                                                 } catch (\Throwable $e) {
                                                     $qrSvg = null;
@@ -507,8 +506,8 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                                 <thead>
                                                     <tr>
                                                         <th style="width: 22%;">Date</th>
-                                                        <th style="width: 60%;">Subject</th>
-                                                        <th style="width: 27%;">Time</th>
+                                                        <th style="width: 62%;">Code & Subject</th>
+                                                        <th style="width: 25%;">Time</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -518,7 +517,7 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                                                 {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
                                                             </td>
                                                             <td style="font-weight: 500; font-size: 10px;">
-                                                                {{ $rtn->subject->name ?? 'N/A' }}
+                                                                {{ $rtn->subject->code ? '['.$rtn->subject->code.']' : '' }} {{'-'}} {{ $rtn->subject->name ?? 'N/A' }}
                                                             </td>
                                                             <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 400;">
                                                                 {{ $rtn->start_time ? \Carbon\Carbon::parse($rtn->start_time)->format('h:i A') : '-' }}
@@ -538,8 +537,8 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                                 <thead>
                                                     <tr>
                                                         <th style="width: 22%;">Date</th>
-                                                        <th style="width: 60%;">Subject</th>
-                                                        <th style="width: 27%;">Time</th>
+                                                        <th style="width: 62%;">Code &Subject</th>
+                                                        <th style="width: 25%;">Time</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -549,7 +548,7 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                                                 {{ \Carbon\Carbon::parse($rtn->exam_date)->format('d-m-Y') }}
                                                             </td>
                                                             <td style="font-weight: 500; font-size: 10px;">
-                                                                {{ $rtn->subject->name ?? 'N/A' }}
+                                                                {{ $rtn->subject->code ? '['.$rtn->subject->code.']' : '' }}{{' - '}}{{ $rtn->subject->name ?? 'N/A' }}
                                                             </td>
                                                             <td style="text-align: center; white-space: nowrap; font-size: 10px; font-weight: 400;">
                                                                 {{ $rtn->start_time ? \Carbon\Carbon::parse($rtn->start_time)->format('h:i A') : '-' }}
@@ -598,12 +597,12 @@ $wrapBn = function (string $text, bool $upper = false): string {
                                 <table class="footer-tbl" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="width: 38%; text-align: center; vertical-align: bottom;">
-                                            <div style="height: 22px;"></div>
+                                            <div style="height: 12px;"></div>
                                             <div class="sig-box"><span>Signature Of Class Teacher</span></div>    
                                         </td>
                                         <td style="width: 24%;"></td>
                                         <td style="width: 38%; text-align: center; vertical-align: bottom;">
-                                            <div style="height: 22px; text-align: center;">
+                                            <div style="height: 12px; text-align: center;">
                                                 @if(!empty($school->signature) && file_exists(public_path($school->signature)))
                                                     <img src="{{ public_path($school->signature) }}" style="max-height: 22px; max-width: 90px; display: inline-block;">
                                                 @endif

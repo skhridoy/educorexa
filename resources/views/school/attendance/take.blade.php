@@ -262,7 +262,10 @@
                         <h1 class="page-title"><i class="fa-solid fa-clipboard-user me-2"></i> {{ __('Take Attendance') }}</h1>
                         <p class="page-subtitle">{{ __('Record daily student attendance for your assigned classes.') }}</p>
                     </div>
-                    <div class="text-md-end">
+                    <div class="text-md-end d-flex align-items-center gap-2">
+                        @if(Route::has('exam.attendance.index'))
+                            <a href="{{ route('exam.attendance.index', ['tenant' => request()->route('tenant') ?? auth()->user()->school?->slug]) }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-clipboard-check me-1"></i>{{ __('Exam Attendance') }}</a>
+                        @endif
                         <div class="badge bg-primary-gradient px-4 py-2 rounded-pill shadow-sm fs-6">
                             <i class="fa-solid fa-calendar-day me-2"></i> {{ date('d M Y') }}
                         </div>

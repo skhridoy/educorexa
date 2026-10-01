@@ -11,6 +11,10 @@ use App\Models\Subject;
 
 class ExamRoutine extends Model
 {
+    protected $casts = [
+        'exam_date' => 'date',
+    ];
+
     protected $fillable = [
         'school_id',
         'academic_year_id',
