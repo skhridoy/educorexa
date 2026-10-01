@@ -244,14 +244,59 @@ class ExamAttendanceController extends Controller
             ->where('class_id', $class->id)
             ->get()
             ->groupBy('student_id');
+        $studentRoutines = $students->mapWithKeys(function ($student) use ($routines) {
+            return [$student->id => $routines
+                ->filter(fn ($routine) => $this->routineAppliesToStudent($routine, $student->religion))
+                ->values()];
+        });
 
         return [
             'schoolInfo' => $school,
             'exam' => $exam,
             'class' => $class,
             'routines' => $routines,
+            'studentRoutines' => $studentRoutines,
             'students' => $students,
             'records' => $records,
         ];
+    }
+
+    private function routineAppliesToStudent(ExamRoutine $routine, ?string $religion): bool
+    {
+        $subjectText = strtolower(trim(implode(' ', array_filter([
+            $routine->subject?->name,
+            $routine->subject?->code,
+        ]))));
+
+        $religionKeywords = [
+            'islam' => ['islam', 'muslim', 'ইসলাম', 'মুসলিম'],
+            'hindu' => ['hindu', 'hinduism', 'হিন্দু'],
+            'buddhist' => ['buddh', 'বৌদ্ধ'],
+            'christian' => ['christian', 'christianity', 'খ্রিস্ট', 'খ্রিষ্ট'],
+        ];
+
+        $subjectReligion = null;
+        foreach ($religionKeywords as $key => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (str_contains($subjectText, strtolower($keyword))) {
+                    $subjectReligion = $key;
+                    break 2;
+                }
+            }
+        }
+
+        // Subjects without a religion keyword are common subjects for everyone.
+        if ($subjectReligion === null) {
+            return true;
+        }
+
+        $studentReligion = strtolower(trim((string) $religion));
+        foreach ($religionKeywords[$subjectReligion] as $keyword) {
+            if (str_contains($studentReligion, strtolower($keyword))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

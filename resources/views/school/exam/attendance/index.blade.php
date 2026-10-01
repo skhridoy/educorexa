@@ -57,7 +57,7 @@
 @if($examId && $classId)
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-const examScanUrl = @json(route('exam.attendance.record', ['tenant' => $tenant]));
+const examScanUrl = @json(url('/exam-attendance/record'));
 const scanPayload = {exam_id: @json($examId), class_id: @json($classId), date: @json($date)};
 let examScanner, examBusy = false;
 async function submitExamScan(code) {

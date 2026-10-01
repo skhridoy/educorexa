@@ -521,8 +521,7 @@
 
         isProcessingScan = true;
         const attendanceDate = document.getElementById('attendance-date').value;
-        const tenant = "{{ auth()->user()->school->slug }}";
-        const recordUrl = "{{ route('attendance.qr.record', ['tenant' => ':tenant']) }}".replace(':tenant', tenant);
+        const recordUrl = @json(url('/attendance/qr-scan/record'));
 
         fetch(recordUrl, {
             method: 'POST',

@@ -59,6 +59,7 @@
     $schoolAddress = $wrapBn($schoolInfo->address ?? '');
 @endphp
 @foreach($students as $student)
+    @php($studentRoutinesForSheet = $studentRoutines[$student->id] ?? $routines)
     <div class="sheet">
         @if($schoolInfo->logo && file_exists(public_path($schoolInfo->logo)))
             <img class="watermark" src="{{ public_path($schoolInfo->logo) }}" alt="">
@@ -112,7 +113,7 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach($routines as $index => $routine)
+            @foreach($studentRoutinesForSheet as $index => $routine)
                 <tr>
                     <td class="sl">{{ $index + 1 }}</td>
                     <td style="text-transform: uppercase; text-align: center;">{{ optional($routine->exam_date)->format('d M Y') }}</td>
